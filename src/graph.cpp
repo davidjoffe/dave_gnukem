@@ -14,6 +14,7 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include <string.h>
 #include <stdlib.h>
 #include "SDL.h"
+#include "sys_log.h"//Log
 
 #include "graph.h"
 
@@ -41,6 +42,26 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 	// Initialize graphics library
 	SDL_Init(SDL_INIT_VIDEO);
 
+	// [dj2016-10] Get the user's monitor resolution, and find (basically) largest multiple of 320x200 that fits in
+	// that size, to make for 'largest possible' gameplay window, that also scales from 320x200 'proportionally' nicely
+	// (i.e. square aspect ratio of pixels, etc.)
+	// [low/future] - if 2 monitors, will this behave 'correct'
+	const SDL_VideoInfo* vidinfo = SDL_GetVideoInfo();
+	if (vidinfo)
+	{
+		// THIS MUST BE TESTED ON LINUX [dj2016-10]
+		int max_w = vidinfo->current_w;
+		int max_h = vidinfo->current_h;
+		if (max_w>iWidth && max_h>iHeight)
+		{
+			int nMultiple = djMAX(1, djMIN( vidinfo->current_w / iWidth, vidinfo->current_h / iHeight ) );
+			iWidth *= nMultiple;
+			iHeight *= nMultiple;
+		}
+
+		Log( "DaveStartup(): DisplayResolution(%d,%d).\n", max_w, max_h );
+	}
+
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
 	// Window dressing crap
@@ -50,6 +71,7 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 	SDL_ShowCursor(0);
 
 	//--- (1) - Front buffer
+	Log( "DaveStartup(): djgOpenVisual(w,h=%d,%d).\n", iWidth, iHeight );
 	if (NULL == (pVisMain = djgOpenVisual( bFullScreen?"fullscreen":NULL, iWidth, iHeight )))
 	{
 		printf( "GraphInit(): COULDNT OPEN GMAIN\n" );

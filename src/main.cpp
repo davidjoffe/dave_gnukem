@@ -143,22 +143,18 @@ int DaveStartup(bool bFullScreen, bool b640)
 	// NOTE: Use 640x480 if you want to use the built-in editor (F4/F5)
 	//
 	Log ("DaveStartup(): Initializing graphics system ...\n");
+	int w=320;
+	int h=200;
 	if (b640 == true)
 	{
-		if (!GraphInit( bFullScreen, 640, 480 ))
-		//if (!GraphInit( bFullScreen, 1920, 1080 ))
-		{
-			Log( "DaveStartup(): Graphics initialization failed.\n" );
-			return -1;
-		}
+		w = 640;
+		h = 480;
 	}
-	else
+	// [dj2016-10] Note this w/h is effectively now a 'hint' as it may not initialize to the exact requested size
+	if (!GraphInit( bFullScreen, w, h ))
 	{
-		if (!GraphInit( bFullScreen, 320, 200 ))
-		{
-			Log( "DaveStartup(): Graphics initialization failed.\n" );
-			return -1;
-		}
+		Log( "DaveStartup(): Graphics initialization failed.\n" );
+		return -1;
 	}
 
 	djSoundInit();				// Initialize sound
