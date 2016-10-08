@@ -41,7 +41,7 @@ char* M_GetFilePath ( const char* filename );
 char* M_GetFileRoot ( const char* filename );
 char* M_GetFileExtension ( const char* filename );
 char* M_GetFirstPathDir ( char *filename );
-char* M_GetFirstDir ( const char *filename );
+const char* M_GetFirstDir ( const char *filename );
 
 // this set modifies original contents: be careful not to loose information
 void M_GetFilePath ( char* filename );

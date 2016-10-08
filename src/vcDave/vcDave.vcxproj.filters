@@ -1,0 +1,370 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{da3557ce-e670-4725-a1ba-a96ae774ae57}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\djGameLib">
+      <UniqueIdentifier>{4ce35519-c7ae-4659-9491-b425706d4bbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\djGameLib\win32">
+      <UniqueIdentifier>{e8c261cd-ac2d-465e-b840-c48b2af43bbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\djGameLib\sdl">
+      <UniqueIdentifier>{adae82df-b591-415f-ba3a-6466a57ed584}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Editor">
+      <UniqueIdentifier>{48ffc176-34f4-4497-940c-2f00dc5f4566}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{5db4e41c-56e6-4a57-a6b4-1d923247ff86}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files\djGameLibHeaders">
+      <UniqueIdentifier>{bffc8781-1b20-4ff2-a3ca-bc691282c0a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\EditorHeaders">
+      <UniqueIdentifier>{070ad121-9cc8-406e-9284-66e5495a930d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Documentation">
+      <UniqueIdentifier>{aeed05e0-61c1-4705-93e5-4fe05db46197}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Documentation\Doxygen">
+      <UniqueIdentifier>{91dfcfed-1f99-495e-af42-46c975745725}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{1d99106d-6bae-4c10-8fa4-c936c13eff67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\games">
+      <UniqueIdentifier>{005c799f-21ee-4942-a8ff-a4e00406ae03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\games\tog">
+      <UniqueIdentifier>{31644e2b-5d37-468d-91b9-8b2d7651a9e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\sprites">
+      <UniqueIdentifier>{5c03e485-0e67-499a-ae2e-5327cace0cf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{a3916a9b-08d6-4240-bc29-817d8feaaa69}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\win32\winmain.cpp">
+      <Filter>Source Files\djGameLib\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl\djgraph.cpp">
+      <Filter>Source Files\djGameLib\sdl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl\djinput.cpp">
+      <Filter>Source Files\djGameLib\sdl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl\djsound.cpp">
+      <Filter>Source Files\djGameLib\sdl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl\djtime.cpp">
+      <Filter>Source Files\djGameLib\sdl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\djimage.cpp">
+      <Filter>Source Files\djGameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\djlog.cpp">
+      <Filter>Source Files\djGameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\djstring.cpp">
+      <Filter>Source Files\djGameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\djtypes.cpp">
+      <Filter>Source Files\djGameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ed.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ed_common.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ed_DrawBoxContents.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ed_lvled.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ed_macros.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ed_spred.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\block.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\bullet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\credits.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\graph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hero.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hiscores.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\instructions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\inventory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\keys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\level.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\m_misc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\mission.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\mixins.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\mmgr\mmgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sys_error.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sys_log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\djgamelib.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djgraph.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djimage.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djinput.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djlog.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djsound.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djstring.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djtime.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djtypes.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ed.h">
+      <Filter>Header Files\EditorHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ed_common.h">
+      <Filter>Header Files\EditorHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ed_DrawBoxContents.h">
+      <Filter>Header Files\EditorHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ed_lvled.h">
+      <Filter>Header Files\EditorHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ed_macros.h">
+      <Filter>Header Files\EditorHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ed_spred.h">
+      <Filter>Header Files\EditorHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\block.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\bullet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\credits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\datadir.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\graph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hero.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hiscores.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\instructions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inventory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\keys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\level.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\m_aliases.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\m_misc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mission.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mixins.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mmgr\mmgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\mmgr\nommgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sys_defs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sys_error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sys_log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\documentation\doxygen\doxygen.cfg">
+      <Filter>Documentation\Doxygen</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\documentation\doxygen\FooterFile.html">
+      <Filter>Documentation\Doxygen</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\documentation\doxygen\HeaderFile.html">
+      <Filter>Documentation\Doxygen</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\documentation\doxygen\mainpage.txt">
+      <Filter>Documentation\Doxygen</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\documentation\doxygen\styles.css">
+      <Filter>Documentation\Doxygen</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\tog\tog-bg-black.tga">
+      <Filter>Data\games\tog</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\tog\tog-lev_0.lev">
+      <Filter>Data\games\tog</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\tog\tog-lev_1.lev">
+      <Filter>Data\games\tog</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\tog\tog-lev_2.lev">
+      <Filter>Data\games\tog</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\tog\tog-lev_3.lev">
+      <Filter>Data\games\tog</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\tog\tog-spr_16.bmp">
+      <Filter>Data\games\tog</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\tog\tog-spr_16.dat">
+      <Filter>Data\games\tog</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\tog\tog-spr_16.psd">
+      <Filter>Data\games\tog</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\tog\tog-spr_16.tga">
+      <Filter>Data\games\tog</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\tog\tog.gam">
+      <Filter>Data\games\tog</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\tog\zz-empty.lev">
+      <Filter>Data\games\tog</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\default.gam">
+      <Filter>Data\games</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\foo.gam">
+      <Filter>Data\games</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\sprites\def0spr.dat">
+      <Filter>Data\sprites</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\sprites\def1spr.dat">
+      <Filter>Data\sprites</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\sprites\def2spr.dat">
+      <Filter>Data\sprites</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\sprites\def3spr.dat">
+      <Filter>Data\sprites</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\sprites\def4spr.dat">
+      <Filter>Data\sprites</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\sprites\def5spr.dat">
+      <Filter>Data\sprites</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\sprites\def6spr.dat">
+      <Filter>Data\sprites</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\sprites\def7spr.dat">
+      <Filter>Data\sprites</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\sprites\foo0spr.dat">
+      <Filter>Data\sprites</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\data\missions.txt">
+      <Filter>Data</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\HISTORY.txt" />
+    <CustomBuild Include="..\..\TODO.txt" />
+  </ItemGroup>
+</Project>

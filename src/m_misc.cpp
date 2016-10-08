@@ -227,7 +227,7 @@ Get filename without path or extension
 char* M_GetFileRoot ( const char* filename )
 {
 	static char	root[SYS_MAX_PATH];
-	char		*ptr;
+	const char		*ptr;
 
 	ptr = strrchr ( filename, '\\' );
 	if ( !ptr )
@@ -236,9 +236,9 @@ char* M_GetFileRoot ( const char* filename )
 		ptr = (char*) filename-1;
 
 	strcpy ( root, ptr+1 );
-	ptr = strchr ( root, '.' );
-	if ( ptr )
-		*ptr = 0;
+	char* ptr2 = strchr ( root, '.' );
+	if ( ptr2 )
+		*ptr2 = 0;
 
 	return root;
 }
@@ -254,7 +254,7 @@ Get filename extension (without the '.')
 char* M_GetFileExtension ( const char* filename )
 {
 	static char	ext[SYS_MAX_EXT];
-	char		*ptr = strrchr ( filename, '.' );
+	const char		*ptr = strrchr ( filename, '.' );
 
 	if ( ptr )
 	{
@@ -414,7 +414,7 @@ char* M_GetFilePathAlloc ( const char* filename )
 char* M_GetFileRootAlloc ( const char* filename )
 {
 	char	*root;
-	char	*ptr;
+	const char	*ptr;
 
 	root = new char [SYS_MAX_PATH];
 
@@ -425,9 +425,9 @@ char* M_GetFileRootAlloc ( const char* filename )
 		ptr = (char*) filename-1;
 
 	strcpy ( root, ptr+1 );
-	ptr = strchr ( root, '.' );
-	if ( ptr )
-		*ptr = 0;
+	char* ptr2 = strchr ( root, '.' );
+	if ( ptr2 )
+		*ptr2 = 0;
 
 	return root;
 }
@@ -437,7 +437,7 @@ char* M_GetFileRootAlloc ( const char* filename )
 char* M_GetFileExtensionAlloc ( const char* filename )
 {
 	char	*ext;
-	char	*ptr = strrchr ( filename, '.' );
+	const char	*ptr = strrchr ( filename, '.' );
 
 	ext = new char [SYS_MAX_EXT];
 
@@ -554,9 +554,9 @@ Same as above, but does not modify original filename and points to
 contents of the original
 =================
 */
-char* M_GetFirstDir ( const char *filename )
+const char* M_GetFirstDir ( const char *filename )
 {
-	char		*ptr;
+	const char		*ptr;
 
 	if ( '/' == *filename )
 		filename++;
