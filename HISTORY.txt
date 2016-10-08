@@ -1,0 +1,383 @@
+2008/08/06 - Version 0.56a
+ - Updated to compile on newer compilers. No feature changes.
+
+2004/08/24 - Version 0.56
+ - Added -640 switch; (do not need to recompile to use editor now).
+ - Level Ed no longer leaves traces on the screen after exiting.
+ - .gam files and macros.txt accept Unix and Windows line breaks.
+ - Polished levels slightly.
+ - Level editor completely works again.
+ - Added powerboots cheat code. (backspace+P)
+ - Updated the documentation.
+
+2004/08/08 - Version 0.55
+ - Some cleaning up, and merging of contributions by EMH and Vytautas Shaltenis
+ - Moved to Sourceforge.
+
+2002/09/25 - Version 0.54e
+ - Scrapped 'lives'
+ - Some more tileset additions/changes from Evil Mr Henry
+ - New cheat keys in game (god mode).
+
+2002/09/24 - Version 0.54d
+ - Added some more new sprites from Evil Mr Henry
+ - Fixed level-editor crash-when-view-at-bottom-of-map bug
+
+2002/09/21 - Version 0.54c
+ - Begin integrating integrated level editor from Vytautas Shaltenis (rtfb).
+ - Added some new sprites from Evil Mr Henry
+
+2002/09/15
+ - Fixed CR/LF text file reading problem in Linux
+ - Fixed a problem with the TGA loader
+
+2002/09/09 - Version 0.54b
+ - Added levels from "TOG of Spookware"
+
+2001/09/23 - Version 0.54
+ - Dynamite explosion sound
+
+2001/09/22
+ - Monster bullets
+
+2001/09/20
+ - Get it compiling on Linux again
+ - More load/save game stuff
+
+2001/09/19
+ - Integrate SDL_mixer sound support contributions from Kent Mein
+
+2001/09/03
+ - Made keys redefinable
+
+2001/09/02
+ - Misc changes and bugfixes
+ - Ability to enter high score username
+ - Added stationary spiked ball
+ - Added basic framework for redefining keys
+ - Added configuration file stuff
+ - Added some very rudimentary save/load game stuff
+ - "Dust" effect as hero lands
+
+2001/08/11
+ - Misc changes (some BeOS changes)
+ - Flame monster thing (similar to dumbbot)
+
+2001/07/25
+ - Cleaned up (genericized) teleport and level-exit code
+ - Exit now animates
+
+2001/07/24 - Version 0.53
+
+2001/07/22
+ - Ported to SDL (still wrapped though)
+ - Minor editor improvements
+
+2001/07/15 - Version 0.52
+
+2001/07/14
+ - Misc small changes/fixes/graphics improvements etc
+
+2001/07/13
+ - Small changes and fixes
+ - Shootable coke can
+ - Proper "firepower"
+
+2001/07/12
+ - Fans
+
+2001/07/11
+ - Rewrote (cleaned up) bullet code
+ - Misc bugfixes
+
+2001/07/10
+ - Falling block disappears when hits floor
+ - Bullet stops when hits solid stuff
+ - Got rid of djArray
+
+2001/07/09
+ - Dynamite (flames in gray boxes)
+
+2001/07/06
+ - Rewrote conveyor belt code
+ - Side flame throw blocks (flames look a bit like condoms though :/)
+ - Level background image
+
+2001/07/04
+ - Rewrote (cleaned up) monster (robot) code
+ - Rewrote (cleaned up) lift code
+ - Misc cleanups (e.g. palette stuff killed for good)
+
+2001/07/03 - Version 0.51c
+ - Reasonable cleanup: Replaced stupid "objects" array stuff
+   with CPickup class, also powerboots etc. Added "replace"
+   utility for level chars. Minor graphics improvements.
+
+2001/07/01
+ - Floating balloon
+ - Acme falling block
+ - Disk
+ - Slightly improved teleporter appearance
+
+2001/06/21 - Version 0.51b
+ - Spikes
+ - "Example" level
+
+2001/06/20
+ - Bonus when collecting G,N,U,K,E,M in order
+ - Bonus when shooting all cameras in a level
+ - New collectables (e.g. rugby ball, joystick, radio etc)
+ - Misc graphics improvements
+
+2001/06/17 - Version 0.51
+ - Release 0.51
+   Added a "thing factory" to make it a bit easier to add new thing types.
+   Completely rewrote door/key code. Can now pick up letters. Added shootable
+   solid blocks. Can now shoot security cameras. Added green crawly things.
+   Added purple flags (also in boxes). Added shootable banana. Added high
+   score list (almost)
+
+2001/06/16
+ - Got rid of djGameLib :) Cleaned up quite a bit. Added a bouncing spiky ball.
+
+2001/06/14
+ - Some more misc cleanups. Put new version on web page.
+
+2001/06/03
+ - Misc cleanups, misc graphics improvements, added doxygen support
+
+2000/01/03 - Version 0.5
+ - Release 0.5
+
+1999/12/30
+ - Nice crates :)
+ - "Macros" for the level editor
+
+1999/12/29
+ - More cleaning up (surprise)
+ - Toggle background blocks view on level editor
+ - Some graphics improvements
+ - 16-bit color mode support
+
+1999/12/28
+ - Added some more sound effects
+ - Moved the input stuff into the DJG library
+ - A whole lot more cleaning up
+
+1999/12/27
+ - Ported level editor to also work on Windows
+ - Added "lives"
+ - Added basic sound support to Windows version
+
+1999/12/26
+ - Win32 version :)
+ - Added an instructions screen
+ - More code refactoring and cleaning up
+
+1999/12/25
+ - More refactoring and cleaning up. Graph.h/cpp now platform-independent
+
+1999/12/24
+ - Extensive refactoring to clean up and make crossplatform
+ - Started adding support for 32-bit images, fonts, sprites etc
+ - Sprites can now be in TGA format
+
+1999/06/07
+ - More structural changes to make cross-platform
+
+1999/05/29
+ - Start to port game to "djg", cross-platform library
+
+1999/03/31
+ - Boxes now fall
+
+1999/03/23 - Version 0.44c
+ - Added another level from Steve Merrifield
+ - Added boxes
+ - Started adding infrastructure for bonus letters
+
+1999/03/22 - Version 0.44b
+ - Added level from Steve Merrifield
+
+1999/03/08 - Version 0.44
+ - Fixed editor bug of not displaying sprite type properly
+ - Added ability to select levelset in editor
+
+1999/03/07
+ - Updated Felix Richters english documentation and replaced README
+   with it.
+
+1999/02/28 - Version 0.43
+ - Ability to select levelset (mission) from menu.
+ - New levelset infrastructure virtually in now.
+
+1999/02/27
+ - Yet more sprite code. *sigh* .. Almost done. RLE is dead.
+   Long live bitmask. For now, anyway.
+
+1999/02/26
+ - Aaargh! Still more spriteset code.
+
+1999/02/25
+ - More spriteset code.
+
+1999/02/24
+ - More spriteset code.
+
+1999/02/21
+ - More level set stuff. Re-writing sprite code.
+
+1999/02/18
+ - Some more work on level set stuff.
+
+1999/02/17
+ - Started adding "level set" infrastructure. Source is bloating :/
+
+1999/02/16
+ - Fixed 24-bit mode with the editor
+
+1999/02/14
+ - Improved tracing/message system (log.h/log.cpp)
+ - Slight speed optimizing: RLE algorithm for sprite transparency
+
+1999/02/07
+ - Added support for 16-bit color modes; fixed 24-bit support
+
+1999/01/31
+ - Added "double-size" window mode
+ - Added powerboots :)
+ - Added friendlier "flags edit" feature to sprite editor
+
+1999/01/30
+ - Created "template" example level
+ - Not mine, but the key-release bug in ggi has been fixed! Woohoo!!
+
+1999/01/29
+ - Added corny doom-ripoff skull to main menu
+ - Rewrote lift code, with far more flexible, generic infrastructure
+ - Fixed up exits, they now draw properly (2x2 blocks, instead of 1x1)
+ - Added rudimentary conveyor belt
+
+1999/01/28 - Version 0.42
+ - Added rudimentary Duke1-style lifts
+
+1999/01/25
+ - Smarter fullscreen script.
+ - Added credits screen.
+
+1999/01/23
+ - Bugfixes, mostly with level bounds checking
+
+1999/01/22
+ - Rewrote menu code; multiple menu support now in
+
+1999/01/19 - Version 0.4
+ - Minor bugfixes
+ - Moved sprites around to more or less permanent locations
+ - Added "./fullscreen" script to make fullscreen even easier :)
+ - Added bananas :)
+ - Some font8x8 and menu improvements/structural changes.
+ - Created main title screen background image
+
+1999/01/17
+ - Added cute floating scores when you pick up stuff.
+ - Created general-purpose animated explosion. For now, used when you kill a
+   dumb bot.
+ - Added rudimentary teleporters.
+ - Added "-f" command-line option hack to do fullscreen. Needs root.
+
+1999/01/16
+ - Sprite editor: added rotate, flip and line copy/paste
+ - Both left and right alt and ctrl now work
+
+1999/01/15 - Version 0.38
+ - New architecture for storing foreground objects that fall etc; fixes
+   problem of n cokes becoming 1 coke as they fall onto each other.
+ - Revamped font8x8 system.
+ - Widened main game viewport width from 11 to 12 blocks
+
+1999/01/13
+ - Various bugfixes, mostly with bullets.
+ - Added "fullscreen.txt", describing how to run the game in "full-screen
+   mode" under X.
+ - Added horizontal fill to level editor.
+
+1999/01/10
+ - Converted palette file format to GIMP-style palette file.
+ - Created util directory for various "utility" programs, such as a new
+   conversion program that will convert Duke Nukem 1 level files, sort
+   of. (Scummy eh?)
+ - Converted main game screen image to using a pcx file, as a "skin".
+ - Various bugfixes.
+
+1999/01/09
+ - Improved levels memory usage a bit, tidied up code a little.
+
+1999/01/07 - Version 0.35
+ - You can now shoot monsters. Woohoo! :) Fixed 256-color modes screen
+   drawing bug. Other minor bugfixes.
+
+1999/01/06
+ - Improved monster system. Touching monsters can now hurt you (can't shoot
+   back yet ;) Added basic game timing. Fixed up bullet code a bit. Added
+   ASYNC mode to frontbuffer, which makes game feel much nicer in X.
+   Added some more documentation (eg editor how-to). Minor bugfixes.
+
+1999/01/05 - Version 0.3
+ - Added Duke "security cameras" that follow you; currently the sprites are
+   just big yellow arrows that follow you though. Added rudimentary monster
+   support, with just one monster, a "dumb bot".
+
+1999/01/04
+ - Got more level editor stuff working. Added support for exits and multiple
+   levels (game and editor), and a "you have finished the game" message when
+   you get through all levels :)
+
+1999/01/03 - Version 0.25
+ - Converted game.cpp to use new sprite data structure. Phew.
+   Added block type and extras editting to sprite editor.
+   Fixed some bugs. Got basic level editor working. (game.cpp is looking
+   like a train wreck.)
+
+1999/01/02 - Version 0.2
+ - Sprite editor coming along nicely. Added triple-buffering scheme for
+   non-flickery, clipped main-game-viewport output. Re-added crappy bullets.
+
+1998/12/31
+ - Started adding basics for new level and graphics editor. Am busy
+   rewriting the sprite and level interface.
+
+1998/12/31 - Version 0.1
+ - After transparency fiasco I have begun conversion to DirectBuffer's.
+   Transparency functionality is in now. I have decided to release v 0.1,
+   even though it is still very alpha.
+
+1998/12/30
+ - Annoying problems regarding non-existence of transparency blits in GGI.
+   Will try proceed by writing my own.
+
+1998/12/26
+ - Got some more graphics stuff working, 8x8 and 16x16 bitmaps. No
+   transparency yet, and several quirks, but its starting to look good.
+
+1998/12/25
+ - Struggled a lot trying to get the old-style keyboard handler (interrupt
+   based) to behave with libgii, which seems to be VERY poorly documented.
+   I hope I don't struggle as much converting the timer interrupt stuff.
+ - The main menu works, sort of, and I'm ready to start digging into the
+   actual game part.
+
+1998/12/24
+ - Gotten the code to compile in about an hour. Mostly just created a bunch
+   of stubs. Lots of platform-dependent stuff there. Some badly designed
+   stuff, but some quite well designed stuff also. (I wrote the original in
+   my first year at university, as learning project for c/c++ :) No real C++
+   there though, except the 'new' operator.
+
+1998/12/23
+ - Decide to have a go at porting djg to ggi. I reckon most the code will
+   probably have to be rewritten.
+
+1995
+ - Original DOS/EGA djg started then placed on hold. Some origins from
+   a previous pascal/assembler version.
