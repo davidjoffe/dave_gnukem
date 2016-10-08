@@ -124,13 +124,58 @@ void djgFlush( djVisual * /*pVis*/)
 
 void djgFlip( djVisual * pVisDest, djVisual * pVisSrc )
 {
-	if (pVisSrc==NULL)
+	if (pVisSrc==NULL)//<- Level editor etc.
+	{
 		SDL_Flip(pVisDest->pSurface);
+	}
 	else
 	{
+		// [dj2016-10-08] If have large modern monitor then 320x200 window is really tiny and unpleasant to play - added
+		// this quick-n-dirty scaling blit to let the main window be any 'arbitrary' larger resolution to allow the
+		// gameplay window to at least be larger - my idea/thinking is just to e.g. try create the main window sort of
+		// (basically) the largest 'multiple' of 320x200 (ideally incorporating window dressing) that fits in your
+		// screen ... this is not entirely perfect but is a quick and easy way to get the game relatively playable
+		// as compared to the tiny gameplay window we have now (and also, NB, makes level editing much more
+		// user-friendly).
 		CdjRect rcSrc(0, 0, 320, 200);
-		CdjRect rcDest(0, 0, 320, 200);
-		SDL_BlitSurface(pVisSrc->pSurface, &rcSrc, pVisDest->pSurface, &rcDest);
+		CdjRect rcDest(0, 0, pVisDest->width, pVisDest->height);
+		unsigned int uScaleX = (pVisDest->width / 320); // Note we deliberately do *integer* division as we *want* to round down etc.
+		unsigned int uScaleY = (pVisDest->height / 200); // Note we deliberately do *integer* division as we *want* to round down etc.
+		unsigned int uScaleMax = djMAX(1,djMIN(uScaleX,uScaleY));//Select smallest of vertical/horizontal scaling factor in order to fit everything in the window
+		SDL_Rect rc;
+		rc.w = uScaleMax;
+		rc.h = uScaleMax;
+		if ((rcSrc.w!=rcDest.w || rcSrc.h!=rcDest.h)
+			&& pVisSrc->pSurface->format->BytesPerPixel == 4//Current scaling blit implementation only supports 4BPP [dj2016-10] [TODO: Handle other format, OR if upgrading to libsdl2, just use libsdl's scale blit function]
+			)
+		{
+			//Quick-n-dirty scaling blit [dj2016-10] NB note that if/when we migrate to LibSDL2 we can just use the API functions for this instead
+			djgLock(pVisSrc);
+			djgLock(pVisDest);
+			unsigned int uBPP = pVisSrc->pSurface->format->BytesPerPixel;
+			unsigned int *pSurfaceMem = (unsigned int*)pVisSrc->pSurface->pixels;
+			unsigned int uMemOffsetRow = 0;
+			for ( unsigned int y=0; y<200; ++y )
+			{
+				uMemOffsetRow = (y * (pVisSrc->pSurface->pitch/uBPP));
+				pSurfaceMem = ((unsigned int*)pVisSrc->pSurface->pixels) + uMemOffsetRow;
+				// Note we must be careful here, pVisSrc->pSurface->pitch is in *bytes*, pSurfaceMem is a pointer to unsigned int* so pointer 'math' in multiples of 4
+				for ( unsigned int x=0; x<320; ++x )
+				{
+					rc.x = x*uScaleMax;
+					rc.y = y*uScaleMax;
+					SDL_FillRect(pVisDest->pSurface, &rc, *pSurfaceMem);
+					++pSurfaceMem;
+				}
+			}
+			djgUnlock(pVisDest);
+			djgUnlock(pVisSrc);
+		}
+		else
+		{
+			//Non-scaling blit [faster, but can only do if src same size as dest]
+			SDL_BlitSurface(pVisSrc->pSurface, &rcSrc, pVisDest->pSurface, &rcDest);
+		}
 		SDL_Flip(pVisDest->pSurface);
 	}
 }
