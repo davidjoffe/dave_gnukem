@@ -22,8 +22,8 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include <string.h>
 
 
-int	rMask, gMask, bMask, aMask;
-int	rShift, gShift, bShift, aShift;
+int	rMask=0, gMask=0, bMask=0, aMask=0;
+int	rShift=0, gShift=0, bShift=0, aShift=0;
 
 
 

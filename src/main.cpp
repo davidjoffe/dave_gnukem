@@ -148,7 +148,7 @@ int DaveStartup(bool bFullScreen, bool b640)
 	if (b640 == true)
 	{
 		w = 640;
-		h = 480;
+		h = 400;
 	}
 	// [dj2016-10] Note this w/h is effectively now a 'hint' as it may not initialize to the exact requested size
 	if (!GraphInit( bFullScreen, w, h ))

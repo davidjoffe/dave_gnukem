@@ -29,10 +29,10 @@ void _SetFileAndLine ( const char *filename, const int linenum )
 
 void _SYS_Error ( const char *fmt, ... )
 {
-	char		text[1024];
-	char		text2[1024];
-	char		*ptr, *ptr2;
-	va_list		args = NULL;
+	char		text[1024]={0};
+	char		text2[1024]={0};
+	char		*ptr=NULL, *ptr2=NULL;
+	va_list		args;
 
 	if ( NULL == fmt )
 		return;
@@ -59,10 +59,10 @@ void _SYS_Error ( const char *fmt, ... )
 
 void _SYS_Warning ( const char *fmt, ... )
 {
-	char		text[1024];
-	char		text2[1024];
-	char		*ptr, *ptr2;
-	va_list		args = NULL;
+	char		text[1024]={0};
+	char		text2[1024]={0};
+	char		*ptr=NULL, *ptr2=NULL;
+	va_list		args;
 
 	if ( NULL == fmt )
 		return;
@@ -87,10 +87,10 @@ void _SYS_Warning ( const char *fmt, ... )
 
 void _SYS_Debug ( const char *fmt, ... )
 {
-	char		text[1024];
-	char		text2[1024];
-	char		*ptr, *ptr2;
-	va_list		args = NULL;
+	char		text[1024]={0};
+	char		text2[1024]={0};
+	char		*ptr=NULL, *ptr2=NULL;
+	va_list		args;
 
 	if ( NULL == fmt )
 		return;

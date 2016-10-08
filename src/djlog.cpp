@@ -12,16 +12,20 @@ License: GNU GPL Version 2 (*not* "later versions")
 
 #include "djlog.h"
 #include <stdio.h>
+#include <stdarg.h>//va_list etc.
 
 void log_message( const char * szFormat, ... )
 {
-   static char buf[1024];
+	static char buf[4096]={0};
 
-   if ( szFormat == NULL )
-      return;
+	if ( szFormat == NULL )
+		return;
 
-   // print the formatted log string onto buf
-   vsprintf( buf, szFormat, (char*)(&szFormat + 1) );
+	// print the formatted log string onto buf
+	va_list args;
+	va_start(args, szFormat);
+	vsnprintf(buf, 4096, szFormat, args);
+	va_end(args);
 
 #ifdef WIN32
    // send message to debugger

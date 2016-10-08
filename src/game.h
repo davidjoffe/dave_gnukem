@@ -16,6 +16,7 @@ License: GNU GPL Version 2 (*not* "later versions")
 
 class CBullet;
 
+#include <cstddef>//NULL
 #include <vector>
 using namespace std;
 
