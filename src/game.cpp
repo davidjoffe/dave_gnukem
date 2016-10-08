@@ -384,7 +384,7 @@ int game_startup()
 	GraphFlip();
 
 	// try maintain a specific frame rate
-	float fTimeFrame = (1.0f / FRAME_RATE);
+	const float fTIMEFRAME = (1.0f / FRAME_RATE);
 
 	float fTimeFirst = djTimeGetTime();
 
@@ -522,6 +522,7 @@ int game_startup()
 			}
 #endif
 
+//this shouldn't be in 'default' game or something .. ?
 			// Debug: hurt self
 			static bool b = false;
 			bool bOld = b;
@@ -537,8 +538,8 @@ int game_startup()
 			bForceUpdate = false;
 		}
 		// FIXME: time next should be calculated more absolutely, not relatively.
-//		fTimeNext = fTimeNow + fTimeFrame;
-		fTimeNext = fTimeNext + fTimeFrame;
+//		fTimeNext = fTimeNow + fTIMEFRAME;
+		fTimeNext = fTimeNext + fTIMEFRAME;
 
 		//-- ESC - Pop up the in-game menu
 		if (iEscape==1)
@@ -579,6 +580,7 @@ int game_startup()
 			afTimeTaken.erase(afTimeTaken.begin());
 
 
+//fixmeV1 this looks pretty fundamental to get right:
 		// FIXME: This behaviour is incorrect. A keyup inside a 2nd-time round
 		// frame keypoll is not getting registered before the 2nd frame updates
 		// and draws (huh?) (try move left/right only one block. It's difficult)
