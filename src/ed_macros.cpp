@@ -4,7 +4,7 @@
 #include "ed_common.h"
 #include "ed_lvled.h"
 #include "sys_error.h"
-
+#include "graph.h"//pVisMain
 #include <vector>
 using namespace std;
 #include <stdio.h>
@@ -130,26 +130,28 @@ void PlaceMacro(int x, int y, int iMacroIndex)
 
 void ShowMacros()
 {
+	// [dj2016-10] Changed this so that macros list is displayed relative to bottom of screen
+	unsigned int y = pVisMain->height - 8*10;
 	for ( int i=0; i<9; i++ )
 	{
 		int iMacro = g_iAssignedMacros[i];
 		char buf[1024];
 		sprintf( buf, "%d.", i+1 );
-		ED_DrawStringClear( MACROS_X, MACROS_Y, "Macros:" );
-		ED_DrawString( MACROS_X, MACROS_Y, "Macros:" );
+		ED_DrawStringClear( MACROS_X, y, "Macros:" );
+		ED_DrawString( MACROS_X, y, "Macros:" );
 
-		ED_DrawStringClear( MACROS_X, MACROS_Y+i*8+8, buf );
-		ED_DrawString( MACROS_X, MACROS_Y+i*8+8, buf );
+		ED_DrawStringClear( MACROS_X, y+i*8+8, buf );
+		ED_DrawString( MACROS_X, y+i*8+8, buf );
 		if (iMacro==-1)
 		{
-			ED_DrawStringClear( MACROS_X+16, MACROS_Y+i*8+8, "none" );
-			ED_DrawString( MACROS_X+16, MACROS_Y+i*8+8, "none" );
+			ED_DrawStringClear( MACROS_X+16, y+i*8+8, "none" );
+			ED_DrawString( MACROS_X+16, y+i*8+8, "none" );
 		}
 		else
 		{
 			SMacro *pMac = g_apMacros[iMacro];
-			ED_DrawStringClear( MACROS_X+16, MACROS_Y+i*8+8, pMac->szName );
-			ED_DrawString( MACROS_X+16, MACROS_Y+i*8+8, pMac->szName  );
+			ED_DrawStringClear( MACROS_X+16, y+i*8+8, pMac->szName );
+			ED_DrawString( MACROS_X+16, y+i*8+8, pMac->szName  );
 		}
 	}
 }

@@ -26,7 +26,6 @@ void PlaceMacro(int x, int y, int iMacroIndex);
 void ShowMacros();
 
 #define MACROS_X 270
-#define MACROS_Y 320
 
 
 #endif		// #ifndef __MACROS_H__
