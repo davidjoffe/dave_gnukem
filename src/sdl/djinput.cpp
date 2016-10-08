@@ -322,10 +322,10 @@ const char *GetKeyString(int nSDLKeyCode)
 	case SDLK_SCROLLOCK:	return "SCROLLOCK";
 	case SDLK_RSHIFT:		return "RSHIFT";
 	case SDLK_LSHIFT:		return "LSHIFT";
-	case SDLK_RCTRL:		return "RCTRL";
-	case SDLK_LCTRL:		return "LCTRL";
-	case SDLK_RALT:			return "RALT";
-	case SDLK_LALT:			return "LALT";
+	case SDLK_RCTRL:		return "CTRL";
+	case SDLK_LCTRL:		return "CTRL";
+	case SDLK_RALT:			return "ALT";
+	case SDLK_LALT:			return "ALT";
 	case SDLK_RMETA:		return "RMETA";
 	case SDLK_LMETA:		return "LMETA";
 	case SDLK_LSUPER:		return "LSUPER";
@@ -346,16 +346,25 @@ const char *GetKeyString(int nSDLKeyCode)
 
 /*--------------------------------------------------------------------------*/
 djVisual *g_pVisInput = NULL;
-int           g_iFlags;
-int           mouse_x;
-int           mouse_y;
-int           mouse_b;
+int           g_iFlags = 0;
+int           mouse_x = 0;
+int           mouse_y = 0;
+int           mouse_b = 0;
 /*--------------------------------------------------------------------------*/
 
 bool djiPollEvents(SDL_Event &Event)
 {
 	if (SDL_PollEvent(&Event))
 	{
+		// [dj2016-10] Prevent distinguishing between left and right control/alt, i.e. treat both left-ctrl and right-ctrl as just 'ctrl'
+		// and likewise for alt .. I think this makes for slightly more user-friendlier experience with default keys etc.
+		if (Event.type==SDL_KEYDOWN||Event.type==SDL_KEYUP)
+		{
+			if (Event.key.keysym.sym==SDLK_LCTRL)
+				Event.key.keysym.sym = SDLK_RCTRL;
+			else if (Event.key.keysym.sym==SDLK_LALT)
+				Event.key.keysym.sym = SDLK_RALT;
+		}
 		int i;
 		// Handle some basic events
 		switch (Event.type)
