@@ -77,6 +77,7 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 		printf( "GraphInit(): COULDNT OPEN GMAIN\n" );
 		return false;
 	}
+	Log( "DaveStartup(): Display bytes per pixel %d\n", pVisMain->bpp) ;
 	imode = pVisMain->bpp;
 
 	// Set the 32<->16 pixel conversion atributes, so the

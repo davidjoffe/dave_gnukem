@@ -24,6 +24,9 @@
 #include <time.h>
 #include "sys_defs.h"
 
+#ifdef WIN32
+//#include <windows.h>//OutputDebugString
+#endif
 
 #define DEFAULT_LOG_FILE	"game.log"
 
@@ -120,8 +123,8 @@ void DisposeLog ( dword log_id )
 
 void Log ( const char *fmt, ... )
 {
-	char		text[1024];
-	va_list		ap = NULL;
+	char		text[1024]={0};
+	va_list		ap;
 
 	if ( !initialised )
 		return;
@@ -137,6 +140,11 @@ void Log ( const char *fmt, ... )
 
 	fprintf ( log_files[0], "%s", text );
 	fflush ( log_files[0] );
+
+	#if defined(WIN32) && defined(_DEBUG)
+	//dj2016-10 Log to debugger in Windows
+	//::OutputDebugString( text );
+	#endif
 }
 
 
@@ -144,8 +152,8 @@ void Log ( const char *fmt, ... )
 
 void Log ( dword log_mask, const char *fmt, ... )
 {
-	char		text[1024];
-	va_list		ap = NULL;
+	char		text[1024]={0};
+	va_list		ap;
 	int		i;
 
 	if ( !initialised )
@@ -166,6 +174,11 @@ void Log ( dword log_mask, const char *fmt, ... )
 		{
 			fprintf ( log_files[i], "%s", text );
 			fflush ( log_files[i] );
+
+			#if defined(WIN32) && defined(_DEBUG)
+			//dj2016-10 Log to debugger in Windows
+			//::OutputDebugString( text );
+			#endif
 		}
 	}
 }
