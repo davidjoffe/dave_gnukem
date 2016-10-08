@@ -55,7 +55,7 @@ void InitMainMenu();
 void KillMainMenu();
 
 /*--------------------------------------------------------------------------*/
-// Main menu
+// Main menu [NB, warning, the handling code uses indexes :/ .. so if you add/remove items, must update there too - dj2016-10]
 struct SMenuItem mainMenuItems[] =
 {
 	{ false, "{~~~~~~~~~~~~~~~~~}" },
@@ -146,6 +146,7 @@ int DaveStartup(bool bFullScreen, bool b640)
 	if (b640 == true)
 	{
 		if (!GraphInit( bFullScreen, 640, 480 ))
+		//if (!GraphInit( bFullScreen, 1920, 1080 ))
 		{
 			Log( "DaveStartup(): Graphics initialization failed.\n" );
 			return -1;
@@ -567,7 +568,7 @@ void SelectMission()
 
 void InitMainMenu()
 {
-	mainMenu.setClrBack ( djColor(10,40,150) ); // Crap colour. Need something better, like a bitmap
+	mainMenu.setClrBack ( djColor(42,57,112) ); //mainMenu.setClrBack ( djColor(10,40,150) ); // Crap colour. Need something better, like a bitmap
 	//mainMenu.m_clrBack = djColor(129,60,129);
 	mainMenu.setSize ( 0 );
 	mainMenu.setItems ( mainMenuItems );
