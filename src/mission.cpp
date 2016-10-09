@@ -512,6 +512,7 @@ int CSpriteData::LoadSpriteImage()
 		sprintf( buf, "%s", m_szImgFilename );
 #endif
 		iRet = m_pImage->Load( buf );
+		djCreateImageHWSurface( m_pImage );
 	}
 
 	return iRet;

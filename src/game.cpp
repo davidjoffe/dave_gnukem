@@ -215,6 +215,7 @@ void GameInitialSetup()
 	{
 		pSkinGame = new djImage;
 		pSkinGame->Load( FILE_GAMESKIN );
+		djCreateImageHWSurface( pSkinGame );
 	}
 }
 
@@ -313,6 +314,7 @@ void PerLevelSetup()
 	{
 		djDEL(pBackground);
 	}
+	djCreateImageHWSurface( pBackground );
 
 	// Clear out inventory
 	InvClear();
