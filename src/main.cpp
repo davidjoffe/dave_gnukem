@@ -227,8 +227,10 @@ void DoMainMenu()
 		if (g_pImgMain)
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
 		char sz[100]={0};
-		sprintf(sz,"v0.6",pVisBack->width, pVisBack->height);
-		GraphDrawString(pVisBack, g_pFont8x8, 320 - 40, 200 - 8, (unsigned char*)sz);
+		sprintf(sz,"v0.6 (9 Oct 2016)",pVisBack->width, pVisBack->height);
+		GraphDrawString(pVisBack, g_pFont8x8, 320 - 17*8, 200 - 8*2, (unsigned char*)sz);
+		sprintf(sz,"http://djoffe.com/",pVisBack->width, pVisBack->height);
+		GraphDrawString(pVisBack, g_pFont8x8, 320 - 17*8, 200 - 8, (unsigned char*)sz);
 
 		GraphFlip();
 
