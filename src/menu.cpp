@@ -38,7 +38,7 @@ void menu_move( CMenu *pMenu, int& option, int diff, unsigned char cCursor )
 	// Redraw the menu cursor
 	djgDrawImageAlpha( pVisBack, g_pFont8x8, ((int)cCursor%32)*8, ((int)cCursor/32)*8, pMenu->getXOffset()+8, pMenu->getYOffset()+8*option, 8, 8 );
 
-	GraphFlip();
+	GraphFlip(true);
 }
 /*--------------------------------------------------------------------------*/
 

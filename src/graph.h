@@ -43,10 +43,10 @@ extern bool GraphInit( bool bFullScreen, int iWidth, int iHeight );
 extern void GraphDone();
 
 //! Flip the back buffer to the front buffer
-extern void GraphFlip();
+extern void GraphFlip(bool bScaleView);
 
 //! Flip the view buffer into the back buffer
-extern void GraphFlipView( int iViewWidth );
+extern void GraphFlipView( int iViewWidth, int iViewHeight );
 
 //! Draw a string of characters from a font bitmap
 extern void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const unsigned char *szStr );

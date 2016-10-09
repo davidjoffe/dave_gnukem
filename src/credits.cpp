@@ -52,7 +52,7 @@ void ShowCredits()
 
 	// Display credits bitmap
 	djgDrawImage( pVisBack, pImageCredits, 0, 0, pImageCredits->Width(), pImageCredits->Height() );
-	GraphFlip();
+	GraphFlip(true);
 
 	// Pop up credits menu
 	do_menu( &creditsMenu );

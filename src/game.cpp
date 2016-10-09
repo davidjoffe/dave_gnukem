@@ -41,6 +41,12 @@ using namespace std;
 #include "hiscores.h"
 #include "sys_log.h"
 
+int VIEW_WIDTH = 12;
+int VIEW_HEIGHT = 10;
+
+//[dj2016-10-10]
+bool g_bBigViewportMode=false;
+
 /*--------------------------------------------------------------------------*/
 //
 // Game cheats system (useful for development/testing)
@@ -364,7 +370,7 @@ int game_startup()
 
 	TRACE( "game_startup(): GameDrawSkin()\n" );
 	GameDrawSkin();
-	GraphFlip();
+	GraphFlip(!g_bBigViewportMode);
 
 	// Per level setup (fixme, should this get called from withing per-game setup?
 	PerLevelSetup();
@@ -383,7 +389,7 @@ int game_startup()
 
 	GameDrawFirepower();
 
-	GraphFlip();
+	GraphFlip(!g_bBigViewportMode);
 
 	// try maintain a specific frame rate
 	const float fTIMEFRAME = (1.0f / FRAME_RATE);
@@ -476,6 +482,49 @@ int game_startup()
 					ShowGameMessage("CHEAT: GOD MODE", 96);
 					g_bGodMode = true;
 				}
+				// BACKSPACE + B: Toggle 'big viewport mode' [dj2016-10-10]
+				// It seems to be difficult to toggle just once ... so we detect key up/down 'edge' and only toggle on that
+				static bool g_bBKeyLast=false;
+				bool bBKey = g_iKeys[DJKEY_B];
+				if (bBKey && !g_bBKeyLast)// Detect keydown 'edge'
+				{
+					g_bBigViewportMode = !g_bBigViewportMode;
+					if (g_bBigViewportMode)
+					{
+						VIEW_WIDTH = (pVisView->width / 16) - 10;
+						VIEW_HEIGHT = (pVisView->height - 5*16) / 16;
+						if (VIEW_HEIGHT>=100)VIEW_HEIGHT=100;
+						if (VIEW_WIDTH>=128)VIEW_WIDTH=128;
+					}
+					else
+					{
+						VIEW_WIDTH = 12;
+						VIEW_HEIGHT = 10;
+						/*SDL_Rect rect;
+						rect.x = 0;
+						rect.y = 0;
+						rect.w = pVisView->width;
+						rect.h = pVisView->height;
+						SDL_FillRect(pVisView->pSurface, &rect, SDL_MapRGB(pVisView->pSurface->format, 0, 0, 0));*/
+						// Refresh background again, as larger viewport will have obliterated right side with score etc.
+						if (pBackground)
+						{
+							djgDrawImage(pVisView, pBackground, 0, 0, 0, 0, pBackground->Width()*4, pBackground->Height()*4);
+						}
+						// NB, TODO, we actually need to also need to redraw score etc. here (though since this is just a dev/editing mode, not a real game mode, it doesn't have to be perfect)
+
+						// When going out of 'big viewport' mode, hero might now be off the (now-tiny) 'viewport' :/ .. so must also 're-center' viewport around hero
+						if (x>xo+VIEW_WIDTH/2) xo = x-VIEW_WIDTH/2;
+						if (y>yo+VIEW_HEIGHT/2) yo = y-VIEW_HEIGHT/2;
+
+						//dj2016-10-10 fixmeLOW this + the draw background right above seems to not be working, not sure why
+						// (i.e. when toggle OUT of big viewport mode, right side background behind score etc. should look correct)
+						// I don't have time right now to figure out why
+						GraphFlip(true);
+					}
+				}
+				g_bBKeyLast = bBKey;
+
 				// BACKSPACE + P: Powerboots
 				if (g_iKeys[DJKEY_P])
 				{
@@ -550,12 +599,12 @@ int game_startup()
 
 			// Redraw everything that needs to be redrawn
 			GameDrawSkin();
-			GraphFlipView( VIEW_WIDTH );
+			GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT );
 			update_health( 0 );
 			update_score( 0 );
 			GameDrawFirepower();
 			InvDraw();
-			GraphFlip();
+			GraphFlip(!g_bBigViewportMode);
 		}
 
 
@@ -611,10 +660,9 @@ int game_startup()
 /*-----------------------------------------------------------*/
 void GameHeartBeat()
 {
-	CThing * pThing;
-	int n, i, j;
-	int ifoo;
-	ifoo = key_action;
+	CThing * pThing = NULL;
+	int n=0, i=0, j=0;
+	//int ifoo = key_action;
 
 	// Update hero basic stuff
 	HeroUpdate();
@@ -745,12 +793,12 @@ void GameHeartBeat()
 
 	// Check for bullet collisions with things (e.g. shootable boxes, monsters etc).
 	// Also we check for monster bullet collisions against hero.
-	for ( i=0; i<(int)g_apBullets.size(); i++ )
+	for ( i=0; i<(int)g_apBullets.size(); ++i )
 	{
 		CBullet *pBullet = g_apBullets[i];
 		if (pBullet->eType==CBullet::BULLET_HERO)
 		{
-			for ( j=0; j<(int)g_apThings.size(); j++ )
+			for ( j=0; j<(int)g_apThings.size(); ++j )
 			{
 				CThing *pThing = g_apThings[j];
 				if (pThing->IsShootable())
@@ -869,7 +917,7 @@ NextBullet3:
 
 	// Interact with "things"
 	// Check if you're on anything funny, like an exit
-	for ( i=0; i<(int)g_apThings.size(); i++ )
+	for ( i=0; i<(int)g_apThings.size(); ++i )
 	{
 		CThing *pThing = g_apThings[i];
 		if (pThing->OverlapsBounds(x*16+x_small*8, y*16-16))
@@ -908,7 +956,7 @@ NextBullet3:
 
 
 	// Drop all objects that can fall
-	for ( i=0; i<(int)g_apThings.size(); i++ )
+	for ( i=0; i<(int)g_apThings.size(); ++i )
 	{
 		pThing = g_apThings[i];
 		// if (object falls) && (nothing below it) && (inview)
@@ -969,7 +1017,7 @@ NextBullet3:
 	}
 
 	// Flip the back buffer onto the front
-	GraphFlip();
+	GraphFlip(!g_bBigViewportMode);
 }
 
 void Die()
@@ -1057,7 +1105,7 @@ void SetScore(int nScore)
 {
 	g_nScore = nScore;
 
-	char score_buf[16];
+	char score_buf[32]={0};
 	sprintf( score_buf, "%10d", (int)g_nScore );
 	// Clear behind the score with part of the game skin
 	if (pSkinGame)
@@ -1089,47 +1137,72 @@ void DrawThingsAtLayer(EdjLayer eLayer)
 
 void GameDrawView()
 {
-	int i,j,a,b,xoff,yoff;
+	int i=0,j=0,a=0,b=0,xoff=0,yoff=0;
 	int anim_offset = 0;
-	unsigned char *tempptr;
+	unsigned char *tempptr=NULL;
 
-	// Clear view background
+	// Draw view background
 	if (pBackground)
 		djgDrawImage(pVisView, pBackground, 0, 0, 16, 16, VIEW_WIDTH*16, VIEW_HEIGHT*16);
-	else
-		djgClear(pVisView);
+
+	// Clear viewport background before starting to draw game view in there
+	// (If we don't, then the background doesn't clear where there are 'bg' (background) sprites)
+	// (We don't want to draw the actual sprite as it has a little 'BG' on it to help with level editing)
+	if (g_bBigViewportMode || pBackground==NULL)//<- The (only) reason we don't 'need' to do this if not in 'big viewport mode' is because of the pBackground image draw right above, effectively clears the viewport 'anyway' already for that section where there is background image
+	{
+		SDL_Rect rect;
+		rect.x = 16;
+		rect.y = 16;
+		rect.w = VIEW_WIDTH*16;
+		rect.h = VIEW_HEIGHT*16;
+		SDL_FillRect(pVisView->pSurface, &rect, SDL_MapRGB(pVisView->pSurface->format, 0, 0, 0));
+		//djgClear(pVisView);
+	}
 
 	//(10 seconds got to just after coke can, purple lab)
 	tempptr = (unsigned char *)(g_pLevel) + yo*512+(xo<<2);
 	yoff = 200+16;
 	//  c=2;
-	for ( i=0; i<10; i++ )
+	//const unsigned int uLevelPixelW = 128*16;
+	//const unsigned int uLevelPixelH = 100*16;
+
+
+	for ( i=0; i<VIEW_HEIGHT; ++i )
 	{
 		//  d=24;
 		xoff = -xo_small+2;
-		for ( j=0; j<VIEW_WIDTH+xo_small; j++ )
+		for ( j=0; j<VIEW_WIDTH+xo_small; ++j )
 		{
-			// BLOCK[2,3] -> background block
-			a = *(tempptr+2);
-			b = *(tempptr+3);
-			// Animated block?
-			anim_offset = (GET_EXTRA( a, b, 4 ) & FLAG_ANIMATED) ? anim4_count : 0;
+			// Bounds-checks to not 'buffer overflow' etc. by going past bottom (or right) of level [dj2016-10]
+			if (yo+i>=LEVEL_HEIGHT || xo+j>=LEVEL_WIDTH)
+			{
+				// do nothing .. leave black
+			}
+			else
+			{
+				// BLOCK[2,3] -> background block
+				a = *(tempptr+2);
+				b = *(tempptr+3);
+				// Animated block?
+				anim_offset = (GET_EXTRA( a, b, 4 ) & FLAG_ANIMATED) ? anim4_count : 0;
 
-			// draw background block
-			//djgDrawImage( pVisView, g_pCurMission->GetSpriteData(a)->m_pImage, ((b+anim_offset)%16)*16, ((b+anim_offset)/16)*16, xoff*8,16+i*16,16,16 );
-			if ((a | b) != 0)
-				DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff*8, 16+i*16);
+				// draw background block
+				//djgDrawImage( pVisView, g_pCurMission->GetSpriteData(a)->m_pImage, ((b+anim_offset)%16)*16, ((b+anim_offset)/16)*16, xoff*8,16+i*16,16,16 );
+				if ((a | b) != 0)//<- This if prevents background clearing of 'bg' background block .. etiher we need to clear entire viewport before start drawing map, or must draw a black square here 'manually' .. not sure which is more efficient ultimately
+				{
+					DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff*8, 16+i*16);
+				}
 
-			// BLOCK[0,1] -> foreground block
-			a = *(tempptr);
-			b = *(tempptr+1);
-			// Animated block?
-			anim_offset = (GET_EXTRA( a, b, 4 ) & FLAG_ANIMATED) ? anim4_count : 0;
+				// BLOCK[0,1] -> foreground block
+				a = *(tempptr);
+				b = *(tempptr+1);
+				// Animated block?
+				anim_offset = (GET_EXTRA( a, b, 4 ) & FLAG_ANIMATED) ? anim4_count : 0;
 
-			// draw foreground block, unless its (0,0)
-			if ((a | b) != 0)
-				DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff*8, 16+i*16);
-
+				// draw foreground block, unless its (0,0)
+				if ((a | b) != 0)
+					DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff*8, 16+i*16);
+			}
 			xoff+=2;
 			tempptr += 4;
 		}
@@ -1172,7 +1245,7 @@ void GameDrawView()
 	if (bShowDebugInfo) DrawDebugInfo();
 
 	// Flip the off-screen world viewport onto the backbuffer
-	GraphFlipView( VIEW_WIDTH );
+	GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT );
 }
 
 void parse_level(void)
@@ -1402,7 +1475,7 @@ void DrawDebugInfo()
 void DrawBullets()
 {
 	unsigned int i;
-	for ( i=0; i<g_apBullets.size(); i++ )
+	for ( i=0; i<g_apBullets.size(); ++i )
 	{
 		CBullet *pBullet = g_apBullets[i];
 		if (OVERLAPS_VIEW(pBullet->x, pBullet->y, pBullet->x+BULLET_WIDTH, pBullet->y+BULLET_HEIGHT))

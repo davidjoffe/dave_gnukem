@@ -73,7 +73,7 @@ void ShowHighScores()
 			GraphDrawString(pVisBack, g_pFont8x8, 24+11*8, 24+i*12, (unsigned char*)buf);
 		}
 
-		GraphFlip();
+		GraphFlip(true);
 
 		// Pop up high scores menu
 		do_menu( &HighScoresMenu);

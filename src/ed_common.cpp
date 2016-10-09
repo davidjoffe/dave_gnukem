@@ -266,7 +266,7 @@ void ED_ClearScreen()
 
 void ED_FlipBuffers ()
 {
-	djgFlip ( pVisMain, NULL );
+	djgFlip ( pVisMain, NULL, false );
 }
 
 
