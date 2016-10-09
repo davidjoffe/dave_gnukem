@@ -161,6 +161,7 @@ int DaveStartup(bool bFullScreen, bool b640)
 
 	g_pImgMain = new djImage;			// Load main skin (title screen)
 	g_pImgMain->Load("data/main.tga");
+	djCreateImageHWSurface( g_pImgMain );
 
 	InitMissionSystem();
 
@@ -221,17 +222,20 @@ void DoMainMenu()
 
 	do
 	{
-		int menu_option;
 
 		// Load main menu background image
 		if (g_pImgMain)
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
+		char sz[100]={0};
+		sprintf(sz,"v0.6",pVisBack->width, pVisBack->height);
+		GraphDrawString(pVisBack, g_pFont8x8, 320 - 40, 200 - 8, (unsigned char*)sz);
+
 		GraphFlip();
 
 		// Random select menu cursor, either hearts or skulls
 		mainMenu.setMenuCursor ( (rand()%4==0 ? mainMenuCursorSkull : mainMenuCursor) );
 
-		menu_option = do_menu( &mainMenu );
+		int menu_option = do_menu( &mainMenu );
 
 		switch (menu_option)
 		{

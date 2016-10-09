@@ -34,7 +34,10 @@ void ShowInstructions()
 	if (pImgInstructions==NULL)
 	{
 		if (NULL != (pImgInstructions = new djImage))
+		{
 			pImgInstructions->Load( FILE_IMG_INSTRUCTIONS );
+			djCreateImageHWSurface( pImgInstructions );
+		}
 	}
 	if (pImgInstructions)
 	{

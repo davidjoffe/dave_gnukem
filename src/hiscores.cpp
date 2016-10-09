@@ -58,6 +58,7 @@ void ShowHighScores()
 	{
 		g_pImgHighScores = new djImage;
 		g_pImgHighScores->Load(FILE_IMG_HIGHSCORES);
+		djCreateImageHWSurface( g_pImgHighScores );
 	}
 	if (g_pImgHighScores)
 	{

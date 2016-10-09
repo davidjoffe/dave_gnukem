@@ -154,5 +154,10 @@ public:
 };
 
 
+/*--------------------------------------------------------------------------*/
+//[dj2016-10] experimenting here with attempted HW surface cache, needs work [started as fixing wrong colors on Linux VNC]
+extern bool djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ );
+/*--------------------------------------------------------------------------*/
+
 #endif
 

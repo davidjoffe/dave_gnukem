@@ -100,7 +100,10 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 
 	//--- (5) - Load 8x8 font bitmap (FIXME error check)
 	if (NULL != (g_pFont8x8 = new djImage))
+	{
 		g_pFont8x8->Load( FILE_IMG_FONT );
+		djCreateImageHWSurface( g_pFont8x8 );
+	}
 
 	return true;
 }
@@ -133,7 +136,7 @@ void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const unsigne
 	if (x<0 || y<0) return;
 
 	// Draw each character in the string
-	for ( unsigned int i=0; i<strlen((char*)szStr); i++ )
+	for ( unsigned int i=0; i<strlen((char*)szStr); ++i )
 	{
 		int iIndex = (int)szStr[i];
 		djgDrawImageAlpha( pVis, pImg, 8*(iIndex%32), 8*(iIndex/32), x+i*8, y, 8, 8 );

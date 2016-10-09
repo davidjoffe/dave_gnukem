@@ -21,6 +21,9 @@ License: GNU GPL Version 2 (*not* "later versions")
 
 #include <string.h>
 
+// [dj2016-10] For 'texture' manager'
+#include <map>
+std::map< djImage*, SDL_Surface *> g_SurfaceMap;
 
 int	rMask=0, gMask=0, bMask=0, aMask=0;
 int	rShift=0, gShift=0, bShift=0, aShift=0;
@@ -29,26 +32,27 @@ int	rShift=0, gShift=0, bShift=0, aShift=0;
 
 unsigned int djgMapColor( djVisual * pVis, djColor color )
 {
-	unsigned int ret = 0;
-
-	switch ( pVis->bpp )
-	{
-	case 16:
-		// FIXME: assume 5-6-5 = wrong
-// DEBUG: changed by rtfb
-
-		ret = ((color.r/8)<<11) | ((color.g/4)<<5) | (color.b/8);
-/*/
-		ret = ((color.r/8)<<10) | ((color.g/4)<<5) | (color.b/8);
-/**/
-		break;
-	case 24:
-	case 32:
-		ret = 0xFF000000 | (color.r<<16) | (color.g<<8) | color.b;
-		break;
-	}
-
-	return ret;
+	return SDL_MapRGB(pVis->pSurface->format, color.r, color.g, color.b);
+//	unsigned int ret = 0;
+//
+//	switch ( pVis->bpp )
+//	{
+//	case 16:
+//		// FIXME: assume 5-6-5 = wrong
+//// DEBUG: changed by rtfb
+//
+//		ret = ((color.r/8)<<11) | ((color.g/4)<<5) | (color.b/8);
+///*/
+//		ret = ((color.r/8)<<10) | ((color.g/4)<<5) | (color.b/8);
+///**/
+//		break;
+//	case 24:
+//	case 32:
+//		ret = 0xFF000000 | (color.r<<16) | (color.g<<8) | color.b;
+//		break;
+//	}
+//
+//	return ret;
 }
 
 djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackbuffer )
@@ -69,6 +73,8 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 	{
 		SDL_Surface *pSurface = SDL_CreateRGBSurface(SDL_HWSURFACE, w, h,
 			bpp,
+			//fixme [dj2016-10] this doesn't quite seem right to me ? must come back to this and have a closer look at all this again later ..
+			// in theory this works but might be less efficient
 			0xFF000000,
 			0x00FF0000,
 			0x0000FF00,
@@ -192,10 +198,10 @@ void djgClear( djVisual * pVis )
 
 void djgPutPixel( djVisual * pVis, int x, int y, int r, int g, int b )
 {
-	djColor       col;
-	unsigned int pixel;
-	col = djColor( r, g, b );
-	pixel = djgMapColor( pVis, col );
+	//djColor       col;
+	//col = djColor( r, g, b );
+	//pixel = djgMapColor( pVis, col );
+	unsigned int pixel = SDL_MapRGB(pVis->pSurface->format, r, g, b);
 	SDL_Rect rc;
 	rc.x = x;
 	rc.y = y;
@@ -244,7 +250,7 @@ void djgDrawRectangle( djVisual * pVis, int x, int y, int w, int h )
 
 void djgDrawBox( djVisual * pVis, int x, int y, int w, int h )
 {
-	unsigned int pixel = djgMapColor( pVis, pVis->colorfore );
+	unsigned int pixel = SDL_MapRGB(pVis->pSurface->format, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);//djgMapColor( pVis, pVis->colorfore );
 	CdjRect rc(x, y, w, h);
 	SDL_FillRect(pVis->pSurface, &rc, pixel);
 }
@@ -256,7 +262,7 @@ void djgDrawHLine( djVisual * pVis, int x, int y, int n )
 	if (x+n>pVis->width) { n=pVis->width-x; }
 	if (n<=0) return;
 
-	unsigned int pixel = djgMapColor( pVis, pVis->colorfore );
+	unsigned int pixel = SDL_MapRGB(pVis->pSurface->format, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);//djgMapColor( pVis, pVis->colorfore );
 
 	djgLock( pVis );
 	for ( int i=0; i<n; i++ )
@@ -272,7 +278,7 @@ void djgDrawVLine( djVisual * pVis, int x, int y, int n )
 	if (y+n>pVis->height) { n=pVis->height-y; }
 	if (n<=0) return;
 
-	unsigned int pixel = djgMapColor( pVis, pVis->colorfore );
+	unsigned int pixel = SDL_MapRGB(pVis->pSurface->format, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);//djgMapColor( pVis, pVis->colorfore );
 
 	djgLock( pVis );
 	for ( int i=0; i<n; i++ )
@@ -291,6 +297,33 @@ void djgDrawImage( djVisual *pVis, djImage *pImage, int xS, int yS, int xD, int 
 	if (pImage==NULL) return;
 
 	if (xS<0 || yS<0) return;
+
+
+	// IF HARDWARE SURFACE FOR THIS IMAGE, USE IT
+	SDL_Surface* pHWSurface = NULL;
+	std::map< djImage*, SDL_Surface * >::const_iterator iter = g_SurfaceMap.find( pImage );
+	if (iter != g_SurfaceMap.end())
+	{
+		pHWSurface = iter->second;
+	}
+	if (pHWSurface)
+	{
+		//BLIT
+		SDL_Rect rectSrc;
+		rectSrc.x = xS;
+		rectSrc.y = yS;
+		rectSrc.w = w;
+		rectSrc.h = h;
+		SDL_Rect rectDest;
+		rectDest.x = xD;
+		rectDest.y = yD;
+		rectDest.w = w;
+		rectDest.h = h;
+		SDL_BlitSurface(pHWSurface, &rectSrc, pVis->pSurface, &rectDest);
+		return;
+	}
+
+
 
 	// clipping
 	if (xD>=pVis->width || yD>=pVis->height) return;
@@ -354,6 +387,31 @@ void djgDrawImage( djVisual *pVis, djImage *pImage, int xS, int yS, int xD, int 
 
 void djgDrawImage2( djVisual *v, djImage *img, int xS, int yS, int xD, int yD, int w, int h )
 {
+
+	// IF HARDWARE SURFACE FOR THIS IMAGE, USE IT
+	SDL_Surface* pHWSurface = NULL;
+	std::map< djImage*, SDL_Surface * >::const_iterator iter = g_SurfaceMap.find( img );
+	if (iter != g_SurfaceMap.end())
+	{
+		pHWSurface = iter->second;
+	}
+	if (pHWSurface)
+	{
+		//BLIT
+		SDL_Rect rectSrc;
+		rectSrc.x = xS;
+		rectSrc.y = yS;
+		rectSrc.w = w;
+		rectSrc.h = h;
+		SDL_Rect rectDest;
+		rectDest.x = xD;
+		rectDest.y = yD;
+		rectDest.w = w;
+		rectDest.h = h;
+		SDL_BlitSurface(pHWSurface, &rectSrc, v->pSurface, &rectDest);
+		return;
+	}
+
 	djgLock( v );
 	for ( int i=0; i<h; i++ )
 	{
@@ -379,6 +437,30 @@ void djgDrawImage2( djVisual *v, djImage *img, int xS, int yS, int xD, int yD, i
 void djgDrawImageAlpha( djVisual *pVis, djImage *pImage, int xS, int yS, int xD, int yD, int w, int h )
 {
 	if (pImage==NULL) return;
+
+	// IF HARDWARE SURFACE FOR THIS IMAGE, USE IT
+	SDL_Surface* pHWSurface = NULL;
+	std::map< djImage*, SDL_Surface * >::const_iterator iter = g_SurfaceMap.find( pImage );
+	if (iter != g_SurfaceMap.end())
+	{
+		pHWSurface = iter->second;
+	}
+	if (pHWSurface)
+	{
+		//BLIT
+		SDL_Rect rectSrc;
+		rectSrc.x = xS;
+		rectSrc.y = yS;
+		rectSrc.w = w;
+		rectSrc.h = h;
+		SDL_Rect rectDest;
+		rectDest.x = xD;
+		rectDest.y = yD;
+		rectDest.w = w;
+		rectDest.h = h;
+		SDL_BlitSurface(pHWSurface, &rectSrc, pVis->pSurface, &rectDest);
+		return;
+	}
 
 	// clipping
 	if (xD>=pVis->width || yD>=pVis->height) return;
@@ -473,3 +555,169 @@ void SetPixelConversion ( djVisual *vis )
 	Log ( "\t[RGBA]Mask: 0x%x; 0x%x; 0x%x 0x%x\n", rMask, gMask, bMask, aMask );
 	Log ( "\t[RGBA]Shift: 0x%x; 0x%x; 0x%x 0x%x\n", rShift, gShift, bShift, aShift );
 }
+
+bool djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
+{
+	extern djVisual* pVisView;
+	djVisual* pVisDisplayBuffer = pVisView;
+	if (pImage==NULL) return false;
+
+	SDL_Surface* pSurfaceFoo = ::SDL_CreateRGBSurfaceFrom(
+		pImage->Data(),
+		pImage->Width(),
+		pImage->Height(),
+		32,
+		pImage->Pitch(),
+		0xFF0000,
+		0xFF00,
+		0xFF,
+		0xFF000000);
+	g_SurfaceMap[ pImage ] = pSurfaceFoo;
+
+	return true;
+
+
+
+
+
+
+
+	/*	SDL_SetAlpha(pVisDisplayBuffer->pSurface, SDL_SRCALPHA, 255);
+	SDL_Surface* pSurfaceImg2 = ::SDL_CreateRGBSurfaceFrom(
+		pImage->Data(),
+		pImage->Width(),
+		pImage->Height(),
+		32,
+		pImage->Pitch(),//		pImage->Width() * 4,
+		0xFF0000,
+		0xFF00,
+		0xFF,
+		0xFF000000);
+	if (pSurfaceImg2)
+	{
+		SDL_Surface* pSurface = SDL_ConvertSurface(pSurfaceImg2,
+			pVisDisplayBuffer->pSurface->format,
+                                0);
+		if (pSurface)
+		{
+//SDL_SetAlpha(pSurface, SDL_SRCALPHA, 0);
+			g_SurfaceMap[ pImage ] = pSurface;
+
+
+
+
+		SDL_LockSurface(pSurface);
+		SDL_LockSurface(pSurfaceImg2);
+		unsigned int *pSurfaceMemImg = (unsigned int*)pSurfaceImg2->pixels;
+		unsigned int *pSurfaceMem = (unsigned int*)pSurface->pixels;
+		//unsigned int *pSurfaceMem2 = (unsigned int*)pSurfaceImg->pixels;
+		for ( int y=0; y<pImage->Height(); ++y )
+		{
+			for ( int i=0; i<pImage->Width(); ++i )
+			{
+				if ((y%3)==0)
+				{
+					*(pSurfaceMem + i + ((y*pSurface->pitch)/4)) = 0x50FF8822;
+					if (y>0)
+						*(pSurfaceMem + i + (((y-1)*pSurface->pitch)/4)) = 0x0000FF00;
+					//unsigned int vOrig = *(pSurfaceMemImg + i + ((y*pSurfaceImg2->pitch)/4));
+					//if ((vOrig & 0xFF000000)==0)
+					//*(pSurfaceMem + i + ((y*pSurface->pitch)/4)) = *(pSurfaceMem + i + ((y*pSurface->pitch)/4))  &  0x00FFFFFF;
+				}
+				//*(pSurfaceMem2 + i + ((y*pSurface->pitch)/4)) = 0x00FF000000;
+			}
+		}
+		SDL_UnlockSurface(pSurfaceImg2);
+		SDL_UnlockSurface(pSurface);
+
+
+
+
+
+
+			return true;
+		}
+		return false;
+	}
+	return false;
+*/
+
+
+								
+								
+								
+								
+								// TO CHECK - if fail to create in hardware, will it automatically created in SW or must we do that ourselves (!?)s
+	SDL_Surface* pSurface = ::SDL_CreateRGBSurface(
+SDL_SWSURFACE,
+		pImage->Width(),
+		pImage->Height(),
+		32,//pVisDisplayBuffer->pSurface->format->BitsPerPixel,
+		0xFF0000,//pVisDisplayBuffer->pSurface->format->Rmask,
+		0xFF00,//pVisDisplayBuffer->pSurface->format->Gmask,
+		0xFF,//pVisDisplayBuffer->pSurface->format->Bmask,
+		0xFF000000);//pVisDisplayBuffer->pSurface->format->Amask);
+	if (!pSurface)
+		return false;
+	g_SurfaceMap[ pImage ] = pSurface;
+	SDL_Surface* pSurfaceImg = ::SDL_CreateRGBSurfaceFrom(
+		pImage->Data(),
+		pImage->Width(),
+		pImage->Height(),
+		32,
+		pImage->Pitch(),//		pImage->Width() * 4,
+		0xFF0000,
+		0xFF00,
+		0xFF,
+		0xFF000000);
+
+	if (pSurfaceImg)
+	{
+		//SDL_LockSurface(pSurfaceImg);
+		//SDL_LockSurface(pSurface);
+		//SDL_SetAlpha(pSurfaceImg, SDL_SRCALPHA, 255);
+		//SDL_SetAlpha(pSurfaceImg, SDL_SRCALPHA, 100);
+
+		SDL_Rect rectSrc;
+		rectSrc.x = 0;
+		rectSrc.y = 0;
+		rectSrc.w = pImage->Width();
+		rectSrc.h = pImage->Height();
+		SDL_Rect rectDest;
+		rectDest.x = 0;
+		rectDest.y = 0;
+		rectDest.w = pImage->Width();
+		rectDest.h = pImage->Height();
+		SDL_BlitSurface(pSurfaceImg, &rectSrc, pSurface, &rectDest);
+
+
+		SDL_LockSurface(pSurface);
+		SDL_LockSurface(pSurfaceImg);
+		unsigned int *pSurfaceMemImg = (unsigned int*)pSurfaceImg->pixels;
+		unsigned int *pSurfaceMem = (unsigned int*)pSurface->pixels;
+		//unsigned int *pSurfaceMem2 = (unsigned int*)pSurfaceImg->pixels;
+		for ( int y=0; y<pImage->Height(); ++y )
+		{
+			for ( int i=0; i<pImage->Width(); ++i )
+			{
+				if ((y%3)==0)
+				{
+					//*(pSurfaceMem + i + ((y*pSurface->pitch)/4)) = 0x50FF8822;
+					unsigned int vOrig = *(pSurfaceMemImg + i + ((y*pSurfaceImg->pitch)/4));
+					if ((vOrig & 0xFF000000)==0)
+					*(pSurfaceMem + i + ((y*pSurface->pitch)/4)) = *(pSurfaceMem + i + ((y*pSurface->pitch)/4))  &  0x00FFFFFF;
+				}
+				//*(pSurfaceMem2 + i + ((y*pSurface->pitch)/4)) = 0x00FF000000;
+			}
+		}
+		SDL_UnlockSurface(pSurfaceImg);
+		SDL_UnlockSurface(pSurface);
+SDL_SetAlpha(pSurface, SDL_SRCALPHA, 0);
+		//SDL_UnlockSurface(pSurfaceImg);
+
+		//SDL_FreeSurface(pSurfaceImg);
+		//delete pSurface;//?
+	}
+	return true;
+}
+

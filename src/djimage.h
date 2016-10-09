@@ -36,7 +36,7 @@ public:
 	int     GetPixel( int x, int y );
 	void    PutPixel( int x, int y, unsigned int pixel );
 	//! Return a pointer to the image data
-	unsigned char *Data() { return m_pData; }
+	unsigned char *Data() const { return m_pData; }
 	
 	int Height() const { return m_iHeight; } //!< height in pixels
 	int Width()  const { return m_iWidth; }  //!< width in pixels
