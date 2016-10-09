@@ -10,3 +10,8 @@ Old project page: http://gnukem.sourceforge.net/
 Dave Gnukem originally created by: David Joffe http://djoffe.com/ (https://www.livecoding.tv/david_joffe/)
 
 Project was maintained by EMH (Evil Mr Henry) for a number of years until Oct 2016
+
+You can watch recent development on this project being live-streamed at:
+https://www.livecoding.tv/david_joffe/
+e.g.
+https://www.livecoding.tv/david_joffe/videos/wae18-dave-gnukem-c-game-side-scrolling-shooter
