@@ -128,7 +128,7 @@ void djgFlush( djVisual * /*pVis*/)
 	//pVis = pVis;		// shut up the "unused" warning
 }
 
-void djgFlip( djVisual * pVisDest, djVisual * pVisSrc )
+void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 {
 	if (pVisSrc==NULL)//<- Level editor etc.
 	{
@@ -151,7 +151,9 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc )
 		SDL_Rect rc;
 		rc.w = uScaleMax;
 		rc.h = uScaleMax;
-		if ((rcSrc.w!=rcDest.w || rcSrc.h!=rcDest.h)
+		if (bScaleView
+			&& (rcSrc.w!=rcDest.w || rcSrc.h!=rcDest.h)
+		//fixme is this righT? waht if bpp == 2 ..
 			&& pVisSrc->pSurface->format->BytesPerPixel == 4//Current scaling blit implementation only supports 4BPP [dj2016-10] [TODO: Handle other format, OR if upgrading to libsdl2, just use libsdl's scale blit function]
 			)
 		{
@@ -179,6 +181,7 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc )
 		}
 		else
 		{
+			CdjRect rcSrc(0, 0, pVisSrc->width, pVisSrc->height);
 			//Non-scaling blit [faster, but can only do if src same size as dest]
 			SDL_BlitSurface(pVisSrc->pSurface, &rcSrc, pVisDest->pSurface, &rcDest);
 		}

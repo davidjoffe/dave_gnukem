@@ -42,7 +42,7 @@ void ShowInstructions()
 	if (pImgInstructions)
 	{
 		djgDrawImage( pVisBack, pImgInstructions, 0, 0, pImgInstructions->Width(), pImgInstructions->Height() );
-		GraphFlip();
+		GraphFlip(true);
 
 		// Pop up credits menu
 		do_menu( &instructionsMenu );

@@ -6,6 +6,7 @@
 // 1999/05 : begin attempted Win32 port, ack
 // 1999/12 : re-begin attempted Win32 port
 // 2001/05 : begin SDL port; doxygen comments
+// 2016/10 : new github + livecoding 'era'
 
 /*
 Copyright (C) 1995-2001 David Joffe
@@ -227,12 +228,12 @@ void DoMainMenu()
 		if (g_pImgMain)
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
 		char sz[100]={0};
-		sprintf(sz,"v0.6 (9 Oct 2016)",pVisBack->width, pVisBack->height);
-		GraphDrawString(pVisBack, g_pFont8x8, 320 - 17*8, 200 - 8*2, (unsigned char*)sz);
+		sprintf(sz,"v0.61 (10 Oct 2016)",pVisBack->width, pVisBack->height);
+		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8*2, (unsigned char*)sz);
 		sprintf(sz,"http://djoffe.com/",pVisBack->width, pVisBack->height);
-		GraphDrawString(pVisBack, g_pFont8x8, 320 - 17*8, 200 - 8, (unsigned char*)sz);
+		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8, (unsigned char*)sz);
 
-		GraphFlip();
+		GraphFlip(true);
 
 		// Random select menu cursor, either hearts or skulls
 		mainMenu.setMenuCursor ( (rand()%4==0 ? mainMenuCursorSkull : mainMenuCursor) );
@@ -405,7 +406,7 @@ void RedefineKeys()
 		else
 			GraphDrawString(pVisBack, g_pFont8x8, 48, 180, (unsigned char*)"Escape cancels");
 
-		GraphFlip();
+		GraphFlip(true);
 	} while (bLoop);
 }
 
@@ -496,7 +497,7 @@ bool GetHighScoreUserName(char *szBuffer)
 		}
 
 
-		GraphFlip();
+		GraphFlip(true);
 	} while (bLoop);
 	return bRet;
 }

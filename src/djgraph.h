@@ -129,7 +129,7 @@ extern void       djgDrawImageAlpha( djVisual *pVis, djImage *pImage, int xS, in
 //! Draw (w,h) pixels from a visual at (xD,yD) from (xS,yS)
 extern void       djgDrawVisual( djVisual *pDest, djVisual *pSrc, int xD, int yD, int xS, int yS, int w, int h );
 //! flip one visual to another
-extern void       djgFlip( djVisual * pVisDest, djVisual * pVisSrc );
+extern void       djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView );
 
 
 // DEBUG by rtfb

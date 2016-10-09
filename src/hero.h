@@ -23,7 +23,7 @@ extern int hero_mode;
 extern int nHurtCounter;
 
 
-// Fixme, these names have GOT to change!
+// Fixme, these names have GOT to change! [should be in a class too - not globals - dj2016-10]
 extern int x;			//!< Hero's absolute x position, in level block coordinates
 extern int y;			//!< Hero's absolute y position, in level block coordinates
 extern int x_small;		//!< x_small == 0 ? hero at x : hero at x + 8 pixels

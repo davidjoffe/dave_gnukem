@@ -30,9 +30,10 @@ djVisual *pVisMain = NULL;
 djVisual *pVisBack = NULL;
 djVisual *pVisView = NULL;
 
-void GraphFlip()
+// ScaleView should also be false for the level editor [why does that already work?]
+void GraphFlip(bool bScaleView)
 {
-	djgFlip( pVisMain, pVisBack );
+	djgFlip( pVisMain, pVisBack, bScaleView );
 }
 
 bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
@@ -124,9 +125,9 @@ void GraphDone()
 }
 
 // FIXME: , view_height?
-void GraphFlipView( int iViewWidth )
+void GraphFlipView( int iViewWidth, int iViewHeight )
 {
-	djgDrawVisual( pVisBack, pVisView, 16, 16, 16, 16, iViewWidth*16, 10*16 );
+	djgDrawVisual( pVisBack, pVisView, 16, 16, 16, 16, iViewWidth*16, iViewHeight*16 );
 }
 
 // FIXME: Currenetly assumes a 256-char 32x8 character 256x128 pixel alpha-mapped image
