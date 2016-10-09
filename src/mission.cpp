@@ -14,6 +14,7 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include "mission.h"
 #include "djlog.h"
 #include "djstring.h"
+#include "graph.h"//djCreateImageHWSurface
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
