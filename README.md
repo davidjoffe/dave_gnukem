@@ -3,7 +3,7 @@ Dave Gnukem is a 2D scrolling platform shooter similar to, and inspired by, Duke
 
 Source code repository: https://github.com/davidjoffe/dave_gnukem
 
-Project SourceForge page: https://sourceforge.net/projects/gnukem/
+Project SourceForge page (and current download location for released binaries): https://sourceforge.net/projects/gnukem/
 
 Old project page: http://gnukem.sourceforge.net/
 
