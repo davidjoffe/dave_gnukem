@@ -18,8 +18,8 @@ License: GNU GPL Version 2 (*not* "later versions")
 //#define NOSOUND
 
 bool bSoundEnabled = false;
-bool bHaveMixer;
-Mix_Chunk *sounds[255];
+bool bHaveMixer = false;
+Mix_Chunk *sounds[255]={NULL};
 int numsounds = 0;
 /*--------------------------------------------------------------------------*/
 //
@@ -80,6 +80,7 @@ SOUND_HANDLE djSoundLoad( char *szFilename )
 	sounds[i] = (Mix_Chunk *)malloc(sizeof(Mix_Chunk));
 	if (!(sounds[i] = Mix_LoadWAV(szFilename))) {
 		djMSG("ERROR: SOUNDLOAD(%s): Unable to load sound", szFilename);
+		//printf("ERROR: SOUNDLOAD(%s): Unable to load sound\n", szFilename);
 		return SOUNDHANDLE_INVALID;
 	}
 	numsounds ++;
@@ -93,6 +94,7 @@ SOUND_HANDLE djSoundLoad( char *szFilename )
 bool djSoundPlay( SOUND_HANDLE i )
 {
 #ifndef NOSOUND
+	if (i==SOUNDHANDLE_INVALID)return false;
 	if (djSoundEnabled()) {
 		Mix_PlayChannel(0,sounds[i],0);
 		// while (*Mix_Playing(0)) { SDL_Delay(100); }
