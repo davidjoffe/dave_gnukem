@@ -23,6 +23,7 @@ https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrol
 
 2016/10/10
 
+* Fix: "Dying in the pungee sticks will often cause a crash" (thank you to porter who pointed that out)
 * Add semi-experimental 'big viewport mode' (Backspace + B in game to toggle) to make level creation/testing easier for level editors
 
 2016/10/09 - Version 0.6 (0.60)
