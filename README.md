@@ -21,7 +21,7 @@ https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrol
 
 # History / Changes
 
-2016/10/10
+2016/10/10 - Version 0.61
 
 * Fix: "Dying in the pungee sticks will often cause a crash" (thank you to porter who pointed that out)
 * Fix a segfault in Linux (possibly VNC only?) when navigating in-game menus and other sub-menus
