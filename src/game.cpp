@@ -47,6 +47,16 @@ int VIEW_HEIGHT = 10;
 //[dj2016-10-10]
 bool g_bBigViewportMode=false;
 
+//[dj2016-10-10 [livecoding-streamed]] Trying to fix "Dying in the pungee sticks will often cause a crash"
+// Problem in short was:
+// * Game main loop iterating over 'things' and checking hero interaction with them through HeroOverlaps
+// * CSpike::HeroOverlaps triggers 'update health (-1)
+// * SetHealth on health reaching 0 would call Die()
+// * Die() in turn would try restart the level [immediately], which would cause all g_apThings to be deleted [and new ones created etc.] - and this is the bad part - while we're still in the loop checking HeroOverlaps() with those things
+// Solution: Die 'asynchronously' - i.e. just set a flag that you've died, and then (still immediately) but once 'safely' past iterating through all
+// the g_apThings update ticks etc., *then* actually restartlevel.
+bool g_bDied = false;
+
 /*--------------------------------------------------------------------------*/
 //
 // Game cheats system (useful for development/testing)
@@ -248,6 +258,7 @@ void PerGameSetup()
 	HeroSetJumpMode(JUMP_NORMAL);
 
 	g_nLevel = 0;
+	g_bDied = false;
 
 	g_nScore = 0;
 	g_nFirepower = 1;
@@ -271,6 +282,7 @@ void PerLevelSetup()
 	g_nFirepowerOld = g_nFirepower;
 	g_nHealthOld = g_nHealth;
 
+	g_bDied = false;
 
 	// (1) Initialize all relevant variables for entering a new level
 
@@ -922,6 +934,8 @@ NextBullet3:
 		CThing *pThing = g_apThings[i];
 		if (pThing->OverlapsBounds(x*16+x_small*8, y*16-16))
 		{
+			// [dj2016-10-10] Note that if inside HeroOverlaps(), it can cause you to die, e.g. if you've interacted with
+			// spikes .. so be aware you may be dead after calling that .. thats g_bDied, which causes level restart below.
 			int nRet = pThing->HeroOverlaps();
 			if (nRet==THING_DIE)
 			{
@@ -985,7 +999,7 @@ NextBullet3:
 
 
 	// "Tick" (update) all objects
-	for ( i=0; i<(int)g_apThings.size(); i++ )
+	for ( i=0; i<(int)g_apThings.size(); ++i )
 	{
 		pThing = g_apThings[i];
 		// FIXME: THING_REMOVE?
@@ -1000,6 +1014,12 @@ NextBullet3:
 
 
 
+	if (g_bDied)
+	{
+		// Reset to beginning of current level
+		RestartLevel();
+		g_bDied = false;
+	}
 
 
 
@@ -1022,8 +1042,8 @@ NextBullet3:
 
 void Die()
 {
-	// Reset to beginning of current level
-	RestartLevel();
+	// [dj2016-10] Just set a flag here that we've died, which we process 'asynchronously' (to fix the 'dying in the pungee sticks will often cause a crash' issue)
+	g_bDied = true;
 }
 
 void HeroShoot(int nX, int nY, int nXDiff, int nYDiff)
@@ -1082,7 +1102,7 @@ void SetHealth(int nHealth)
 
 	// Build a string representing health bars (which are in the 8x8 font)
 	char szHealth[MAX_HEALTH+1];
-	for ( i=0; i<MAX_HEALTH; i++ )
+	for ( i=0; i<MAX_HEALTH; ++i )
 	{
 		// 170 = health; 169 = not health
 		szHealth[MAX_HEALTH-1-i] = (i<g_nHealth?170:169);
