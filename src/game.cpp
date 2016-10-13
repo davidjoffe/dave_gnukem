@@ -512,27 +512,21 @@ int game_startup()
 					{
 						VIEW_WIDTH = 12;
 						VIEW_HEIGHT = 10;
-						/*SDL_Rect rect;
-						rect.x = 0;
-						rect.y = 0;
-						rect.w = pVisView->width;
-						rect.h = pVisView->height;
-						SDL_FillRect(pVisView->pSurface, &rect, SDL_MapRGB(pVisView->pSurface->format, 0, 0, 0));*/
-						// Refresh background again, as larger viewport will have obliterated right side with score etc.
-						if (pBackground)
-						{
-							djgDrawImage(pVisView, pBackground, 0, 0, 0, 0, pBackground->Width()*4, pBackground->Height()*4);
-						}
+
 						// NB, TODO, we actually need to also need to redraw score etc. here (though since this is just a dev/editing mode, not a real game mode, it doesn't have to be perfect)
 
 						// When going out of 'big viewport' mode, hero might now be off the (now-tiny) 'viewport' :/ .. so must also 're-center' viewport around hero
 						if (x>xo+VIEW_WIDTH/2) xo = x-VIEW_WIDTH/2;
 						if (y>yo+VIEW_HEIGHT/2) yo = y-VIEW_HEIGHT/2;
 
-						//dj2016-10-10 fixmeLOW this + the draw background right above seems to not be working, not sure why
-						// (i.e. when toggle OUT of big viewport mode, right side background behind score etc. should look correct)
-						// I don't have time right now to figure out why
-						GraphFlip(true);
+						// Redraw everything that needs to be redrawn, as larger viewport will have obliterated right side with score etc.
+						GameDrawSkin();
+						GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT );
+						update_health( 0 );
+						update_score( 0 );
+						GameDrawFirepower();
+						InvDraw();
+						GraphFlip(!g_bBigViewportMode);//Flip
 					}
 				}
 				g_bBKeyLast = bBKey;
