@@ -40,7 +40,7 @@ Dependencies: LibSDL1.2, LibSDL-Mixer 1.2
 ## Windows Build Instructions
 
 * Visual Studio 2010 project is included.
-* Must set 'Working Directory' to ../../ to run (under Project / Properties / Configure Properties / Debugging)
+* **NB** You must set your Visual Studio 'Working Directory' to ../../ in order to run this (under Project / Properties / Configure Properties / Debugging) or it won't find the data files and just immediately exit on run
 
 ## Linux Build Instructions
 
