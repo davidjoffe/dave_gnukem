@@ -1,5 +1,5 @@
 # Dave Gnukem
-Dave Gnukem is a 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source.
+Dave Gnukem is a 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. (The game is intentionally somewhat 'retro'; the original Duke Nukem 1 had 16-color EGA 320x200 graphics.)
 
 Source code repository: https://github.com/davidjoffe/dave_gnukem
 
@@ -7,9 +7,9 @@ Source code repository: https://github.com/davidjoffe/dave_gnukem
 
 Old project page: http://gnukem.sourceforge.net/
 
-Dave Gnukem originally created by: David Joffe http://djoffe.com/ (https://www.livecoding.tv/david_joffe/)
+Created by: David Joffe http://djoffe.com/ (https://www.livecoding.tv/david_joffe/)
 
-Project was maintained by EMH (Evil Mr Henry) for a number of years until Oct 2016
+The project was maintained by EMH (Evil Mr Henry) for a number of years until Oct 2016
 
 You can watch recent development on this project being live-streamed at:
 https://www.livecoding.tv/david_joffe/
@@ -41,6 +41,7 @@ Dependencies: LibSDL1.2, LibSDL-Mixer 1.2
 
 * Visual Studio 2010 project is included.
 * **NB** You must set your Visual Studio 'Working Directory' to ../../ in order to run this (under Project / Properties / Configure Properties / Debugging) or it won't find the data files and just immediately exit on run
+* If you get an error about not finding SDL DLL(s) when running, set 'Project / Properties / Configure Properties / Environment' to: PATH=c:\your\path\to\DLLs;%PATH%
 
 ## Linux Build Instructions
 
