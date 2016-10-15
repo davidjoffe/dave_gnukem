@@ -24,7 +24,7 @@ struct SMenuItem
 	//! A real menu item (true), or just a string (false)?
 	bool m_bitem;
 	//! The menu text to display
-	char *m_szText;
+	const char *m_szText;
 };
 /*--------------------------------------------------------------------------*/
 /*!
