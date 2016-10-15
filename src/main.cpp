@@ -284,19 +284,48 @@ void AppendCharacter(char *szBuffer, char c, int nMaxLen)
 	}
 }
 
-void CornyDialogEffect(int x1, int y1, int w, int h, bool bInverted = false)
+void DialogBoxEffect(int x1, int y1, int w, int h, bool bInverted = false)
 {
+	//dj2016-10 updating this to have broader smoother bevelled edges, a darker default background color, and some 'noise' to make it look a bit better
+
 	// Background
-	djgSetColorFore( pVisBack, djColor(170,170,170) );
-	djgDrawBox( pVisBack, x1, y1, w, h );
+	int nCOLORMID = 150;
+	//djgSetColorFore( pVisBack, djColor(nCOLORMID,nCOLORMID,nCOLORMID) );
+	//djgDrawBox( pVisBack, x1, y1, w, h );
+	srand(123);//<- Must stay same each frame as this is drawing every frame? or what [dj2016-10]
+	#define clrRANDOFFSET ( (rand() % 8) - 4 )
+	for ( int x=0;x<w;++x )
+	{
+		for ( int y=0;y<h;++y )
+		{
+			djgSetColorFore( pVisBack, djColor(nCOLORMID+clrRANDOFFSET,nCOLORMID+clrRANDOFFSET,nCOLORMID+clrRANDOFFSET) );
+			djgDrawBox( pVisBack, x1+x, y1+y, 1, 1 );
+		}
+	}
 	// dark bottom/right edge
-	djgSetColorFore( pVisBack, bInverted ? djColor(230,230,230) : djColor(80,80,80) );
-	djgDrawBox( pVisBack, x1, y1+h-1, w, 1);
-	djgDrawBox( pVisBack, x1+w-1, y1, 1, h);
+	//djgSetColorFore( pVisBack, bInverted ? djColor(230,230,230) : djColor(80,80,80) );/
+	//djgDrawBox( pVisBack, x1, y1+h-1, w, 1);
+	//djgDrawBox( pVisBack, x1+w-1, y1, 1, h);
+	int N=(bInverted ? 1 : 5);
+	for ( int n=0;n<N;n++ )
+	{
+		int nColorStep = (nCOLORMID-80)/N;
+		int nColorStepHi = (230-nCOLORMID)/N;
+		djgSetColorFore( pVisBack, bInverted ? djColor(230+clrRANDOFFSET-n*nColorStepHi,230+clrRANDOFFSET-n*nColorStepHi,230+clrRANDOFFSET-n*nColorStepHi) : djColor(80+n*nColorStep+clrRANDOFFSET,80+n*nColorStep+clrRANDOFFSET,80+n*nColorStep+clrRANDOFFSET) );
+		djgDrawBox( pVisBack, x1+n, y1+h-n, w-n*2, 1);//bottom
+		djgDrawBox( pVisBack, x1+w-(n+1), y1+n+1, 1, h-n*2);//right
+
+		// white top/left edge
+		djgSetColorFore( pVisBack, bInverted ? djColor(80+n*nColorStep+clrRANDOFFSET,80+n*nColorStep+clrRANDOFFSET,80+n*nColorStep+clrRANDOFFSET) : djColor(230+clrRANDOFFSET-n*nColorStepHi,230+clrRANDOFFSET-n*nColorStepHi,230+clrRANDOFFSET-n*nColorStepHi) );
+		djgDrawBox( pVisBack, x1+n, y1+n, w-n*2, 1);//top
+		djgDrawBox( pVisBack, x1+n, y1+n, 1, h-n*2);//left
+	}
+	//djgDrawBox( pVisBack, x1+w-1, y1, 1, h);
+
 	// white top/left edge
-	djgSetColorFore( pVisBack, bInverted ? djColor(80,80,80) : djColor(230,230,230) );
-	djgDrawBox( pVisBack, x1, y1, w, 1);
-	djgDrawBox( pVisBack, x1, y1, 1, h);
+	//djgSetColorFore( pVisBack, bInverted ? djColor(80,80,80) : djColor(230,230,230) );
+	//djgDrawBox( pVisBack, x1, y1, w, 1);
+	//djgDrawBox( pVisBack, x1, y1, 1, h);
 }
 
 // Helper for RedefineKeys to prevent assigning same key to two actions [dj2016-10]
@@ -324,7 +353,7 @@ void RedefineKeys()
 		djgSetColorFore( pVisBack, djColor(0,0,0) );
 		djgDrawBox( pVisBack, 0, 0, 320, 200 );
 		// Stupid cheesy boring dialog-border effect
-		CornyDialogEffect(nXLeft, 32, nDX, 128);
+		DialogBoxEffect(nXLeft, 32, nDX, 128);
 
 		djiPollBegin();
 		//SDLMod ModState = SDL_GetModState();
@@ -377,7 +406,7 @@ void RedefineKeys()
 		djiPollEnd();
 
 
-		//CornyDialogEffect(nXLeft-4, 100, nDX+8, 16, true);
+		//DialogBoxEffect(nXLeft-4, 100, nDX+8, 16, true);
 		int i;
 		for ( i=0; i<KEY_NUMKEYS; i++ )
 		{
@@ -434,7 +463,7 @@ bool GetHighScoreUserName(char *szBuffer)
 		djgSetColorFore( pVisBack, djColor(0,0,0) );
 		djgDrawBox( pVisBack, 0, 0, 320, 200 );
 		// Stupid cheesy boring dialog-border effect
-		CornyDialogEffect(nXLeft-12, 64, nDX+24, 64);
+		DialogBoxEffect(nXLeft-12, 64, nDX+24, 64);
 
 		djiPollBegin();
 		SDLMod ModState = SDL_GetModState();
@@ -496,7 +525,7 @@ bool GetHighScoreUserName(char *szBuffer)
 			bLoop = false;
 		}
 
-		CornyDialogEffect(nXLeft-4, 100, nDX+8, 16, true);
+		DialogBoxEffect(nXLeft-4, 100, nDX+8, 16, true);
 		GraphDrawString( pVisBack, g_pFont8x8, 100,  72, (unsigned char*)"New high score!");
 		GraphDrawString( pVisBack, g_pFont8x8,  96,  88, (unsigned char*)"Enter your name:" );
 		GraphDrawString( pVisBack, g_pFont8x8, nXLeft-2, 104, (unsigned char*)szBuffer );

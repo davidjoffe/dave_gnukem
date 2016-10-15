@@ -28,7 +28,7 @@ void ShowInstructions()
 	instructionsMenu.setSize(0);
 	instructionsMenu.setItems(instructionsMenuItems);
 	instructionsMenu.setMenuCursor(instructionsMenuCursor);
-	instructionsMenu.setClrBack(djColor(0,173,173));
+	instructionsMenu.setClrBack(djColor(48,66,128));
 	instructionsMenu.setXOffset(220);
 	instructionsMenu.setYOffset(128);
 	if (pImgInstructions==NULL)
