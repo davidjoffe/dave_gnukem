@@ -535,8 +535,10 @@ void SelectMission()
 	for ( i=0; i<(int)g_apMissions.size(); i++ )
 	{
 		pMenuItems[i+1].m_bitem = true;
-		pMenuItems[i+1].m_szText = new char[128];
-		sprintf( pMenuItems[i+1].m_szText, "|  %-31.31s |", g_apMissions[i]->GetName() );
+		char* szText = new char[128];
+		//fixme ^ leaks
+		sprintf( szText, "|  %-31.31s |", g_apMissions[i]->GetName() );
+		pMenuItems[i+1].m_szText = szText;//<- a bit gross
 	}
 	// Top and bottom menu entries, the borders
 	pMenuItems[0].m_bitem = false;
