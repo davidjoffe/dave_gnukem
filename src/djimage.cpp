@@ -172,8 +172,8 @@ int djImage::Load( const char * szFilename )
 	if ( szFilename == NULL )
 		return -1;
 
-	char * szTemp;
-	char * szExt;
+	char * szTemp = NULL;
+	char * szExt = NULL;
 	int    ret = -1;
 
 	szTemp = djStrDeepCopy( szFilename );
@@ -211,7 +211,7 @@ int djImage::LoadTGA( const char * szFilename )
 
 	SYS_Debug ( "djImage::LoadTGA(%s)\n", szFilename );
 
-	int fin;
+	int fin=0;
 
 	// Open the file
 	if (0 > (fin = open( szFilename, FILEOPEN_FLAGS )))
@@ -228,7 +228,7 @@ int djImage::LoadTGA( const char * szFilename )
 	// Skip past the comment field
 	if (Header.m_idLength!=0)
 	{
-		char szComments[256];
+		char szComments[256]={0};
 		read( fin, szComments, Header.m_idLength);
 	}
 
@@ -343,7 +343,7 @@ int djImage::LoadTGA( const char * szFilename )
 	}
 
 	close( fin );
-	return 0;
+	return iRet;
 }
 
 int djImage::LoadSPR( const char * szFilename )

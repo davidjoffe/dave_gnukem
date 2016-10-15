@@ -42,7 +42,7 @@ static int	sprite1b = 0;
 
 
 #define NUM_LEVEL_INSTRUCTIONS 15
-static char *level_instructions[NUM_LEVEL_INSTRUCTIONS] =
+static const char *level_instructions[NUM_LEVEL_INSTRUCTIONS] =
 {
 	"- Instructions: ----------",
 	"1-9     Place macros 1-9",

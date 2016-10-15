@@ -93,6 +93,6 @@ enum EBlockType
 };
 
 //! Friendly strings for block types \ref EBlockType, used by editor.
-extern char * block_type_names[TYPE_LASTONE+1];
+extern const char * block_type_names[TYPE_LASTONE+1];
 
 #endif

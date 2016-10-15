@@ -64,10 +64,10 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 	pVis->m_bFullscreen = false;
 
 	// Create a default visual, just a plain non-resizing window
-	static SDL_Surface *p = NULL;
+	//static SDL_Surface *p = NULL;
 	if (NULL == vistype)
 	{
-		p = pVis->pSurface = SDL_SetVideoMode(w, h, bpp, SDL_HWSURFACE|(bBackbuffer?SDL_DOUBLEBUF:0));
+		/*p = */pVis->pSurface = SDL_SetVideoMode(w, h, bpp, SDL_HWSURFACE|(bBackbuffer?SDL_DOUBLEBUF:0));
 	}
 	else if (0 == strcmp( vistype, "memory" ))
 	{
@@ -561,8 +561,8 @@ void SetPixelConversion ( djVisual *vis )
 
 bool djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 {
-	extern djVisual* pVisView;
-	djVisual* pVisDisplayBuffer = pVisView;
+	//extern djVisual* pVisView;
+	//djVisual* pVisDisplayBuffer = pVisView;
 	if (pImage==NULL) return false;
 
 	SDL_Surface* pSurfaceFoo = ::SDL_CreateRGBSurfaceFrom(
@@ -625,9 +625,9 @@ bool djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 						*(pSurfaceMem + i + (((y-1)*pSurface->pitch)/4)) = 0x0000FF00;
 					//unsigned int vOrig = *(pSurfaceMemImg + i + ((y*pSurfaceImg2->pitch)/4));
 					//if ((vOrig & 0xFF000000)==0)
-					//*(pSurfaceMem + i + ((y*pSurface->pitch)/4)) = *(pSurfaceMem + i + ((y*pSurface->pitch)/4))  &  0x00FFFFFF;
+					// *(pSurfaceMem + i + ((y*pSurface->pitch)/4)) = *(pSurfaceMem + i + ((y*pSurface->pitch)/4))  &  0x00FFFFFF;
 				}
-				//*(pSurfaceMem2 + i + ((y*pSurface->pitch)/4)) = 0x00FF000000;
+				// *(pSurfaceMem2 + i + ((y*pSurface->pitch)/4)) = 0x00FF000000;
 			}
 		}
 		SDL_UnlockSurface(pSurfaceImg2);

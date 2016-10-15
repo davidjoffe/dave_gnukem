@@ -31,7 +31,7 @@ TODO:
 
 
 #define NUMFLAGS 5
-static char *szFlags[NUMFLAGS] =
+static const char *szFlags[NUMFLAGS] =
 {
 	"solid",
 	"animated",
@@ -44,7 +44,7 @@ static char *szFlags[NUMFLAGS] =
 
 
 #define NUM_SPRITE_INSTRUCTIONS 12
-static char *sprite_instructions[NUM_SPRITE_INSTRUCTIONS] =
+static const char *sprite_instructions[NUM_SPRITE_INSTRUCTIONS] =
 {
 	"- Instructions: ----------",
 	"Arrows  Select sprite",

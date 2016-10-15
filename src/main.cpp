@@ -228,9 +228,9 @@ void DoMainMenu()
 		if (g_pImgMain)
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
 		char sz[100]={0};
-		sprintf(sz,"v0.61 (10 Oct 2016)",pVisBack->width, pVisBack->height);
+		sprintf(sz,"%s","v0.61 (10 Oct 2016)");
 		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8*2, (unsigned char*)sz);
-		sprintf(sz,"http://djoffe.com/",pVisBack->width, pVisBack->height);
+		sprintf(sz,"%s","http://djoffe.com/");
 		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8, (unsigned char*)sz);
 
 		GraphFlip(true);
@@ -519,7 +519,7 @@ void CheckHighScores( int score )
 
 void SelectMission()
 {
-	int i, iret, maxlen;
+	int i=0, iret=0;
 	SMenuItem *pMenuItems;
 	unsigned char menuMissionCursor[] = { 128, 129, 130, 131, 0 };
 	CMenu menuMission ("main.pp:SelectMission()");
@@ -531,7 +531,6 @@ void SelectMission()
 	menuMission.setItems ( 0 );
 
 	// Build the menu, adding mission names as entries
-	maxlen = 0;
 	pMenuItems = new SMenuItem[g_apMissions.size() + 3];
 	for ( i=0; i<(int)g_apMissions.size(); i++ )
 	{

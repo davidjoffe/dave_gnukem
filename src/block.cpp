@@ -7,7 +7,7 @@ License: GNU GPL Version 2 (*not* "later versions")
 *********/
 #include "block.h"
 
-char * block_type_names[TYPE_LASTONE+1] =
+const char * block_type_names[TYPE_LASTONE+1] =
 {
    " 0 Nothing",
    " 1 ",
