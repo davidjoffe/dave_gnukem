@@ -25,7 +25,7 @@ extern void djiPoll();
 extern void djiPollBegin();
 extern void djiPollEnd();
 extern bool djiPollEvents(SDL_Event &Event);
-extern void djiWaitForKeyUp(char cKey);
+extern void djiWaitForKeyUp(unsigned char cKey);
 extern bool djiAnyKeyDown();
 extern bool djiKeyDown(int iScanCode);
 extern bool djiKeyPressed(int iScanCode);

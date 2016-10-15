@@ -485,7 +485,7 @@ void djiDone()
 {
 }
 
-void djiWaitForKeyUp(char cKey)
+void djiWaitForKeyUp(unsigned char cKey)
 {
 	// FIXME: CPU KILLER
 	do

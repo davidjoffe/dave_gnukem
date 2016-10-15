@@ -37,12 +37,12 @@ static bool	log2screen = false;
 static bool	log2console = false;
 static bool	initialised = false;
 static int	log_backup_level = 5;
-static char	log_filename_base[SYS_MAX_FILE];
-static dword	sys_log;
+static char	log_filename_base[SYS_MAX_FILE] = { 0 };
+static dword	sys_log = 0;
 
-static FILE	*log_files[MAX_LOGS];
-static dword	masks[MAX_LOGS];
-static int	num_logs;
+static FILE	*log_files[MAX_LOGS] = { NULL };
+static dword	masks[MAX_LOGS] = { 0 };
+static unsigned int	num_logs = 0;
 
 
 void BackupAndCreate ( FILE **f, const char *filename, int bklevel );
@@ -53,9 +53,7 @@ void PushBackup ( const char *filename, int bklevel );
 // Init/Kill
 void InitLog ()
 {
-	int	i;
-
-	for ( i=0; i<MAX_LOGS; i++ )
+	for ( unsigned int i=0; i<MAX_LOGS; ++i )
 	{
 		masks[i] = SETBIT(i);
 	}
@@ -106,9 +104,7 @@ dword CreateLog ( const char *filename, const char *descr )
 
 void DisposeLog ( dword log_id )
 {
-	int	i;
-
-	for ( i=0; i<num_logs; i++ )
+	for ( unsigned int i=0; i<num_logs; ++i )
 	{
 		if ( SETBIT(i) == log_id )
 		{
@@ -116,7 +112,6 @@ void DisposeLog ( dword log_id )
 			initialised = false;
 		}
 	}
-
 }
 
 
@@ -152,9 +147,8 @@ void Log ( const char *fmt, ... )
 
 void Log ( dword log_mask, const char *fmt, ... )
 {
-	char		text[1024]={0};
+	char		text[2048]={0};
 	va_list		ap;
-	int		i;
 
 	if ( !initialised )
 		return;
@@ -162,13 +156,13 @@ void Log ( dword log_mask, const char *fmt, ... )
 	if ( NULL == fmt )
 		return;
 
-	memset ( text, 0, 1024 );
+	memset ( text, 0, 2048 );
 
 	va_start ( ap, fmt );
 		vsprintf ( (char*)text, fmt, ap );
 	va_end ( ap );
 
-	for ( i=0; i<num_logs; i++ )
+	for ( unsigned int i=0; i<num_logs; i++ )
 	{
 		if ( SETBIT(i) == log_mask )
 		{
