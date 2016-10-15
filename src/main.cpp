@@ -299,6 +299,16 @@ void CornyDialogEffect(int x1, int y1, int w, int h, bool bInverted = false)
 	djgDrawBox( pVisBack, x1, y1, 1, h);
 }
 
+// Helper for RedefineKeys to prevent assigning same key to two actions [dj2016-10]
+bool IsKeyUsed(int* anKeys, int key)
+{
+	for ( unsigned int i=0; i<KEY_NUMKEYS; ++i )
+	{
+		if (anKeys[i] == key)
+			return true;
+	}
+	return false;
+}
 void RedefineKeys()
 {
 	int anKeys[KEY_NUMKEYS] = {0};
@@ -347,7 +357,7 @@ void RedefineKeys()
 							StoreGameKeys();
 						}
 					}
-					else if (IsGameKey(Event.key.keysym.sym))
+					else if (IsGameKey(Event.key.keysym.sym) && !IsKeyUsed(anKeys, Event.key.keysym.sym))
 					{
 						anKeys[nCurrent] = Event.key.keysym.sym;
 						nCurrent++;
