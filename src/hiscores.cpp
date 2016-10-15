@@ -130,7 +130,7 @@ bool SaveHighScores(const char *szFilename)
 		djMSG("SaveHighScores(%s): Failed to create file\n", szFilename);
 		return false;
 	}
-	fprintf(pOut, "%d\n", MIN(g_aScores.size(), MAX_HIGHSCORES));
+	fprintf(pOut, "%d\n", MIN((int)g_aScores.size(), (int)MAX_HIGHSCORES));
 	for ( int i=0; i<(int)(MIN(g_aScores.size(), MAX_HIGHSCORES)); i++ )
 	{
 		fprintf(pOut, "%s\n", g_aScores[i].szName);

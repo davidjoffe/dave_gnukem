@@ -87,15 +87,13 @@ CMission::CMission()
 
 CMission::~CMission()
 {
-	int i;
-
-	for ( i=0; i<m_apLevels.size(); i++ )
+	for ( unsigned int i=0; i<m_apLevels.size(); i++ )
 	{
 		djDEL(m_apLevels[i]);
 	}
 	m_apLevels.clear();
 
-	for ( i=0; i<NUM_SPRITE_DATA; i++ )
+	for ( unsigned int i=0; i<NUM_SPRITE_DATA; i++ )
 	{
 		djDEL(m_apSpriteData[i]);
 	}
