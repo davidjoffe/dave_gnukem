@@ -533,7 +533,7 @@ void SelectMission()
 	SMenuItem *pMenuItems;
 	unsigned char menuMissionCursor[] = { 128, 129, 130, 131, 0 };
 	CMenu menuMission ("main.pp:SelectMission()");
-	menuMission.setClrBack ( djColor(129,0,129) );
+	menuMission.setClrBack ( djColor(48,66,128) );
 	menuMission.setSize ( 0 );
 	menuMission.setMenuCursor( menuMissionCursor );
 	menuMission.setXOffset ( -1 );

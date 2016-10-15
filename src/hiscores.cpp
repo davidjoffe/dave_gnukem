@@ -51,7 +51,7 @@ void ShowHighScores()
 	HighScoresMenu.setSize(0);
 	HighScoresMenu.setItems(instructionsHighScoreItems);
 	HighScoresMenu.setMenuCursor(instructionsHighScoreCursor);
-	HighScoresMenu.setClrBack( djColor(0,173,173) );
+	HighScoresMenu.setClrBack( djColor(48,66,128) );
 	HighScoresMenu.setXOffset( 220 );
 	HighScoresMenu.setYOffset ( 160 );
 	if (g_pImgHighScores==NULL)
