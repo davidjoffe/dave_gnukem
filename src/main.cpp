@@ -446,6 +446,9 @@ void RedefineKeys()
 			GraphDrawString(pVisBack, g_pFont8x8, 48, 180, (unsigned char*)"Escape cancels");
 
 		GraphFlip(true);
+
+		//Prevent CPU hogging or it eats up a full core here [dj2016-10]
+		SDL_Delay(20);
 	} while (bLoop);
 }
 
