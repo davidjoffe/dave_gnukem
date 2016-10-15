@@ -25,7 +25,7 @@ int g_anKeys[KEY_NUMKEYS] =
 };
 
 // Key descriptions
-char *g_aszKeys[KEY_NUMKEYS] =
+const char *g_aszKeys[KEY_NUMKEYS] =
 {
 	"Action",
 	"Left",

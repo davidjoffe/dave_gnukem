@@ -24,7 +24,7 @@ extern void         djSoundDone();
 extern void         djSoundEnable();
 extern void         djSoundDisable();
 extern bool         djSoundEnabled();
-extern SOUND_HANDLE djSoundLoad( char *szFilename );
+extern SOUND_HANDLE djSoundLoad( const char *szFilename );
 extern bool         djSoundPlay( SOUND_HANDLE iHandle );
 
 

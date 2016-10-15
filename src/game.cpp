@@ -87,7 +87,7 @@ void IngameMenu();
 // Sound files
 //
 
-char *g_szSoundFiles[SOUND_MAX] =
+const char *g_szSoundFiles[SOUND_MAX] =
 {
 	"data/sounds/pickup.wav",
 	"data/sounds/laser2.wav",
@@ -497,7 +497,7 @@ int game_startup()
 				// BACKSPACE + B: Toggle 'big viewport mode' [dj2016-10-10]
 				// It seems to be difficult to toggle just once ... so we detect key up/down 'edge' and only toggle on that
 				static bool g_bBKeyLast=false;
-				bool bBKey = g_iKeys[DJKEY_B];
+				bool bBKey = (g_iKeys[DJKEY_B]!=0);
 				if (bBKey && !g_bBKeyLast)// Detect keydown 'edge'
 				{
 					g_bBigViewportMode = !g_bBigViewportMode;
@@ -1472,8 +1472,8 @@ void DrawDebugInfo()
 	}
 
 	GraphDrawString(pVisView, g_pFont8x8, 32, 16, (unsigned char*)"Debug info on (D)" );
-	char buf[64];
-	sprintf(buf, "%d things", g_apThings.size());
+	char buf[128]={0};
+	sprintf(buf, "%d things", (int)g_apThings.size());
 	GraphDrawString(pVisView, g_pFont8x8, 32, 24, (unsigned char*)buf );
 	sprintf(buf, "%d visible", nNumVisible);
 	GraphDrawString(pVisView, g_pFont8x8, 32, 32, (unsigned char*)buf );

@@ -71,7 +71,7 @@ void djSoundDone()
 #endif
 }
 
-SOUND_HANDLE djSoundLoad( char *szFilename )
+SOUND_HANDLE djSoundLoad( const char *szFilename )
 {
 #ifndef NOSOUND
 	int i;

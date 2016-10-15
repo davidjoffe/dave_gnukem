@@ -17,7 +17,7 @@ INCLUDEDIRS= -I/usr/include/SDL
 # If you don't -DDATA_DIR to a valid dir, then data files will be assumed
 # to be in current directory
 #CFLAGS = -Wall -I/usr/local/include -DHAVE_SOUND -DDEBUG -O -m486
-CFLAGS = -Wall -DUSESDL -DDEBUG $(INCLUDEDIRS)
+CFLAGS = -Wall -Wno-switch -DUSESDL -DDEBUG $(INCLUDEDIRS)
 #Release version:
 #CFLAGS = -O -Wall -I/usr/local/include -DHAVE_SOUND $(INCLUDEDIRS)
 
