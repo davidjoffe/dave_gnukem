@@ -251,7 +251,7 @@ M_GetFileExtension
 Get filename extension (without the '.')
 =====================
 */
-char* M_GetFileExtension ( const char* filename )
+/*char* M_GetFileExtension ( const char* filename )
 {
 	static char	ext[SYS_MAX_EXT];
 	const char		*ptr = strrchr ( filename, '.' );
@@ -264,7 +264,7 @@ char* M_GetFileExtension ( const char* filename )
 		ext[0] = '\0';
 
 	return ext;
-}
+}*/
 
 
 
@@ -329,17 +329,18 @@ void M_GetFileRoot ( char* filename )
 
 
 
-void M_GetFileExtension ( char* filename )
+/*void M_GetFileExtension ( char* filename )
 {
-	char *ptr = strrchr ( filename, '.' );
+	const char *ptr = strrchr ( filename, '.' );
 
 	if ( ptr )
 	{
 		strcpy ( filename, ptr+1 );
 	}
 	else
-		filename = "";
+		strcpy ( filename, "" );
 }
+*/
 
 
 
@@ -527,7 +528,7 @@ void M_StripFilePath ( char *filename )
 }
 
 
-char* M_GetFirstPathDir ( char *filename )
+/*char* M_GetFirstPathDir ( char *filename )
 {
 	static char	dir[SYS_MAX_FILE];
 	char		*ptr;
@@ -544,6 +545,7 @@ char* M_GetFirstPathDir ( char *filename )
 
 	return dir;
 }
+*/
 
 
 /*

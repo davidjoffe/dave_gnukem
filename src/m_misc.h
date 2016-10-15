@@ -15,7 +15,7 @@
 
 
 
-#define SETBIT(x) (1<<x)
+#define SETBIT(x) (((unsigned int)1)<<x)
 
 
 void M_ParseErrno ( int err );
@@ -39,14 +39,14 @@ bool M_IsDirectory ( const char *filename );
 // this set returns pointers to static buffers: copy if needed
 char* M_GetFilePath ( const char* filename );
 char* M_GetFileRoot ( const char* filename );
-char* M_GetFileExtension ( const char* filename );
-char* M_GetFirstPathDir ( char *filename );
+//char* M_GetFileExtension ( const char* filename );//dj2016-10 commenting out M_GetFileExtension as they seem to be unused [now] from what i can tell
+//char* M_GetFirstPathDir ( char *filename );//dj2016-10 commenting out as it seems to be unused
 const char* M_GetFirstDir ( const char *filename );
 
 // this set modifies original contents: be careful not to loose information
 void M_GetFilePath ( char* filename );
 void M_GetFileRoot ( char* filename );
-void M_GetFileExtension ( char* filename );
+//void M_GetFileExtension ( char* filename );
 /*
  * NOTE: Very important function! Call before any access to files, unless
  * absolutely sure that filename is correct.
