@@ -211,7 +211,7 @@ void GameInitialSetup()
 	LoadHighScores();		// Load high scores
 
 	// Set up the in-game menu
-	gameMenu.setClrBack(djColor(0,0,129));
+	gameMenu.setClrBack( djColor(48,66,128) );
 	gameMenu.setSize(0);
 	gameMenu.setItems(gameMenuItems);
 	gameMenu.setMenuCursor(gameMenuCursor);
