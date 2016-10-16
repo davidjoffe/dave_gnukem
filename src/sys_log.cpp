@@ -87,12 +87,15 @@ dword CreateLog ( const char *filename, const char *descr )
 
 	BackupAndCreate ( &log_files[num_logs], filename, 0 );
 
-	fprintf ( log_files[num_logs], "+------------------------------------------------------------------+\n" );
-	fprintf ( log_files[num_logs], "|          %s log file for %02d/%02d/%04d  %02d:%02d:%02d                |\n", descr, tme->tm_mon + 1, tme->tm_mday, tme->tm_year + 1900, tme->tm_hour, tme->tm_min, tme->tm_sec   );
-	fprintf ( log_files[num_logs], "+------------------------------------------------------------------+\n" );
-	fprintf ( log_files[num_logs], "\n" );
-	fprintf ( log_files[num_logs], "\n" );
-	fflush ( log_files[num_logs] );
+	if (log_files[num_logs]!=NULL)
+	{
+		fprintf ( log_files[num_logs], "+------------------------------------------------------------------+\n" );
+		fprintf ( log_files[num_logs], "|          %s log file for %02d/%02d/%04d  %02d:%02d:%02d                |\n", descr, tme->tm_mon + 1, tme->tm_mday, tme->tm_year + 1900, tme->tm_hour, tme->tm_min, tme->tm_sec   );
+		fprintf ( log_files[num_logs], "+------------------------------------------------------------------+\n" );
+		fprintf ( log_files[num_logs], "\n" );
+		fprintf ( log_files[num_logs], "\n" );
+		fflush ( log_files[num_logs] );
+	}
 
 	initialised = true;
 
@@ -108,7 +111,8 @@ void DisposeLog ( dword log_id )
 	{
 		if ( SETBIT(i) == log_id )
 		{
-			fclose ( log_files[i] );
+			if (log_files[i] != NULL)
+				fclose ( log_files[i] );
 			initialised = false;
 		}
 	}
@@ -133,8 +137,11 @@ void Log ( const char *fmt, ... )
 		vsprintf ( (char*)text, fmt, ap );
 	va_end ( ap );
 
-	fprintf ( log_files[0], "%s", text );
-	fflush ( log_files[0] );
+	if (log_files[0]!=NULL)
+	{
+		fprintf ( log_files[0], "%s", text );
+		fflush ( log_files[0] );
+	}
 
 	#if defined(WIN32) && defined(_DEBUG)
 	//dj2016-10 Log to debugger in Windows
@@ -166,8 +173,11 @@ void Log ( dword log_mask, const char *fmt, ... )
 	{
 		if ( SETBIT(i) == log_mask )
 		{
-			fprintf ( log_files[i], "%s", text );
-			fflush ( log_files[i] );
+			if (log_files[i]!=NULL)
+			{
+				fprintf ( log_files[i], "%s", text );
+				fflush ( log_files[i] );
+			}
 
 			#if defined(WIN32) && defined(_DEBUG)
 			//dj2016-10 Log to debugger in Windows
