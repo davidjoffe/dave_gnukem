@@ -467,9 +467,14 @@ int game_startup()
 			//if (g_iKeys[DJKEY_UP])		key_action = 1;
 			//if (g_iKeys[DJKEY_LEFT])	key_left = 1;
 			//if (g_iKeys[DJKEY_RIGHT])	key_right = 1;
-			if (g_iKeys[DJKEY_CTRL])	key_jump = 1;
+			
+			// We allow ctrl as a sort of 'default' fallback jump if (and only if) it isn't assigned/redefined to anything
+			if (!IsGameKeyAssigned(SDLK_RCTRL))
+			{
+				if (g_iKeys[DJKEY_CTRL])	key_jump = 1;
+			}
 			//if (g_iKeys[DJKEY_ALT])		key_shoot = 1;
-			if (g_iKeys[DJKEY_P])		key_jump = 1;
+			//[dj2016-10 don't think it really makes sense to have P as jump - if anything, pause??[LOW]](g_iKeys[DJKEY_P])		key_jump = 1;
 //			if (g_iKeys[DJKEY_E])		key_edit = 1;
 // "integrated" level editor:
 			if (g_iKeys[DJKEY_F4])
@@ -648,8 +653,14 @@ int game_startup()
 		key_jump   = anKeyState[KEY_JUMP];
 		key_shoot  = anKeyState[KEY_SHOOT];
 
-		key_jump   = g_iKeys[DJKEY_CTRL];
-		key_jump  |= g_iKeys[DJKEY_P];
+		// We allow ctrl as a sort of 'default' fallback jump if (and only if) it isn't assigned/redefined to anything
+		//fixmeLOW/MED - This functionality seems to appear twice - not sure what that's about but will probably have
+		// to come back to that [perhaps as part of looking into the story of keypolling behavior being 'subtly incorrect'] [dj2016-10-16]
+		if (!IsGameKeyAssigned(SDLK_RCTRL))
+		{
+			key_jump   = g_iKeys[DJKEY_CTRL];
+		}
+		//key_jump  |= g_iKeys[DJKEY_P];
 
 		// ensure we don't leave the borders of the level
 		// fixme; is this still necessary what with the (other functions)
@@ -657,7 +668,7 @@ int game_startup()
 		y = MAX( MIN(y, 99), 2 );
 	} // while (game running)
 
-	TRACE("game_startup(): main game loop exitted.\n");
+	TRACE("game_startup(): main game loop exited.\n");
 
 	PerGameCleanup();
 	return g_nScore;

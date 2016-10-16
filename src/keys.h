@@ -37,4 +37,7 @@ extern bool IsGameKey(int nKeyCode);
 //! Store current game keys into the settings object
 extern void StoreGameKeys();
 
+//! Helper to check if the given (SDL) keycode has been assigned to a game action under 'redefine keys'
+extern bool IsGameKeyAssigned(int nKeyCode);
+
 #endif

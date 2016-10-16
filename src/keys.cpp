@@ -20,9 +20,20 @@ int g_anKeys[KEY_NUMKEYS] =
 	SDLK_UP,
 	SDLK_LEFT,
 	SDLK_RIGHT,
-	SDLK_RCTRL,
-	SDLK_RALT
+	SDLK_RCTRL,//Note LCTRL and RCTRL are both 'mapped onto' just RCTRL currently [dj2016-10]
+	SDLK_RALT//Note LALT and RALT are both 'mapped onto' just RALT currently [dj2016-10]
 };
+
+// Note here keycode is the SDL one, not the 'DJ' one [dj2016-10]
+bool IsGameKeyAssigned(int nKeyCode)
+{
+	for ( unsigned int i=0; i<KEY_NUMKEYS; ++i )
+	{
+		if ( g_anKeys[i]==nKeyCode )
+			return true;
+	}
+	return false;
+}
 
 // Key descriptions
 const char *g_aszKeys[KEY_NUMKEYS] =
