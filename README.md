@@ -21,9 +21,10 @@ https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrol
 
 # History / Changes
 
-2016/10/16 - Version 0.62 (Mac-only Release - v0.61 still the current latest for Windows)
+2016/10/16 - Version 0.62
 
 * Get Dave Gnukem compiling and running on Mac OS X: https://www.livecoding.tv/david_joffe/videos/jbBvb-dave-gnukem-c-game-side-scrolling-shooter-9
+* Miscellaneous minor aesthetic improvements
 
 2016/10/10 - Version 0.61
 
