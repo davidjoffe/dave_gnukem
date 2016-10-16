@@ -46,7 +46,7 @@ public:
 	void setSize ( int sz ) { m_iSize = sz; };
 	void setXOffset ( int offs ) { m_xOffset = offs; }
 	void setYOffset ( int offs ) { m_yOffset = offs; }
-	void setItems ( SMenuItem *items ) { m_items = items; }
+	void setItems ( const SMenuItem *items ) { m_items = items; }
 	void setSoundMove ( SOUND_HANDLE h ) { m_iSoundMove = h; }
 
 	const djColor& getClrBack () const { return m_clrBack; }
@@ -58,8 +58,8 @@ public:
 	const SMenuItem* getItems () const { return m_items; }
 
 private:
-	SMenuItem		*m_items;	// We DON'T own this!! (m_szText==NULL)-terminated
-	unsigned char	*m_szCursor; // We DON'T own this!!
+	const SMenuItem		*m_items;	// We DON'T own this!! (m_szText==NULL)-terminated
+	const unsigned char	*m_szCursor; // We DON'T own this!!
 	int				m_xOffset;
 	int				m_yOffset;
 	int				m_iSize;

@@ -14,7 +14,7 @@
 
 djImage *pImageCredits = NULL;
 
-struct SMenuItem creditsMenuItems[] =
+const struct SMenuItem creditsMenuItems[] =
 {
    { false, "        " },
    { true,  "   OK   " },
