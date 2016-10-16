@@ -21,7 +21,11 @@ extern "C"
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
+#ifdef __APPLE__
+#include <stdlib.h>//Fixing malloc.h 'not found' error compiling on Mac [dj2016-10]
+#else
 #include <malloc.h>
+#endif
 #include <errno.h>
 #ifdef WIN32
 #include <direct.h> // getcwd etc

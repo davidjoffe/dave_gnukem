@@ -13,7 +13,11 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include <SDL_error.h>
 #include <SDL_mixer.h>
 
+#ifdef __APPLE__
+#include <stdlib.h>//Fixing malloc.h 'not found' error compiling on Mac [dj2016-10]
+#else
 #include <malloc.h>
+#endif
 
 //#define NOSOUND
 
