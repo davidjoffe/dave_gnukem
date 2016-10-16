@@ -16,13 +16,13 @@
 #include "sys_defs.h"
 
 
-static char	*file = NULL;
+static const char	*file = NULL;
 static int	line = 0;
 
 
 void _SetFileAndLine ( const char *filename, const int linenum )
 {
-	file = (char*) filename;
+	file = filename;
 	line = linenum;
 }
 
