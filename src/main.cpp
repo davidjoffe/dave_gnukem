@@ -533,10 +533,13 @@ void RedefineKeys()
 			}
 		}
 
+		GraphDrawString(pVisBack, g_pFont8x8, 8, 186, (unsigned char*)"'Action' is used for e.g. opening doors ");
+		GraphDrawString(pVisBack, g_pFont8x8, 8, 192, (unsigned char*)"with keys or activating teleporters.");
+
 		if (bFinished)
-			GraphDrawString(pVisBack, g_pFont8x8, 48, 180, (unsigned char*)"Enter accepts, escape cancels");
+			GraphDrawString(pVisBack, g_pFont8x8, 48, 164, (unsigned char*)"Enter accepts, escape cancels");
 		else
-			GraphDrawString(pVisBack, g_pFont8x8, 48, 180, (unsigned char*)"Escape cancels");
+			GraphDrawString(pVisBack, g_pFont8x8, 48, 164, (unsigned char*)"Escape cancels");
 
 		GraphFlip(true);
 

@@ -30,7 +30,7 @@ void ShowInstructions()
 	instructionsMenu.setMenuCursor(instructionsMenuCursor);
 	instructionsMenu.setClrBack(djColor(48,66,128));
 	instructionsMenu.setXOffset(220);
-	instructionsMenu.setYOffset(128);
+	instructionsMenu.setYOffset(136);
 	if (pImgInstructions==NULL)
 	{
 		if (NULL != (pImgInstructions = new djImage))
