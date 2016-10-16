@@ -40,6 +40,11 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include "sys_log.h"
 #include "sys_error.h"
 
+#ifdef __APPLE__
+#include <mach-o/dyld.h>//_NSGetExecutablePath
+#include <sys/stat.h>//For djFolderExists stuff
+#endif
+
 /*--------------------------------------------------------------------------*/
 djImage *g_pImgMain = NULL;
 
@@ -124,10 +129,98 @@ int main ( int argc, char** argv )
 	return 0;
 }
 
+#ifdef __APPLE__
+// Append a folder to existing path, 'intelligently' handling
+// the trailing slash worries for us.
+void djAppendPath(char* szPath,char* szAppend)
+{
+	if (szPath==NULL)return;
+	if (szAppend==NULL||szAppend[0]==0)return;
+
+	// If doesn't have trailing slash, add one (unless szPath is empty string)
+	if (strlen(szPath)>0)
+	{
+		char cLast = szPath[ strlen(szPath)-1 ];
+		if (cLast!='/' && cLast!='\\')
+		{
+			strcat(szPath,"/");
+		}
+	}
+	strcat(szPath,szAppend);
+}
+/*bool djFolderExists(const char* szPath)
+{
+	struct stat sb;
+	if (stat(szPath, &sb) == 0 && S_ISDIR(sb.st_mode))
+	{
+		return true;
+	}
+	return false;
+}*/
+bool djFileExists(const char* szPath)
+{
+	struct stat sb;
+	if (stat(szPath, &sb) == 0 && S_ISREG(sb.st_mode))
+	{
+		return true;
+	}
+	return false;
+}
+#endif
 
 int DaveStartup(bool bFullScreen, bool b640)
 {
 	InitLog ();
+
+#ifdef __APPLE__
+	// Basically what we want to do here is:
+	// If the 'cwd' does NOT have a data folder under it, but
+	// the 'executable path' does, then we want to *change* the
+	// current 'working directory' to be the same as the 'executable
+	// path' - I think. [dj2016-10 - trying to fix running straight
+	// out of DMG doesn't work - though ideally users should install
+	// or copy anyway ..]
+	char cwd[8192]={0};//current working directory (not to be confused with the path the executable is in, though often they're the same, depending)
+	if(getcwd(cwd,sizeof(cwd)))
+	{
+		//debug//printf("Current working directory:%s\n",cwd);
+		// Check if data folder is present relative to cwd
+		char szDataFile[8192]={0};
+		strcpy(szDataFile,cwd);
+		djAppendPath(szDataFile,"data/missions.txt");//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever
+		//debug//printf("Checking for:%s\n",szDataFile);fflush(NULL);
+		if (!djFileExists(szDataFile))
+		{
+			printf("Warning: Data folder not found, trying executable path fallback ...\n");fflush(NULL);
+			char path[4096]={0};
+			uint32_t size = sizeof(path);
+			if (_NSGetExecutablePath(path, &size) == 0)
+			{
+				printf("Executable path is %s\n", path);fflush(NULL);
+
+				// This path is e.g. /Blah/Foo/davegnukem
+				// the last part is the executable, we want just the
+				// folder, so find the last '/' and set the char
+				// after it to 0 to NULL-terminate.
+				char *szLast = strrchr(path,'/');
+				if (szLast)
+					*(szLast+1) = 0; // NULL-terminate
+
+				strcpy(szDataFile,path);
+				djAppendPath(szDataFile,"data/missions.txt");
+				if (djFileExists(szDataFile))
+				{
+					printf("Successfully found the data path :)\n");fflush(NULL);
+					// Yay, we found the data folder by the executable -
+					// change the 'working directory' to 'path'
+					chdir(path);
+				}
+			}
+//else
+    //printf("buffer too small; need size %u\n", size);
+		}
+	}
+#endif
 
 	Log ( "\n================[ Starting Application Init ]===============\n" );
 
