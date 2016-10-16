@@ -571,7 +571,7 @@ void ShowInstructions()
 	}
 	unsigned int uOffsetX = pVisMain->width - uMaxStrLen * FONT_WIDTH;
 	unsigned int uOffsetY = pVisMain->height - NUM_LEVEL_INSTRUCTIONS * FONT_HEIGHT;
-	djgSetColorFore( pVisMain, djColor(20,20,80) );
+	djgSetColorFore( pVisMain, djColor(42,57,112) );
 	djgDrawBox( pVisMain, uOffsetX, uOffsetY, uMaxStrLen*FONT_WIDTH, NUM_LEVEL_INSTRUCTIONS*FONT_HEIGHT );
 	for ( int i=0; i<NUM_LEVEL_INSTRUCTIONS; i++ )
 	{
