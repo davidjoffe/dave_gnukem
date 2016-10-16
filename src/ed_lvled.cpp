@@ -127,6 +127,7 @@ void LVLED_Kill ()
 
 switch_e LVLED_MainLoop ()
 {
+	//fixme hogs cpu ... but looking at below, maybe not trivial to fix without affecting usability? [dj2016-10]
 	//int	i;
 	bool	bRunning = true;
 	while ( bRunning )

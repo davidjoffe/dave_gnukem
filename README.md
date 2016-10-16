@@ -21,6 +21,8 @@ https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrol
 
 # History / Changes
 
+* 2016/10/16 Get compiling and running on Mac OS X: https://www.livecoding.tv/david_joffe/videos/jbBvb-dave-gnukem-c-game-side-scrolling-shooter-9
+
 2016/10/10 - Version 0.61
 
 * Fix: "Dying in the pungee sticks will often cause a crash" (thank you to porter who pointed that out)
@@ -55,6 +57,12 @@ apt-get install libsdl1.2-dev
 
 apt-get install libsdl-mixer1.2-dev
 
+
+## Mac OS X Build Instructions
+
+Same as Linux - type 'make'. Run with ./davegnukem if it built correctly.
+
+Dependencies: You may have to first install LibSDL1.2 and LibSDL-Mixer1.2 (these can be installed by downloading the source code and doing 'make' and 'make install' (as root) for each of these first).
 
 # TODOs (To Sort):
 
