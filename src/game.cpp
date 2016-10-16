@@ -618,7 +618,7 @@ int game_startup()
 		float fTimeRun;
 		fTimeRun = fTimeNow - fTimeFirst;
 		iFrameCount++;
-		static char sbuf[1024];
+		static char sbuf[1024]={0};
 		sprintf( sbuf, "%.2f", (float)iFrameCount / fTimeRun );
 		if (iFrameCount==60)
 		{
