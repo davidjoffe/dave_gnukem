@@ -33,7 +33,7 @@ static int	levelview_y = 0;	// a minimap.
 static int	levelview_w = LEVEL_VIEW_WIDTH;	// these two are for representing
 static int	levelview_h = LEVEL_VIEW_HEIGHT;	// a minimap.
 static bool	bShowBack = true;	// toggles display of background blocks (the ones that could be trated as 'world', not the entities)
-static bool	bLevelFore = false;	// toggles drawing of foreground layer
+static bool	bLevelFore = true;//false;	// toggles drawing of foreground layer
 static int	g_nLevel = 0;		// points to current level.
 static int	sprite0a = 0;
 static int	sprite0b = 0;
@@ -41,13 +41,14 @@ static int	sprite1a = 0;
 static int	sprite1b = 0;
 
 
-#define NUM_LEVEL_INSTRUCTIONS 15
+#define NUM_LEVEL_INSTRUCTIONS 16
 static const char *level_instructions[NUM_LEVEL_INSTRUCTIONS] =
 {
 	"- Instructions: ----------",
 	"1-9     Place macros 1-9",
 	"Arrows  Move",
 	"Alt+Clk MoveTo",
+	"Ctl+Alt+Clk Start-Level-At",
 	"F4      Sprite editor",
 	"X       Toggle foreground",
 	"Z       Toggle background",
@@ -62,7 +63,7 @@ static const char *level_instructions[NUM_LEVEL_INSTRUCTIONS] =
 };
 
 
-static void HandleMouse();
+bool HandleMouse();
 //static void SetSprite ( int new_sprite );
 static void MoveMinimap( int ox, int oy );
 static void DrawMinimapRectangle();
@@ -140,7 +141,8 @@ switch_e LVLED_MainLoop ()
 		if (g_iKeys[DJKEY_ESC])
 			bRunning = false;
 
-		HandleMouse ();
+		if (!HandleMouse ())
+			bRunning = false;
 		static bool bflagleft = false;
 		static bool bflagright = false;
 		static bool bflagup = false;
@@ -338,9 +340,9 @@ HandleMouse
 TODO: write the bastard
 =================
 */
-void HandleMouse ()
+bool HandleMouse ()
 {
-	int ax, ay;
+	int ax=0, ay=0;
 
 	// sprites area
 	if (INBOUNDS( mouse_x, mouse_y,
@@ -384,7 +386,17 @@ void HandleMouse ()
 	{
 		ax = (mouse_x - POS_LEVELVIEW_X) / 16;
 		ay = (mouse_y - POS_LEVELVIEW_Y) / 16;
-		if (mouse_b & 1)
+		// dj2016-10: Hold in Ctrl+Alt and click with the mouse to automatically start level with hero 'dropped in' to the clicked position as starting position (to help with level editing / testing)
+		if ((mouse_b & 1)!=0 && g_iKeys[DJKEY_CTRL]!=0 && g_iKeys[DJKEY_ALT]!=0)
+		{
+			extern int g_nOverrideStartX;
+			extern int g_nOverrideStartY;
+
+			g_nOverrideStartX = levelview_x+ax;
+			g_nOverrideStartY = levelview_y+ay;
+			return false;
+		}
+		else if (mouse_b & 1)
 		{
 			SetLevel( ax + levelview_x, ay + levelview_y,
 				sprite0a, sprite0b, bLevelFore );
@@ -395,6 +407,7 @@ void HandleMouse ()
 				sprite1a, sprite1b, bLevelFore );
 		}
 	}
+	return true;
 }
 
 
@@ -551,6 +564,27 @@ void DrawMinimap()
 					POS_LEVELVIEW_Y + i * 16,
 					a, b );
 			}
+		}
+	}
+
+	// If hold in Ctrl+Alt, draw hero overlay at mouse cursor position to indicate the new hero 'drop-in-level-here' functionality [dj2016-10]
+	if (INBOUNDS( mouse_x, mouse_y,
+		POS_LEVELVIEW_X, POS_LEVELVIEW_Y,
+		POS_LEVELVIEW_X + levelview_w * 16 - 1,
+		POS_LEVELVIEW_Y + levelview_h * 16 - 1 ))
+	{
+		int ax = (mouse_x - POS_LEVELVIEW_X) / 16;
+		int ay = (mouse_y - POS_LEVELVIEW_Y) / 16;
+		if (g_iKeys[DJKEY_CTRL]!=0 && g_iKeys[DJKEY_ALT]!=0)
+		{
+			// These sprite offsets etc. are horribly hardcoded [show hero sprite]
+			if (ay>0)
+			{
+				ED_DrawSprite( POS_LEVELVIEW_X + (ax-1) * 16+8, POS_LEVELVIEW_Y + (ay-1) * 16, 4, 16 );
+				ED_DrawSprite( POS_LEVELVIEW_X + (ax  ) * 16+8, POS_LEVELVIEW_Y + (ay-1) * 16, 4, 17 );
+			}
+			ED_DrawSprite( POS_LEVELVIEW_X + (ax-1) * 16+8, POS_LEVELVIEW_Y + ay * 16, 4, 18 );
+			ED_DrawSprite( POS_LEVELVIEW_X + (ax  ) * 16+8, POS_LEVELVIEW_Y + ay * 16, 4, 19 );
 		}
 	}
 }
