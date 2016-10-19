@@ -1273,18 +1273,30 @@ void GameDrawView()
 	GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT );
 }
 
+// [dj2016-10] [fixme don't like these globals just floating here]
+// Level Editor: New feature: Hold in Ctrl+Alt and click with the mouse to automatically start level with hero 'dropped in' to the clicked position as starting position (to help with level editing / testing)
+int g_nOverrideStartX=-1;
+int g_nOverrideStartY=-1;
 void parse_level(void)
 {
 	int i, j;
 	// parse the level (for doors, keys, hero starting position etc.)
-	for ( i=0; i<100; i++ )
+	for ( i=0; i<100; ++i )
 	{
-		for ( j=0; j<128; j++ )
+		for ( j=0; j<128; ++j )
 		{
 			sprite_factory( 0, 0, j, i, 0, true );
 			sprite_factory( 0, 0, j, i, 1, true );
 		}
 	}
+	
+	// For level editor 'click to start hero here' function, added 2016-10:
+	if (g_nOverrideStartX>=0 && g_nOverrideStartY>=0)
+	{
+		relocate_hero(g_nOverrideStartX,g_nOverrideStartY);
+	}
+	g_nOverrideStartX=-1;
+	g_nOverrideStartY=-1;
 }
 
 void sprite_factory( unsigned char a, unsigned char b, int ix, int iy, int ifore, bool bfromlevel )

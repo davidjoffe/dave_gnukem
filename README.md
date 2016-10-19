@@ -24,6 +24,10 @@ Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by A
 
 # History / Changes
 
+Recent:
+
+* Level Editor: New feature: Hold in Ctrl+Alt and click with the mouse to automatically start level with hero 'dropped in' to the clicked position as starting position (to help with level editing / testing)
+
 2016/10/16 - Version 0.62
 
 * Get Dave Gnukem compiling and running on Mac OS X: https://www.livecoding.tv/david_joffe/videos/jbBvb-dave-gnukem-c-game-side-scrolling-shooter-9
@@ -38,6 +42,7 @@ Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by A
 2016/10/09 - Version 0.6 (0.60)
 
 * Take the 2015-08-01 v0.56a EMH release from SourceForge, create github project https://github.com/davidjoffe/dave_gnukem
+* Fixed 'tiny game window'
 * Fix some Linux compile issues, make a few other fixes/improvements (streamed on LiveCoding), call it v0.6 ('un-abandoning' project - DJ)
 
 
@@ -102,6 +107,7 @@ Dependencies: You may have to first install LibSDL1.2 and LibSDL-Mixer1.2 (these
 * Some better graphics
 * Fix up and update credits etc.
 * Signed executables in binary release?
+* [check] Dying seems to reset score to 0 - is that right? Cf. DN1 behavior
 * Is the -640 flag now basically obsolete? Remove? Or change to do something else useful? E.g. to make window maximum size e.g. same as monitor could be useful for level editing.
 
 ## LEVEL/SPRITE EDITOR TODOS:
