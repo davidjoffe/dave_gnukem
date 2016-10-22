@@ -42,7 +42,7 @@ Power boots allow you to jump higher.
 
 # History / Changes
 
-Recent:
+2016/10/22 - Version 0.63b
 
 * Add background music. So far, have only added music by Eric Matyas http://soundimage.org/
 * Add game volume controls (use PgUp and PgDn keys to increase/decrease volume from menus or in-game)
