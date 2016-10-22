@@ -191,6 +191,9 @@ int do_menu( CMenu *pMenu )
 		}
 		djiPollEnd();
 
+		// [dj2016-10] this if seems silly here to me but if i take it out, then as you press Esc on menu,
+		// it draws some 'wrong' stuff for one frame .. whatever, just adding this if back again
+		if (bmenurunning)
 		{
 			// Animate cursor [note this is unfortunately currently a bit 'tied' to the 10Hz frame rate limit ...
 			// if want to e.g. increase menu frame rate in future to say 20Hz or whatever, then the cursor will
