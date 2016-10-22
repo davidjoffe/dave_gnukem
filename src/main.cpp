@@ -329,7 +329,7 @@ void DoMainMenu()
 
 	//dj2016-10 adding background music to main menu, though have not put any real thought into what would
 	// be the best track here so fixme todo maybe dig a bit more and find better choice here etc. [also for levels]
-	Mix_Music* pMusic = Mix_LoadMUS("data/music/eric_matyas/8-Bit-Mayhem.wav");
+	Mix_Music* pMusic = Mix_LoadMUS("data/music/eric_matyas/8-Bit-Mayhem.ogg");
 	if (pMusic!=NULL)
 		Mix_FadeInMusic(pMusic, -1, 800);
 

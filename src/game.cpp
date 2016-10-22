@@ -286,33 +286,33 @@ void PerLevelSetup()
 
 	/*//these are sorted smallest to largest .. for now just selected all except the smaller ones as the shorter ones will may drive you too crazy with the looping..
 	// not yet sure if even the longer ones will be too repetitive [dj2016-10]
-	asMusicFiles.push_back("Dont-Mess-with-the-8-Bit-Knight.wav");
-	asMusicFiles.push_back("Futureopolis.wav");
-	asMusicFiles.push_back("Farty-McSty.wav");
-	asMusicFiles.push_back("Attack-of-the-8-Bit-Hyper-Cranks.wav");
-	asMusicFiles.push_back("The-8-bit-Princess.wav");
-	asMusicFiles.push_back("Mister-Snarkypants.wav");
-	asMusicFiles.push_back("Classy-8-Bit.wav");
-	asMusicFiles.push_back("80s-Space-Game-Loop_v001.wav");
-	asMusicFiles.push_back("Good-Morning-Doctor-Weird.wav");
-	asMusicFiles.push_back("Crazy-Candy-Highway-2.wav");
-	asMusicFiles.push_back("Cyber-Dream-Loop.wav");
-	asMusicFiles.push_back("The-Furry-Monsters-Laboratory.wav");
-	asMusicFiles.push_back("World-of-Automatons_Looping.wav");
-	asMusicFiles.push_back("Castle-8-Bit-Stein.wav");*/
-	asMusicFiles.push_back("Insane-Gameplay_Looping.wav");
-	asMusicFiles.push_back("Dystopic-Mayhem.wav");
-	asMusicFiles.push_back("Mad-Scientist_Looping.wav");
-	asMusicFiles.push_back("Monkey-Drama.wav");
-	//[used in main menu, though am totally opening to changing that]asMusicFiles.push_back("8-Bit-Mayhem.wav");
-	asMusicFiles.push_back("The-Darkness-Below_Looping.wav");
-	asMusicFiles.push_back("Techno-Caper.wav");
-	asMusicFiles.push_back("Funky-Gameplay_Looping.wav");
-	asMusicFiles.push_back("Escape_Looping.wav");
-	asMusicFiles.push_back("Monster-Street-Fighters.wav");
-	asMusicFiles.push_back("Monsters-in-Bell-Bottoms_Looping.wav");
-	asMusicFiles.push_back("Retro-Frantic_V001_Looping.wav");
-	asMusicFiles.push_back("Techno-Gameplay_Looping.wav");
+	asMusicFiles.push_back("Dont-Mess-with-the-8-Bit-Knight.ogg");
+	asMusicFiles.push_back("Futureopolis.ogg");
+	asMusicFiles.push_back("Farty-McSty.ogg");
+	asMusicFiles.push_back("Attack-of-the-8-Bit-Hyper-Cranks.ogg");
+	asMusicFiles.push_back("The-8-bit-Princess.ogg");
+	asMusicFiles.push_back("Mister-Snarkypants.ogg");
+	asMusicFiles.push_back("Classy-8-Bit.ogg");
+	asMusicFiles.push_back("80s-Space-Game-Loop_v001.ogg");
+	asMusicFiles.push_back("Good-Morning-Doctor-Weird.ogg");
+	asMusicFiles.push_back("Crazy-Candy-Highway-2.ogg");
+	asMusicFiles.push_back("Cyber-Dream-Loop.ogg");
+	asMusicFiles.push_back("The-Furry-Monsters-Laboratory.ogg");
+	asMusicFiles.push_back("World-of-Automatons_Looping.ogg");
+	asMusicFiles.push_back("Castle-8-Bit-Stein.ogg");*/
+	asMusicFiles.push_back("Insane-Gameplay_Looping.ogg");
+	asMusicFiles.push_back("Dystopic-Mayhem.ogg");
+	asMusicFiles.push_back("Mad-Scientist_Looping.ogg");
+	asMusicFiles.push_back("Monkey-Drama.ogg");
+	//[used in main menu, though am totally opening to changing that]asMusicFiles.push_back("8-Bit-Mayhem.ogg");
+	asMusicFiles.push_back("The-Darkness-Below_Looping.ogg");
+	asMusicFiles.push_back("Techno-Caper.ogg");
+	asMusicFiles.push_back("Funky-Gameplay_Looping.ogg");
+	asMusicFiles.push_back("Escape_Looping.ogg");
+	asMusicFiles.push_back("Monster-Street-Fighters.ogg");
+	asMusicFiles.push_back("Monsters-in-Bell-Bottoms_Looping.ogg");
+	asMusicFiles.push_back("Retro-Frantic_V001_Looping.ogg");
+	asMusicFiles.push_back("Techno-Gameplay_Looping.ogg");
 	// This is somewhat gross quick n dirty simplistic for now - should rather have ability to assign music file in the level file format [dj2016-10]
 	int nMusicFile = (g_nLevel % asMusicFiles.size());
 	std::string sBasePath = "data/music/eric_matyas/";
