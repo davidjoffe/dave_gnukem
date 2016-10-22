@@ -30,7 +30,7 @@ int	rShift=0, gShift=0, bShift=0, aShift=0;
 
 
 
-unsigned int djgMapColor( djVisual * pVis, djColor color )
+unsigned int djgMapColor( djVisual * pVis, const djColor& color )
 {
 	return SDL_MapRGB(pVis->pSurface->format, color.r, color.g, color.b);
 //	unsigned int ret = 0;
@@ -62,6 +62,8 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 	pVis = new djVisual;
 
 	pVis->m_bFullscreen = false;
+
+	//dj2016-10 fixmelow_tocheck i am wondering if the below is doing speed optimal way of doing everything as this hasn't been looked at in years
 
 	// Create a default visual, just a plain non-resizing window
 	//static SDL_Surface *p = NULL;
@@ -213,25 +215,25 @@ void djgPutPixel( djVisual * pVis, int x, int y, int r, int g, int b )
 	SDL_FillRect(pVis->pSurface, &rc, pixel);
 }
 
-void djgPutPixel( djVisual * pVis, int x, int y, djColor color )
+void djgPutPixel( djVisual * pVis, int x, int y, const djColor& color )
 {
 	djgPutPixel(pVis, x, y, color.r, color.g, color.b);
 }
 
-void djgSetColorFore( djVisual * pVis, djColor color )
+void djgSetColorFore( djVisual * pVis, const djColor& color )
 {
 	pVis->colorfore.r = color.r;
 	pVis->colorfore.g = color.g;
 	pVis->colorfore.b = color.b;
 }
 
-void djgSetColor( djVisual *pVis, djColor clrFore, djColor clrBack )
+void djgSetColor( djVisual *pVis, const djColor& clrFore, const djColor& clrBack )
 {
 	djgSetColorFore( pVis, clrFore );
 	djgSetColorBack( pVis, clrBack );
 }
 
-void djgSetColorBack( djVisual * pVis, djColor color )
+void djgSetColorBack( djVisual * pVis, const djColor& color )
 {
 	pVis->colorback.r = color.r;
 	pVis->colorback.g = color.g;
