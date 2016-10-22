@@ -42,6 +42,9 @@ using namespace std;
 #include "sys_log.h"
 #include "djstring.h"//djStrPrintf
 
+#include <SDL_mixer.h>//For background music stuff
+Mix_Music* g_pGameMusic=NULL;
+
 int VIEW_WIDTH = 12;
 int VIEW_HEIGHT = 10;
 
@@ -278,6 +281,52 @@ void PerLevelSetup()
 
 	Log ( "PerLevelSetup()\n" );
 
+	// Start per-level background music
+	std::vector< std::string > asMusicFiles;
+
+	/*//these are sorted smallest to largest .. for now just selected all except the smaller ones as the shorter ones will may drive you too crazy with the looping..
+	// not yet sure if even the longer ones will be too repetitive [dj2016-10]
+	asMusicFiles.push_back("Dont-Mess-with-the-8-Bit-Knight.wav");
+	asMusicFiles.push_back("Futureopolis.wav");
+	asMusicFiles.push_back("Farty-McSty.wav");
+	asMusicFiles.push_back("Attack-of-the-8-Bit-Hyper-Cranks.wav");
+	asMusicFiles.push_back("The-8-bit-Princess.wav");
+	asMusicFiles.push_back("Mister-Snarkypants.wav");
+	asMusicFiles.push_back("Classy-8-Bit.wav");
+	asMusicFiles.push_back("80s-Space-Game-Loop_v001.wav");
+	asMusicFiles.push_back("Good-Morning-Doctor-Weird.wav");
+	asMusicFiles.push_back("Crazy-Candy-Highway-2.wav");
+	asMusicFiles.push_back("Cyber-Dream-Loop.wav");
+	asMusicFiles.push_back("The-Furry-Monsters-Laboratory.wav");
+	asMusicFiles.push_back("World-of-Automatons_Looping.wav");
+	asMusicFiles.push_back("Castle-8-Bit-Stein.wav");*/
+	asMusicFiles.push_back("Insane-Gameplay_Looping.wav");
+	asMusicFiles.push_back("Dystopic-Mayhem.wav");
+	asMusicFiles.push_back("Mad-Scientist_Looping.wav");
+	asMusicFiles.push_back("Monkey-Drama.wav");
+	//[used in main menu, though am totally opening to changing that]asMusicFiles.push_back("8-Bit-Mayhem.wav");
+	asMusicFiles.push_back("The-Darkness-Below_Looping.wav");
+	asMusicFiles.push_back("Techno-Caper.wav");
+	asMusicFiles.push_back("Funky-Gameplay_Looping.wav");
+	asMusicFiles.push_back("Escape_Looping.wav");
+	asMusicFiles.push_back("Monster-Street-Fighters.wav");
+	asMusicFiles.push_back("Monsters-in-Bell-Bottoms_Looping.wav");
+	asMusicFiles.push_back("Retro-Frantic_V001_Looping.wav");
+	asMusicFiles.push_back("Techno-Gameplay_Looping.wav");
+	// This is somewhat gross quick n dirty simplistic for now - should rather have ability to assign music file in the level file format [dj2016-10]
+	int nMusicFile = (g_nLevel % asMusicFiles.size());
+	std::string sBasePath = "data/music/eric_matyas/";
+	if (g_pGameMusic!=NULL)
+	{
+		Mix_FreeMusic(g_pGameMusic);
+		g_pGameMusic = NULL;
+	}
+	g_pGameMusic = Mix_LoadMUS((sBasePath + asMusicFiles[nMusicFile]).c_str());
+	if (g_pGameMusic!=NULL)
+	{
+		Mix_FadeInMusic(g_pGameMusic, -1, 500);
+	}
+
 	// Save current score and firepower - these must be restored if we die.
 	g_nScoreOld = g_nScore;
 	g_nFirepowerOld = g_nFirepower;
@@ -347,6 +396,8 @@ void PerLevelSetup()
 // Per-game cleanup
 void PerGameCleanup()
 {
+	PerLevelCleanup();//dj2016-10 adding this, not quite sure where it 'should' be called
+	
 	// Empty the inventory completely
 	InvEmpty();
 	// Delete game background image
@@ -358,7 +409,11 @@ void PerGameCleanup()
 
 void PerLevelCleanup()
 {
-
+	if (g_pGameMusic!=NULL)
+	{
+		Mix_FreeMusic(g_pGameMusic);
+		g_pGameMusic = NULL;
+	}
 }
 
 // we have something like this:
@@ -453,13 +508,13 @@ int game_startup()
 					// 'Global' shortcut keys for adjusting volume [dj2016-10]
 					if (Event.key.keysym.sym==SDLK_PAGEUP)
 					{
-						if (djSoundAdjustVolume(4))
-							SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+						djSoundAdjustVolume(4);
+						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
 					}
 					else if (Event.key.keysym.sym==SDLK_PAGEDOWN)
 					{
-						if (djSoundAdjustVolume(-4))
-							SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+						djSoundAdjustVolume(4);
+						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
 					}
 					break;
 				case SDL_KEYUP:

@@ -44,6 +44,7 @@ Power boots allow you to jump higher.
 
 Recent:
 
+* Add background music. So far, have only added music by Eric Matyas http://soundimage.org/
 * Add game volume controls (use PgUp and PgDn keys to increase/decrease volume from menus or in-game)
 * Level Editor: New feature: Hold in Ctrl+Alt and click with the mouse to automatically start level with hero 'dropped in' to the clicked position as starting position (to help with level editing / testing)
 

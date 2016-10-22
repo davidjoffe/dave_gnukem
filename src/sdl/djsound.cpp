@@ -21,6 +21,9 @@ License: GNU GPL Version 2 (*not* "later versions")
 
 //#define NOSOUND
 
+//For now [dj2016-10] just make background music some relative percentage of the main volume (so background is a bit softer so as not to get too annoying) - later could add a separate setting for background music volume
+const float fBACKGROUNDMUSIC_RELATIVE_VOLUME = 0.36f;
+
 bool bSoundEnabled = false;
 bool bHaveMixer = false;
 Mix_Chunk *sounds[255]={NULL};
@@ -60,6 +63,7 @@ int djSoundInit()
 	}
 	//dj2016-10 Adding ability to change volume
 	Mix_Volume(-1,g_nVolume);
+	Mix_VolumeMusic((int)((float)g_nVolume * fBACKGROUNDMUSIC_RELATIVE_VOLUME));//For now [dj2016-10] just make background music some relative percentage of the main volume (so background is a bit softer so as not to get too annoying) - later could add a separate setting for background music volume
 	djSoundEnable();
 #endif
 	return 1;
@@ -131,6 +135,7 @@ void djSoundSetVolume(int nVolume,bool bApply)
 		if (bApply)
 		{
 			Mix_Volume(-1,g_nVolume);
+			Mix_VolumeMusic((int)((float)g_nVolume * fBACKGROUNDMUSIC_RELATIVE_VOLUME));//For now [dj2016-10] just make background music some relative percentage of the main volume (so background is a bit softer so as not to get too annoying) - later could add a separate setting for background music volume
 		}
 #endif
 	}
@@ -146,6 +151,7 @@ bool djSoundAdjustVolume(int nDiff)
 	if (nVolumePrev != g_nVolume)
 	{
 		Mix_Volume(-1,g_nVolume);
+		Mix_VolumeMusic((int)((float)g_nVolume * fBACKGROUNDMUSIC_RELATIVE_VOLUME));//For now [dj2016-10] just make background music some relative percentage of the main volume (so background is a bit softer so as not to get too annoying) - later could add a separate setting for background music volume
 		return true;
 	}
 #endif

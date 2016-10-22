@@ -45,6 +45,8 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include <sys/stat.h>//For djFolderExists stuff
 #endif
 
+#include <SDL_mixer.h>//For background music stuff
+
 /*--------------------------------------------------------------------------*/
 djImage *g_pImgMain = NULL;
 
@@ -325,6 +327,12 @@ void DoMainMenu()
 {
 	bool bRunning = true;
 
+	//dj2016-10 adding background music to main menu, though have not put any real thought into what would
+	// be the best track here so fixme todo maybe dig a bit more and find better choice here etc. [also for levels]
+	Mix_Music* pMusic = Mix_LoadMUS("data/music/eric_matyas/8-Bit-Mayhem.wav");
+	if (pMusic!=NULL)
+		Mix_FadeInMusic(pMusic, -1, 800);
+
 	do
 	{
 
@@ -332,7 +340,7 @@ void DoMainMenu()
 		if (g_pImgMain)
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
 		char sz[100]={0};
-		sprintf(sz,"%s","v0.62 (16 Oct 2016)");
+		sprintf(sz,"%s","v0.62b (22 Oct 2016)");
 		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8*2, (unsigned char*)sz);
 		sprintf(sz,"%s","http://djoffe.com/");
 		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8, (unsigned char*)sz);
@@ -351,6 +359,9 @@ void DoMainMenu()
 			//int score = PlayGame ();
 			int score = game_startup();
 			CheckHighScores( score );
+			// Game levels start their own music, so when come out of game and back to main menu, restart main menu music
+			if (pMusic!=NULL)
+				Mix_FadeInMusic(pMusic, -1, 800);
 			break;
 		}
 		case 2: // select mission
@@ -376,6 +387,12 @@ void DoMainMenu()
 			break;
 		}
 	} while (bRunning);
+
+	if (pMusic)
+	{
+		Mix_FreeMusic(pMusic);
+		pMusic = NULL;
+	}
 }
 
 void AppendCharacter(char *szBuffer, char c, int nMaxLen)
