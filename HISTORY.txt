@@ -1,5 +1,6 @@
-2016/10/09 - Version 0.6
+2016/10/09 - Version 0.6 (0.60)
  - Take the 2015-08-01 v0.56a EMH release from SourceForge, create github project https://github.com/davidjoffe/dave_gnukem
+ - Fixed 'tiny game window'
  - Fix some Linux compile issues, make a few other fixes/improvements (streamed on LiveCoding), call it v0.6 ('un-abandoning' project - DJ)
 
 2008/08/06 - Version 0.56a
