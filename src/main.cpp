@@ -225,6 +225,13 @@ int DaveStartup(bool bFullScreen, bool b640)
 	Log ( "\n================[ Starting Application Init ]===============\n" );
 
 	g_Settings.Load(CONFIG_FILE);	// Load saved settings
+	// We need to first check the setting is *actually there*, not just call e.g. FindSettingInt(), otherwise
+	// if volume setting has never been set/saved before, it will return a value of 0 which will set the volume to 0.
+	// We need to distinguish between 'never been set', and 'actually set to 0'. [dj2016-10]
+	if (g_Settings.FindSetting("Volume")!=NULL)
+	{
+		djSoundSetVolume( g_Settings.FindSettingInt("Volume"), false );//NB Don't "apply" the volume setting because sound library only init'd slightly further down
+	}
 
 	srand(time(NULL));				// Seed the random number generator
 
@@ -282,6 +289,9 @@ void DaveCleanup()
 {
 	Log ( "\n================[ Starting Application Kill ]===============\n" );
 
+	// Save user volume setting
+	g_Settings.SetSettingInt("Volume",djSoundGetVolume());
+
 	KillMainMenu();
 	Log ( "KillMainMenu() ok\n" );
 	KillMissionSystem();
@@ -302,6 +312,7 @@ void DaveCleanup()
 	Log ( "GraphDone() ok\n" );
 	djTimeDone();			// Timer stuff
 	Log ( "djTimeDone() ok\n" );
+
 	g_Settings.Save(CONFIG_FILE);	// Save settings
 	Log ( "g_Settings.Save(CONFIG_FILE) ok\n" );
 

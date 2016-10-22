@@ -18,6 +18,7 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include "djinput.h"
 #include "djtime.h"
 #include "sys_error.h"
+//#include <SDL_mixer.h>
 
 
 int option;
@@ -40,8 +41,6 @@ void menu_move( CMenu *pMenu, int& option, int diff, unsigned char cCursor )
 
 	// Redraw the menu cursor
 	djgDrawImageAlpha( pVisBack, g_pFont8x8, ((int)cCursor%32)*8, ((int)cCursor/32)*8, pMenu->getXOffset()+8, pMenu->getYOffset()+8*option, 8, 8 );
-
-	GraphFlip(true);
 }
 /*--------------------------------------------------------------------------*/
 
@@ -53,6 +52,25 @@ int do_menu( CMenu *pMenu )
 	int i;
 	int size;
 	const unsigned char *szCursor;
+
+	/*
+	//extern SOUND_HANDLE g_iSounds[SOUND_MAX];
+	static SOUND_HANDLE idMusic = (SOUND_HANDLE)-1;
+	if ((int)idMusic < 0)
+	{
+		//idMusic = djSoundLoad("data/music/Monster-Street-Fighters.wav");//The-Darkness-Below_Looping.wav");//djSoundLoad("data/music/Classy-8-Bit.wav");
+		//idMusic = djSoundLoad("data/music/8-Bit-Mayhem.wav");//<-A bit too heavy on the beat maybe
+		//idMusic = djSoundLoad("data/music/Classy-8-Bit.wav");
+		idMusic = djSoundLoad("data/music/Mister-Snarkypants.wav");//A maybe? for a later map
+		if ((int)idMusic>=0)
+		{
+			extern Mix_Chunk *sounds[255];
+			//Mix_Volume(1,MIX_MAX_VOLUME/2);
+			Mix_FadeInChannel(1, sounds[idMusic], -1, 400);
+			//djSoundPlay( idMusic, true );
+		}
+	}
+	*/
 
 	// Initialize cursor animation
 	szCursor = pMenu->getMenuCursor();
@@ -93,7 +111,7 @@ int do_menu( CMenu *pMenu )
 
 
 	// We want to maintain 10 fps on menu cursor animations
-	float fTimeFrame = (1.0f / 10.0f);
+	const float fTimeFrame = (1.0f / 10.0f);
 
 	// Start out by being at next time
 	float fTimeNext = djTimeGetTime();
@@ -104,74 +122,88 @@ int do_menu( CMenu *pMenu )
 	do
 	{
 		fTimeNow = djTimeGetTime();
-		bool bForceUpdate = false;
-		// If we're already behind, just force us to get there
-		if (fTimeNext < fTimeNow)
-		{
-			//printf( "slow\n" );
-			fTimeNext = fTimeNow;
-			bForceUpdate = true;
-		}
-
-		while (bmenurunning && (fTimeNow<fTimeNext || bForceUpdate)) // until we reach next frames time
-		{
-			SDL_Delay(10);
-
-			// poll keys
-			djiPoll();
-
-			// up arrow
-			static bool bkeyup = false;
-			if ( (g_iKeys[DJKEY_UP]) && (bkeyup == false) )
-			{
-				menu_move( pMenu, option, -1, *szCursor );
-			}
-			bkeyup = (bool)(g_iKeys[DJKEY_UP]!=0);
-
-			// down arrow
-			static bool bkeydown = false;
-			if ( (g_iKeys[DJKEY_DOWN]) && (bkeydown == false) )
-			{
-				menu_move( pMenu, option, 1, *szCursor );
-			}
-			bkeydown = (bool)(g_iKeys[DJKEY_DOWN] != 0);
-
-			// home key
-			if (g_iKeys[DJKEY_HOME])
-				menu_move( pMenu, option, -option + pMenu->getSize() - 1, *szCursor );
-
-			// end key
-			if (g_iKeys[DJKEY_END])
-				menu_move( pMenu, option, -option, *szCursor );
-
-			// enter
-			if (g_iKeys[DJKEY_ENTER])
-				bmenurunning = 0;
-
-			// escape
-			if (g_iKeys[DJKEY_ESC])
-			{
-				option = -1;
-				bmenurunning = 0;
-			}
-
-
-			fTimeNow = djTimeGetTime();
-			bForceUpdate = false;
-		}
 		fTimeNext = fTimeNow + fTimeFrame;
-
-
-		if (bmenurunning)
+		
+		// Sleep a little to not hog CPU to cap menu update (frame rate) at approx 10Hz
+		while (fTimeNow<fTimeNext)
 		{
-			// Animate cursor
+			SDL_Delay(5);
+			fTimeNow = djTimeGetTime();
+		}
+
+		// [dj2016-10] Re-implementing this to do own djiPollBegin/djiPollEnd in menu instead of calling djiPoll()
+		// because of issue whereby key events get 'entirely' missed if up/down even within one 'frame'.
+		djiPollBegin();
+		SDL_Event Event;
+		while (SDL_PollEvent(&Event))
+		{
+			switch (Event.type)
+			{
+			case SDL_KEYDOWN:
+
+				// 'Global' shortcut keys for adjusting volume [dj2016-10]
+				if (Event.key.keysym.sym==SDLK_PAGEUP)
+				{
+					if (djSoundAdjustVolume(4))
+						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+				}
+				else if (Event.key.keysym.sym==SDLK_PAGEDOWN)
+				{
+					if (djSoundAdjustVolume(-4))
+						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+				}
+
+				// up arrow
+				else if (Event.key.keysym.sym==SDLK_UP)
+					menu_move( pMenu, option, -1, *szCursor );
+
+				// down arrow
+				else if (Event.key.keysym.sym==SDLK_DOWN)
+					menu_move( pMenu, option, 1, *szCursor );
+
+				// home key
+				else if (Event.key.keysym.sym==SDLK_HOME)//g_iKeys[DJKEY_HOME])
+					menu_move( pMenu, option, -option + pMenu->getSize() - 1, *szCursor );
+
+				// end key
+				else if (Event.key.keysym.sym==SDLK_END)//if (g_iKeys[DJKEY_END])
+					menu_move( pMenu, option, -option, *szCursor );
+
+				// enter
+				else if (Event.key.keysym.sym==SDLK_RETURN)//if (g_iKeys[DJKEY_ENTER])
+					bmenurunning = 0;
+
+				// escape
+				else if (Event.key.keysym.sym==SDLK_ESCAPE)//if (g_iKeys[DJKEY_ESC])
+				{
+					option = -1;
+					bmenurunning = 0;
+				}
+
+				break;
+			case SDL_KEYUP:
+				break;
+			case SDL_QUIT:
+				bmenurunning=0;
+				option = -1;//Exit
+				break;
+			}
+		}
+		djiPollEnd();
+
+		{
+			// Animate cursor [note this is unfortunately currently a bit 'tied' to the 10Hz frame rate limit ...
+			// if want to e.g. increase menu frame rate in future to say 20Hz or whatever, then the cursor will
+			// animate two times too fast (say) .. if do that in future then must just make this update slightly
+			// 'smarter' on the animation - not a priority now at all. dj2016-10]
 			szCursor++;
 			if (*szCursor == 0)
 				szCursor = pMenu->getMenuCursor ();
 
-			menu_move( pMenu, option, 0, *szCursor );
+			menu_move( pMenu, option, 0, *szCursor );//Force redraw of cursor for animation purposes
 		}
 
+		GraphFlip(true);
 	} while (bmenurunning);
 
 	// Wait for user to let go of escape or enter
@@ -180,6 +212,7 @@ int do_menu( CMenu *pMenu )
 	else
 		djiWaitForKeyUp(DJKEY_ENTER);
 
+	//Mix_FadeOutChannel(1, 1000);
 
 	return option;
 }

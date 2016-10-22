@@ -25,6 +25,7 @@ bool bSoundEnabled = false;
 bool bHaveMixer = false;
 Mix_Chunk *sounds[255]={NULL};
 int numsounds = 0;
+int g_nVolume = 85;//[0..128] Default volume (don't have default volume at max, I think? dj2016-10) Note LibSDL Mixer MIX_MAX_VOLUME is 128.
 /*--------------------------------------------------------------------------*/
 //
 // Common
@@ -52,11 +53,13 @@ int djSoundInit()
 	int audio_channels=2;
 	if (Mix_OpenAudio(22050, AUDIO_S16, audio_channels, 1024) < 0) {
 		fprintf(stderr,
-			"Warning: Couldn't set 11025 Hz 8-bit audio\n- Reason : %s\n",
+			"Warning: Couldn't set 22050 Hz 16-bit audio\n- Reason : %s\n",
 			SDL_GetError());
 		djSoundDisable();
 		return 0;
 	}
+	//dj2016-10 Adding ability to change volume
+	Mix_Volume(-1,g_nVolume);
 	djSoundEnable();
 #endif
 	return 1;
@@ -95,14 +98,54 @@ SOUND_HANDLE djSoundLoad( const char *szFilename )
 #endif
 }
 
-bool djSoundPlay( SOUND_HANDLE i )
+bool djSoundPlay( SOUND_HANDLE i )//, bool bLoop )
 {
 #ifndef NOSOUND
 	if (i==SOUNDHANDLE_INVALID)return false;
 	if (djSoundEnabled()) {
 		Mix_PlayChannel(0,sounds[i],0);
+		//^ fixme todo i think this should use -1 as 2nd parameter, that should fix 'explosion sounds don't always play'? but needs more testing etc.[dj2016-10]
+		//Mix_PlayChannel(bLoop?1:-1,sounds[i],bLoop ? -1 : 0);
 		// while (*Mix_Playing(0)) { SDL_Delay(100); }
 	}
 #endif
 	return true;
+}
+
+int djSoundGetVolume()
+{
+	return g_nVolume;
+}
+
+void djSoundSetVolume(int nVolume,bool bApply)
+{
+	if (g_nVolume!=nVolume)
+	{
+		g_nVolume = nVolume;
+		if (g_nVolume<0)g_nVolume=0;
+		if (g_nVolume>128)g_nVolume=128;
+
+#ifndef NOSOUND
+		if (bApply)
+		{
+			Mix_Volume(-1,g_nVolume);
+		}
+#endif
+	}
+}
+
+bool djSoundAdjustVolume(int nDiff)
+{
+#ifndef NOSOUND
+	int nVolumePrev = g_nVolume;
+	g_nVolume += nDiff;
+	if (g_nVolume<0)g_nVolume=0;
+	if (g_nVolume>128)g_nVolume=128;//MIX_MAX_VOLUME
+	if (nVolumePrev != g_nVolume)
+	{
+		Mix_Volume(-1,g_nVolume);
+		return true;
+	}
+#endif
+	return false;
 }

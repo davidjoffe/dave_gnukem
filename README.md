@@ -26,6 +26,7 @@ Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by A
 
 Recent:
 
+* Add game volume controls (use PgUp and PgDn keys to increase/decrease volume from menus or in-game)
 * Level Editor: New feature: Hold in Ctrl+Alt and click with the mouse to automatically start level with hero 'dropped in' to the clicked position as starting position (to help with level editing / testing)
 
 2016/10/16 - Version 0.62

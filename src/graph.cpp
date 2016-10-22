@@ -15,6 +15,7 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include <stdlib.h>
 #include "SDL.h"
 #include "sys_log.h"//Log
+#include "djstring.h"//djStrPrintf
 
 #include "graph.h"
 
@@ -30,10 +31,94 @@ djVisual *pVisMain = NULL;
 djVisual *pVisBack = NULL;
 djVisual *pVisView = NULL;
 
+//Very simple pseudo 'console message' [dj2016-10]
+std::string g_sMsg("");
+int g_nConsoleMsgTimer=0;//[milliseconds]
+void SetConsoleMessage( const std::string& sMsg )
+{
+	g_sMsg = sMsg;
+	g_nConsoleMsgTimer = 2000;//Display message for ~2s then it disappears
+}
+
 // ScaleView should also be false for the level editor [why does that already work?]
 void GraphFlip(bool bScaleView)
 {
+	const bool bShowFrameRate = false;//<- DEBUG? 'global' frame rate
+
+	// in leveled i think pVisBack is NULL??? not sure [dj2016-10] don't want this in level editor
+	SDL_Surface* pVisTemp = NULL;//<-cbsu/sbsu? create once not every frame? this is just to remember temporarily
+	// what's 'behind' the console message and immediately restore it after, otherwise e.g. say subsequent
+	// volume changes cause the console message to draw over its previous self in a sort of 'additive' way
+	// leaving text looking messed up [dj2016-10]
+	if (pVisBack!=NULL && g_pFont8x8!=NULL && (!g_sMsg.empty() || bShowFrameRate))
+	{
+		pVisTemp = SDL_CreateRGBSurface(SDL_HWSURFACE, 320, 8, pVisBack->pSurface->format->BitsPerPixel,
+			pVisBack->pSurface->format->Rmask,
+			pVisBack->pSurface->format->Gmask,
+			pVisBack->pSurface->format->Bmask,
+			0);
+		if (pVisTemp)
+		{
+			SDL_Rect Rect;
+			Rect.x=0;
+			Rect.y=0;
+			Rect.w=320;
+			Rect.h=8;
+			SDL_BlitSurface(pVisBack->pSurface, &Rect, pVisTemp, &Rect);
+		}
+
+		//SDL_GetTicks "Get the number of milliseconds since the SDL library initialization". Note that SDL_GetTicks wraps at ~49days
+		static unsigned int uTimeLast = 0;
+		if (uTimeLast==0)
+			uTimeLast = SDL_GetTicks();
+		unsigned int uTimeNow = SDL_GetTicks();
+
+		if (!g_sMsg.empty())
+		{
+			GraphDrawString( pVisBack, g_pFont8x8, 0, 0, (const unsigned char*)g_sMsg.c_str() );
+			
+			// Clear console message after a certain time
+			if (uTimeNow>=0 && uTimeNow>uTimeLast)
+			{
+				g_nConsoleMsgTimer -= ((int)uTimeNow - (int)uTimeLast);
+				if (g_nConsoleMsgTimer<=0)
+				{
+					g_sMsg.clear();
+					g_nConsoleMsgTimer = -1;
+				}
+			}
+		}
+
+		if (bShowFrameRate)
+		{
+			// Simple global frame rate display [?]
+			// Be careful to avoid divide by zero here
+			std::string sFrameRate;//Note this is 'instantaneous' frame rate i.e. last-frame-only so can look a bit jumpy, no smoothing
+			if (uTimeNow>=0 && uTimeNow>uTimeLast)
+			{
+				sFrameRate = djStrPrintf("%.2f", 1000.f / (float)(uTimeNow - uTimeLast) );
+				GraphDrawString( pVisBack, g_pFont8x8, 150, 0, (const unsigned char*)sFrameRate.c_str() );
+			}
+		}
+
+		uTimeLast = uTimeNow;
+	}
+
 	djgFlip( pVisMain, pVisBack, bScaleView );
+
+	// Restore to back buffer what was underneath the message
+	if (pVisTemp)
+	{
+		SDL_Rect Rect;
+		Rect.x=0;
+		Rect.y=0;
+		Rect.w=320;
+		Rect.h=8;
+		SDL_BlitSurface(pVisTemp, &Rect, pVisBack->pSurface, &Rect);
+
+		// inefficient .. do this once not every frame ..
+		SDL_FreeSurface(pVisTemp);
+	}
 }
 
 bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
