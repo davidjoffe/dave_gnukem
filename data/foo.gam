@@ -1,5 +1,6 @@
-The Foo Game
-This is a foo mission pack. Bite me.
+Sample/Template Game
+Description of this game, set of levels etc. This can cover multiple
+lines blah blah blah etc. Ends with a single tilde on a line.
 ~
 levels/foo.lev,data/levels/bg1.tga,Foo Level,David Joffe
 levels/template.lev,data/levels/bg1.tga,Template Level,David Joffe
