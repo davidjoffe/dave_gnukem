@@ -69,7 +69,7 @@ static void MoveMinimap( int ox, int oy );
 static void DrawMinimapRectangle();
 static void RedrawView ();
 static void DrawSprites ();
-static void DrawGrid( int x, int y, int w, int h, int nx, int ny, djColor clr );
+static void DrawGrid( int x, int y, int w, int h, int nx, int ny, const djColor& clr );
 static void DrawLevelGrid();
 static void DrawLevelname();
 static void DrawMinimap();
@@ -481,7 +481,7 @@ void DrawSprites ()
 }
 
 
-void DrawGrid( int x, int y, int w, int h, int nx, int ny, djColor clr )
+void DrawGrid( int x, int y, int w, int h, int nx, int ny, const djColor& clr )
 {
 	djgSetColorFore( pVisMain, clr );
 	int i;
