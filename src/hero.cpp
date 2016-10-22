@@ -25,10 +25,10 @@ int nHurtCounter = 0;
 struct SJumpInfo
 {
 	int size;         // number of offsets
-	int * jump_diffs; // offsets (y axis)
+	const int * jump_diffs; // offsets (y axis)
 };
-int g_aiJumpNormal[] = { -1, -1, -1,  0, 0, 0, 1, 1, 1 };
-int g_aiJumpBoots[]  = { -1, -1, -1, -1, 0, 0, 0, 1, 1, 1, 1 };
+const int g_aiJumpNormal[] = { -1, -1, -1,  0, 0, 0, 1, 1, 1 };
+const int g_aiJumpBoots[]  = { -1, -1, -1, -1, 0, 0, 0, 1, 1, 1, 1 };
 
 // NOTE: I've made these 1 smaller than they actually are, so that the last one is always
 // just a "natural" falling .. which allows dust to be kicked up. There is still a bug
