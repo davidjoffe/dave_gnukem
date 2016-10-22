@@ -20,7 +20,7 @@ INCLUDEDIRS= -I/usr/include/SDL -I/usr/local/include/SDL
 # If you don't -DDATA_DIR to a valid dir, then data files will be assumed
 # to be in current directory
 #CCFLAGS = -Wall -I/usr/local/include -DHAVE_SOUND -DDEBUG -O -m486
-CCFLAGS = -Wall -Wno-switch -DUSESDL -DDEBUG $(INCLUDEDIRS)
+CCFLAGS = -Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
 #Release version:
 #CCFLAGS = -O -Wall -I/usr/local/include -DHAVE_SOUND $(INCLUDEDIRS)
 

@@ -10,11 +10,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
                         PSTR szCmdLine,
                         int iCmdShow)
 {
-#ifndef USESDL
-	// Extra initialization needed for Windows
-	//djgInitWin32( (int)hInstance );
-#endif
-
 	// FIXME: The intel compiler thinks that you cannot do this .. ???
 	// Run the standard "main" function
 	return main(__argc, __argv);
