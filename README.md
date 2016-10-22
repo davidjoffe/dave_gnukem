@@ -22,6 +22,24 @@ https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrol
 ## About Duke Nukem 1
 Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by Apogee Software in 1991 that launched the Duke Nukem series: https://goo.gl/yP4PbS  The original Duke Nukem 1 was created by Todd Replogle (co-creator of the Duke Nukem series), John Carmack (of id Software), Scott Miller (founder of 3D Realms), Allen H. Blum III, George Broussard, and Jim Norwood.
 
+## Gameplay Instructions
+
+Try find the exit, while dodging or shooting monsters.
+
+### Default Keys:
+
+* Left/Right: Move left/right
+* Ctrl: Jump
+* Alt: Shoot
+* Up Arrow: Action key (for e.g. opening doors, using teleporters or lifts, activating the exit, etc.)
+* Escape: In-game menu
+
+* PgUp/PgDn: Increase/decrease volume
+
+To open doors, find the correct color key, and press the action key on the 'lock' nearby the door(s).
+
+Power boots allow you to jump higher.
+
 # History / Changes
 
 Recent:
