@@ -71,7 +71,7 @@ public:
 // Color management
 
 //! Create a 32-bit unsigned int representing the given colour as it should be written to the given display surface.
-extern unsigned int djgMapColor( djVisual *pVis, djColor color );
+extern unsigned int djgMapColor( djVisual *pVis, const djColor& color );
 /*--------------------------------------------------------------------------*/
 // Visual management
 
@@ -91,11 +91,11 @@ extern void      djgFlush( djVisual * pVis );
 //-- Color functions
 
 //! set foreground and background colors
-extern void       djgSetColor( djVisual *pVis, djColor clrFore, djColor clrBack );
+extern void       djgSetColor( djVisual *pVis, const djColor& clrFore, const djColor& clrBack );
 //! set foreground color
-extern void       djgSetColorFore( djVisual * pVis, djColor color );
+extern void       djgSetColorFore( djVisual * pVis, const djColor& color );
 //! set background color
-extern void       djgSetColorBack( djVisual * pVis, djColor color );
+extern void       djgSetColorBack( djVisual * pVis, const djColor& color );
 
 //-- Drawing primitives
 
@@ -104,7 +104,7 @@ extern void       djgClear( djVisual * pVis );
 //! Put pixel
 extern void       djgPutPixel( djVisual * pVis, int x, int y, int r, int g, int b );
 //! Put pixel
-extern void       djgPutPixel( djVisual * pVis, int x, int y, djColor color );
+extern void       djgPutPixel( djVisual * pVis, int x, int y, const djColor& color );
 //! draw rectangle in current color
 extern void       djgDrawRectangle( djVisual * pVis, int x, int y, int w, int h );
 //! draw filled box in current color
