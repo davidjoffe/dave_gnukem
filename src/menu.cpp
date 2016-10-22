@@ -18,7 +18,6 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include "djinput.h"
 #include "djtime.h"
 #include "sys_error.h"
-//#include <SDL_mixer.h>
 
 
 int option;
@@ -52,25 +51,6 @@ int do_menu( CMenu *pMenu )
 	int i;
 	int size;
 	const unsigned char *szCursor;
-
-	/*
-	//extern SOUND_HANDLE g_iSounds[SOUND_MAX];
-	static SOUND_HANDLE idMusic = (SOUND_HANDLE)-1;
-	if ((int)idMusic < 0)
-	{
-		//idMusic = djSoundLoad("data/music/Monster-Street-Fighters.wav");//The-Darkness-Below_Looping.wav");//djSoundLoad("data/music/Classy-8-Bit.wav");
-		//idMusic = djSoundLoad("data/music/8-Bit-Mayhem.wav");//<-A bit too heavy on the beat maybe
-		//idMusic = djSoundLoad("data/music/Classy-8-Bit.wav");
-		idMusic = djSoundLoad("data/music/Mister-Snarkypants.wav");//A maybe? for a later map
-		if ((int)idMusic>=0)
-		{
-			extern Mix_Chunk *sounds[255];
-			//Mix_Volume(1,MIX_MAX_VOLUME/2);
-			Mix_FadeInChannel(1, sounds[idMusic], -1, 400);
-			//djSoundPlay( idMusic, true );
-		}
-	}
-	*/
 
 	// Initialize cursor animation
 	szCursor = pMenu->getMenuCursor();
@@ -144,13 +124,13 @@ int do_menu( CMenu *pMenu )
 				// 'Global' shortcut keys for adjusting volume [dj2016-10]
 				if (Event.key.keysym.sym==SDLK_PAGEUP)
 				{
-					if (djSoundAdjustVolume(4))
-						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+					djSoundAdjustVolume(4);
+					SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
 				}
 				else if (Event.key.keysym.sym==SDLK_PAGEDOWN)
 				{
-					if (djSoundAdjustVolume(-4))
-						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+					djSoundAdjustVolume(-4);
+					SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
 				}
 
 				// up arrow
