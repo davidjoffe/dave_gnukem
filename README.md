@@ -105,7 +105,7 @@ Dependencies: You may have to first install LibSDL1.2 and LibSDL-Mixer1.2 (these
 	* Clean up of 'textures'
 	* Actual hardware accel if available [todo: proper blending]
 	* Restoring hardware surfaces on toggle fullscreen with DirectX
-* Explosion sound doesn't always play
+* Explosion sound doesn't always play (fixed 2016-10-22 but fix could use more testing, cf. channel -1 story)
 * DEV
 	* Update TargetName to DaveGnukem in VS2010
 	* Set up working folders to work 'out the box', so to speak
