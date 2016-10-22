@@ -427,7 +427,7 @@ int CSpriteData::LoadData( const char *szFilename )
 			{
 				for ( int k=0; k<16; k++ )
 				{
-					djColor clr = m_pImage->GetPixelColor(k+iIndexX, j+iIndexY);
+					const djColor& clr = m_pImage->GetPixelColor(k+iIndexX, j+iIndexY);
 					r += (int)clr.r;
 					g += (int)clr.g;
 					b += (int)clr.b;
