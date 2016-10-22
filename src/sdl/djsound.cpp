@@ -103,8 +103,10 @@ bool djSoundPlay( SOUND_HANDLE i )//, bool bLoop )
 #ifndef NOSOUND
 	if (i==SOUNDHANDLE_INVALID)return false;
 	if (djSoundEnabled()) {
-		Mix_PlayChannel(0,sounds[i],0);
-		//^ fixme todo i think this should use -1 as 2nd parameter, that should fix 'explosion sounds don't always play'? but needs more testing etc.[dj2016-10]
+		// [dj2016-10] Changing this channel here from 0 to -1 (to auto-select 'next available channel') .. I think this should fix
+		// the 'explosion sounds don't always play' issue, but this needs more testing etc. ... I think the issue with explosion
+		// sounds not playing is this was always trying to play all sounds on channel 0 so if channel busy then sound doesn't play.
+		Mix_PlayChannel(-1,sounds[i],0);
 		//Mix_PlayChannel(bLoop?1:-1,sounds[i],bLoop ? -1 : 0);
 		// while (*Mix_Playing(0)) { SDL_Delay(100); }
 	}
