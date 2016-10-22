@@ -46,11 +46,9 @@ class djVisual
 public:
 	djVisual()
 	{
-#ifdef USESDL
 		pSurface = NULL;
 		colorfore = djColor(255,255,255);
 		colorback = djColor(0,0,0);
-#endif
 		width    = 0;
 		height   = 0;
 		stride   = 0;
@@ -58,11 +56,9 @@ public:
 		pixwidth = 0;
 		m_bFullscreen = false;
 	}
-#ifdef USESDL
 	SDL_Surface *pSurface;
 	djColor                  colorfore;
 	djColor                  colorback;
-#endif
 	int                      width;
 	int                      height;
 	int                      stride;
