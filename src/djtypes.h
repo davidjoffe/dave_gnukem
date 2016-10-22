@@ -22,14 +22,20 @@ class djColor
 {
 public:
 	djColor() : r(0), g(0), b(0), a(255) { }
-	djColor(unsigned short ir, unsigned short ig, unsigned short ib)
+	djColor(unsigned char ir, unsigned char ig, unsigned char ib)
 		: r(ir), g(ig), b(ib), a(255) { }
-	djColor(unsigned short ir, unsigned short ig, unsigned short ib, unsigned short ia)
+	djColor(unsigned char ir, unsigned char ig, unsigned char ib, unsigned char ia)
 		: r(ir), g(ig), b(ib), a(ia) { }
-	unsigned short r;
-	unsigned short g;
-	unsigned short b;
-	unsigned short a;
+
+	// [dj2016-10] These were 'unsigned short' which is [now] 16-bit, I'm not 100% sure if these were somewhere along the way of the code history 'intended'
+	// to be 16-bit, or if maybe when I started back in the 90s a short was 8-bit or something, I don't know (it's possible as early dev target for this game was 16-bit);
+	// changing this to 'byte' to get rid of some compiler warnings and to make it consistent with the class documentation (which says 'byte' for RGBA etc.) - have
+	// checked through all uses of djColor and didn't immediately see anything that should break.
+
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
+	unsigned char a;
 };
 
 
