@@ -513,7 +513,7 @@ int game_startup()
 					}
 					else if (Event.key.keysym.sym==SDLK_PAGEDOWN)
 					{
-						djSoundAdjustVolume(4);
+						djSoundAdjustVolume(-4);
 						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
 					}
 					break;
