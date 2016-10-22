@@ -3,13 +3,15 @@
 \brief   Some string helper functions
 \author  David Joffe
 
-Copyright (C) 1998-2002 David Joffe
+Copyright (C) 1998-2016 David Joffe
 
 License: GNU GPL Version 2 (*not* "later versions")
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _DJSTRING_H_
 #define _DJSTRING_H_
+
+#include <string>
 
 //! Make a deep copy of string. Must be deleted with "delete[]".
 extern char * djStrDeepCopy( const char * src );
@@ -24,5 +26,8 @@ extern void   djStrToLower( char * str );
 //! eg djStrPart("a,b;c,d", 3, ",;") should return "c"
 //! You are responsible for deleting the string it returns
 extern char * djStrPart( const char *str, int i, const char *delim );
+
+//! Helper to create a std::string with value as per printf-style formatting and variable argument list
+extern std::string djStrPrintf( const char* szFormat, ... );
 
 #endif

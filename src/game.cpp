@@ -40,6 +40,7 @@ using namespace std;
 #include "bullet.h"
 #include "hiscores.h"
 #include "sys_log.h"
+#include "djstring.h"//djStrPrintf
 
 int VIEW_WIDTH = 12;
 int VIEW_HEIGHT = 10;
@@ -448,6 +449,18 @@ int game_startup()
 						if (Event.key.keysym.sym==g_anKeys[i])
 							anKeyState[i] = 1;
 					}
+
+					// 'Global' shortcut keys for adjusting volume [dj2016-10]
+					if (Event.key.keysym.sym==SDLK_PAGEUP)
+					{
+						if (djSoundAdjustVolume(4))
+							SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+					}
+					else if (Event.key.keysym.sym==SDLK_PAGEDOWN)
+					{
+						if (djSoundAdjustVolume(-4))
+							SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+					}
 					break;
 				case SDL_KEYUP:
 					for ( i=0; i<KEY_NUMKEYS; i++ )
@@ -630,8 +643,8 @@ int game_startup()
 			iFrameCount /= 2;
 			fTimeFirst += (fTimeRun/2);
 		}
-		djgDrawImage( pVisBack, pSkinGame, 0, 0, 0, 0, 196, 8 );
-		GraphDrawString( pVisBack, g_pFont8x8, 0, 0, (unsigned char*)sbuf );
+		djgDrawImage( pVisBack, pSkinGame, 0, 8, 0, 8, 196, 8 );
+		GraphDrawString( pVisBack, g_pFont8x8, 0, 8, (unsigned char*)sbuf );
 
 		// update
 		float fT1 = djTimeGetTime();

@@ -1,7 +1,7 @@
 /*
 djstring.cpp
 
-Copyright (C) 1998-2002 David Joffe
+Copyright (C) 1998-2016 David Joffe
 
 License: GNU GPL Version 2 (*not* "later versions")
 */
@@ -13,6 +13,7 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include "mmgr/mmgr.h"
 
 #include "djstring.h"
+#include <stdarg.h>//va_list etc. [for djStrPrintf dj2016-10]
 
 char *djStrDeepCopy( const char * src )
 {
@@ -96,4 +97,19 @@ void djStrToLower( char * str )
 	{
 		if ((str[i] >= 'A') && (str[i] <= 'Z')) str[i] += 32;
 	}
+}
+
+std::string djStrPrintf( const char* szFormat, ... )
+{
+	if ( szFormat == NULL )
+		return "";
+
+	// Print the formatted string onto buf
+	char buf[4096]={0};
+	va_list args;
+	va_start(args, szFormat);
+	vsnprintf(buf, 4096, szFormat, args);
+	va_end(args);
+
+	return buf;
 }
