@@ -35,12 +35,17 @@ Try find the exit, while dodging or shooting monsters.
 * Escape: In-game menu
 
 * PgUp/PgDn: Increase/decrease volume
+* Insert: Toggle sounds on/off
 
 To open doors, find the correct color key, and press the action key on the 'lock' nearby the door(s).
 
 Power boots allow you to jump higher.
 
 # History / Changes
+
+Recent:
+
+* Add shortcut key to toggle sounds on/off (Insert)
 
 2016/10/22 - Version 0.63 / 0.64 / 0.65
 
@@ -157,3 +162,11 @@ Dependencies: You may have to first install LibSDL1.2 and LibSDL-Mixer1.2 (these
 * ? Make a list of 'level TODOs' that are must-have for a 'version 1'?
 
 
+
+# Additional Credits
+
+* (2016-10-23) data/sounds/shoot\_cg1_modified.wav Slightly modified version of cg1.wav from http://opengameart.org/content/chaingun-pistol-rifle-shotgun-shots by Michel Baradari http://michel-baradari.de/
+	"Sounds (c) by Michel Baradari apollo-music.de
+	Licensed under CC BY 3.0 http://creativecommons.org/licenses/by/3.0/
+	Hosted on opengameart.org"
+* (2016-10-23) data/sounds/sfx\_weapon_singleshot7.wav by Juhani Junkala (CC0 creative commons license) ("The Essential Retro Video Game Sound Effects Collection [512 sounds]")

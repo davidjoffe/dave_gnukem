@@ -11,7 +11,9 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include "../djlog.h"
 #include <SDL_audio.h>
 #include <SDL_error.h>
+#ifndef NOSOUND
 #include <SDL_mixer.h>
+#endif
 
 #ifdef __APPLE__
 #include <stdlib.h>//Fixing malloc.h 'not found' error compiling on Mac [dj2016-10]
@@ -24,8 +26,8 @@ License: GNU GPL Version 2 (*not* "later versions")
 //For now [dj2016-10] just make background music some relative percentage of the main volume (so background is a bit softer so as not to get too annoying) - later could add a separate setting for background music volume
 const float fBACKGROUNDMUSIC_RELATIVE_VOLUME = 0.36f;
 
-bool bSoundEnabled = false;
-bool bHaveMixer = false;
+bool g_bSoundInit = false;
+bool g_bSoundEnabled = true;
 Mix_Chunk *sounds[255]={NULL};
 int numsounds = 0;
 int g_nVolume = 85;//[0..128] Default volume (don't have default volume at max, I think? dj2016-10) Note LibSDL Mixer MIX_MAX_VOLUME is 128.
@@ -34,24 +36,51 @@ int g_nVolume = 85;//[0..128] Default volume (don't have default volume at max, 
 // Common
 //
 /*--------------------------------------------------------------------------*/
+void SetVolumeHelper()
+{
+#ifndef NOSOUND
+	if (g_bSoundInit)
+	{
+	Mix_Volume(-1,g_bSoundEnabled ? g_nVolume : 0);
+	Mix_VolumeMusic(g_bSoundEnabled ? (int)((float)g_nVolume * fBACKGROUNDMUSIC_RELATIVE_VOLUME) : 0);//For now [dj2016-10] just make background music some relative percentage of the main volume (so background is a bit softer so as not to get too annoying) - later could add a separate setting for background music volume
+	}
+#endif
+}
+/*--------------------------------------------------------------------------*/
 void djSoundEnable()
 {
-	bSoundEnabled = true;
+	if (!g_bSoundEnabled)
+	{
+#ifndef NOSOUND
+		Mix_ResumeMusic();
+#endif
+		g_bSoundEnabled = true;
+		SetVolumeHelper();
+	}
 }
 
 void djSoundDisable()
 {
-	bSoundEnabled = false;
+	if (g_bSoundEnabled)
+	{
+#ifndef NOSOUND
+		Mix_PauseMusic();
+#endif
+		g_bSoundEnabled = false;
+		SetVolumeHelper();
+	}
 }
 
 bool djSoundEnabled()
 {
-	return bSoundEnabled;
+	return g_bSoundEnabled;
 }
 
 int djSoundInit()
 {
 #ifndef NOSOUND
+	//if (!g_bSoundInit)
+	//{
 	numsounds = 0;
 	int audio_channels=2;
 	if (Mix_OpenAudio(22050, AUDIO_S16, audio_channels, 1024) < 0) {
@@ -61,10 +90,12 @@ int djSoundInit()
 		djSoundDisable();
 		return 0;
 	}
+	// This must be set before calling SetVolumeHelper() or volume will start at 100%
+	g_bSoundInit = true;
 	//dj2016-10 Adding ability to change volume
-	Mix_Volume(-1,g_nVolume);
-	Mix_VolumeMusic((int)((float)g_nVolume * fBACKGROUNDMUSIC_RELATIVE_VOLUME));//For now [dj2016-10] just make background music some relative percentage of the main volume (so background is a bit softer so as not to get too annoying) - later could add a separate setting for background music volume
-	djSoundEnable();
+	SetVolumeHelper();
+	//djSoundEnable();
+	//}
 #endif
 	return 1;
 }
@@ -80,6 +111,7 @@ void djSoundDone()
 	}
 	numsounds = 0;
 #endif
+	g_bSoundInit = false;
 }
 
 SOUND_HANDLE djSoundLoad( const char *szFilename )
@@ -134,8 +166,7 @@ void djSoundSetVolume(int nVolume,bool bApply)
 #ifndef NOSOUND
 		if (bApply)
 		{
-			Mix_Volume(-1,g_nVolume);
-			Mix_VolumeMusic((int)((float)g_nVolume * fBACKGROUNDMUSIC_RELATIVE_VOLUME));//For now [dj2016-10] just make background music some relative percentage of the main volume (so background is a bit softer so as not to get too annoying) - later could add a separate setting for background music volume
+			SetVolumeHelper();
 		}
 #endif
 	}
@@ -150,8 +181,7 @@ bool djSoundAdjustVolume(int nDiff)
 	if (g_nVolume>128)g_nVolume=128;//MIX_MAX_VOLUME
 	if (nVolumePrev != g_nVolume)
 	{
-		Mix_Volume(-1,g_nVolume);
-		Mix_VolumeMusic((int)((float)g_nVolume * fBACKGROUNDMUSIC_RELATIVE_VOLUME));//For now [dj2016-10] just make background music some relative percentage of the main volume (so background is a bit softer so as not to get too annoying) - later could add a separate setting for background music volume
+		SetVolumeHelper();
 		return true;
 	}
 #endif

@@ -234,6 +234,12 @@ int DaveStartup(bool bFullScreen, bool b640)
 	{
 		djSoundSetVolume( g_Settings.FindSettingInt("Volume"), false );//NB Don't "apply" the volume setting because sound library only init'd slightly further down
 	}
+	const char* szValue = g_Settings.FindSetting("SoundsOn");
+	if (szValue!=NULL && std::string(szValue)=="OFF")//on by default unless specifically turned off
+	{
+		djSoundDisable();
+		SetConsoleMessage("Sounds OFF (Ins)");
+	}
 
 	srand(time(NULL));				// Seed the random number generator
 
@@ -293,6 +299,7 @@ void DaveCleanup()
 
 	// Save user volume setting
 	g_Settings.SetSettingInt("Volume",djSoundGetVolume());
+	g_Settings.SetSetting("SoundsOn",djSoundEnabled()?"ON":"OFF");
 
 	KillMainMenu();
 	Log ( "KillMainMenu() ok\n" );
@@ -340,7 +347,7 @@ void DoMainMenu()
 		if (g_pImgMain)
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
 		char sz[100]={0};
-		sprintf(sz,"%s","v0.65 (22 Oct 2016)");
+		sprintf(sz,"%s","v0.65b (23 Oct 2016)");
 		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8*2, (unsigned char*)sz);
 		sprintf(sz,"%s","http://djoffe.com/");
 		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8, (unsigned char*)sz);
@@ -483,9 +490,9 @@ void RedefineKeys()
 		{
 			switch (Event.type)
 			{
-			case SDL_KEYDOWN:
-				break;
-			case SDL_KEYUP:
+			//case SDL_KEYDOWN:
+				//break;
+			case SDL_KEYDOWN://UP:
 				switch (Event.key.keysym.sym)
 				{
 				case SDLK_ESCAPE:
