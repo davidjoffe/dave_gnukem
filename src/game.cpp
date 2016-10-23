@@ -42,8 +42,10 @@ using namespace std;
 #include "sys_log.h"
 #include "djstring.h"//djStrPrintf
 
+#ifndef NOSOUND
 #include <SDL_mixer.h>//For background music stuff
 Mix_Music* g_pGameMusic=NULL;
+#endif
 
 int VIEW_WIDTH = 12;
 int VIEW_HEIGHT = 10;
@@ -94,10 +96,11 @@ void IngameMenu();
 const char *g_szSoundFiles[SOUND_MAX] =
 {
 	"data/sounds/pickup.wav",
-	"data/sounds/laser2.wav",
+	"data/sounds/shoot_cg1_modified.wav",//<- Hero shoot sound
 	"data/sounds/bark.wav",
 	"data/sounds/wooeep.wav",
-	"data/sounds/explode.wav"
+	"data/sounds/explode.wav",
+	"data/sounds/sfx_weapon_singleshot7.wav"//<- Monster shoot sound
 };
 SOUND_HANDLE g_iSounds[SOUND_MAX];
 
@@ -515,6 +518,14 @@ int game_startup()
 					{
 						djSoundAdjustVolume(-4);
 						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+					}
+					else if (Event.key.keysym.sym==SDLK_INSERT)
+					{
+						if (djSoundEnabled())
+							djSoundDisable();
+						else
+							djSoundEnable();
+						SetConsoleMessage( djSoundEnabled() ? "Sounds ON (Ins)" : "Sounds OFF (Ins)" );
 					}
 					break;
 				case SDL_KEYUP:
@@ -1140,7 +1151,7 @@ void MonsterShoot(int nX, int nY, int nXDiff, int nYDiff)
 	pBullet->dy = nYDiff;
 	pBullet->eType = CBullet::BULLET_MONSTER;
 	g_apBullets.push_back(pBullet);
-	djSoundPlay( g_iSounds[SOUND_SHOOT] );
+	djSoundPlay( g_iSounds[SOUND_SHOOT2] );
 }
 
 void HeroSetHurting(bool bReset)

@@ -15,10 +15,6 @@ License: GNU GPL Version 2 (*not* "later versions")
 typedef unsigned int SOUND_HANDLE;
 #define SOUNDHANDLE_INVALID ((unsigned int)~0)
 
-extern bool bSoundEnabled;
-// not all sound cards have a mixer
-extern bool bHaveMixer;
-
 extern int          djSoundInit();
 extern void         djSoundDone();
 extern void         djSoundEnable();

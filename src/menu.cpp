@@ -132,6 +132,14 @@ int do_menu( CMenu *pMenu )
 					djSoundAdjustVolume(-4);
 					SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
 				}
+				else if (Event.key.keysym.sym==SDLK_INSERT)
+				{
+					if (djSoundEnabled())
+						djSoundDisable();
+					else
+						djSoundEnable();
+					SetConsoleMessage( djSoundEnabled() ? "Sounds ON (Ins)" : "Sounds OFF (Ins)" );
+				}
 
 				// up arrow
 				else if (Event.key.keysym.sym==SDLK_UP)
@@ -193,6 +201,7 @@ int do_menu( CMenu *pMenu )
 	if (option == -1)
 		djiWaitForKeyUp(DJKEY_ESC);
 	else
+		//this isn't working [anymore?] for redefine keys???
 		djiWaitForKeyUp(DJKEY_ENTER);
 
 	//Mix_FadeOutChannel(1, 1000);
