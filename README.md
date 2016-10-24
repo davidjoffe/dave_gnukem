@@ -1,9 +1,8 @@
 # Dave Gnukem
 Dave Gnukem is a 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The game is intentionally somewhat 'retro'; the original Duke Nukem 1 had 16-color EGA 320x200 graphics.)
 
-Source code repository: https://github.com/davidjoffe/dave_gnukem
-
-**Release Downloads:**: https://sourceforge.net/projects/gnukem/
+**Release Downloads:** https://sourceforge.net/projects/gnukem/
+**Source code repository:** https://github.com/davidjoffe/dave_gnukem
 
 Old project page: http://gnukem.sourceforge.net/
 
@@ -100,6 +99,32 @@ Same as Linux - type 'make'. Run with ./davegnukem if it built correctly.
 
 Dependencies: You may have to first install LibSDL1.2 and LibSDL-Mixer1.2 (these can be installed by downloading the source code and doing 'make' and 'make install' (as root) for each of these first).
 
+# Level Editor Instructions
+
+
+Note there is currently no 'undo', so be careful. If happy with a set of work, save your changes.
+
+* F5 from within the game invokes the level editor
+* F1: Save current changes (NB: there is currently no 'unsaved changes' warning, so remember to save your changes, if desired)
+* Escape: Exit level editor and start playing current level
+* Hold in Ctrl+Alt and click with the mouse to drop in hero and start playing/testing level at the clicked position
+* X: Toggle display/editing of 'foreground layer' (there are two 'layers', the background layer primarily for solid stuff, e.g. walls, and the foreground layer generally for e.g. objects or monsters, or other semi-transparent objects)
+* Z: Toggle display/editing of 'background layer'
+* M,N: Previous/Next spriteset. There is a left-click and right-click "sprite palette"; clicking the left or right mouse button in the map preview area places an object from the left-click or right-click palette, respectively. Click in the spriteset with the left or mouse button to select that sprite object to either the left or right-click "sprite palette".
+* To select the hero start position in the map, select and place either the 2nd-last or 3rd-last object in the first spriteset (it looks like a figure with a left or right arrow, which indicates the start direction). There should only be one of these per level.
+* To place the exit position in the map, select and place the last object in the first spritset. There should only be one of these per level.
+* 1-9: Macros: Float the mouse cursor in the map preview area and press one of these shortcuts to place from a few pre-defined complex objects, e.g. crates.
+* F: Do a 'horizontal fill' of the current selected sprite (on the current layer)
+* To choose the desired level, use the Up+L 'cheat' from within the game
+* To choose the desired 'game' i.e. 'mission' (i.e. set of levels), use the main game menu 'Select mission'
+
+Note that for active animated objects that consist in the spriteset of multiple sprites (e.g. each conveyor belt piece has 4 sprites, for its animation), you *must* place the *first* of the four in the map for the object to work correctly.
+
+Keep in mind that once the hero has the powerboots, he'll be able to jump higher. So there is a sort of logical progression if you place powerboots in a level, i.e. they should be placed once per 'mission' (i.e. set of levels), and levels prior to that should assume the default lower jump height, levels after that point might possibly assume the higher jump height.
+
+To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add a new line containing the name of your .gam file, e.g. "mygame/mygame.gam" (without quotes). (You should try keep all files associated with a particular game/mission in its own subfolder.) To add/remove levels for that game/mission, edit the .gam file (see the included .gam files to see the format).
+
+
 # TODOs (To Sort):
 
 * Create 'Roadmap' to "version 1"? E.g. starter list below:
@@ -120,9 +145,6 @@ Dependencies: You may have to first install LibSDL1.2 and LibSDL-Mixer1.2 (these
 * [med] Level Editor is hogging CPU [check sprite editor, does it also?]
 * Finalize sprites and other graphics to at least reasonable ready state
 * Finalize a basic playable set of levels
-* To make it easier to edit levels, need
-	some way to easily 'place' hero
-	at the map area you're editing
 * Check for all possible hardcoded keys that may be interfering with redefined keys (e.g. Ctrl, H, backspace+G etc.)
 * [After redefine keys] Ctrl *both* shoot and jump
 * H to damage health should not be on by default [likewise other things]
