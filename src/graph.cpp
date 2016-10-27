@@ -9,6 +9,9 @@ License: GNU GPL Version 2 (*not* "later versions")
 */
 /*--------------------------------------------------------------------------*/
 
+#ifdef WIN32
+#include <Windows.h>
+#endif
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
@@ -133,11 +136,13 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 	// (i.e. square aspect ratio of pixels, etc.)
 	// [low/future] - if 2 monitors, will this behave 'correct'
 	const SDL_VideoInfo* vidinfo = SDL_GetVideoInfo();
+	int max_w = -1;
+	int max_h = -1;
 	if (vidinfo)
 	{
 		// THIS MUST BE TESTED ON LINUX [dj2016-10]
-		int max_w = vidinfo->current_w;
-		int max_h = vidinfo->current_h;
+		max_w = vidinfo->current_w;
+		max_h = vidinfo->current_h;
 		if (max_w>iWidth && max_h>iHeight)
 		{
 			int nMultiple = djMAX(1, djMIN( vidinfo->current_w / iWidth, vidinfo->current_h / iHeight ) );
@@ -190,6 +195,30 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 		g_pFont8x8->Load( FILE_IMG_FONT );
 		djCreateImageHWSurface( g_pFont8x8 );
 	}
+
+#ifdef WIN32
+	// [Windows] Not sure if it's LibSDL or Windows but the window keeps getting created positioned so that the bottom portion of it is
+	// off the bottom of the screen and you have to manually move the window to play every time, which is annoying ... attempting here
+	// to get HWND of active window and try move it automatically if it's off the bottom of the screen .. [dj2016-10]
+	//HANDLE hProc = ::GetCurrentProcess();
+	HWND hWnd = ::GetActiveWindow();
+	if (hWnd!=NULL)
+	{
+		RECT rc;
+		memset(&rc,0,sizeof(rc));
+		if (::GetWindowRect(hWnd,&rc))
+		{
+			// [Note we need to factor in the size of the Windows taskbar bla bla]
+			//if (max_h>0 && rc.top + iHeight >= max_h)
+			{
+			// For now just move window to top; later should try make his more 'intelligent' (or
+			// maybe with LibSDL2 this is perhaps better?
+			::MoveWindow(hWnd, rc.left, 0, iWidth, iHeight, false);
+			}
+		}
+	}
+#endif
+
 
 	return true;
 }
