@@ -20,8 +20,6 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include "sys_error.h"
 
 
-int option;
-
 void menu_move( CMenu *pMenu, int& option, int diff, unsigned char cCursor )
 {
 	djgSetColorFore( pVisBack, pMenu->getClrBack() );
@@ -47,16 +45,14 @@ void menu_move( CMenu *pMenu, int& option, int diff, unsigned char cCursor )
 /*--------------------------------------------------------------------------*/
 int do_menu( CMenu *pMenu )
 {
-	int option;
-	int i;
-	int size;
-	const unsigned char *szCursor;
+	int i=0;
+	int size=0;
 
 	// Initialize cursor animation
-	szCursor = pMenu->getMenuCursor();
+	const unsigned char *szCursor = pMenu->getMenuCursor();
 
 	// set default option
-	option = 1;
+	int option = 1;
 
 	// calculate size of menu
 	for ( size=0; pMenu->getItems()[size].m_szText != NULL; size++ )
