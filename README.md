@@ -44,6 +44,9 @@ Power boots allow you to jump higher.
 
 Recent:
 
+* Fix: Restore Game from main menu doesn't work
+* Fix: Save/Restore game doesn't save "mission" (i.e. selected "game")
+* Fix: On Windows, game window often starts slightly off bottom of screen
 * Add shortcut key to toggle sounds on/off (Insert)
 
 2016/10/22 - Version 0.63 / 0.64 / 0.65
