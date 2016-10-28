@@ -556,13 +556,13 @@ void RedefineKeys()
 			else if (anKeys[i]!=0)
 			{
 				// Show new key
-				char szBuf[1024] = "";
+				char szBuf[1024] = {0};
 				sprintf(szBuf, "(%s)", GetKeyString(anKeys[i]));
 				GraphDrawString( pVisBack, g_pFont8x8, 64+14*8, 64+i*16, (unsigned char*)szBuf );
 			}
 			// Show previous key
 			{
-				char szBuf[1024] = "";
+				char szBuf[1024] = {0};
 				sprintf(szBuf, "(%s)", GetKeyString(g_anKeys[i]));
 				GraphDrawString( pVisBack, g_pFont8x8, 64+22*8, 64+i*16, (unsigned char*)szBuf );
 			}
@@ -679,7 +679,7 @@ void CheckHighScores( int score )
 {
 	if (IsNewHighScore(score))
 	{
-		char szUserName[1024] = "";
+		char szUserName[1024] = {0};
 		if (GetHighScoreUserName(szUserName))
 		{
 			AddHighScore(szUserName, score);
