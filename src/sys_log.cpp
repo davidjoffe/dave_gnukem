@@ -208,7 +208,7 @@ void LogToConsole ( const bool l2c )
 
 void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 {
-	char	file[SYS_MAX_FILE];
+	char	file[SYS_MAX_FILE]={0};
 
 	if ( NULL == filename )
 		strcpy ( file, DEFAULT_LOG_FILE );
@@ -233,9 +233,9 @@ void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 
 void PushBackup2 ( const char *filename, int bklevel )
 {
-	char		oldname[SYS_MAX_FILE];
-	char		newname[SYS_MAX_FILE];
-	char		appendix[SYS_MAX_EXT];
+	char		oldname[SYS_MAX_FILE]={0};
+	char		newname[SYS_MAX_FILE]={0};
+	char		appendix[SYS_MAX_EXT]={0};
 	FILE		*ff = NULL;
 
 	strcpy ( oldname, filename );
@@ -269,8 +269,8 @@ void PushBackup2 ( const char *filename, int bklevel )
 
 void PushBackup ( const char *filename, int bklevel )
 {
-	char		newname[SYS_MAX_FILE];
-	char		appendix[SYS_MAX_EXT];
+	char		newname[SYS_MAX_FILE]={0};
+	char		appendix[SYS_MAX_EXT]={0};
 	FILE		*ff;
 
 	ff = fopen ( filename, "r" );

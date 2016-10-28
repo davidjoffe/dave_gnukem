@@ -107,7 +107,7 @@ int CMission::Load( char * szfilename )
 	ifstream	fin;
 	string		line;
 	int			state;
-	char		filename[2048];
+	char		filename[2048]={0};
 
 	SYS_Debug ( "CMission::Load( %s ): Loading ...\n", szfilename );
 
