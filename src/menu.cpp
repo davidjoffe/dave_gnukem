@@ -19,11 +19,13 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include "djtime.h"
 #include "sys_error.h"
 
+djImage* g_pImgMenuBackground8x8 = NULL;//dj2016-10 background 'noise' image experiment
 
 void menu_move( CMenu *pMenu, int& option, int diff, unsigned char cCursor )
 {
-	djgSetColorFore( pVisBack, pMenu->getClrBack() );
-	djgDrawBox( pVisBack, pMenu->getXOffset()+8, pMenu->getYOffset()+option*8, 8, 8 );
+	//djgSetColorFore( pVisBack, pMenu->getClrBack() );
+	//djgDrawBox( pVisBack, pMenu->getXOffset()+8, pMenu->getYOffset()+option*8, 8, 8 );
+	djgDrawImage( pVisBack, g_pImgMenuBackground8x8, pMenu->getXOffset()+8, pMenu->getYOffset()+option*8, 8, 8 );
 
 	int iOptionPrev = option;
 	option += diff;
@@ -48,6 +50,17 @@ int do_menu( CMenu *pMenu )
 	int i=0;
 	int size=0;
 
+	//dj2016-10-28 trying background image with 'noise' instead of solid background color for menu ..
+	if (g_pImgMenuBackground8x8==NULL)
+	{
+		g_pImgMenuBackground8x8 = new djImage;
+		if (g_pImgMenuBackground8x8->Load( "data/menucharbackground.tga" )>=0)
+		{
+			djCreateImageHWSurface( g_pImgMenuBackground8x8 );
+			//bLoaded = true;
+		}
+	}
+
 	// Initialize cursor animation
 	const unsigned char *szCursor = pMenu->getMenuCursor();
 
@@ -71,8 +84,48 @@ int do_menu( CMenu *pMenu )
 	{
 		// Draw blank underneath menu (FIXME: Somehow should be able to be image underneath)
 
-		djgSetColorFore( pVisBack, pMenu->getClrBack() );
-		djgDrawBox( pVisBack, pMenu->getXOffset(), pMenu->getYOffset()+i*8, 8 * strlen(pMenu->getItems()[i].m_szText), 8 );
+		//djgSetColorFore( pVisBack, pMenu->getClrBack() );
+		//djgDrawBox( pVisBack, pMenu->getXOffset(), pMenu->getYOffset()+i*8, 8 * strlen(pMenu->getItems()[i].m_szText), 8 );
+		//static bool bLoaded=false;
+		//if (bLoaded)
+		{
+			for ( unsigned int j=0; j<strlen(pMenu->getItems()[i].m_szText); ++j )
+			{
+				djgDrawImage( pVisBack, g_pImgMenuBackground8x8, pMenu->getXOffset()+j*8, pMenu->getYOffset()+i*8, 8, 8 );
+			}
+
+
+			//left+top 'light' lines
+			djgSetColorFore(pVisBack,djColor(80,80,80));
+			djgDrawRectangle( pVisBack,
+				pMenu->getXOffset(),
+				pMenu->getYOffset(),
+				1,
+				size*8);
+			//top
+			djgDrawRectangle( pVisBack,
+				pMenu->getXOffset(),
+				pMenu->getYOffset(),
+				strlen(pMenu->getItems()[0].m_szText)*8,
+				1
+				);
+
+			//bottom+right 'dark' lines
+			djgSetColorFore(pVisBack,djColor(35,35,35));
+			djgDrawRectangle( pVisBack,
+				pMenu->getXOffset()+2,
+				pMenu->getYOffset()+size*8,
+				strlen(pMenu->getItems()[0].m_szText)*8-2,
+				1);
+			//right
+			djgDrawRectangle( pVisBack,
+				pMenu->getXOffset()+strlen(pMenu->getItems()[0].m_szText)*8,
+				pMenu->getYOffset()+2,
+				1,
+				size*8-1
+				);
+		}
+
 
 		// Draw menu text
 		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset(), pMenu->getYOffset()+i*8, (unsigned char*)pMenu->getItems()[i].m_szText );

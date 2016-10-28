@@ -169,12 +169,18 @@ djImage *pBackground      = NULL; // Level background image
 /*--------------------------------------------------------------------------*/
 struct SMenuItem gameMenuItems[] =
 {
-	{ false, "{~~~~~~~~~~~~~~~~~}" },
+	/*{ false, "{~~~~~~~~~~~~~~~~~}" },//dj2016-10 try without the big borders ..
 	{ true,  "|  Continue       |" },
 	{ true,  "|  Save Game      |" },
 	{ true,  "|  Restore Game   |" },
 	{ true,  "|  Abort Game     |" },
-	{ false, "[~~~~~~~~~~~~~~~~~]" },
+	{ false, "[~~~~~~~~~~~~~~~~~]" },*/
+	{ false, "                   " },
+	{ true,  "   Continue        " },
+	{ true,  "   Save Game       " },
+	{ true,  "   Restore Game    " },
+	{ true,  "   Abort Game      " },
+	{ false, "                   " },
 	{ false, NULL }
 };
 unsigned char gameMenuCursor[] = { 128, 129, 130, 131, 0 };
