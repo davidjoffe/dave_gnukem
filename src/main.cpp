@@ -66,7 +66,7 @@ void KillMainMenu();
 // Main menu [NB, warning, the handling code uses indexes :/ .. so if you add/remove items, must update there too - dj2016-10]
 struct SMenuItem mainMenuItems[] =
 {
-	{ false, "{~~~~~~~~~~~~~~~~~}" },
+	/*{ false, "{~~~~~~~~~~~~~~~~~}" },//dj2016-10 try without the big borders ..
 	{ true,  "|  Start gnu game |" },
 	{ true,  "|  Select Mission |" },
 	{ true,  "|  Restore game   |" },
@@ -77,7 +77,19 @@ struct SMenuItem mainMenuItems[] =
 	{ true,  "|  High scores    |" },
 	{ true,  "|  Credits        |" },
 	{ true,  "|  Quit           |" },
-	{ false, "[~~~~~~~~~~~~~~~~~]" },
+	{ false, "[~~~~~~~~~~~~~~~~~]" },*/
+	{ false, "                   " },
+	{ true,  "   Start gnu game  " },
+	{ true,  "   Select Mission  " },
+	{ true,  "   Restore game    " },
+	{ true,  "   Ordering info   " },
+	{ true,  "    (not!)         " },
+	{ true,  "   Instructions    " },
+	{ true,  "   Redefine keys   " },
+	{ true,  "   High scores     " },
+	{ true,  "   Credits         " },
+	{ true,  "   Quit            " },
+	{ false, "                   " },
 	{ false, NULL }
 };
 
@@ -716,15 +728,15 @@ void SelectMission()
 		pMenuItems[i+1].m_bitem = true;
 		char* szText = new char[256];
 		//fixme ^ leaks
-		sprintf( szText, "|  %-31.31s |", g_apMissions[i]->GetName() );
+		sprintf( szText, "   %-31.31s  ", g_apMissions[i]->GetName() );//sprintf( szText, "|  %-31.31s |", g_apMissions[i]->GetName() );
 		pMenuItems[i+1].m_szText = szText;//<- a bit gross [a bit you say]
 	}
 	// Top and bottom menu entries, the borders
 	pMenuItems[0].m_bitem = false;
-	pMenuItems[0].m_szText = djStrDeepCopy( "{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}" );
+	pMenuItems[0].m_szText = djStrDeepCopy( "                                    " );//pMenuItems[0].m_szText = djStrDeepCopy( "{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}" );
 
 	pMenuItems[g_apMissions.size()+1].m_bitem = false;
-	pMenuItems[g_apMissions.size()+1].m_szText = djStrDeepCopy("[~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~]");
+	pMenuItems[g_apMissions.size()+1].m_szText = djStrDeepCopy("                                    ");//djStrDeepCopy("[~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~]");
 	pMenuItems[g_apMissions.size()+2].m_bitem = false; // Null-terminator
 	pMenuItems[g_apMissions.size()+2].m_szText = NULL;
 
