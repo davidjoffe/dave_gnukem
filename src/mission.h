@@ -22,6 +22,7 @@ License: GNU GPL Version 2 (*not* "later versions")
 #include <vector>
 using namespace std;
 #include "mmgr/mmgr.h"
+#include <string>
 /*--------------------------------------------------------------------------*/
 class CMission;
 class CLevel;
