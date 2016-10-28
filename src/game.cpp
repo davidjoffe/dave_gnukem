@@ -97,7 +97,7 @@ const char *g_szSoundFiles[SOUND_MAX] =
 {
 	"data/sounds/pickup.wav",
 	"data/sounds/shoot_cg1_modified.wav",//<- Hero shoot sound
-	"data/sounds/bark.wav",
+	"data/sounds/exit.ogg",//<-dj2016-10-28 New proper exit sound (is "PowerUp13.mp3" by Eric Matyas http://soundimage.org/)
 	"data/sounds/wooeep.wav",
 	"data/sounds/explode.wav",
 	"data/sounds/sfx_weapon_singleshot7.wav"//<- Monster shoot sound
@@ -1204,6 +1204,10 @@ void SetHealth(int nHealth)
 
 void update_health(int health_diff)
 {
+	// [dj2016-10-28] Keep health static if hero 'frozen' (e.g. going through teleporters or exits), otherwise
+	// say a monster could kill you after you've already gone through an exit.
+	if (HeroIsFrozen())
+		return;
 	SetHealth(g_nHealth + health_diff);
 	// If busy jumping up and something hurts hero, stop the jump
 	if (health_diff<0 && hero_mode==MODE_JUMPING)

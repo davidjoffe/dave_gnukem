@@ -596,7 +596,7 @@ CExit::CExit()
 void CExit::Draw()
 {
 	int nOffset;
-	nOffset = (m_nActivated>=1 ? ((m_nActivated-1)%4)*2 : 0);
+	nOffset = (m_nActivated>=1 ? ((djMIN(5,m_nActivated)-1)%4)*2 : 0);
 	DRAW_SPRITE16(pVisView, 5,  96 + nOffset, CALC_XOFFSET(m_x  ,0), CALC_YOFFSET(m_y-1));
 	DRAW_SPRITE16(pVisView, 5,  97 + nOffset, CALC_XOFFSET(m_x+1,0), CALC_YOFFSET(m_y-1));
 	DRAW_SPRITE16(pVisView, 5, 112 + nOffset, CALC_XOFFSET(m_x  ,0), CALC_YOFFSET(m_y  ));
@@ -607,7 +607,7 @@ int CExit::Action()
 {
 	m_nActivated = 0;
 	djSoundPlay( g_iSounds[SOUND_EXIT] );
-	HeroFreeze(50);
+	HeroFreeze(200);//<-This must just be longer or equal to the duration until m_nActivated goes past the threshold to do NextLevel()
 	return 0;
 }
 
@@ -624,7 +624,7 @@ int CExit::Tick()
 			// that the hero has "entered" the door.
 			if (m_nActivated>2)
 				m_eLayer = LAYER_TOP;
-			if (m_nActivated>5)
+			if (m_nActivated>25)//dj2016-10-28 changing this from 5 to 25 as we're adding a longer exit sound
 			{
 				NextLevel();
 			}
