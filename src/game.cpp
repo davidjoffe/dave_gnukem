@@ -430,7 +430,7 @@ void PerLevelCleanup()
 // cleanup
 /*-----------------------------------------------------------*/
 
-int game_startup()
+int game_startup(bool bLoadGame)
 {
 	// FIXME: Where to determine this?
 	TRACE( "game_startup()\n" );
@@ -459,6 +459,13 @@ int game_startup()
 	g_bGameRunning = true;
 
 	GameDrawFirepower();
+
+	//dj2016-10-28 Used if doing 'Restore Game' from *main* game menu. [This is perhaps slightly spaghetti-ish, it's done this way as LoadGame() has been originally
+	// written under the assumption of doing *in-game* loading of a savegame.
+	if (bLoadGame)
+	{
+		LoadGame();
+	}
 
 	GraphFlip(!g_bBigViewportMode);
 

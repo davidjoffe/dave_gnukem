@@ -342,7 +342,6 @@ void DoMainMenu()
 
 	do
 	{
-
 		// Load main menu background image
 		if (g_pImgMain)
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
@@ -374,7 +373,14 @@ void DoMainMenu()
 		case 2: // select mission
 			SelectMission();
 			break;
-		case 3: // restore game
+		case 3: // restore game [dj2016-10 adding implementation for this - it did nothing before]
+			{
+				int score = game_startup(true);
+				CheckHighScores( score );
+				// Game levels start their own music, so when come out of game and back to main menu, restart main menu music
+				if (pMusic!=NULL)
+					Mix_FadeInMusic(pMusic, -1, 800);
+			}
 			break;
 		case 6: // instructions
 			ShowInstructions();
@@ -708,10 +714,10 @@ void SelectMission()
 	for ( i=0; i<(int)g_apMissions.size(); i++ )
 	{
 		pMenuItems[i+1].m_bitem = true;
-		char* szText = new char[128];
+		char* szText = new char[256];
 		//fixme ^ leaks
 		sprintf( szText, "|  %-31.31s |", g_apMissions[i]->GetName() );
-		pMenuItems[i+1].m_szText = szText;//<- a bit gross
+		pMenuItems[i+1].m_szText = szText;//<- a bit gross [a bit you say]
 	}
 	// Top and bottom menu entries, the borders
 	pMenuItems[0].m_bitem = false;
@@ -745,7 +751,7 @@ void SelectMission()
 
 void InitMainMenu()
 {
-	mainMenu.setClrBack ( djColor(42,57,112) ); //mainMenu.setClrBack ( djColor(10,40,150) ); // Crap colour. Need something better, like a bitmap
+	mainMenu.setClrBack ( djColor(70,70,80)/*djColor(42,57,112)*/ ); //mainMenu.setClrBack ( djColor(10,40,150) ); // Crap colour. Need something better, like a bitmap
 	//mainMenu.m_clrBack = djColor(129,60,129);
 	mainMenu.setSize ( 0 );
 	mainMenu.setItems ( mainMenuItems );
