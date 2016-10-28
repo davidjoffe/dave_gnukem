@@ -1765,6 +1765,13 @@ bool SaveGame()
 	FILE *pOut = fopen("savegame.gnukem", "w");
 	if (pOut==NULL)
 		return false;
+
+	//From 2016-10-28 save a 'format version', to make it easier if we change the file format in future to keep things sane
+	fprintf(pOut, "fileversion=2\n");
+	//dj2016-10-28 Add load/save of current 'mission' (otherwise if we save game as say level 4 of 3rd mission then do save game from mission 1 it loads incorrectly to level 4 of mission 1). Note though, want to try keep this file format though 'backward-compatible' i.e. want older versions to still load
+	// We try use the filename to 'know' which 'mission' to load again (as this is probably the least likely to change)
+	fprintf(pOut, "mission=%s\n",g_pCurMission!=NULL ? g_pCurMission->GetFilename().c_str() : "");
+
 	fprintf(pOut, "%d\n", g_nLevel);
 	// We use the "old" values because we must save the values we had when we *started* this level.
 	// Same with health.
@@ -1772,6 +1779,7 @@ bool SaveGame()
 	fprintf(pOut, "%d\n", g_nFirepowerOld);
 	fprintf(pOut, "%d\n", g_nHealthOld);
 	InvSave(pOut); // Save inventory
+
 	fclose(pOut);
 	return true;
 }
@@ -1781,8 +1789,53 @@ bool LoadGame()
 	FILE *pIn = fopen("savegame.gnukem", "r");
 	if (pIn==NULL)
 		return false;
-	int nLevel, nScore, nFirepower, nHealth;
-	fscanf(pIn, "%d\n", &nLevel);
+	int nLevel=0, nScore=0, nFirepower=0, nHealth=0;
+
+	//dj2016-10-28 Add load/save of current 'mission' (otherwise if we save game as say level 4 of 3rd mission then do save game from mission 1 it loads incorrectly to level 4 of mission 1). Note though, want to try keep this file format though 'backward-compatible' i.e. want older versions to still load
+	// Note here if loading a file saved with a build prior to 28 October 2016, then at this point we're already 'at the end' of the file, in which case we can't know the correct 'mission', however, we can assume it's probably most likely to have been the default game, so just use that as default.
+	std::string sMissionFilename = "default.gam";
+
+	// Check for 'fileversion=', which was only added 2016-10-28 .. if not present, then the first line is the level number.
+	char szFirstLine[1024]={0};
+	fscanf(pIn,"%s\n",szFirstLine);
+	if (strncmp(szFirstLine,"fileversion=",12)==0)
+	{
+		// Fileversion 2
+		char szFilename[4096]={0};//gross
+		fscanf(pIn,"mission=%s\n",szFilename);//[LOW] Wonder if we might have cross-platform issues here? E.g. savegame on Windows with CR+LF & try load on e.g. a LF-only platform say?
+		if (szFilename[0]!=0)
+		{
+			sMissionFilename = szFilename;
+		}
+
+		fscanf(pIn, "%d\n", &nLevel);
+	}
+	else
+	{
+		// Fileversion 1
+		nLevel = atoi(szFirstLine);
+	}
+	djMSG("LOADGAME: Mission=%s\n", sMissionFilename.c_str());
+	// Find the mission from the list of missions
+	CMission* pMission = g_apMissions[0];//<-Default to the first one
+	for ( std::vector<CMission * >::const_iterator iter=g_apMissions.begin(); iter!=g_apMissions.end(); ++iter )
+	{
+		if (sMissionFilename==(*iter)->GetFilename())
+		{
+			pMission = *iter;
+			break;
+		}
+	}
+	if (pMission != g_pCurMission)
+	{
+		PerGameCleanup();
+
+		g_pCurMission = pMission;
+
+		PerGameSetup();
+	}
+
+	//fscanf(pIn, "%d\n", &nLevel);
 	fscanf(pIn, "%d\n", &nScore);
 	fscanf(pIn, "%d\n", &nFirepower);
 	fscanf(pIn, "%d\n", &nHealth);
@@ -1793,6 +1846,7 @@ bool LoadGame()
 	g_nFirepower = nFirepower;
 	// Load inventory. We do this after level setup stuff, otherwise it gets cleared in per-level setup..
 	InvLoad(pIn);
+
 	fclose(pIn);
 	// Set current "old" values, otherwise if save a game immediately after loading one, the existing
 	// game's values (and not the loaded games values) get saved

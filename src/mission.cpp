@@ -99,14 +99,14 @@ CMission::~CMission()
 	}
 }
 
-int CMission::Load( char * szfilename )
+int CMission::Load( const char * szfilename )
 {
 	if (szfilename==NULL) return -1; // NULL string
 	if (szfilename[0]==0) return -2; // empty string
 
 	ifstream	fin;
 	string		line;
-	int			state;
+	int			state=0;
 	char		filename[2048]={0};
 
 	SYS_Debug ( "CMission::Load( %s ): Loading ...\n", szfilename );
@@ -214,6 +214,9 @@ int CMission::Load( char * szfilename )
 	{
 		SYS_Error( "CMission::Load( %s ): Bad end state %d\n", szfilename, state );
 	}
+
+	// Remember the filename for load/save game purposes (to know which 'mission' to load/save) [dj2016-10]
+	m_sFilename = szfilename;
 
 	fin.close ();
 

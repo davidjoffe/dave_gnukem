@@ -129,13 +129,13 @@ void InvSave(FILE *pOut)
 {
 	unsigned int i;
 	// Save number of *PERSISTENT* items
-	int nCount = 0;
+	int nNumPersistentItems = 0;
 	for ( i=0; i<g_apInventory.size(); i++ )
 	{
 		if (g_apInventory[i].bPersistent)
-			nCount++;
+			++nNumPersistentItems;
 	}
-	fprintf(pOut, "%d\n", nCount);
+	fprintf(pOut, "%d\n", nNumPersistentItems);
 	for ( i=0; i<g_apInventory.size(); i++ )
 	{
 		// Save only persistent things to file, otherwise we'd be saving things
@@ -154,13 +154,13 @@ void InvLoad(FILE *pIn)
 	// Clear existing
 	InvEmpty();
 	// Read number of items
-	int nItems;
+	int nItems=0;
 	fscanf(pIn, "%d\n", &nItems);
 	djMSG("LOADGAME: InvLoad: %d items\n", nItems);
 	// Use object factory to load items
 	for ( i=0; i<nItems; i++ )
 	{
-		int nTypeID, a, b;
+		int nTypeID=-1, a=0, b=0;
 		fscanf(pIn, "%d %d %d\n", &nTypeID, &a, &b);
 		CThing *pThing = g_ThingFactory.Allocate(nTypeID);
 		if (pThing==NULL)
