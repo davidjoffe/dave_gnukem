@@ -355,7 +355,6 @@ int djImage::LoadSPR( const char * szFilename )
 
 int djImage::SaveRAW( const char * szFilename )
 {
-	int fin;
 	if ( m_pData == NULL )
 		return -2;
 
@@ -364,7 +363,7 @@ int djImage::SaveRAW( const char * szFilename )
 	// (they just assume you want a text file, and translate all CR's
 	// found in the output data for "write")
 	// fin = creat( szFilename, FILECREATE_FLAGS );
-	fin = open( szFilename, FILECREATE_FLAGS, FILECREATE_PERM );
+	int fin = open( szFilename, FILECREATE_FLAGS, FILECREATE_PERM );
 	if (fin < 0)
 	{
 		return -1;

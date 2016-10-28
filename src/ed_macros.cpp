@@ -23,12 +23,12 @@ vector<SMacro*> g_apMacros;
 // Macro stuff
 bool LoadMacros()
 {
-	FILE *fin;
-	char buf[1024];
+	FILE *fin=NULL;
+	char buf[1024]={0};
 	if (NULL == (fin = fopen( "data/editor/macros.txt", "r" )))
 		return false;
 
-	SMacro *pMacro;
+	SMacro* pMacro=NULL;
 	fgets( buf, sizeof(buf), fin );
 	buf[strlen(buf)-1] = 0; // strip trailing newline
 	while (strcmp(buf, "$") && !feof(fin))
@@ -135,7 +135,7 @@ void ShowMacros()
 	for ( int i=0; i<9; i++ )
 	{
 		int iMacro = g_iAssignedMacros[i];
-		char buf[1024];
+		char buf[1024]={0};
 		sprintf( buf, "%d.", i+1 );
 		ED_DrawStringClear( MACROS_X, y, "Macros:" );
 		ED_DrawString( MACROS_X, y, "Macros:" );

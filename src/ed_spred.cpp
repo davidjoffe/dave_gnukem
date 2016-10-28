@@ -294,8 +294,8 @@ belong to sprite.
 */
 void SpriteDrawFlags()
 {
-	int  i;
-	unsigned char buf[32], c;
+	int  i=0;
+	unsigned char buf[64]={0}, c=0;
 	for ( i=0; i<NUMFLAGS; i++ )
 	{
 		if (ED_GetSpriteExtra( ED_GetCurrSpriteSet(), ED_GetCurrSprite(), 4 ) & (1 << i))
@@ -368,10 +368,10 @@ void SpriteSetType( int itype )
 
 void DrawSprites ()
 {
-	int i;
-	int ox, oy;
-	int xoffset, yoffset;
-	char buf[1024];
+	int i=0;
+	int ox=0, oy=0;
+	int xoffset=0, yoffset=0;
+	char buf[1024]={0};
 
 //	djgSetColorFore( pVisMain, djColor(255,255,255) );
 	sprintf( buf, "%d,%-15.15s", ED_GetCurrSpriteSet(), g_pCurMission->GetSpriteData(ED_GetCurrSpriteSet())->m_szImgFilename );

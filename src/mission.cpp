@@ -33,8 +33,8 @@ int LoadMissions( const char * szfilename )
 {
 	if (szfilename==NULL) return -1; // NULL string
 	if (szfilename[0]==0) return -2; // empty string
-	FILE * fin;
-	char buf[1024];
+	FILE * fin=NULL;
+	char buf[1024]={0};
 
 	// open file
 	// FIXME: We need a consistent way to handle "DATA_DIR"
@@ -279,7 +279,7 @@ int CMission::LoadSprites()
 
 int CMission::SaveSprites()
 {
-	int i;
+	int i=0;
 	int nRet = 0;
 
 	// i iterates through the 256 possible ID's for spritesets
@@ -290,7 +290,7 @@ int CMission::SaveSprites()
 		pSpriteData = g_pCurMission->GetSpriteData( i );
 		if ( pSpriteData != NULL ) // It *can* be NULL
 		{
-			char szFilename[1024];
+			char szFilename[1024]={0};
 			// Save sprite data file
 #ifdef DATA_DIR
 			sprintf( szFilename, "%s%s", DATA_DIR, pSpriteData->m_szFilenameData );
@@ -367,9 +367,9 @@ CSpriteData::~CSpriteData()
 
 int CSpriteData::LoadData( const char *szFilename )
 {
-	FILE	*fin;
-	int		i, j;
-	int		temp;
+	FILE	*fin=NULL;
+	int		i=0, j=0;
+	int		temp=0;
 
 	SYS_Debug ( "CSpriteData::LoadData( %s ): Loading ...\n", szFilename );
 
@@ -377,7 +377,7 @@ int CSpriteData::LoadData( const char *szFilename )
 	if (NULL == (fin = fopen( szFilename, "r" )))
 	{
 #ifdef DATA_DIR
-		char buf[1024];
+		char buf[1024]={0};
 		sprintf( buf, "%s%s", DATA_DIR, szFilename );
 		if (NULL == (fin = fopen( buf, "r" )))
 #endif
@@ -504,7 +504,7 @@ int CSpriteData::LoadSpriteImage()
 	}
 	else
 	{
-		char buf[1024];
+		char buf[1024]={0};
 #ifdef DATA_DIR
 		sprintf( buf, "%s%s", DATA_DIR, m_szImgFilename );
 #else
