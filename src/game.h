@@ -118,8 +118,10 @@ extern bool check_solid( int ix, int iy, bool bCheckThings=true );
 //! Return true if given rectangle [pixel coordinates] is colliding with anything solid
 extern bool CheckCollision(int x1, int y1, int x2, int y2, CBullet *pBullet=NULL);
 
-
-extern int game_startup();
+// [dj2016-10-28: bLoadGame is true if and only if loading game from *main menu* .. long story short, this is because
+// the LoadGame() function assumes game being loaded *in-game* (as you can also load game from in-game menu) - this
+// feels a bit spaghetti-ish to me, but will do for now.
+extern int game_startup(bool bLoadGame=false);
 extern void parse_level();
 extern void sprite_factory( unsigned char a, unsigned char b, int ix, int iy, int ifore, bool bfromlevel );
 
