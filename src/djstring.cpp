@@ -35,17 +35,15 @@ char *djStrDup(const char *src)
 
 char *djStrDeepCopy( const char * src, int n )
 {
-	char * temp;
-
 	if ( NULL == src )
 		return NULL;
 
 	// FIXME: If src is shorter than n then allocate less
-	temp = new char[ n + 1 ];
-	strncpy( temp, src, n );
-	temp[n] = '\0';
+	char* szNewStr = new char[ n + 1 ];
+	strncpy( szNewStr, src, n );
+	szNewStr[n] = '\0';
 
-	return temp;
+	return szNewStr;
 }
 
 // i starts counting at 1

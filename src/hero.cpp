@@ -35,11 +35,11 @@ const int g_aiJumpBoots[]  = { -1, -1, -1, -1, 0, 0, 0, 1, 1, 1, 1 };
 // (FIXME) whereby no dust can be created on the very last jump-fall-move - this hack
 // just makes it less common, as you have to land one block higher from which you've jumped.
 // Hackedy hackedy hack ..
-struct SJumpInfo jumpNormal = {  8, g_aiJumpNormal }; // "Normal" jump offsets
-struct SJumpInfo jumpBoots  = { 10, g_aiJumpBoots  }; // Jump offsets with boots
+const struct SJumpInfo jumpNormal = {  8, g_aiJumpNormal }; // "Normal" jump offsets
+const struct SJumpInfo jumpBoots  = { 10, g_aiJumpBoots  }; // Jump offsets with boots
 //struct SJumpInfo jumpNormal = {  9, g_aiJumpNormal }; // "Normal" jump offsets
 //struct SJumpInfo jumpBoots  = { 11, g_aiJumpBoots  }; // Jump offsets with boots
-struct SJumpInfo * pJumpInfo; // Points to current jump info, normal or boots
+const struct SJumpInfo * pJumpInfo; // Points to current jump info, normal or boots
 int jump_pos = 0; // Offset into the "jump info" array of y-axis offsets
 
 void HeroSetJumpMode(EJump eJump)
