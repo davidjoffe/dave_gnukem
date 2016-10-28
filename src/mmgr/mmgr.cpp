@@ -485,7 +485,7 @@ static	void	dumpLeakReport()
 
 	// Header
 
-	static  char    timeString[25];
+	static  char    timeString[25]={0};
 	memset(timeString, 0, sizeof(timeString));
 	time_t  t = time(NULL);
 	struct  tm *tme = localtime(&t);
@@ -1547,7 +1547,7 @@ void	m_dumpMemoryReport(const char *filename, const bool overwrite)
 
         // Header
 
-        static  char    timeString[25];
+        static  char    timeString[25]={0};
         memset(timeString, 0, sizeof(timeString));
         time_t  t = time(NULL);
         struct  tm *tme = localtime(&t);

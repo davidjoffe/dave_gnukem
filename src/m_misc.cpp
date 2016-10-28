@@ -185,7 +185,7 @@ Get filename path directory
 */
 char* M_GetFilePath ( const char* filename )
 {
-	static char	path[SYS_MAX_PATH];
+	static char	path[SYS_MAX_PATH]={0};
 	char		*ptr;
 
 	strcpy ( path, filename );
@@ -226,7 +226,7 @@ Get filename without path or extension
 */
 char* M_GetFileRoot ( const char* filename )
 {
-	static char	root[SYS_MAX_PATH];
+	static char	root[SYS_MAX_PATH]={0};
 	const char		*ptr;
 
 	ptr = strrchr ( filename, '\\' );
@@ -253,7 +253,7 @@ Get filename extension (without the '.')
 */
 /*char* M_GetFileExtension ( const char* filename )
 {
-	static char	ext[SYS_MAX_EXT];
+	static char	ext[SYS_MAX_EXT]={0};
 	const char		*ptr = strrchr ( filename, '.' );
 
 	if ( ptr )
@@ -530,7 +530,7 @@ void M_StripFilePath ( char *filename )
 
 /*char* M_GetFirstPathDir ( char *filename )
 {
-	static char	dir[SYS_MAX_FILE];
+	static char	dir[SYS_MAX_FILE]={0};
 	char		*ptr;
 
 	if ( '/' == *filename )
