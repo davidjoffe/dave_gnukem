@@ -42,14 +42,15 @@ Power boots allow you to jump higher.
 
 # History / Changes
 
-Recent:
+2016/10/29 - Version 0.66 [Windows only]
 
 * Add shortcut key to toggle sounds on/off (Insert)
+* Fix: On Windows, game window often starts slightly off bottom of screen
 * Fix: Restore Game from main menu doesn't work
 * Fix: Save/Restore game doesn't save "mission" (i.e. selected "game")
-* Fix: On Windows, game window often starts slightly off bottom of screen
 * New proper exit sound (is "PowerUp13.mp3" by Eric Matyas http://soundimage.org/)
 * Fixed: A monster could kill you in the moments after you entered the exit
+* Better hero shooting sound
 
 2016/10/22 - Version 0.63 / 0.64 / 0.65
 
