@@ -614,7 +614,7 @@ bool GetHighScoreUserName(char *szBuffer)
 				}
 				else if (Event.key.keysym.sym>=SDLK_0 && Event.key.keysym.sym<=SDLK_9)
 				{
-					char acShifted[] = ")!@#$%^&*(";
+					const char* acShifted = ")!@#$%^&*(";
 					if (ModState & KMOD_SHIFT)
 						AppendCharacter(szBuffer, acShifted[(char)Event.key.keysym.sym - SDLK_0], MAX_HIGHSCORE_LEN);
 					else
@@ -693,7 +693,7 @@ void CheckHighScores( int score )
 void SelectMission()
 {
 	int i=0, iret=0;
-	SMenuItem *pMenuItems;
+	SMenuItem* pMenuItems=NULL;
 	unsigned char menuMissionCursor[] = { 128, 129, 130, 131, 0 };
 	CMenu menuMission ("main.pp:SelectMission()");
 	menuMission.setClrBack ( djColor(48,66,128) );

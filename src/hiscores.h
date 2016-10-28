@@ -25,8 +25,10 @@ public:
 	//! A single entry on the high score list
 	struct SScore
 	{
+		SScore();
+
 		//! Name
-		char szName[128];
+		char szName[256];
 		//! Score
 		int nScore;
 	};

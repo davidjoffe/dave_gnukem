@@ -21,6 +21,11 @@ using namespace std;
 #include "graph.h"
 #include "djlog.h"
 
+SScore::SScore() : nScore(0)
+{
+	memset(szName,0,sizeof(szName));//ugh, this is 2016
+}
+
 // Scores, sorted from highest to lowest
 vector<SScore> g_aScores;
 
@@ -66,7 +71,7 @@ void ShowHighScores()
 
 		for ( int i=0; i<(int)g_aScores.size(); i++ )
 		{
-			char buf[128];
+			char buf[128]={0};
 			sprintf(buf, "%d  %d", i, g_aScores[i].nScore);
 			GraphDrawString(pVisBack, g_pFont8x8, 24, 24+i*12, (unsigned char*)buf);
 			sprintf(buf, "%s", g_aScores[i].szName);
@@ -96,7 +101,7 @@ bool LoadHighScores(const char *szFilename)
 		return false;
 	}
 
-	char buf[512];
+	char buf[512]={0};
 
 	fgets(buf, sizeof(buf), pIn);
 	djStripCRLF(buf); // strip CR/LF characters
@@ -190,4 +195,3 @@ void GetHighScore(int nIndex, SScore &Score)
 	strcpy(Score.szName, g_aScores[nIndex].szName);
 	Score.nScore = g_aScores[nIndex].nScore;
 }
-

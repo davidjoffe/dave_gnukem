@@ -414,7 +414,7 @@ static	void	log(const char *format, ...)
 {
 	// Build the buffer
 
-	static char buffer[2048];
+	static char buffer[2048]={0};
 	va_list	ap;
 	va_start(ap, format);
 	vsprintf(buffer, format, ap);

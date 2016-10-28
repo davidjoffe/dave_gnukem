@@ -456,10 +456,10 @@ void RedrawView ()
 
 void DrawSprites ()
 {
-	int i;
-	int ox, oy;
-	int xoffset, yoffset;
-	char buf[1024];
+	int i=0;
+	int ox=0, oy=0;
+	int xoffset=0, yoffset=0;
+	char buf[1024]={0};
 
 //	djgSetColorFore( pVisMain, djColor(255,255,255) );
 

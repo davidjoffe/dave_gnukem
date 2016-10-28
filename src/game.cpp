@@ -1185,7 +1185,7 @@ void SetHealth(int nHealth)
 	}
 
 	// Build a string representing health bars (which are in the 8x8 font)
-	char szHealth[MAX_HEALTH+1];
+	char szHealth[MAX_HEALTH+1]={0};
 	for ( i=0; i<MAX_HEALTH; ++i )
 	{
 		// 170 = health; 169 = not health

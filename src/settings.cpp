@@ -29,7 +29,7 @@ bool CSettings::Load(const char *szFilename)
 	FILE *pInput = fopen(szFilename, "r");
 	if (pInput==NULL)
 		return false;
-	char szBuf[1024];
+	char szBuf[1024]={0};
 
 	fgets(szBuf, sizeof(szBuf), pInput);
 	szBuf[strlen(szBuf)-1] = 0;
@@ -133,7 +133,7 @@ void CSettings::SetSetting(const char *szKey, const char *szValue)
 
 void CSettings::SetSettingInt(const char *szKey, int nValue)
 {
-	char szBuf[64];
+	char szBuf[64]={0};
 	sprintf(szBuf, "%d", nValue);
 	SetSetting(szKey, szBuf);
 }

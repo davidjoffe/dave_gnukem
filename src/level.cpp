@@ -59,7 +59,7 @@ unsigned char * level_load( int i, const char * szfilename )
 	// if a level is already loaded at position i, delete it
 	level_delete( i );
 
-	char filename[1024];
+	char filename[1024]={0};
 
 	sprintf( filename, "%s%s", DATA_DIR, szfilename );
 
@@ -89,9 +89,9 @@ unsigned char * level_load( int i, const char * szfilename )
 
 int level_save( int i, const char * szfilename )
 {
-	int file_handle;
-	unsigned char * level;
-	char filename[1024];
+	int file_handle=0;
+	unsigned char * level=NULL;
+	char filename[1024]={0};
 
 	sprintf( filename, "%s%s", DATA_DIR, szfilename );
 
