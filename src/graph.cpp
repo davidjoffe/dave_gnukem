@@ -145,7 +145,7 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 		max_h = vidinfo->current_h;
 		if (max_w>iWidth && max_h>iHeight)
 		{
-			int nMultiple = djMAX(1, djMIN( vidinfo->current_w / iWidth, vidinfo->current_h / iHeight ) );
+			int nMultiple = djMAX(1, djMIN( max_w / iWidth, max_h / iHeight ) );
 			iWidth *= nMultiple;
 			iHeight *= nMultiple;
 		}
@@ -204,16 +204,28 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 	HWND hWnd = ::GetActiveWindow();
 	if (hWnd!=NULL)
 	{
+		// Want original X position [so when we call MoveWindow we keep Windows' X position - I'm not quite sure if this is good
+		// or bad but I think it miiight be better in the case of multiple monitors, not sure though, this would need more testing [dj2016-10]]
+		RECT rcWnd;
+		memset(&rcWnd,0,sizeof(rcWnd));
+		::GetWindowRect(hWnd,&rcWnd);
+
 		RECT rc;
 		memset(&rc,0,sizeof(rc));
-		if (::GetWindowRect(hWnd,&rc))
+		if (::GetClientRect(hWnd,&rc))//Client rect is the size of the game window area only, not including e.g. window border and title etc.
 		{
 			// [Note we need to factor in the size of the Windows taskbar bla bla]
 			//if (max_h>0 && rc.top + iHeight >= max_h)
 			{
+			DWORD dwCurrentStyles = (DWORD)::GetWindowLongA(hWnd,GWL_STYLE);
+			DWORD dwExStyle = (DWORD)::GetWindowLongA(hWnd,GWL_EXSTYLE);
+
+			// MoveWindow will 'shrink' the window as it uses total size *including* window dressing, while GetWindowRect
+			::AdjustWindowRectEx(&rc,dwCurrentStyles,FALSE,dwExStyle);//<-Uppercase FALSE as we're now in Win32-API-land [minor point]
+
 			// For now just move window to top; later should try make his more 'intelligent' (or
 			// maybe with LibSDL2 this is perhaps better?
-			::MoveWindow(hWnd, rc.left, 0, iWidth, iHeight, false);
+			::MoveWindow(hWnd, rcWnd.left, 0, rc.right-rc.left, rc.bottom-rc.top, false);
 			}
 		}
 	}
