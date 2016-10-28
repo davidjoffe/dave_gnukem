@@ -76,7 +76,7 @@ public:
 
 	// Methods
 
-	int		Load( char * szfilename );
+	int		Load( const char * szfilename );
 
 	void	AddLevel( CLevel * pLevel );
 	CLevel*	GetLevel( int i );
@@ -93,6 +93,10 @@ public:
 
 	vector<CLevel *>	m_apLevels;
 	CSpriteData			*m_apSpriteData[NUM_SPRITE_DATA];
+
+	std::string GetFilename() const { return m_sFilename; }
+protected:
+	std::string m_sFilename;//Store the filename so we can remember it for load/save game purposes [dj2016-10 - hm, conceptually it doesn't quite feel right having this here, but, there are probably worse things in the codebase to worry about right now]
 };
 /*--------------------------------------------------------------------------*/
 /*!
