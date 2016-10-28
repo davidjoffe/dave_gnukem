@@ -1124,7 +1124,7 @@ NextBullet3:
 	if (g_nGameMessageCount>=0)
 	{
 		g_nGameMessageCount--;
-		GraphDrawString( pVisBack, g_pFont8x8, 48, 160, (unsigned char*)g_sGameMessage.c_str() );
+		GraphDrawString( pVisBack, g_pFont8x8, 16, 160, (unsigned char*)g_sGameMessage.c_str() );
 	}
 
 	// Flip the back buffer onto the front
@@ -1876,11 +1876,11 @@ void IngameMenu()
 	{
 	case 2:
 		if (SaveGame())
-			ShowGameMessage("Game saved", 18);
+			ShowGameMessage("Saved checkpoint at\nlast-completed level", 32);
 		break;
 	case 3:
 		if (!LoadGame())
-			ShowGameMessage("Game load failed", 24);
+			ShowGameMessage("Game load failed", 32);
 		break;
 	case 4:
 		g_bGameRunning = false;

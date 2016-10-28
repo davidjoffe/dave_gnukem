@@ -263,10 +263,20 @@ void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const unsigne
 	if (x<0 || y<0) return;
 
 	// Draw each character in the string
+	int xoffset=0;
 	for ( unsigned int i=0; i<strlen((char*)szStr); ++i )
 	{
 		int iIndex = (int)szStr[i];
-		djgDrawImageAlpha( pVis, pImg, 8*(iIndex%32), 8*(iIndex/32), x+i*8, y, 8, 8 );
+		if (szStr[i]=='\n')//Newline? [dj2016-10-28]
+		{
+			y+=8;
+			xoffset=0;
+		}
+		else
+		{
+			djgDrawImageAlpha( pVis, pImg, 8*(iIndex%32), 8*(iIndex/32), x+xoffset*8, y, 8, 8 );
+			++xoffset;
+		}
 	}
 }
 
