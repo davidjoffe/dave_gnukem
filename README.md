@@ -42,6 +42,10 @@ Power boots allow you to jump higher.
 
 # History / Changes
 
+Recent:
+
+* Increase gameplay viewport width from 12 to 13 blocks
+
 2016/10/29 - Version 0.66 [Windows only]
 
 * Add shortcut key to toggle sounds on/off (Insert)

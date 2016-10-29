@@ -47,7 +47,11 @@ using namespace std;
 Mix_Music* g_pGameMusic=NULL;
 #endif
 
-int VIEW_WIDTH = 12;
+// The original Duke Nukem 1 has a 13x10 'blocks' viewport, though in future we could use this
+// to either allow larger game viewport for this game, or have 'derived' games using this 'engine' with
+// larger viewports [dj2016-10]
+const int VIEW_WIDTH_DEFAULT=13;//In number of game 'blocks'
+int VIEW_WIDTH = VIEW_WIDTH_DEFAULT;
 int VIEW_HEIGHT = 10;
 
 //[dj2016-10-10]
@@ -102,19 +106,19 @@ const char *g_szSoundFiles[SOUND_MAX] =
 	"data/sounds/explode.wav",
 	"data/sounds/sfx_weapon_singleshot7.wav"//<- Monster shoot sound
 };
-SOUND_HANDLE g_iSounds[SOUND_MAX];
+SOUND_HANDLE g_iSounds[SOUND_MAX]={0};
 
 /*--------------------------------------------------------------------------*/
 
 // Positions of various elements on screen
 
-#define SCORE_X (28*8)
+#define SCORE_X (28*8+8)
 #define SCORE_Y (3*8)
 
-#define HEALTH_X (28*8)
+#define HEALTH_X (28*8+8)
 #define HEALTH_Y (7*8)
 
-#define FIREPOWER_X (224)
+#define FIREPOWER_X (224+8)
 #define FIREPOWER_Y (96)
 
 
@@ -607,7 +611,7 @@ int game_startup(bool bLoadGame)
 					}
 					else
 					{
-						VIEW_WIDTH = 12;
+						VIEW_WIDTH = VIEW_WIDTH_DEFAULT;
 						VIEW_HEIGHT = 10;
 
 						// NB, TODO, we actually need to also need to redraw score etc. here (though since this is just a dev/editing mode, not a real game mode, it doesn't have to be perfect)
