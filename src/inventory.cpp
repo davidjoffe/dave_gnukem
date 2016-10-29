@@ -26,7 +26,7 @@ vector<SInvItem> g_apInventory;
 
 
 // X,Y location on screen to draw inventory (in pixels)
-#define INVENTORY_X (28*8)
+#define INVENTORY_X (28*8+8)
 #define INVENTORY_Y (17*8)
 
 void InvMakeAllPersistent()
