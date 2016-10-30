@@ -44,6 +44,7 @@ Power boots allow you to jump higher.
 
 Recent:
 
+* Add hero jump/landing sounds (credit for the sounds: Juhani Junkala)
 * Increase gameplay viewport width from 12 to 13 blocks
 
 2016/10/29 - Version 0.66 [Windows only]
@@ -197,8 +198,9 @@ To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add 
 
 # Additional Credits
 
-* (2016-10-23) data/sounds/shoot\_cg1_modified.wav Slightly modified version of cg1.wav from http://opengameart.org/content/chaingun-pistol-rifle-shotgun-shots by Michel Baradari http://michel-baradari.de/
+* 2016-10-30 data/sounds/jump.wav and data/sounds/jump_landing.wav From same Juhani Junkala collection as per below
+* 2016-10-23 data/sounds/shoot\_cg1_modified.wav Slightly modified version of cg1.wav from http://opengameart.org/content/chaingun-pistol-rifle-shotgun-shots by Michel Baradari http://michel-baradari.de/
 	"Sounds (c) by Michel Baradari apollo-music.de
 	Licensed under CC BY 3.0 http://creativecommons.org/licenses/by/3.0/
 	Hosted on opengameart.org"
-* (2016-10-23) data/sounds/sfx\_weapon_singleshot7.wav by Juhani Junkala (CC0 creative commons license) ("The Essential Retro Video Game Sound Effects Collection [512 sounds]")
+* 2016-10-23 data/sounds/sfx\_weapon_singleshot7.wav by Juhani Junkala (CC0 creative commons license) ("The Essential Retro Video Game Sound Effects Collection [512 sounds]")

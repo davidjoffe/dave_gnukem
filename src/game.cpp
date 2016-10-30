@@ -105,6 +105,8 @@ const char *g_szSoundFiles[SOUND_MAX] =
 	"data/sounds/wooeep.wav",
 	"data/sounds/explode.wav",
 	"data/sounds/sfx_weapon_singleshot7.wav"//<- Monster shoot sound
+	,"data/sounds/jump.wav"//dj2016-10-30
+	,"data/sounds/jump_landing.wav"//dj2016-10-30
 };
 SOUND_HANDLE g_iSounds[SOUND_MAX]={0};
 
@@ -821,6 +823,7 @@ void GameHeartBeat()
 			{
 				// Kick up some dust ..
 				AddThing(CreateDust(x, y));
+				djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
 			}
 			bFallingPrev = bFalling;
 		}
