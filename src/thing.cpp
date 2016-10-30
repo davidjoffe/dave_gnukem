@@ -819,6 +819,7 @@ int CKey::HeroOverlaps()
 	if (InvAdd(this))
 	{
 		update_score(1000, m_x, m_y);
+		djSoundPlay( g_iSounds[SOUND_KEY_PICKUP] );
 		return THING_REMOVE;
 	}
 	// Inventory full? Don't pick up or do anything.
@@ -965,6 +966,7 @@ int CBanana::HeroOverlaps()
 		update_score(200, m_x, m_y);
 		update_health(2);
 	}
+	djSoundPlay(g_iSounds[SOUND_PICKUP]);
 	return THING_DIE;
 }
 /*-----------------------------------------------------------*/
@@ -1864,6 +1866,7 @@ CThing *CreateExplosion(int nX, int nY)
 	pExplosion->SetPosition(nX/16, nY/16);
 	pExplosion->m_xOffset = 0;//nX % 16;
 	pExplosion->m_yOffset = nY % 16;
+	djSoundPlay( g_iSounds[SOUND_SOFT_EXPLODE] );
 	return pExplosion;
 }
 
