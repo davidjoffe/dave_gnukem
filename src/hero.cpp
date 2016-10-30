@@ -55,6 +55,8 @@ void HeroStartJump()
 {
 	hero_mode = MODE_JUMPING;
 	jump_pos = 0;
+	
+	djSoundPlay( g_iSounds[SOUND_JUMP] );
 }
 
 void HeroCancelJump()
@@ -72,6 +74,7 @@ void HeroUpdateJump()
 		hero_picoffs = 1;
 		// Kick up some dust ..
 		AddThing(CreateDust(x, y));
+		djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
 	}
 	jump_pos++;
 	if (jump_pos >= pJumpInfo->size)
