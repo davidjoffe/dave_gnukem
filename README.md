@@ -44,7 +44,7 @@ Power boots allow you to jump higher.
 
 Recent:
 
-* Add hero jump/landing sounds (credit for the sounds: Juhani Junkala)
+* Add hero jump/landing sounds (credit for the sounds: Juhani Junkala), key pick-up sound, and more
 * Increase gameplay viewport width from 12 to 13 blocks
 
 2016/10/29 - Version 0.66 [Windows only]
@@ -198,6 +198,8 @@ To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add 
 
 # Additional Credits
 
+* 2016-10-30 data/sounds/soft_explode.wav From same Juhani Junkala collection as per below
+* 2016-10-30 data/sounds/key_pickup.wav http://opengameart.org/content/key-pickup author Vinrax, license 'CC BY 3.0' https://creativecommons.org/licenses/by/3.0/
 * 2016-10-30 data/sounds/jump.wav and data/sounds/jump_landing.wav From same Juhani Junkala collection as per below
 * 2016-10-23 data/sounds/shoot\_cg1_modified.wav Slightly modified version of cg1.wav from http://opengameart.org/content/chaingun-pistol-rifle-shotgun-shots by Michel Baradari http://michel-baradari.de/
 	"Sounds (c) by Michel Baradari apollo-music.de

@@ -107,6 +107,8 @@ const char *g_szSoundFiles[SOUND_MAX] =
 	"data/sounds/sfx_weapon_singleshot7.wav"//<- Monster shoot sound
 	,"data/sounds/jump.wav"//dj2016-10-30
 	,"data/sounds/jump_landing.wav"//dj2016-10-30
+	,"data/sounds/soft_explode.wav"//dj2016-10-30
+	,"data/sounds/key_pickup.wav"//dj2016-10-30
 };
 SOUND_HANDLE g_iSounds[SOUND_MAX]={0};
 
