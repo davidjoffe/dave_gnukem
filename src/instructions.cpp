@@ -15,9 +15,12 @@ djImage *pImgInstructions=NULL;
 
 struct SMenuItem instructionsMenuItems[] =
 {
-   { false, "{~~~~~~}" },
+   /*{ false, "{~~~~~~}" },
    { true,  "|  OK  |" },
-   { false, "[~~~~~~]" },
+   { false, "[~~~~~~]" },*/
+   { false, "        " },
+   { true,  "   OK   " },
+   { false, "        " },
    { false, NULL }
 };
 unsigned char instructionsMenuCursor[] = { 128, 129, 130, 131, 0 };

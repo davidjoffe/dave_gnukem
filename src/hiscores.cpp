@@ -33,9 +33,12 @@ djImage *g_pImgHighScores = NULL;
 
 struct SMenuItem instructionsHighScoreItems[] =
 {
-   { false, "{~~~~~~}" },
+   /*{ false, "{~~~~~~}" },
    { true,  "|  OK  |" },
-   { false, "[~~~~~~]" },
+   { false, "[~~~~~~]" },*/
+   { false, "        " },
+   { true,  "   OK   " },
+   { false, "        " },
    { false, NULL }
 };
 unsigned char instructionsHighScoreCursor[] = { 128, 129, 130, 131, 0 };
