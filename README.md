@@ -2,19 +2,24 @@
 Dave Gnukem is a 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The game is intentionally somewhat 'retro'; the original Duke Nukem 1 had 16-color EGA 320x200 graphics.)
 
 **Release Downloads:** https://sourceforge.net/projects/gnukem/
+
+**Direct Download Link:** https://sourceforge.net/projects/gnukem/files/latest/download?source=files
+
 **Source code repository:** https://github.com/davidjoffe/dave_gnukem
 
-Old project page: http://gnukem.sourceforge.net/
+Project page: http://gnukem.sourceforge.net/
 
 Created by: David Joffe http://djoffe.com/ (https://www.livecoding.tv/david_joffe/)
 
-The project was maintained by EMH (Evil Mr Henry) for a number of years until Oct 2016
+The project was maintained by EMH (Evil Mr Henry) for a number of years until Oct 2016. Additional contributions by: T.O.G, Vytautas Shaltenis, Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
 You can watch recent development on this project being live-streamed at:
 https://www.livecoding.tv/david_joffe/
 e.g.
 https://www.livecoding.tv/david_joffe/videos/wae18-dave-gnukem-c-game-side-scrolling-shooter and 
 https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrolling-shooter-3 etc.
+
+As of 8 Oct 2016, this project is under 'properly' active development again, and the goal/intention is to get to a 'version 1' by no later than Oct 2017.
 
 ![Dave Gnukem Screenshot](http://i.imgur.com/mN12Vtk.png "Dave Gnukem Screenshot")
 
@@ -206,3 +211,4 @@ To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add 
 	Licensed under CC BY 3.0 http://creativecommons.org/licenses/by/3.0/
 	Hosted on opengameart.org"
 * 2016-10-23 data/sounds/sfx\_weapon_singleshot7.wav by Juhani Junkala (CC0 creative commons license) ("The Essential Retro Video Game Sound Effects Collection [512 sounds]")
+* 2016-10 Thanks to daveywavey @ livecoding for help with setting up git repo
