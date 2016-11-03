@@ -211,4 +211,4 @@ To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add 
 	Licensed under CC BY 3.0 http://creativecommons.org/licenses/by/3.0/
 	Hosted on opengameart.org"
 * 2016-10-23 data/sounds/sfx\_weapon_singleshot7.wav by Juhani Junkala (CC0 creative commons license) ("The Essential Retro Video Game Sound Effects Collection [512 sounds]")
-* 2016-10 Thanks to daveywavey @ livecoding for help with setting up git repo
+* 2016-10 Thanks to daveywavey @ livecoding https://www.livecoding.tv/daveywavey/ for help with setting up github repo
