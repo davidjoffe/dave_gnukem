@@ -45,6 +45,10 @@ To open doors, find the correct color key, and press the action key on the 'lock
 
 Power boots allow you to jump higher.
 
+# Ports
+
+* Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/
+
 # History / Changes
 
 Recent:
