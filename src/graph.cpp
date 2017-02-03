@@ -126,8 +126,6 @@ void GraphFlip(bool bScaleView)
 
 bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 {
-	int imode;
-
 	// Initialize graphics library
 	SDL_Init(SDL_INIT_VIDEO);
 
@@ -165,11 +163,11 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 	Log( "DaveStartup(): djgOpenVisual(w,h=%d,%d).\n", iWidth, iHeight );
 	if (NULL == (pVisMain = djgOpenVisual( bFullScreen?"fullscreen":NULL, iWidth, iHeight )))
 	{
-		printf( "GraphInit(): COULDNT OPEN GMAIN\n" );
+		printf( "GraphInit(): COULDN'T OPEN GMAIN\n" );
 		return false;
 	}
 	Log( "DaveStartup(): Display bytes per pixel %d\n", pVisMain->bpp) ;
-	imode = pVisMain->bpp;
+	int imode = pVisMain->bpp;
 
 	// Set the 32<->16 pixel conversion atributes, so the
 	// images would be displayed correctly with any pixel format
@@ -178,14 +176,14 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 	//--- (2) - Back buffer
 	if (NULL == (pVisBack = djgOpenVisual( "memory", iWidth, iHeight, imode )))
 	{
-		printf( "GraphInit(): COULDNT OPEN GBACK\n" );
+		printf( "GraphInit(): COULDN'T OPEN GBACK\n" );
 		return false;
 	}
 
 	//--- (3) - View buffer
 	if (NULL == (pVisView = djgOpenVisual( "memory", iWidth, iHeight, imode )))
 	{
-		printf( "GraphInit(): COULDNT OPEN GVIEW\n" );
+		printf( "GraphInit(): COULDN'T OPEN GVIEW\n" );
 		return false;
 	}
 
