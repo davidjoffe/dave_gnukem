@@ -112,6 +112,7 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 void djgCloseVisual( djVisual * pVis )
 {
 	SDL_FreeSurface(pVis->pSurface);
+	pVis->pSurface = NULL;//?<- dj2017-01 not sure if this is all that's necessary for cleanup here ...
 }
 
 void djgLock( djVisual * pVis )
