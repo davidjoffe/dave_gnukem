@@ -3,9 +3,9 @@
 //
 // 1995/07/28
 /*
-Copyright (C) 1995-2002 David Joffe
+Copyright (C) 1995-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 /*--------------------------------------------------------------------------*/
 
@@ -497,6 +497,7 @@ int game_startup(bool bLoadGame)
 	while (g_bGameRunning)
 	{
 
+		//debug//printf("{");
 		fTimeNow = djTimeGetTime();
 		bool bForceUpdate = false;
 		// If we're already behind, just force us to get there
@@ -518,6 +519,15 @@ int game_startup(bool bLoadGame)
 			//djiPoll();
 			// only register key presses here, so that key presses aren't missed.
 			SDL_Event Event;
+			//debug//printf("P");
+			// dj2017-06-18:
+			// Detect the 'edge' i.e. the moment keystate changes from 0 to 1
+			// We must do this so that if we get a down/up within the same poll *before*
+			// the heartbeat, we still process it (once) to e.g. move one block in the
+			// immediate subsequent 'heartbeat'.
+			// (This fixes the loooooong-outstanding annoying issue "Key polling behavior is
+			// subtly incorrect")
+			int key_down_edge[KEY_NUMKEYS] = {0};
 			while (djiPollEvents(Event))
 			{
 				switch (Event.type)
@@ -526,7 +536,16 @@ int game_startup(bool bLoadGame)
 					for ( i=0; i<KEY_NUMKEYS; i++ )
 					{
 						if (Event.key.keysym.sym==g_anKeys[i])
+						{
+							//debug//printf("KEY_DOWN[%d]",i);
 							anKeyState[i] = 1;
+							
+							if (i==KEY_LEFT  && key_left==0)	key_down_edge[KEY_LEFT] = 1;
+							if (i==KEY_RIGHT && key_right==0)	key_down_edge[KEY_RIGHT] = 1;
+							if (i==KEY_ACTION&& key_action==0)	key_down_edge[KEY_ACTION] = 1;
+							if (i==KEY_JUMP  && key_jump==0)	key_down_edge[KEY_JUMP] = 1;
+							if (i==KEY_SHOOT && key_shoot==0)	key_down_edge[KEY_SHOOT] = 1;
+						}
 					}
 
 					// 'Global' shortcut keys for adjusting volume [dj2016-10]
@@ -553,17 +572,28 @@ int game_startup(bool bLoadGame)
 					for ( i=0; i<KEY_NUMKEYS; i++ )
 					{
 						if (Event.key.keysym.sym==g_anKeys[i])
+						{
+							//debug//printf("KEY_UP[%d]",i);
 							anKeyState[i] = 0;
+							
+							// If e.g. key_left is '1' it means we've already 'processed/handled' the 'down' edge event in the 'heartbeat' - so squash the value to 0 now to ensure we don't e.g. do the double-move
+							if (i==KEY_LEFT && key_left==1)		key_left = 0;
+							if (i==KEY_RIGHT && key_right==1)	key_right = 0;
+							if (i==KEY_ACTION && key_action==1)	key_action = 0;
+							if (i==KEY_SHOOT && key_shoot==1)	key_shoot = 0;
+							if (i==KEY_JUMP && key_jump==1)		key_jump = 0;
+								
+						}
 					}
 					break;
 				}
 			}
 
-			if (anKeyState[KEY_ACTION]) key_action = 1;
-			if (anKeyState[KEY_LEFT])   key_left = 1;
-			if (anKeyState[KEY_RIGHT])  key_right = 1;
-			if (anKeyState[KEY_JUMP])   key_jump = 1;
-			if (anKeyState[KEY_SHOOT])  key_shoot = 1;
+			if (key_down_edge[KEY_ACTION]) key_action = 1;
+			if (key_down_edge[KEY_LEFT])   key_left = 1;
+			if (key_down_edge[KEY_RIGHT])  key_right = 1;
+			if (key_down_edge[KEY_JUMP])   key_jump = 1;
+			if (key_down_edge[KEY_SHOOT])  key_shoot = 1;
 			//if (g_iKeys[DJKEY_UP])		key_action = 1;
 			//if (g_iKeys[DJKEY_LEFT])	key_left = 1;
 			//if (g_iKeys[DJKEY_RIGHT])	key_right = 1;
@@ -741,12 +771,6 @@ int game_startup(bool bLoadGame)
 		if (afTimeTaken.size()>MAX_DEBUGGRAPH)
 			afTimeTaken.erase(afTimeTaken.begin());
 
-
-//fixmeV1 this looks pretty fundamental to get right:
-		// FIXME: This behaviour is incorrect. A keyup inside a 2nd-time round
-		// frame keypoll is not getting registered before the 2nd frame updates
-		// and draws (huh?) (try move left/right only one block. It's difficult)
-
 		key_action = anKeyState[KEY_ACTION];
 		key_left   = anKeyState[KEY_LEFT];
 		key_right  = anKeyState[KEY_RIGHT];
@@ -766,6 +790,7 @@ int game_startup(bool bLoadGame)
 		// fixme; is this still necessary what with the (other functions)
 		x = MAX( MIN(x,126), 1 );
 		y = MAX( MIN(y, 99), 2 );
+		//debug//printf("}");
 	} // while (game running)
 
 	TRACE("game_startup(): main game loop exited.\n");
@@ -777,6 +802,7 @@ int game_startup(bool bLoadGame)
 /*-----------------------------------------------------------*/
 void GameHeartBeat()
 {
+	//debug//printf("HEARTBEAT[");
 	CThing * pThing = NULL;
 	int n=0, i=0, j=0;
 	//int ifoo = key_action;
@@ -799,11 +825,13 @@ void GameHeartBeat()
 	if (!((key_jump) && (hero_mode != MODE_JUMPING))) {
 		if (key_left)
 		{
+			//debug//printf("L");
 			key_left = 0;
 			move_hero(-1,0);
 		}
 		if (key_right)
 		{
+			//debug//printf("R");
 			key_right = 0;
 			move_hero(1,0);
 		}
@@ -1144,6 +1172,8 @@ NextBullet3:
 
 	// Flip the back buffer onto the front
 	GraphFlip(!g_bBigViewportMode);
+
+	//debug//printf("]");
 }
 
 void Die()
