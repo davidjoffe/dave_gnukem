@@ -72,6 +72,7 @@ void ED_CommonKill ()
 	djiInit( pVisMain, INPUT_KEYDOWN|INPUT_KEYUP|INPUT_KEYREPEAT );
 	SDL_ShowCursor(0);
 	delete pFont;
+	pFont = NULL;
 	DeleteMacros ();
 	djiClearBuffer ();
 }
