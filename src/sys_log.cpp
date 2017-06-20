@@ -122,7 +122,7 @@ void DisposeLog ( dword log_id )
 
 void Log ( const char *fmt, ... )
 {
-	char		text[1024]={0};
+	char		text[4096]={0};
 	va_list		ap;
 
 	if ( !initialised )
@@ -131,7 +131,7 @@ void Log ( const char *fmt, ... )
 	if ( NULL == fmt )
 		return;
 
-	memset ( text, 0, 1024 );
+	memset ( text, 0, 4096 );
 
 	va_start ( ap, fmt );
 		vsprintf ( (char*)text, fmt, ap );
@@ -154,7 +154,7 @@ void Log ( const char *fmt, ... )
 
 void Log ( dword log_mask, const char *fmt, ... )
 {
-	char		text[2048]={0};
+	char		text[4096]={0};
 	va_list		ap;
 
 	if ( !initialised )
@@ -163,7 +163,7 @@ void Log ( dword log_mask, const char *fmt, ... )
 	if ( NULL == fmt )
 		return;
 
-	memset ( text, 0, 2048 );
+	memset ( text, 0, 4096 );
 
 	va_start ( ap, fmt );
 		vsprintf ( (char*)text, fmt, ap );

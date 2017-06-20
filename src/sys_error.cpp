@@ -14,23 +14,25 @@
 
 #include "sys_log.h"
 #include "sys_defs.h"
+#include <string>
 
-
-static const char	*file = NULL;
-static int	line = 0;
-
+std::string g_sFile;
+static int	g_nLine = 0;
 
 void _SetFileAndLine ( const char *filename, const int linenum )
 {
-	file = filename;
-	line = linenum;
+	// [dj2017-06-20] Make a copy of the passed-in filename string rather than keep pointer to it (in case caller deletes string, then this would crash)
+	g_sFile = "";
+	if (filename!=NULL)
+		g_sFile = filename;
+	g_nLine = linenum;
 }
 
 
 void _SYS_Error ( const char *fmt, ... )
 {
-	char		text[1024]={0};
-	char		text2[1024]={0};
+	char		text[2048]={0};
+	char		text2[2048]={0};
 	char		*ptr=NULL, *ptr2=NULL;
 	va_list		args;
 
@@ -41,7 +43,7 @@ void _SYS_Error ( const char *fmt, ... )
 		vsprintf ( text, fmt, args );
 	va_end ( args );
 
-	sprintf ( text2, "[Error] %s line %d: ", file, line );
+	sprintf ( text2, "[Error] %s line %d: ", g_sFile.c_str(), g_nLine );
 	ptr2 = text2 + strlen ( text2 );
 
 	ptr = text;
@@ -59,8 +61,8 @@ void _SYS_Error ( const char *fmt, ... )
 
 void _SYS_Warning ( const char *fmt, ... )
 {
-	char		text[1024]={0};
-	char		text2[1024]={0};
+	char		text[2048]={0};
+	char		text2[2048]={0};
 	char		*ptr=NULL, *ptr2=NULL;
 	va_list		args;
 
@@ -71,7 +73,7 @@ void _SYS_Warning ( const char *fmt, ... )
 		vsprintf ( text, fmt, args );
 	va_end ( args );
 
-	sprintf ( text2, "[Warning] %s line %d: ", file, line );
+	sprintf ( text2, "[Warning] %s line %d: ", g_sFile.c_str(), g_nLine );
 	ptr2 = text2 + strlen ( text2 );
 
 	ptr = text;
@@ -87,8 +89,8 @@ void _SYS_Warning ( const char *fmt, ... )
 
 void _SYS_Debug ( const char *fmt, ... )
 {
-	char		text[1024]={0};
-	char		text2[1024]={0};
+	char		text[2048]={0};
+	char		text2[2048]={0};
 	char		*ptr=NULL, *ptr2=NULL;
 	va_list		args;
 
@@ -99,7 +101,7 @@ void _SYS_Debug ( const char *fmt, ... )
 		vsprintf ( text, fmt, args );
 	va_end ( args );
 
-	sprintf ( text2, "[Debug] %s line %d: ", file, line );
+	sprintf ( text2, "[Debug] %s line %d: ", g_sFile.c_str(), g_nLine );
 	ptr2 = text2 + strlen ( text2 );
 
 	ptr = text;
@@ -111,4 +113,3 @@ void _SYS_Debug ( const char *fmt, ... )
 
 	Log ( "%s", text2 );
 }
-

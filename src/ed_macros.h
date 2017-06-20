@@ -8,6 +8,7 @@
 // Macro stuff
 struct SMacro
 {
+	SMacro():szName(NULL){};
 	char		*szName;
 	std::vector<int> m_aiBlocks[4];
 };
