@@ -562,12 +562,32 @@ void SetPixelConversion ( djVisual *vis )
 	Log ( "\t[RGBA]Shift: 0x%x; 0x%x; 0x%x 0x%x\n", rShift, gShift, bShift, aShift );
 }
 
+void djDestroyImageHWSurface( djImage* pImage )
+{
+	if (pImage==NULL) return;
+
+	std::map< djImage*, SDL_Surface *>::const_iterator iter = g_SurfaceMap.find( pImage );
+	if (iter == g_SurfaceMap.end())
+		return; // Hardware texture for this image not found
+
+	// Delete the associated hardware surface
+	SDL_Surface* pHardwareSurface = iter->second;
+	SDL_FreeSurface(pHardwareSurface);
+	//? ?delete pHardwareSurface;
+	pHardwareSurface = NULL;
+
+	// Remove from 'map'
+	g_SurfaceMap.erase( pImage );
+}
 bool djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 {
 	//extern djVisual* pVisView;
 	//djVisual* pVisDisplayBuffer = pVisView;
 	if (pImage==NULL) return false;
 
+	//fixmeLOW should ideally warn or assert or something if pImage already in map here??? [dj2017-06-20]
+
+	//fixme to check are these actually hardware surfaces
 	SDL_Surface* pSurfaceFoo = ::SDL_CreateRGBSurfaceFrom(
 		pImage->Data(),
 		pImage->Width(),

@@ -73,13 +73,17 @@ void EditorMainLoop ()
 				SwitchMode ( LVLED_MainLoop () );
 				LVLED_Kill ();
 
-//DJ2017-06-19 THERE'S SOME SORT OF SERIOUS BUG HERE .. this isn't right .. when we exit the level editor we immediately continue with that 'heartbeat'
+				//DJ2017-06-19 THERE'S SOME SORT OF SERIOUS BUG HERE .. this isn't right .. when we exit the level editor we immediately continue with that 'heartbeat'
 				// processing, however, we've destroyed everything during PerLevelSetup(), so we're basically playing one frame out with corrupted/deleted
 				// /dangling objects, or something along those lines. I'm not sure if that's directly the cause of the subsequent font corruption in
 				// subsequent level editor invocations or if that is something separate/different. Need more testing.
 				// We had a similar problem recently with the "Dying in the pungee sticks will often cause a crash" issue, which was fixed - I think
 				// this is basically along the lines of the same sort of problem, so look at how we solved it there also.
-				PerLevelSetup();
+				// dj2017-06-20 I think the above turned out to be a texture manager issue,
+				// and should be fixed now.
+				// However, I replaced this PerLevelSetup() with a call in the return to
+				// RestartLevel(), which I think is probably more 'correct' anyway?
+				//PerLevelSetup();
 				break;
 			}
 			case SWITCH_EXIT:

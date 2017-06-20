@@ -51,6 +51,7 @@ void InitHighScores()
 
 void KillHighScores()
 {
+	djDestroyImageHWSurface(g_pImgHighScores);
 	djDEL(g_pImgHighScores);
 }
 

@@ -41,6 +41,7 @@ void InitCredits()
 
 void KillCredits()
 {
+	djDestroyImageHWSurface(pImageCredits);
 	djDEL(pImageCredits);
 }
 

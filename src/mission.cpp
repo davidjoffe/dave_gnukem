@@ -5,7 +5,7 @@
 /*
 mission.cpp
 
-Copyright (C) 1999-2002 David Joffe
+Copyright (C) 1999-2017 David Joffe
 
 License: GNU GPL Version 2 (*not* "later versions")
 */
@@ -363,6 +363,7 @@ CSpriteData::CSpriteData()
 
 CSpriteData::~CSpriteData()
 {
+	djDestroyImageHWSurface(m_pImage);
 	djDEL(m_pImage);
 	djDELV(m_szImgFilename);
 	djDELV(m_szFilenameData);
@@ -496,7 +497,11 @@ int CSpriteData::LoadSpriteImage()
 	SYS_Debug ( "CSpriteData::LoadSpriteImage( %s ): Loading ...\n", m_szImgFilename );
 
 	// If image already exists, delete it
-	djDEL(m_pImage);
+	if (m_pImage)
+	{
+		djDestroyImageHWSurface(m_pImage);
+		djDEL(m_pImage);
+	}
 
 	int iRet = 0;
 
