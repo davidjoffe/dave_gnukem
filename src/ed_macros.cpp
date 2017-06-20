@@ -69,7 +69,7 @@ bool LoadMacros()
 	for ( i=0; i<(int)g_apMacros.size(); i++ )
 	{
 		SMacro *pMac = g_apMacros[i];
-		printf( "%s\n", pMac->szName );
+		printf( "%s\n", pMac->szName==NULL ? "" : pMac->szName );
 		for ( int j=0; j<(int)pMac->m_aiBlocks[0].size(); j++ )
 		{
 			printf( "%d %d %d %d\n",

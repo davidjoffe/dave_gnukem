@@ -2,9 +2,9 @@
 /*
 instructions.cpp
 
-Copyright (C) 1999-2001 David Joffe
+Copyright (C) 1999-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 #include "djtypes.h"
 #include "instructions.h"
@@ -49,6 +49,9 @@ void ShowInstructions()
 
 		// Pop up credits menu
 		do_menu( &instructionsMenu );
+
+		// [dj2017-06-20] Clean up / delete instructions image
+		djDestroyImageHWSurface( pImgInstructions );
+		djDEL(pImgInstructions);
 	}
 }
-

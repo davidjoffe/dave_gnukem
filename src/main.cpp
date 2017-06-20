@@ -9,9 +9,9 @@
 // 2016/10 : new github + livecoding 'era'
 
 /*
-Copyright (C) 1995-2001 David Joffe
+Copyright (C) 1995-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 
 /*--------------------------------------------------------------------------*/
@@ -327,6 +327,7 @@ void DaveCleanup()
 	Log ( "djiDone() ok\n" );
 	djSoundDone();			// Sound
 	Log ( "djSoundDone() ok\n" );
+	djDestroyImageHWSurface(g_pImgMain);
 	djDEL(g_pImgMain);		// Delete main menu background image (title screen)
 	Log ( "djDEL(g_pImgMain) ok\n" );
 	GraphDone();			// Graphics

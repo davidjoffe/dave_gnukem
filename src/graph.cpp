@@ -3,9 +3,9 @@
 // David Joffe 1998/12
 // replacing the old djgega.cpp graphics interface
 /*
-Copyright (C) 1998-2001 David Joffe
+Copyright (C) 1998-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 /*--------------------------------------------------------------------------*/
 
@@ -235,6 +235,7 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 
 void GraphDone()
 {
+	djDestroyImageHWSurface(g_pFont8x8);
 	djDEL(g_pFont8x8);
 
 	djgCloseVisual( pVisView );

@@ -55,6 +55,7 @@ void ED_CommonInit ()
 
 	pFont = new djImage;
 	pFont->Load( "data/simplefont.tga" );
+	djCreateImageHWSurface(pFont);
 
 	SDL_ShowCursor ( 1 );
 
@@ -71,6 +72,7 @@ void ED_CommonKill ()
 {
 	djiInit( pVisMain, INPUT_KEYDOWN|INPUT_KEYUP|INPUT_KEYREPEAT );
 	SDL_ShowCursor(0);
+	djDestroyImageHWSurface(pFont);
 	delete pFont;
 	pFont = NULL;
 	DeleteMacros ();
