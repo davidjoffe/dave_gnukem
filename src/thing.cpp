@@ -664,6 +664,9 @@ void CTeleporter::Initialize(int b0, int b1)
 
 int CTeleporter::Action()
 {
+	// If already activated, don't re-activative, this prevents us sitting in a freeze-loop if user sits holding in action key on the teleporter [dj2017-06-22]
+	if (m_bActivated)
+		return 0;
 	// Locate the other teleporter
 	unsigned int j;
 	for ( j=0; j<g_apThings.size(); j++ )
