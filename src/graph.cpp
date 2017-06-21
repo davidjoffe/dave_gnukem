@@ -124,7 +124,7 @@ void GraphFlip(bool bScaleView)
 	}
 }
 
-bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
+bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 {
 	// Initialize graphics library
 	SDL_Init(SDL_INIT_VIDEO);
@@ -144,11 +144,19 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 		if (max_w>iWidth && max_h>iHeight)
 		{
 			int nMultiple = djMAX(1, djMIN( max_w / iWidth, max_h / iHeight ) );
+			// If a forced scale factor has been passed in, try use that
+			// what happens if pass in ginormous value? crash .. so limit to make 'not too big' e.g. nMultiple*2 max?
+			if (nForceScale>=1)
+			{
+				if (nForceScale>nMultiple*2)
+					nForceScale=nMultiple*2;
+				nMultiple = nForceScale;
+			}
 			iWidth *= nMultiple;
 			iHeight *= nMultiple;
 		}
 
-		Log( "DaveStartup(): DisplayResolution(%d,%d).\n", max_w, max_h );
+		Log( "GraphInit(): DisplayResolution(%d,%d).\n", max_w, max_h );
 	}
 
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -160,13 +168,13 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight )
 	SDL_ShowCursor(0);
 
 	//--- (1) - Front buffer
-	Log( "DaveStartup(): djgOpenVisual(w,h=%d,%d).\n", iWidth, iHeight );
+	Log( "GraphInit(): djgOpenVisual(w,h=%d,%d).\n", iWidth, iHeight );
 	if (NULL == (pVisMain = djgOpenVisual( bFullScreen?"fullscreen":NULL, iWidth, iHeight )))
 	{
 		printf( "GraphInit(): COULDN'T OPEN GMAIN\n" );
 		return false;
 	}
-	Log( "DaveStartup(): Display bytes per pixel %d\n", pVisMain->bpp) ;
+	Log( "GraphInit(): Display bytes per pixel %d\n", pVisMain->bpp) ;
 	int imode = pVisMain->bpp;
 
 	// Set the 32<->16 pixel conversion atributes, so the

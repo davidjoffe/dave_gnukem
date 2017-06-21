@@ -38,7 +38,7 @@ extern djImage *g_pFont8x8;
 
 
 //! Initialize the graphics system for the game
-extern bool GraphInit( bool bFullScreen, int iWidth, int iHeight );
+extern bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale=-1 );
 
 //! Shut down the graphics system
 extern void GraphDone();
