@@ -787,13 +787,19 @@ int game_startup(bool bLoadGame)
 		{
 			SwitchMode ( SWITCH_SPRED );
 			ED_Main ();
-				
+
+			// NB, if we are holding a key down when entering sprite/level editor, we 'miss' the gameloop's KeyUp event as the integrated editor takes over input polling; this leads to potentially "stuck" keystates in anKeyState when exiting, which in turn causes problems like e.g. if you press 'up' before entering the level editor then drop yourself out of the level editor over a teleporter, the game freezes as it keeps re-activating the teleporter since the action key is effectively behaving as if stuck down. TL;DR CLEAR THE KEYSTATES HERE (even if the keys really are down on exit editor). I am not mad about this solution, all feels a little wobbly/workaround-y, but should do for now. [dj2017-06-22]
+			memset( anKeyState, 0, sizeof(anKeyState) );
+			
 			RestartLevel();
 		}
 		else if (g_iKeys[DJKEY_F5])
 		{
 			SwitchMode ( SWITCH_LVLED );
 			ED_Main ();
+
+			// NB, if we are holding a key down when entering sprite/level editor, we 'miss' the gameloop's KeyUp event as the integrated editor takes over input polling; this leads to potentially "stuck" keystates in anKeyState when exiting, which in turn causes problems like e.g. if you press 'up' before entering the level editor then drop yourself out of the level editor over a teleporter, the game freezes as it keeps re-activating the teleporter since the action key is effectively behaving as if stuck down. TL;DR CLEAR THE KEYSTATES HERE (even if the keys really are down on exit editor). I am not mad about this solution, all feels a little wobbly/workaround-y, but should do for now. [dj2017-06-22]
+			memset( anKeyState, 0, sizeof(anKeyState) );
 
 			RestartLevel(); // [dj2017-06-20] This replaces PerLevelSetup() call that was after LVLED_Kill(), not 100% sure but suspect this slightly more 'correct'
 		}
@@ -869,6 +875,7 @@ void GameHeartBeat()
 		if (key_action)
 		{
 			key_action = 0; // huh?
+			// dj2017-06-22 I think that "huh?" might have something to do with issue encountered of 'freezing on entering teleporter' issue, or else it's just redundant/old code, not sure, as it re-sets key_action anyway from anKeyStates[KEY_ACTION] each heartbeat
 
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
 			// Level cheat key (Ctrl+L)
@@ -1644,11 +1651,16 @@ void DrawDebugInfo()
 	GraphDrawString(pVisView, g_pFont8x8, 32, 32, (unsigned char*)buf );
 	sprintf(buf, "[%d,%d] [%d firepower]", x, y, g_nFirepower);
 	GraphDrawString(pVisView, g_pFont8x8, 32, 40, (unsigned char*)buf );
+
 	if (HeroIsFrozen())
 	{
 		sprintf(buf, "[FROZEN]");
 		GraphDrawString(pVisView, g_pFont8x8, 32, 48, (unsigned char*)buf );
 	}
+
+	extern int nFrozenCount;
+	sprintf(buf, "frozecount=%d", nFrozenCount);
+	GraphDrawString(pVisView, g_pFont8x8, 32, 56, (unsigned char*)buf );
 }
 
 void DrawBullets()
