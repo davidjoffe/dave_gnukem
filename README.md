@@ -53,6 +53,9 @@ Power boots allow you to jump higher.
 
 Recent:
 
+* Added "-scale N" command line option (1 = 320x200, 2=640x400, etc.) (if passed, this overrides the default behavior of attempting to "intelligently" select the scale factor based on e.g. desktop resolution etc.)
+* Fix: "Key polling behavior is subtly incorrect" (this should slightly improve the character control, especially if trying to move left/right one block only)
+* Minor sprite and level improvements
 * Add hero jump/landing sounds (credit for the sounds: Juhani Junkala), key pick-up sound, and more
 * Increase gameplay viewport width from 12 to 13 blocks
 

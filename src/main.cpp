@@ -47,10 +47,13 @@ License: GNU GPL Version 2
 
 #include <SDL_mixer.h>//For background music stuff
 
+#include <map>
+#include <string>
+
 /*--------------------------------------------------------------------------*/
 djImage *g_pImgMain = NULL;
 
-int  DaveStartup(bool bFullScreen, bool b640);	// Application initialization
+int  DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::string >& Parameters);	// Application initialization
 void DaveCleanup();					// Application cleanup
 void SelectMission();				// Select a mission
 void RedefineKeys();				// Redefine keys
@@ -107,12 +110,25 @@ int main ( int argc, char** argv )
 	bool bfullscreen = false;
 	bool b640 = false;
 
+	// parametername => value [dj2017-06-22]
+	std::map< std::string, std::string > Parameters;
+
 	if (argc > 1)
 	{
+		std:string sNextParamGetValue;
 		for ( int i=1; i<argc; i++ )
 		{
-			if (0 == strncmp( argv[i], "-f", 2 )) bfullscreen = true;
-			if (0 == strncmp( argv[i], "-640", 4 )) b640 = true;
+			if (!sNextParamGetValue.empty())
+			{
+				Parameters[sNextParamGetValue] = argv[i];
+				sNextParamGetValue = "";
+			}
+			else
+			{
+				if (0 == strncmp( argv[i], "-f", 2 )) bfullscreen = true;
+				if (0 == strncmp( argv[i], "-640", 4 )) b640 = true;
+				if (0 == strncmp( argv[i], "-scale", 6 )) sNextParamGetValue = "scale";
+			}
 		}
 	}
 	else
@@ -122,11 +138,12 @@ int main ( int argc, char** argv )
 		printf( " Command-line options:\n" );
 		printf( "   -f    Fullscreen mode\n" );
 		printf( "   -640  640x480 mode\n" );
+		printf( "   -scale N [Optional] Force window size multiple of base resolution (1=320x200)\n" );
 		printf( "---------------------------------------------------------\n" );
 	}
 
 	// Initialize everything
-	if (0 != DaveStartup(bfullscreen, b640))
+	if (0 != DaveStartup(bfullscreen, b640, Parameters))
 	{
 		SYS_Error ("DaveStartup() failed.");
 		return -1;
@@ -182,7 +199,7 @@ bool djFileExists(const char* szPath)
 }
 #endif
 
-int DaveStartup(bool bFullScreen, bool b640)
+int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::string >& Parameters)
 {
 	InitLog ();
 
@@ -271,8 +288,15 @@ int DaveStartup(bool bFullScreen, bool b640)
 		w = 640;
 		h = 400;
 	}
+	// dj2017-06-22 Add option to pass in forced scale multiplier. Hm, would it be better to make this a 'setting' rather than command line param? Dunno.
+	int nForceScale = -1;
+	std::map< std::string, std::string >::const_iterator iter=Parameters.find("scale");
+	if (iter!=Parameters.end())
+	{
+		nForceScale = atoi( iter->second.c_str() );
+	}
 	// [dj2016-10] Note this w/h is effectively now a 'hint' as it may not initialize to the exact requested size
-	if (!GraphInit( bFullScreen, w, h ))
+	if (!GraphInit( bFullScreen, w, h, nForceScale ))
 	{
 		Log( "DaveStartup(): Graphics initialization failed.\n" );
 		return -1;
