@@ -1,3 +1,5 @@
+See Readme.md for updated history from Oct 2016
+
 2016/10/09 - Version 0.6 (0.60)
  - Take the 2015-08-01 v0.56a EMH release from SourceForge, create github project https://github.com/davidjoffe/dave_gnukem
  - Fixed 'tiny game window'
