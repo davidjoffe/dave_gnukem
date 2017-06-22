@@ -53,6 +53,8 @@ Power boots allow you to jump higher.
 
 Recent:
 
+2017/06/22 - Version 0.70 [Windows only]
+
 * Add new basic 'Instructions' option to in-game menu
 * Fix: Potential game 'freeze' in teleporter if exiting level editor (or holding in action key)
 * Added "-scale N" command line option (1 = 320x200, 2=640x400, etc.) (if passed, this overrides the default behavior of attempting to "intelligently" select the scale factor based on e.g. desktop resolution etc.)
