@@ -53,6 +53,9 @@ Power boots allow you to jump higher.
 
 Recent:
 
+* Improve character control: Make vertical jumping/falling movement a bit smoother (more similar to the original DN1)
+* Fix soda can not animating
+
 2017/06/22 - Version 0.70 [Windows only]
 
 * Add new basic 'Instructions' option to in-game menu
