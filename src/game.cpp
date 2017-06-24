@@ -130,6 +130,7 @@ SOUND_HANDLE g_iSounds[SOUND_MAX]={0};
 
 // Yeah its pretty low but thats what I was aiming for back in the EGA days
 // and I don't feel like changing it right now. I might still though.
+float g_fFrameRate=18.0f;
 #define FRAME_RATE (18.0f)
 
 #define MAX_HEALTH (10)
@@ -482,7 +483,7 @@ int game_startup(bool bLoadGame)
 	GraphFlip(!g_bBigViewportMode);
 
 	// try maintain a specific frame rate
-	const float fTIMEFRAME = (1.0f / FRAME_RATE);
+	/*const */float fTIMEFRAME = (1.0f / g_fFrameRate);
 
 	float fTimeFirst = djTimeGetTime();
 
@@ -543,6 +544,38 @@ int game_startup(bool bLoadGame)
 							if (i==KEY_ACTION&& key_action==0)	key_down_edge[KEY_ACTION] = 1;
 							if (i==KEY_JUMP  && key_jump==0)	key_down_edge[KEY_JUMP] = 1;
 							if (i==KEY_SHOOT && key_shoot==0)	key_down_edge[KEY_SHOOT] = 1;
+						}
+					}
+
+					// Shift + F6/F7: Dec/Inc speed (framerate).
+					// Not sure if this really makes sense in 'production' game,
+					// but note the original DN1 had equivalent speec dec/inc ('<' and
+					// '>' keys) [dj2017-06-24]
+					if ( (Event.key.keysym.mod & KMOD_LSHIFT)!=0 ||
+					     (Event.key.keysym.mod & KMOD_RSHIFT)!=0)
+					{
+						/*{
+						char buf[1024]={0};
+						sprintf(buf,"%08x,%08x,%08x",(int)Event.key.keysym.sym, (int)Event.key.keysym.mod, (int)Event.key.keysym.scancode);
+						ShowGameMessage(buf, 32);
+						}*/
+						if (Event.key.keysym.sym==SDLK_F6)
+						{
+							g_fFrameRate -= 1.0f;
+							if (g_fFrameRate<1.f)
+								g_fFrameRate = 1.f;
+							fTIMEFRAME = (1.0f / g_fFrameRate);
+							char buf[1024]={0};
+							sprintf(buf,"Dec framerate %.2f",g_fFrameRate);
+							ShowGameMessage(buf, 32);
+						}
+						else if (Event.key.keysym.sym==SDLK_F7)
+						{
+							g_fFrameRate += 1.0f;
+							fTIMEFRAME = (1.0f / g_fFrameRate);
+							char buf[1024]={0};
+							sprintf(buf,"Inc framerate %.2f",g_fFrameRate);
+							ShowGameMessage(buf, 32);
 						}
 					}
 					
