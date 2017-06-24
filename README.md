@@ -42,6 +42,7 @@ Try find the exit, while dodging or shooting monsters.
 
 * PgUp/PgDn: Increase/decrease volume
 * Insert: Toggle sounds on/off
+* Shift+F6/F7: Dec/Inc speed (framerate)
 
 To open doors, find the correct color key, and press the action key on the 'lock' nearby the door(s).
 
@@ -56,6 +57,7 @@ Power boots allow you to jump higher.
 Recent:
 
 * Improve character control: Make vertical jumping/falling movement a bit smoother (more similar to the original DN1)
+* New keyboard shortcuts: Shift+F6/F7: Dec/Inc speed (framerate)
 * Fix soda can not animating
 
 2017/06/22 - Version 0.70 [Windows only]
