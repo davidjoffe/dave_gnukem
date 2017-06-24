@@ -1844,7 +1844,7 @@ void CDust::Draw()
 	{
 		if (m_anAnim[i]<=3)
 		{
-			DRAW_SPRITE16A(pVisView, 5, 20 + m_anAnim[i], CALC_XOFFSET(m_anX[i],0), CALC_YOFFSET(m_anY[i]));
+			DRAW_SPRITE16A(pVisView, 5, 20 + m_anAnim[i], CALC_XOFFSET(m_anX[i],0)+m_xoffset, CALC_YOFFSET(m_anY[i])+m_yoffset);
 		}
 	}
 }
@@ -1873,10 +1873,11 @@ CThing *CreateExplosion(int nX, int nY)
 	return pExplosion;
 }
 
-CThing *CreateDust(int nX, int nY)
+CThing *CreateDust(int nX, int nY, int nOffsetX, int nOffsetY)
 {
 	CDust *pDust = new CDust;
-	pDust->SetPosition(nX, nY);
+	//pDust->SetPosition(nX, nY);
+	pDust->SetLocation(nX, nY, nOffsetX, nOffsetY, 1, 1);
 	pDust->SetType(TYPE_DUST);
 	return pDust;
 }

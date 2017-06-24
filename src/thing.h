@@ -934,7 +934,7 @@ extern CThing *CreateFloatingScore( int x, int y, int score );
 //! Create a \ref CExplosion at (nX,nY) (pixel coordinates)
 extern CThing *CreateExplosion(int nX, int nY);
 
-//! Create a \ref CDust effect at (nX, nY) (level coordinates)
-extern CThing *CreateDust(int nX, int nY);
+//! Create a \ref CDust effect at (nX, nY) (level coordinates), plus optional nOffsetX,nOffsetY pixel offsetl
+extern CThing *CreateDust(int nX, int nY, int nOffsetX=0, int nOffsetY=0);
 
 #endif
