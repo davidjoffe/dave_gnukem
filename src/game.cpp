@@ -364,6 +364,7 @@ void PerLevelSetup()
 	hero_picoffs=0;
 	x_small = 0; // hero not half-block offset
 	xo_small = 0; // view not half-block offset
+	y_offset = 0;
 	// just in case level doesn't contain a starting block ..
 	xo = 0;
 	yo = 0;
@@ -544,7 +545,20 @@ int game_startup(bool bLoadGame)
 							if (i==KEY_SHOOT && key_shoot==0)	key_down_edge[KEY_SHOOT] = 1;
 						}
 					}
-
+					
+					// [dj2017-06] DEBUG/CHEAT/DEV KEYS
+					/*
+					if (Event.key.keysym.sym==SDLK_F8)
+					{
+						g_bSmoothVerticalMovementTest = !g_bSmoothVerticalMovementTest;
+						y_offset = 0;
+						if (g_bSmoothVerticalMovementTest)
+							ShowGameMessage("Smooth vertical movement ON", 32);
+						else
+							ShowGameMessage("Smooth vertical movement OFF", 32);
+					}
+					else
+					*/
 					// 'Global' shortcut keys for adjusting volume [dj2016-10]
 					if (Event.key.keysym.sym==SDLK_PAGEUP)
 					{
@@ -867,6 +881,16 @@ void GameHeartBeat()
 		n = move_hero(0,1);
 		{
 			bool bFalling = (n==0);
+			if (bFalling)
+			{
+				if (!bFallingPrev) // <- just started falling?
+				{
+					g_nFalltime = 0;
+				}
+				++g_nFalltime;
+			}
+			else
+				g_nFalltime = 0;
 			if (bFallingPrev && !bFalling) // <- just stopped falling
 			{
 				// Kick up some dust ..
@@ -1085,7 +1109,7 @@ NextBullet3:
 	for ( i=0; i<(int)g_apThings.size(); ++i )
 	{
 		CThing *pThing = g_apThings[i];
-		if (pThing->OverlapsBounds(x*16+x_small*8, y*16-16))
+		if (pThing->OverlapsBounds(x*16+x_small*8, y*16+y_offset-16))
 		{
 			// [dj2016-10-10] Note that if inside HeroOverlaps(), it can cause you to die, e.g. if you've interacted with
 			// spikes .. so be aware you may be dead after calling that .. thats g_bDied, which causes level restart below.
@@ -1108,7 +1132,7 @@ NextBullet3:
 		if (pThing!=NULL)
 		{
 			// Test if entering or leaving action bounds box
-			if (pThing->InBounds(x*16+x_small*8, y*16-16))
+			if (pThing->InBounds(x*16+x_small*8, y*16+y_offset-16))
 			{
 				if (!pThing->IsHeroInside())
 					pThing->HeroEnter();
@@ -1404,10 +1428,20 @@ void GameDrawView()
 
 		xoff = (x_small - xo_small)+1 + ((x-xo)<<1);
 		xoff *= 8;
-		DRAW_SPRITE16A(pVisView,4,  hero_dir*16+hero_picoffs*4,xoff   ,yoff   );
-		DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+hero_picoffs*4,xoff   ,yoff+16);
-		DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+hero_picoffs*4,xoff+16,yoff   );
-		DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+hero_picoffs*4,xoff+16,yoff+16);
+		DRAW_SPRITE16A(pVisView,4,  hero_dir*16+hero_picoffs*4,xoff   ,yoff   +y_offset);
+		DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+hero_picoffs*4,xoff   ,yoff+16+y_offset);
+		DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+hero_picoffs*4,xoff+16,yoff   +y_offset);
+		DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+hero_picoffs*4,xoff+16,yoff+16+y_offset);
+		if (bShowDebugInfo)
+		{
+			// Light blue box shows hero collision bounding box
+			djgSetColorFore(pVisView,djColor(5,50,200));
+			djgDrawRectangle(pVisView,
+				xoff+8,
+				yoff+y_offset,
+				16,
+				32);
+		}
 	}
 	DrawThingsAtLayer(LAYER_4);
 	DrawThingsAtLayer(LAYER_TOP);

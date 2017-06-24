@@ -1026,7 +1026,7 @@ int CCoke::Tick()
 			return THING_DIE;
 		}
 	}
-	return 0;
+	return CPickup::Tick();//<- This is important for animation currently as CPickup::Tick() handles animation count [dj2017-06-24]
 }
 /*-----------------------------------------------------------*/
 CCrawler::CCrawler()

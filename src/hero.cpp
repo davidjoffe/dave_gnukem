@@ -1,9 +1,9 @@
 /*
 hero.cpp
 
-Copyright (C) 2000-2001 David Joffe
+Copyright (C) 2000-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 
 #include "hero.h"
@@ -18,6 +18,13 @@ int x_small=0, xo_small=0; // x_small == 0 ? hero at x : hero at x + 8 pixels
 int xo = 60, yo = 45;    // xo,yo = top-left corner of view for scrolling
 int hero_dir = 1;        // hero direction, left==0, right==1
 int hero_picoffs = 0;    // hero animation image index offset
+
+bool g_bSmoothVerticalMovementEnabled=true;
+int y_offset = 0;//!< Pixel offset (e.g. [-15,15] relative to the hero's 'block unit' 'y' position. For smooth vertical movement. [Added dj2017-06]
+int g_nFalltime=0;
+// These at '8' correspond relatively closely to original DN1 behavior. Setting these to e.g. 1 or 2 etc. allow much smoother more refined vertical movement of hero, which might be useful in future. [dj2017-06]
+const int nFALL_VERTICAL_PIXELS=8;
+const int nJUMP_VERTICAL_PIXELS=8;
 
 int nHurtCounter = 0;
 
@@ -55,6 +62,7 @@ void HeroStartJump()
 {
 	hero_mode = MODE_JUMPING;
 	jump_pos = 0;
+	y_offset = 0;
 	
 	djSoundPlay( g_iSounds[SOUND_JUMP] );
 }
@@ -67,19 +75,50 @@ void HeroCancelJump()
 
 void HeroUpdateJump()
 {
-	int n;
-	n = move_hero(0,pJumpInfo->jump_diffs[jump_pos]);
-	if (n == 1) { //cancel jump, fell on block (x 1 ret?)
-		HeroCancelJump();
-		hero_picoffs = 1;
-		// Kick up some dust ..
-		AddThing(CreateDust(x, y));
-		djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
-	}
-	jump_pos++;
-	if (jump_pos >= pJumpInfo->size)
+	int n=0;
+	
+	bool bDo = true;//Do 'full-block' movement, i.e. when smooth movement 'wraps' [dj2017-06-24]
+	if (g_bSmoothVerticalMovementEnabled &&
+		pJumpInfo->jump_diffs[jump_pos] < 0)
 	{
-		hero_mode = MODE_NORMAL;
+		y_offset -= nJUMP_VERTICAL_PIXELS;
+		
+		bDo = false;
+		if (y_offset<-15)
+		{
+			y_offset = 0;
+			bDo = true;
+		}
+		//else
+		{
+			// Check if gonna hit head on solid as result of fine 'pixel' movement?
+			bool bSolid = check_solid( x, y - 2 ) | check_solid( x + x_small, y - 2 );
+			if (bSolid)
+			{
+				y_offset += nJUMP_VERTICAL_PIXELS;
+				HeroCancelJump();
+				hero_picoffs = 1;
+				return;
+			}
+		}
+	}
+	
+	if (bDo)
+	{
+		y_offset = 0;
+		n = move_hero(0,pJumpInfo->jump_diffs[jump_pos]);
+		if (n == 1) { //cancel jump, fell on block (x 1 ret?)
+			HeroCancelJump();
+			hero_picoffs = 1;
+			// Kick up some dust ..
+			AddThing(CreateDust(x, y));
+			djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
+		}
+		jump_pos++;
+		if (jump_pos >= pJumpInfo->size)
+		{
+			hero_mode = MODE_NORMAL;
+		}
 	}
 }
 
@@ -121,6 +160,7 @@ void relocate_hero( int xnew, int ynew )
 	x = xnew;
 	y = ynew;
 	x_small = 0;
+	y_offset = 0;
 	xo = MAX( x - int(VIEW_WIDTH / 2), 0 );
 	yo = MAX( y - 6, 0 );
 	xo = MIN( xo, 128 - VIEW_WIDTH );
@@ -155,8 +195,17 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 		if (xdiff>0)
 		{
 			bsolid = false;
-			if ( x_small == 0 ) {
+			if ( x_small == 0 )
+			{
 				bsolid = check_solid( x + 1, y ) | check_solid( x + 1, y - 1 );
+				// Prevent being able to walk into floors left/right while falling [dj2017-06]
+				if (g_bSmoothVerticalMovementEnabled)
+				{
+					if (y_offset<0)
+						bsolid |= check_solid( x + 1, y-1 ) | check_solid( x + 1, y - 2 );
+					else if (y_offset>0)
+						bsolid |= check_solid( x + 1, y+1 ) | check_solid( x + 1, y );
+				}
 			}
 			ret = 2;
 			if (  (!(bsolid)) && ( (x_small) | (!(bsolid)) )  ) {
@@ -179,12 +228,20 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 				
 			}
 		}
-		else
+		else//Try move left
 		{ //facing left, must have pressed left
 			bsolid = false;
 			if (!(x_small))
 			{
 				bsolid = check_solid( x - 1, y ) | check_solid( x - 1, y - 1 );
+				// Prevent being able to walk into floors left/right while falling [dj2017-06]
+				if (g_bSmoothVerticalMovementEnabled)
+				{
+					if (y_offset<0)
+						bsolid |= check_solid( x - 1, y-1 ) | check_solid( x - 1, y - 2 );
+					else if (y_offset>0)
+						bsolid |= check_solid( x - 1, y+1 ) | check_solid( x - 1, y );
+				}
 			}
 			ret = 2;
 			if ((!(bsolid)) & ((x_small) | (!(bsolid))) ) {
@@ -210,6 +267,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 	
 	if (ydiff)
 	{
+		// Jumping
 		if (ydiff == 1)
 			n = 1;      // falling, check below us
 		else
@@ -220,14 +278,46 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 		
 		ret = 1;
 		if (!bsolid) {
-			ret = 0;
-			y += ydiff;
-			if (y-yo<4) yo--;
-			if (y-yo>7) yo++;
-			if ( yo < 0 )
-				yo = 0;
-			if ( yo > 100 - 10 )
-				yo = 100 - 10;
+
+
+			bool bDo = true;//Do 'full-block' movement, i.e. when smooth movement 'wraps' [dj2017-06-24]
+			
+			if (g_bSmoothVerticalMovementEnabled &&
+				ydiff>0)//Falling?
+			{
+				bDo=false;
+				// This g_nFalltime thing is to make hero fall initially slower
+				// then faster (full block at a time).
+				// Apart from looking/feeling slightly more natural, it also 'masks'
+				// a current issue where you get a jerky effect that looks like hero
+				// bouncing up and down when falling off bottom of view, as the view
+				// code scrolls vertically always in increments of 16 pixels, whereas
+				// if hero falls at 8 pixels off bottom then relative vertical offset
+				// of hero on screen toggles 8 pixels each consecutive frame. With
+				// this falltime thing, by the time he is falling off the bottom,
+				// he is falling 16 pixels, and the view scrolls 16 pixels too.
+				// It's a bit fiddly but anyway, we have to do fine tweaks like this.
+				// See also liveedu.tv video 2017-06-24 [dj2017-06-24]
+				y_offset += ( g_nFalltime>=6 ? 16 : nFALL_VERTICAL_PIXELS );
+				ret = 0;//Return 'busy falling'
+				if (y_offset>=15)
+				{
+					bDo = true;
+					y_offset = 0;
+				}
+			}
+
+			if (bDo)
+			{
+				ret = 0;
+				y += ydiff;
+				if (y-yo<4) yo--;
+				if (y-yo>7) yo++;
+				if ( yo < 0 )
+					yo = 0;
+				if ( yo > 100 - 10 )
+					yo = 100 - 10;
+			}
 		}
 	}
 	if ((hero_mode != MODE_JUMPING) && (ret == 0)) {

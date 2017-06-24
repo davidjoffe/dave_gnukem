@@ -3,9 +3,9 @@
 \brief   Hero-related stuff
 \author  David Joffe
 
-Copyright (C) 2001 David Joffe
+Copyright (C) 2001-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 #ifndef _HERO_H_
 #define _HERO_H_
@@ -27,6 +27,24 @@ extern int nHurtCounter;
 extern int x;			//!< Hero's absolute x position, in level block coordinates
 extern int y;			//!< Hero's absolute y position, in level block coordinates
 extern int x_small;		//!< x_small == 0 ? hero at x : hero at x + 8 pixels
+
+// This should really just be permanently on I guess, not sure if there's any good reason to turn it off, unless we want to backtrack today's changes. [dj2017-06-24]
+extern bool g_bSmoothVerticalMovementEnabled;
+extern int y_offset;	//!< Pixel offset (e.g. [-15,15] relative to the hero's 'block unit' 'y' position. For smooth vertical movement. [Added dj2017-06]
+// This g_nFalltime thing is to make hero fall initially slower
+// then faster (full block at a time).
+// Apart from looking/feeling slightly more natural, it also 'masks'
+// an issue with smooth vertical movement enabled where you get a jerky
+// effect that looks like hero bouncing jerkily up and down when falling
+// off bottom of view, as the view code scrolls vertically always in increments of 16 pixels,
+// whereas if hero falls at 8 pixels off bottom then relative vertical offset
+// of hero on screen toggles 8 pixels each consecutive frame. With
+// this falltime thing, by the time he is falling off the bottom,
+// he is falling 16 pixels, and the view scrolls 16 pixels too.
+// It's a bit fiddly but anyway, we have to do fine tweaks like this.
+// See also liveedu.tv video 2017-06-24 [dj2017-06-24]
+extern int g_nFalltime;
+
 //! xo,yo = top-left corner of view for scrolling
 extern int xo;
 
