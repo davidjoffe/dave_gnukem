@@ -11,6 +11,8 @@ Project page: http://gnukem.sourceforge.net/
 
 Video: https://youtu.be/Hi7WYnOA_fo
 
+Please donate to the project, or else I'll make more games like this: https://www.paypal.com/davidjoffe
+
 Created by: David Joffe http://djoffe.com/ (https://www.livecoding.tv/david_joffe/)
 
 The project was maintained by EMH (Evil Mr Henry) for a number of years until Oct 2016. Additional contributions by: T.O.G, Vytautas Shaltenis, Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
