@@ -3,9 +3,9 @@
 \brief   Bullet class
 \author  David Joffe
 
-Copyright (C) 2002 David Joffe
+Copyright (C) 2002-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 #ifndef _BULLET_H_
 #define _BULLET_H_

@@ -1,9 +1,9 @@
 /*
 djinput.cpp
 
-Copyright (C) 1995-2001 David Joffe
+Copyright (C) 1995-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 
 Created: '95/07/20 (originally as a test keyboard interrupt hook)
 */

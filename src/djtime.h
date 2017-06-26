@@ -3,9 +3,9 @@
 \brief   Some timing functions
 \author  David Joffe
 
-Copyright (C) 1999-2001 David Joffe
+Copyright (C) 1999-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 #ifndef _DJTIME_H_
 #define _DJTIME_H_

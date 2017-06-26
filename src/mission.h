@@ -3,9 +3,9 @@
 \brief   Level sets, campaigns, missions, whatever you want to call 'em
 \author  David Joffe
 
-Copyright (C) 1998-2001 David Joffe
+Copyright (C) 1998-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 /*--------------------------------------------------------------------------*/
 /* David Joffe '99/02 */

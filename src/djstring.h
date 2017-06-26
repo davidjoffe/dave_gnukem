@@ -3,9 +3,9 @@
 \brief   Some string helper functions
 \author  David Joffe
 
-Copyright (C) 1998-2016 David Joffe
+Copyright (C) 1998-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _DJSTRING_H_

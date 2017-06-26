@@ -3,9 +3,9 @@
 \brief   High score list
 \author  David Joffe
 
-Copyright (C) 2000-2001 David Joffe
+Copyright (C) 2000-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _HISCORES_H_

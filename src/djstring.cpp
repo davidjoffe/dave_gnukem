@@ -1,9 +1,9 @@
 /*
 djstring.cpp
 
-Copyright (C) 1998-2016 David Joffe
+Copyright (C) 1998-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 
 #include <string.h>

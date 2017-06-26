@@ -3,9 +3,9 @@
 \brief   Basic types and macros
 \author  David Joffe
 
-Copyright (C) 1998-2002 David Joffe
+Copyright (C) 1998-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 
 #ifndef _DJTYPES_H_
