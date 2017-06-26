@@ -707,15 +707,16 @@ int game_startup(bool bLoadGame)
 				if (g_iKeys[DJKEY_PGDN])
 				{
 					ShowGameMessage("CHEAT: HEALTH+KEYS+FIREPOWER", 96);
-
+SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 					// Full health
 					SetHealth(MAX_HEALTH);
 
 					// All keys
-					vector<int> anKeysHave;
+					std::vector<int> anKeysHave;
 					for ( i=0; i<InvGetSize(); i++ )
 					{
-						if (InvGetItem(i)->GetTypeID()==TYPE_KEY)
+						if (InvGetItem(i)->GetTypeID()==TYPE_KEY
+							||InvGetItem(i)->GetTypeID()==TYPE_ACCESSCARD)//dj2017-06 adding access card
 						{
 							CKey *pKey = (CKey*)InvGetItem(i);
 							anKeysHave.push_back(pKey->GetID());
@@ -738,6 +739,21 @@ int game_startup(bool bLoadGame)
 							pKey->Initialize(0, 116+i);
 							InvAdd(pKey);
 						}
+					}
+					{
+						//dj2017-06 Adding access card - this is gross, it's hardcoded here that '5' is its key/door number. Oh well, not going to lose sleep over it.
+						bool bHave = false;
+						for ( unsigned int j=0; j<anKeysHave.size(); j++ )
+						{
+							if (5==anKeysHave[j])//<- [LOW PRIO] this detectioh isn't working correctly [see workaround note above 2017-06]
+								bHave = true;
+						}
+						CKey *pKey = new CAccessCard;
+						pKey->SetType(TYPE_ACCESSCARD);
+						pKey->SetID(5);
+						pKey->SetSprite(1, 97);
+						pKey->Initialize(1, 97);
+						InvAdd(pKey);
 					}
 
 					// Full firepower
