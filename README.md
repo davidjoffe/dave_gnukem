@@ -60,6 +60,7 @@ Recent:
 
 * Implemented access card and access card 'door' and door activator
 * Added special molecule pickup that gives you full health
+* Level Editor: Add level statistics page (Ctrl+F6)
 * Improve character control: Make vertical jumping/falling movement a bit smoother (more similar to the original DN1)
 * New keyboard shortcuts: Shift+F6/F7: Dec/Inc speed (framerate)
 * Fix soda can not animating

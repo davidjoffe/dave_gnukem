@@ -11,6 +11,12 @@
 				// manage this by theirselves
 #include "level.h"	// level_pointer() comes from here
 #include "ed_DrawBoxContents.h"
+//---------------------------------------------------------------------------
+// Level stats stuff [dj2017-06]
+#include <map>
+#include <utility>//For std::pair
+#include "block.h"//For names of block types for DN1
+//---------------------------------------------------------------------------
 
 
 
@@ -41,7 +47,7 @@ static int	sprite1a = 0;
 static int	sprite1b = 0;
 
 
-#define NUM_LEVEL_INSTRUCTIONS 16
+#define NUM_LEVEL_INSTRUCTIONS 17
 static const char *level_instructions[NUM_LEVEL_INSTRUCTIONS] =
 {
 	"- Instructions: ----------",
@@ -58,6 +64,7 @@ static const char *level_instructions[NUM_LEVEL_INSTRUCTIONS] =
 	"N       Previous spriteset",
 	"^C+M    Next level",
 	"^C+N    Previous level",
+	"Ctl+F6  Level Statistics",
 	"ESC     Quit",
 	"--------------------------"
 };
@@ -99,6 +106,217 @@ void SetLevel( int x, int y, int a, int b, bool bforeground );
 }
 
 
+//---------------------------------------------------------------------------
+// Level stats
+class CLevelStats
+{
+public:
+	CLevelStats();
+	// The pair is the usual 'a,b' to denote sprite info (spritesetindex,spriteindex)
+	std::map< std::pair< unsigned char, unsigned char >, int > SpriteCounts;	// Total count for (a,b)
+	std::map< std::pair< unsigned char, unsigned char >, int > SpriteCountsF;	// Foreground instance count for (a,b)
+	std::map< std::pair< unsigned char, unsigned char >, int > SpriteCountsB;	// Background instance count for (a,b)
+	// Hm, shoudltry detect Invalid sprites
+
+	//int m_nMaxCount;
+};
+CLevelStats::CLevelStats() //:
+	//m_nMaxCount(0)
+{
+}
+void CalculateLevelStats(CLevelStats& Stats)
+{
+	// Fill in with 0 by default?
+	for ( int i=0; i<NUM_SPRITE_DATA; ++i)
+	{
+		const CSpriteData* pSpriteData = g_pCurMission->m_apSpriteData[i];
+		// We MUST check for NULL as this silly way of doing it means there will be NULL items [dj2017-06]
+		if (pSpriteData==NULL)continue;
+
+		for ( int b=0; b<=127; ++b )
+		{
+			Stats.SpriteCounts [ std::make_pair((unsigned char)i,(unsigned char)b) ] = 0;
+		}
+	}
+
+	//fixme ----- look for and show 'invalid' blocks???
+	// This "shouldn't happen" but can if someone e.g. added a spriteset, edit level, then delete spriteset.
+	// Or maybe, copy and paste a level from one 'mission' to another, but with fewer spritesets defined
+	// in that mission.
+
+	SLevelBlock Block;
+	for ( int y=0; y<LEVEL_HEIGHT; ++y )
+	{
+		for ( int x=0; x<LEVEL_WIDTH; ++x )
+		{
+			Block = level_get_block( 0, x, y );//first param used to mean something i think but currently always 0 now, should maybe get rid of ultimately [dj2017-06]
+
+			Stats.SpriteCounts [ std::make_pair(Block.aback,Block.bback) ]++;
+			Stats.SpriteCounts [ std::make_pair(Block.afore,Block.bfore) ]++;
+			Stats.SpriteCountsB[ std::make_pair(Block.aback,Block.bback) ]++;
+			Stats.SpriteCountsF[ std::make_pair(Block.afore,Block.bfore) ]++;
+		}
+	}
+
+	// Calculate largest counts (use this to show chart-like view) //?
+	/*
+	int nCountMax = 0;
+	for ( std::map< std::pair< unsigned char, unsigned char >, int >::const_iterator iter=Stats.SpriteCounts.begin(); iter!=Stats.SpriteCounts.end(); ++iter )
+	{
+		// Don't count background / empty blocks toward the 'max'
+		if (iter->first.first==0 && iter->first.second==0)
+			continue;
+		if (iter->second > nCountMax)
+			nCountMax = iter->second;
+	}
+	Stats.m_nMaxCount = nCountMax;
+	*/
+}
+void DisplayLevelStatus( CLevelStats& Stats)
+{
+	bool	bRunning = true;
+	int nPage = 0;
+	int nRowsPerPage = (pVisMain->height / 16) - 2;
+	//this+1is wrong, use ceil(),isok fornow,lowprio
+	int nPages = (int)(Stats.SpriteCounts.size() / nRowsPerPage) + 1;
+	while ( bRunning )
+	{
+		unsigned long delay = 80;
+		SDL_Delay( delay );
+
+		if (g_iKeys[DJKEY_HOME])
+			nPage = 0;
+		if (g_iKeys[DJKEY_END])
+			nPage = nPages-1;
+		if (g_iKeys[DJKEY_PGDN])
+		{
+			nPage++;
+			if (nPage>=nPages) nPage = nPages;
+		}
+		if (g_iKeys[DJKEY_PGUP])
+		{
+			nPage--;
+			if (nPage<0)nPage=0;
+		}
+
+		//RedrawView ();
+		{
+			// Total status
+			ED_ClearScreen();
+			char buf[2048]={0};
+			//int nPages = //CEILINGStats.SpriteCounts.size() % (pVisMain->height / 16);
+			int x=0,y=0,n=0,xleft=8;
+			for ( std::map< std::pair< unsigned char, unsigned char >, int >::const_iterator iter=Stats.SpriteCounts.begin(); iter!=Stats.SpriteCounts.end(); ++iter )
+			{
+				++n;
+				if (n<=nPage*nRowsPerPage)continue;
+				if (y>=nRowsPerPage)
+					continue;
+				//_snprintf(
+
+
+				djgSetColorFore( pVisMain, djColor(60,60,60) );
+				djgDrawHLine( pVisMain, 0, y*16, pVisMain->width );
+
+				ED_DrawSprite( xleft,
+				y*16,
+					iter->first.first, iter->first.second );
+
+				//a,b pair
+				const std::pair< unsigned char, unsigned char >& pair = iter->first;
+
+				sprintf(buf, "%3d,%3d", (unsigned int)pair.first, (unsigned int)pair.second );
+				ED_DrawString( xleft+16+8, y*16+4, buf );
+
+				// Count
+				if (iter->second!=0)
+				{
+					sprintf(buf, "%8d", (int)iter->second );
+					ED_DrawString( xleft+16+8+10*8, y*16+4, buf );
+				}
+
+				// Count (background instances)
+				if (Stats.SpriteCountsB[ pair ]!=0)
+				{
+					sprintf(buf, "%8d", Stats.SpriteCountsB[ pair ] );
+					ED_DrawString( xleft+16+8 + 136, y*16+4, buf );
+				}
+				// Count (foreground instances)
+				if (Stats.SpriteCountsF[ pair ]!=0)
+				{
+					sprintf(buf, "%8d", Stats.SpriteCountsF[ pair ] );
+					ED_DrawString( xleft+16+8 + 136+9*8, y*16+4, buf );
+				}
+
+				// Sprite type 'friendly name' (from blocks.h)?
+				std::string sType;
+				int iType = ED_GetSpriteType( pair.first, pair.second );
+				if (iType>0 && iType<TYPE_LASTONE)
+				{
+					sType = block_type_names[iType];
+
+					// If it's a 'box', handle this as a special case to also show name of what's inside the box
+					if (iType==TYPE_BOX)
+					{
+						int c = ED_GetSpriteExtra(pair.first, pair.second, 10);
+						int d = ED_GetSpriteExtra(pair.first, pair.second, 11);
+						int iTypeContents = ED_GetSpriteType( c,d );
+						sType += " [";
+						if (iTypeContents>=0 && TYPE_LASTONE)
+							sType += block_type_names[iTypeContents];
+						else
+							sType += "(error: invalid box contents - check in spreditor!)";
+						sType += "]";
+					}
+				}
+				else if (iType>=TYPE_LASTONE)//<- dj2017-06 hm, that should probably be ">" as TYPE_LASTONE maybe reserved for possible use? Not sure anyway whatever
+					sType += "(error: invalid type - check in spreditor!)";
+
+				djgSetColorFore( pVisMain, djColor(60,60,60) );
+				djgDrawVLine( pVisMain, xleft+16+8 + 136+9*8+9*8, y*16, 16 );
+				if (!sType.empty())
+				{
+					ED_DrawString( xleft+16+8 + 136+9*8+9*8 + 1, y*16+4, sType.c_str() );
+				}
+
+				djgDrawVLine( pVisMain, pVisMain->width/2, y*16, 16 );
+				if (iter->second>0)
+				{
+					// This 100 is a bit arbitrary
+					int nCountValueCapped = djMIN(100,iter->second);
+					float lfW = ((float)pVisMain->width/2.f);
+					float lfWThis = (float)nCountValueCapped / 100.f;
+					djgDrawBox( pVisMain, pVisMain->width/2, y*16, (int)(lfWThis * lfW), 16 );
+				}
+
+				++y;
+			}
+
+			sprintf(buf,"Level Statistics. Page %d/%d", nPage+1, nPages);
+			ED_DrawString( 0, pVisMain->height-24, buf );
+
+			const char * szfilename = g_pCurMission->GetLevel(g_nLevel)->GetFilename();
+			sprintf(buf,"Level:%s",szfilename==NULL?"":szfilename);
+			ED_DrawString( 0, pVisMain->height-16, buf );
+
+			ED_DrawString( 0, pVisMain->height-8, "Help: Esc exit stats. PgUp/PgDn to scroll. Home/End 1st/last page. Counts are total,background,foreground" );
+
+			ED_FlipBuffers ();
+		}
+		djiPoll();
+
+		if (g_iKeys[DJKEY_ESC])
+			bRunning = false;
+
+		if (!HandleMouse ())
+			bRunning = false;
+
+	} // while (bRunning)
+
+	ED_ClearScreen();
+	RedrawView();
+}
+//---------------------------------------------------------------------------
 
 void LVLED_Init (int curr_level)
 {
@@ -275,6 +493,16 @@ switch_e LVLED_MainLoop ()
 		}
 		if (g_iKeys[DJKEY_CTRL])
 		{
+			//dj2017-06 Add basic level stats
+			if (djiKeyPressed(DJKEY_F6))
+			{
+				CLevelStats Stats;
+				CalculateLevelStats(Stats);
+				DisplayLevelStatus(Stats);
+	//crudeworkaround to prevent double-escape-press handling since we do crappy keyhandling all over the palce in here .. really we should be detecting keyup/down events etc. .. but it's "just" the leveleditor so not a prio [dj2017-06]
+	SDL_Delay(200);
+			}
+
 // TODO: no level selection at this point
 /*			if (djiKeyPressed(DJKEY_N))
 			{
@@ -726,4 +954,3 @@ void LevelFill( int ax, int ay )
 		i++;
 	}
 }
-

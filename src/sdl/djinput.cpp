@@ -24,6 +24,7 @@ SdjKeyMapping key_pairs[] =
 	{ DJKEY_F1,        SDLK_F1 },
 	{ DJKEY_F4,        SDLK_F4 },
 	{ DJKEY_F5,        SDLK_F5 },
+	{ DJKEY_F6,        SDLK_F6 },
 	{ DJKEY_SPACE,     SDLK_SPACE },
 	{ DJKEY_ENTER,     SDLK_RETURN },
 	{ DJKEY_ESC,       SDLK_ESCAPE },
