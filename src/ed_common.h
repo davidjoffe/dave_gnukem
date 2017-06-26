@@ -10,6 +10,8 @@
 // !!!!!!!!!
 
 
+//! Set or clear 'unsaved-changes' statue on the document (level being edited)
+extern void SetDocumentDirty(bool bDirty=true);
 
 class djColor;		// forward
 

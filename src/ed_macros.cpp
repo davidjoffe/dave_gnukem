@@ -125,6 +125,7 @@ void PlaceMacro(int x, int y, int iMacroIndex)
 			pMacro->m_aiBlocks[2][i],
 			pMacro->m_aiBlocks[3][i],
 			LVLED_GetLevelFore () );
+		SetDocumentDirty();
 	}
 }
 
