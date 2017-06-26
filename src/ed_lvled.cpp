@@ -46,8 +46,11 @@ static int	sprite0b = 0;
 static int	sprite1a = 0;
 static int	sprite1b = 0;
 
+// Unsaved changes flag [dj2017-06-27]
+int g_bDocumentDirty = false;
 
-#define NUM_LEVEL_INSTRUCTIONS 17
+
+#define NUM_LEVEL_INSTRUCTIONS 15
 static const char *level_instructions[NUM_LEVEL_INSTRUCTIONS] =
 {
 	"- Instructions: ----------",
@@ -62,8 +65,9 @@ static const char *level_instructions[NUM_LEVEL_INSTRUCTIONS] =
 	"F       Horizontal fill",
 	"M       Next spriteset",
 	"N       Previous spriteset",
-	"^C+M    Next level",
-	"^C+N    Previous level",
+	// These two now defunct:[dj2017-06]
+	//"^C+M    Next level",
+	//"^C+N    Previous level",
 	"Ctl+F6  Level Statistics",
 	"ESC     Quit",
 	"--------------------------"
@@ -86,6 +90,7 @@ static void SetSpriteSelection( int a0, int b0, int a1, int b1 );
 static void SelectLevel ( int i );
 static void LevelFill( int ax, int ay );
 
+// If calling this as an 'edit', should also call SetDocumentDirty() [dj2017-06]
 void SetLevel( int x, int y, int a, int b, bool bforeground );
 
 
@@ -317,9 +322,22 @@ void DisplayLevelStatus( CLevelStats& Stats)
 	RedrawView();
 }
 //---------------------------------------------------------------------------
+void SetDocumentDirty(bool bDirty)
+{
+	if (g_bDocumentDirty!=bDirty)
+	{
+		g_bDocumentDirty=bDirty;
+
+		// Redraw the status indicator (for now, we're using the levelname area, so redraw levelname)
+		DrawLevelname();
+	}
+}
+//---------------------------------------------------------------------------
 
 void LVLED_Init (int curr_level)
 {
+	g_bDocumentDirty=false;
+
 	SelectLevel(curr_level);
 
 	//load the level from disk to get a clean copy.
@@ -340,6 +358,7 @@ void LVLED_Init (int curr_level)
 
 void LVLED_Kill ()
 {
+	g_bDocumentDirty=false;
 }
 
 
@@ -467,6 +486,8 @@ switch_e LVLED_MainLoop ()
 				szfilename = g_pCurMission->GetLevel(g_nLevel)->GetFilename();
 				level_save( 0, szfilename );
 			//}
+			// Clear document dirty state on save
+			SetDocumentDirty(false);
 		}
 		if (g_iKeys[DJKEY_F4])		// switch off the LVLED
 		{
@@ -600,10 +621,12 @@ bool HandleMouse ()
 		else if (mouse_b & 1)
 		{
 			SetLevel( ax, ay, sprite0a, sprite0b, bLevelFore );
+			SetDocumentDirty();
 		}
 		else if (mouse_b & 2)
 		{
 			SetLevel( ax, ay, sprite1a, sprite1b, bLevelFore );
+			SetDocumentDirty();
 		}
 	}
 	// zoomed view area
@@ -628,11 +651,13 @@ bool HandleMouse ()
 		{
 			SetLevel( ax + levelview_x, ay + levelview_y,
 				sprite0a, sprite0b, bLevelFore );
+			SetDocumentDirty();
 		}
 		else if (mouse_b & 2)
 		{
 			SetLevel( ax + levelview_x, ay + levelview_y,
 				sprite1a, sprite1b, bLevelFore );
+			SetDocumentDirty();
 		}
 	}
 	return true;
@@ -740,11 +765,24 @@ void DrawLevelGrid()
 
 void DrawLevelname()
 {
+	std::string sLevelName;
 	const char * szfilename = g_pCurMission->GetLevel(g_nLevel)->GetFilename();
-	ED_DrawStringClear( 0, POS_LEVELVIEW_Y + 16 * levelview_h + 8,
-		"                           " );
+	sLevelName += szfilename;
+
+	if (g_bDocumentDirty)
+	{
+		djgSetColorFore(pVisMain, djColor(80,0,0));
+		sLevelName += " * UNSAVED CHANGES";
+	}
+	else 
+		djgSetColorFore(pVisMain, djColor(0,80,0));
+	// Draw background
+	djgDrawBox(pVisMain, 0, POS_LEVELVIEW_Y + 16 * levelview_h + 8, pVisMain->width/2, 8);
+	//else
+	/*ED_DrawStringClear( 0, POS_LEVELVIEW_Y + 16 * levelview_h + 8,
+		"                           " );*/
 	ED_DrawString( 0, POS_LEVELVIEW_Y + 16 * levelview_h + 8,
-		szfilename );
+		sLevelName.c_str() );
 }
 
 void DrawMinimapRectangle()
@@ -918,6 +956,8 @@ void SelectLevel ( int i )
 		i = g_pCurMission->NumLevels() - 1;
 
 	g_nLevel = i;
+	
+	g_bDocumentDirty=false;
 
 //	level_draw_view();
 //	draw_level_grid();
@@ -945,6 +985,7 @@ void LevelFill( int ax, int ay )
 	{
 		SetLevel( i, ay, sprite0a, sprite0b, false );
 		i--;
+		SetDocumentDirty();
 	}
 	i = ax + 1;
 	while ( (a == *(level_pointer( g_nLevel, i, ay ) + 2)) &&
@@ -952,5 +993,6 @@ void LevelFill( int ax, int ay )
 	{
 		SetLevel( i, ay, sprite0a, sprite0b, false );
 		i++;
+		SetDocumentDirty();
 	}
 }
