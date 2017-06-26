@@ -102,7 +102,8 @@ switch_e SPRED_MainLoop ()
 
 	while ( bRunning )
 	{
-		unsigned long int delay = 50;
+		//dj2017-06 it's almost impossible to press left/right etc. only once .. going to try increase this delay
+		unsigned long int delay = 100;
 		// Try prevent CPU hogging a bit ..
 //		SDL_Delay(10);
 

@@ -48,7 +48,7 @@ Try find the exit, while dodging or shooting monsters.
 
 To open doors, find the correct color key, and press the action key on the 'lock' nearby the door(s).
 
-Power boots allow you to jump higher.
+Power boots allow you to jump higher. The special molecule pickup gives you full health.
 
 # Ports
 
@@ -58,6 +58,7 @@ Power boots allow you to jump higher.
 
 Recent:
 
+* Added special 'molecule' pickup that gives you full health
 * Improve character control: Make vertical jumping/falling movement a bit smoother (more similar to the original DN1)
 * New keyboard shortcuts: Shift+F6/F7: Dec/Inc speed (framerate)
 * Fix soda can not animating

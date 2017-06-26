@@ -101,11 +101,13 @@ REGISTER_THING(CBox,           TYPE_BOX, NULL);
 REGISTER_THING(CTeleporter,    TYPE_TELEPORTER, NULL);
 REGISTER_THING(CDoor,          TYPE_DOOR, NULL);
 REGISTER_THING(CKey,           TYPE_KEY, NULL);
+//REGISTER_THING(CAccessCard,    TYPE_ACCESSCARD, NULL);
 REGISTER_THING(CDoorActivator, TYPE_DOORACTIVATOR, NULL);
 REGISTER_THING(CSoftBlock,     TYPE_SOFTBLOCK, NULL);
 REGISTER_THING(CCamera,        TYPE_CAMERA, CCameraPerLevelInit);
 REGISTER_THING(CBanana,        TYPE_BANANA, NULL);
 REGISTER_THING(CCoke,          TYPE_COKE, NULL);
+REGISTER_THING(CFullHealth,    TYPE_FULLHEALTH, NULL);
 REGISTER_THING(CCrawler,       TYPE_CRAWLER, NULL);
 REGISTER_THING(CSpike,         TYPE_SPIKE, NULL);
 REGISTER_THING(CBalloon,       TYPE_BALLOON, NULL);
@@ -1027,6 +1029,24 @@ int CCoke::Tick()
 		}
 	}
 	return CPickup::Tick();//<- This is important for animation currently as CPickup::Tick() handles animation count [dj2017-06-24]
+}
+/*-----------------------------------------------------------*/
+CFullHealth::CFullHealth()
+{
+	m_bShootable = true;
+	SetShootBounds(0,0,15,15);
+}
+
+int CFullHealth::HeroOverlaps()
+{
+	// Give full health here
+	update_health(100000);//<- This is arbitrary but any very big number should do as long as it's bigger than MAX_HEALTH
+	// Create floating score
+	update_score(1000, m_x, m_y);
+	//ShowGameMessage("Full Health!", 32);
+	// Should we maybe flash the health display or something here to show full health restored
+	// TODO: Play special sound?
+	return CPickup::HeroOverlaps();
 }
 /*-----------------------------------------------------------*/
 CCrawler::CCrawler()

@@ -45,7 +45,8 @@ enum EBlockType
 	TYPE_POWERBOOTS,
 	//! 20 Coke can
 	TYPE_COKE,
-	TYPE_21,
+	//! 21 Full health pickup (DN1 molecule) [dj2017-06-26]
+	TYPE_FULLHEALTH,
 	TYPE_22,
 	//! 23 Dynamite
 	TYPE_DYNAMITE,
