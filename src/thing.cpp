@@ -101,7 +101,7 @@ REGISTER_THING(CBox,           TYPE_BOX, NULL);
 REGISTER_THING(CTeleporter,    TYPE_TELEPORTER, NULL);
 REGISTER_THING(CDoor,          TYPE_DOOR, NULL);
 REGISTER_THING(CKey,           TYPE_KEY, NULL);
-//REGISTER_THING(CAccessCard,    TYPE_ACCESSCARD, NULL);
+REGISTER_THING(CAccessCard,    TYPE_ACCESSCARD, NULL);
 REGISTER_THING(CDoorActivator, TYPE_DOORACTIVATOR, NULL);
 REGISTER_THING(CSoftBlock,     TYPE_SOFTBLOCK, NULL);
 REGISTER_THING(CCamera,        TYPE_CAMERA, CCameraPerLevelInit);
@@ -809,7 +809,16 @@ int CDoor::Tick()
 
 void CDoor::Draw()
 {
+	// Adding ability for door sprite to be animated, as access card is a 'special case' door but is animated [dj2017-06]
+	if (CHECK_FLAG(m_a, m_b, FLAG_ANIMATED))
+	{
+	extern int anim4_count;//[dj2017-06-26 gross, not mad about this 'global' but will do for now]
+	DRAW_SPRITE16A(pVisView, m_a, m_b+anim4_count, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	}
+	else
+	{
 	DRAW_SPRITE16A(pVisView, m_a, m_b+m_nOpenState, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	}
 }
 /*-----------------------------------------------------------*/
 CKey::CKey()
@@ -849,7 +858,9 @@ int CDoorActivator::Action()
 	for ( int i=0; i<InvGetSize(); i++ )
 	{
 		CThing *pThing = InvGetItem(i);
-		if (pThing->GetTypeID()==TYPE_KEY)
+		if (pThing->GetTypeID()==TYPE_KEY
+			|| pThing->GetTypeID()==TYPE_ACCESSCARD//fixLOW "IsKindOf" would be more appropriate but we don't have that type of RTTI info [yet] [dj2017-06]
+			)
 		{
 			if (((CKey*)pThing)->GetID()==m_nID)
 			{
@@ -879,7 +890,16 @@ int CDoorActivator::Action()
 
 void CDoorActivator::Draw()
 {
+	// Adding ability for door sprite to be animated, as access card is a 'special case' door but is animated [dj2017-06]
+	if (CHECK_FLAG(m_a, m_b, FLAG_ANIMATED))
+	{
+	extern int anim4_count;//[dj2017-06-26 gross, not mad about this 'global' but will do for now]
+	DRAW_SPRITE16A(pVisView, m_a, m_b+anim4_count, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	}
+	else
+	{
 	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	}
 }
 /*-----------------------------------------------------------*/
 CSoftBlock::CSoftBlock()

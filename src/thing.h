@@ -610,9 +610,16 @@ public:
 	virtual int HeroOverlaps();
 	virtual void Draw();
 };
-/*class CAccessCard : public CKey
+/*-----------------------------------------------------------*/
+/*!
+\class CAccessCard
+\nosubgrouping
+
+Access card. For the moment, this is just a 'special case' of a door and key, so we just inherit from CKey and (for now, or maybe always) little or nothing else.
+*/
+class CAccessCard : public CKey
 {
-};*/
+};
 /*-----------------------------------------------------------*/
 /*!
 \class CDoorActivator
