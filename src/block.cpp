@@ -30,7 +30,7 @@ const char * block_type_names[TYPE_LASTONE+1] =
    "18 ",
    "19 PowerBoots",
    "20 Coke",
-   "21 ",
+   "21 Full Health [Molecule]",
    "22 ",
    "23 Dynamite",
    "24 FlameThrow",

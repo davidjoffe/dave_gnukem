@@ -610,6 +610,9 @@ public:
 	virtual int HeroOverlaps();
 	virtual void Draw();
 };
+/*class CAccessCard : public CKey
+{
+};*/
 /*-----------------------------------------------------------*/
 /*!
 \class CDoorActivator
@@ -694,6 +697,19 @@ protected:
 	bool IsShot() const { return m_nShotHeight!=-1; }
 	int m_nShotHeight; // -1 until shot, otherwise positive=up height (pixels)
 	int m_nAnim;
+};
+/*-----------------------------------------------------------*/
+/*!
+\class CFullHealth
+\nosubgrouping
+
+Special full-health pickup (this is the molecule in Duke Nukem 1)
+*/
+class CFullHealth : public CPickup
+{
+public:
+	CFullHealth();
+	virtual int HeroOverlaps();
 };
 /*-----------------------------------------------------------*/
 /*!
