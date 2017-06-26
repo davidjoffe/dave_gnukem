@@ -1,9 +1,9 @@
 /*
 djsound.cpp
 
-Copyright (C) 1999-2001 David Joffe and Kent Mein
+Copyright (C) 1999-2017 David Joffe and Kent Mein
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 
 #include "../djsound.h"

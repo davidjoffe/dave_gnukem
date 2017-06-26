@@ -1,5 +1,5 @@
 /*
-Copyright (C) 1998-2004 David Joffe
+Copyright (C) 1998-2017 David Joffe
 License: GNU GPL Version 2
 New level editor started: 1998/12/31
 */

@@ -3,9 +3,9 @@
 \brief   Some simple "mixin" helper classes.
 \author  David Joffe
 
-Copyright (C) 2000-2002 David Joffe
+Copyright (C) 2000-2017 David Joffe
 
-License: GNU GPL Version 2 (*not* "later versions")
+License: GNU GPL Version 2
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _MIXINS_H_
