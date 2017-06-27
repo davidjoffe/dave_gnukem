@@ -210,7 +210,7 @@ void DisplayLevelStatus( CLevelStats& Stats)
 			ED_ClearScreen();
 			char buf[2048]={0};
 			//int nPages = //CEILINGStats.SpriteCounts.size() % (pVisMain->height / 16);
-			int x=0,y=0,n=0,xleft=8;
+			int y=0,n=0,xleft=8;
 			for ( std::map< std::pair< unsigned char, unsigned char >, int >::const_iterator iter=Stats.SpriteCounts.begin(); iter!=Stats.SpriteCounts.end(); ++iter )
 			{
 				++n;

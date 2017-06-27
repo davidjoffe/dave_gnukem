@@ -115,7 +115,7 @@ int main ( int argc, char** argv )
 
 	if (argc > 1)
 	{
-		std:string sNextParamGetValue;
+		std::string sNextParamGetValue;
 		for ( int i=1; i<argc; i++ )
 		{
 			if (!sNextParamGetValue.empty())
