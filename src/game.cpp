@@ -748,12 +748,15 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 							if (5==anKeysHave[j])//<- [LOW PRIO] this detectioh isn't working correctly [see workaround note above 2017-06]
 								bHave = true;
 						}
-						CKey *pKey = new CAccessCard;
-						pKey->SetType(TYPE_ACCESSCARD);
-						pKey->SetID(5);
-						pKey->SetSprite(1, 97);
-						pKey->Initialize(1, 97);
-						InvAdd(pKey);
+						if (!bHave)
+						{
+							CKey *pKey = new CAccessCard;
+							pKey->SetType(TYPE_ACCESSCARD);
+							pKey->SetID(5);
+							pKey->SetSprite(1, 97);
+							pKey->Initialize(1, 97);
+							InvAdd(pKey);
+						}
 					}
 
 					// Full firepower
