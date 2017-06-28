@@ -17,6 +17,9 @@ License: GNU GPL Version 2
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
+#ifdef _DEBUG
+#include <assert.h>
+#endif
 /*--------------------------------------------------------------------------*/
 #ifdef WIN32
 #include "io.h"
@@ -59,7 +62,7 @@ unsigned char * level_load( int i, const char * szfilename )
 	// if a level is already loaded at position i, delete it
 	level_delete( i );
 
-	char filename[1024]={0};
+	char filename[4096]={0};
 
 	sprintf( filename, "%s%s", DATA_DIR, szfilename );
 
@@ -91,7 +94,7 @@ int level_save( int i, const char * szfilename )
 {
 	int file_handle=0;
 	unsigned char * level=NULL;
-	char filename[1024]={0};
+	char filename[4096]={0};
 
 	sprintf( filename, "%s%s", DATA_DIR, szfilename );
 
@@ -128,6 +131,9 @@ int level_save( int i, const char * szfilename )
 
 unsigned char * level_pointer( int i, int x, int y )
 {
+#ifdef _DEBUG
+	assert(i<apLevels.size() && i>=0);// Debug-mode only for speed reasons .. this 
+#endif
 	unsigned char * level = apLevels[i];
 	if (level == NULL)
 		return NULL;

@@ -969,30 +969,30 @@ void SelectLevel ( int i )
 
 void LevelFill( int ax, int ay )
 {
-	int a, b; // block to replace
-	int i;
-
-	if ( (ax < 0) || (ay < 0) || (ax >= 128) || (ay >= 100) )
+	if ( (ax < 0) || (ay < 0) || (ax >= LEVEL_WIDTH) || (ay >= LEVEL_HEIGHT) )
 		return;
 
 	// background block
-	a = *(level_pointer( g_nLevel, ax, ay ) + 2);
-	b = *(level_pointer( g_nLevel, ax, ay ) + 3);
+	int a, b; // block type to replace
+	a = *(level_pointer( 0, ax, ay ) + 2);
+	b = *(level_pointer( 0, ax, ay ) + 3);
 
-	i = ax;
-	while ( (a == *(level_pointer( g_nLevel, i, ay ) + 2)) &&
-		(b == *(level_pointer( g_nLevel, i, ay ) + 3)) && (i >= 0) )
+	// Start at 'x', then dec one by one, filling in blocks until either we hit left side of level or a block that's different to the 'current' block
+	int fillx = ax;
+	while ( (a == *(level_pointer( 0, fillx, ay ) + 2)) &&
+		(b == *(level_pointer( 0, fillx, ay ) + 3)) && (fillx >= 0) )
 	{
-		SetLevel( i, ay, sprite0a, sprite0b, false );
-		i--;
+		SetLevel( fillx, ay, sprite0a, sprite0b, false );
+		fillx--;
 		SetDocumentDirty();
 	}
-	i = ax + 1;
-	while ( (a == *(level_pointer( g_nLevel, i, ay ) + 2)) &&
-		(b == *(level_pointer( g_nLevel, i, ay ) + 3)) && (i <= 127) )
+	// Start at 'x+1', then inc one by one, filling in blocks until either we hit right side of level or a block that's different to the 'current' block
+	fillx = ax + 1;
+	while ( (a == *(level_pointer( 0, fillx, ay ) + 2)) &&
+		(b == *(level_pointer( 0, fillx, ay ) + 3)) && (fillx < LEVEL_WIDTH) )
 	{
-		SetLevel( i, ay, sprite0a, sprite0b, false );
-		i++;
+		SetLevel( fillx, ay, sprite0a, sprite0b, false );
+		fillx++;
 		SetDocumentDirty();
 	}
 }
