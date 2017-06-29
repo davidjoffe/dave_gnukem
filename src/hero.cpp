@@ -311,12 +311,6 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 			{
 				ret = 0;
 				y += ydiff;
-				if (y-yo<4) yo--;
-				if (y-yo>7) yo++;
-				if ( yo < 0 )
-					yo = 0;
-				if ( yo > 100 - 10 )
-					yo = 100 - 10;
 			}
 		}
 	}
