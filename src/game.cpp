@@ -47,6 +47,9 @@ using namespace std;
 Mix_Music* g_pGameMusic=NULL;
 #endif
 
+// See comments at viewport vertical auto-scrolling. DN1 vertical viewport auto-re-centering has this subtle feel of almost taking a frame or three to start 'catching up' to jumping upwards etc. ... this variable helps implement that effect. [dj2017-06-29]
+int g_nRecentlyFallingOrJumping = 0;
+
 // The original Duke Nukem 1 has a 13x10 'blocks' viewport, though in future we could use this
 // to either allow larger game viewport for this game, or have 'derived' games using this 'engine' with
 // larger viewports [dj2016-10]
@@ -294,6 +297,8 @@ void PerLevelSetup()
 	int i;
 
 	Log ( "PerLevelSetup()\n" );
+
+	g_nRecentlyFallingOrJumping=0;
 
 	// Start per-level background music
 	std::vector< std::string > asMusicFiles;
@@ -923,6 +928,7 @@ void GameHeartBeat()
 
 
 	static bool bFallingPrev = false;
+	bool bFalling = false;
 
 	//mode-specific handling
 	switch (hero_mode)
@@ -932,7 +938,7 @@ void GameHeartBeat()
 
 		n = move_hero(0,1);
 		{
-			bool bFalling = (n==0);
+			bFalling = (n==0);
 			if (bFalling)
 			{
 				if (!bFallingPrev) // <- just started falling?
@@ -1014,6 +1020,54 @@ void GameHeartBeat()
 		break;
 
 	}
+
+	// Viewport auto-scrolling (vertical).
+	// Try auto-scroll viewport if we're going too high/low .. the actual original DN1 behaviour seems to be quite well fine-tuned.
+	// The precisely 'correct' behavior is actually pretty subtle, hard to explain exactly what the below's trying to achieve, must play
+	// original DN1 or check livestreaming dev video from 29 June 2017 where this was mainly done. [dj2017-06-29]
+	// Note also here we must keep in mind cases like where you jump up and almost immediately hit your head on the roof -
+	// the jump 'cancels' but simultaneously we're also not falling - this creates one frame where we're neither jumping nor falling
+	// as hero's head hits roof, and without this g_nRecentlyFallingOrJumping "buffer" the vertical offset auto-scrolling incorrectly kicks in.
+	{
+		// 'Avoid' scroll yo (unless 'necessary' e.g. if right at top) up if busy jumping up ... likewise for downward movement
+		if (hero_mode == MODE_JUMPING)
+		{
+			if (y-yo<2) yo--;
+			g_nRecentlyFallingOrJumping = 2;
+		}
+		else
+		{
+			bool bIsFalling = bFalling || bFallingPrev || hero_mode==MODE_JUMPING;
+			if (bIsFalling)
+			{
+				g_nRecentlyFallingOrJumping = 2;
+				if (y-yo>=9) yo++;
+			}
+			else
+			{
+				if (g_nRecentlyFallingOrJumping>0)
+				{
+					--g_nRecentlyFallingOrJumping;
+				}
+				else
+				{
+					if (y-yo<7)
+					{
+						yo--;
+					}
+				}
+				if (y-yo>=7)
+				{
+					yo++;
+				}
+			}
+		}
+		if ( yo < 0 )
+			yo = 0;
+		if ( yo > LEVEL_HEIGHT - 10 )
+			yo = LEVEL_HEIGHT - 10;
+	}
+
 
 	// Check for bullets that have gone out of the view
 	for ( i=0; i<(int)g_apBullets.size(); i++ )
@@ -1752,6 +1806,8 @@ void DrawDebugInfo()
 	extern int nFrozenCount;
 	sprintf(buf, "frozecount=%d", nFrozenCount);
 	GraphDrawString(pVisView, g_pFont8x8, 32, 56, (unsigned char*)buf );
+	//sprintf(buf, "hero_mode=%d", hero_mode);
+	//GraphDrawString(pVisView, g_pFont8x8, 32, 62, (unsigned char*)buf );
 }
 
 void DrawBullets()
