@@ -123,6 +123,18 @@ int CMission::Load( const char * szfilename )
 	state = 0;
 	while ( getline ( fin, line ) )
 	{
+		//dj2017-06 If file has DOS/Windows style newlines then on Linux these get parsed into the string,
+		// which causes problems loading e.g. sprite data because we get a sprite data filename that ends
+		// in a newline (or CR, I'm not sure, doesn't matter, both are wrong) which then causes file to fail to load.
+		// I don't think it's ever desirable for the read 'line' to end in newline or CR so let's just
+		// chop it off when it happens.
+		while (line.length()>0 && 
+			( line[line.length()-1]=='\r' || line[line.length()-1]=='\n' )
+			)
+		{
+			line = line.substr( 0, line.length() - 1 );
+		}
+
 		switch (state)
 		{
 			///////////////////////////////////////////////////////////////
