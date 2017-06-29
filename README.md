@@ -63,6 +63,7 @@ Recent:
 * Level Editor: Add unsaved-changes indication
 * Level Editor: Add level statistics page (Ctrl+F6)
 * Improve character control: Make vertical jumping/falling movement a bit smoother (more similar to the original DN1)
+* Improve viewport vertical auto-scrolling
 * New keyboard shortcuts: Shift+F6/F7: Dec/Inc speed (framerate)
 * Fix soda can not animating
 
