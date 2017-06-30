@@ -11,7 +11,7 @@ Project page: http://gnukem.sourceforge.net/
 
 Video: https://youtu.be/Hi7WYnOA_fo
 
-Please donate to the project, or else I'll make more games like this: https://www.paypal.com/davidjoffe
+Please donate to the project, or else I'll make more games like this: https://paypal.me/davidjoffe
 
 Created by: David Joffe http://djoffe.com/ (https://www.livecoding.tv/david_joffe/)
 
