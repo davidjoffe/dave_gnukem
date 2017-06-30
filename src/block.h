@@ -89,6 +89,8 @@ enum EBlockType
 	TYPE_SPIKEBALL,
 	//! 44 Monster - Dumb robot
 	TYPE_ROBOT,
+	//! 45 Monster - Small flying robot that follows you slowly-ish [dj2017-06-30]
+	TYPE_FLYINGROBOT,
 	//! Highest used block value
 	TYPE_LASTONE
 };

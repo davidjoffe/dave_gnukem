@@ -15,7 +15,7 @@ Please donate to the project, or else I'll make more games like this: https://ww
 
 Created by: David Joffe http://djoffe.com/ (https://www.livecoding.tv/david_joffe/)
 
-The project was maintained by EMH (Evil Mr Henry) for a number of years until Oct 2016. Additional contributions by: T.O.G, Vytautas Shaltenis, Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
+The project was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) for a number of years until Oct 2016. Additional contributions by: T.O.G, Vytautas Shaltenis, Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
 You can watch recent development on this project being live-streamed at:
 https://www.livecoding.tv/david_joffe/
@@ -56,8 +56,9 @@ Power boots allow you to jump higher. The special molecule pickup gives you full
 
 # History / Changes
 
-Recent:
+Recent / 2017/06/22 - Version 0.71 [Windows only]:
 
+* Add new 'flying robot' monster type
 * Implemented access card and access card 'door' and door activator
 * Added special molecule pickup that gives you full health
 * Level Editor: Add unsaved-changes indication
@@ -158,6 +159,7 @@ Note there is currently no 'undo', so be careful. If happy with a set of work, s
 * F: Do a 'horizontal fill' of the current selected sprite (on the current layer)
 * To choose the desired level, use the Up+L 'cheat' from within the game
 * To choose the desired 'game' i.e. 'mission' (i.e. set of levels), use the main game menu 'Select mission'
+* Ctrl+F6: Show level sprite instance statistics
 
 Note that for active animated objects that consist in the spriteset of multiple sprites (e.g. each conveyor belt piece has 4 sprites, for its animation), you *must* place the *first* of the four in the map for the object to work correctly.
 

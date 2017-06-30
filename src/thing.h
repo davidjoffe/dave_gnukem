@@ -834,6 +834,26 @@ protected:
 	int m_nNoShootCounter;
 };
 /*-----------------------------------------------------------*/
+class CFlyingRobot : public CRobot
+{
+public:
+	CFlyingRobot();
+protected:
+	virtual int HeroOverlaps();
+	virtual int OnHeroShot();
+	virtual void Draw();
+	virtual int Tick();
+	int m_nStrength;
+	int m_nDieAnim;
+	//int m_nDir;//Direction (-1 or 1)
+	int m_nXOffset;
+	int m_nYOffset;
+	int m_nMoveEveryNthFrameX;
+	int m_nMoveEveryNthFrameY;
+	int m_nDieAnimLength;
+	bool IsDying() const { return m_nDieAnim>0; }
+};
+/*-----------------------------------------------------------*/
 /*!
 \class CConveyor
 \nosubgrouping
