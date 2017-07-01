@@ -165,7 +165,6 @@ const char *FILE_GAMESKIN = "data/gameskin.tga";
 djImage *pSkinGame        = NULL; // Main game view skin (while playing)
 djImage *pBackground      = NULL; // Level background image
 
-/*--------------------------------------------------------------------------*/
 struct SMenuItem gameMenuItems[] =
 {
 	{ false, "                   " },
@@ -179,16 +178,10 @@ struct SMenuItem gameMenuItems[] =
 };
 unsigned char gameMenuCursor[] = { 128, 129, 130, 131, 0 };
 CMenu gameMenu ( "game.cpp:gameMenu" );
-/*--------------------------------------------------------------------------*/
 
-//animation
 int anim4_count = 0;
 int nSlowDownHeroWalkAnimationCounter = 0;
 
-
-
-
-//game-play
 unsigned int g_nScore = 0;
 int  g_nHealth = 0;
 bool g_bGameRunning = false;
@@ -203,13 +196,6 @@ int g_nFirepowerOld = 1;
 int g_nScoreOld = 0;
 int g_nHealthOld = 0;
 
-
-
-
-/*-----------------------------------------------------------*/
-// Game functions
-/*-----------------------------------------------------------*/
-// Once off initialization stuff
 void GameInitialSetup()
 {
 	SYS_Debug( "GameInitialSetup()\n" );
