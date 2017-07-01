@@ -555,13 +555,8 @@ int game_startup(bool bLoadGame)
 			if (key_down_edge[KEY_RIGHT])  key_right = 1;
 			if (key_down_edge[KEY_JUMP])   key_jump = 1;
 			if (key_down_edge[KEY_SHOOT])  key_shoot = 1;
-			//if (g_iKeys[DJKEY_UP])		key_action = 1;
-			//if (g_iKeys[DJKEY_LEFT])	key_left = 1;
-			//if (g_iKeys[DJKEY_RIGHT])	key_right = 1;
-			
 			// We allow ctrl as a sort of 'default' fallback jump if (and only if) it isn't assigned/redefined to anything
-			if (!IsGameKeyAssigned(SDLK_RCTRL))
-			{
+			if (!IsGameKeyAssigned(SDLK_RCTRL)){
 				if (g_iKeys[DJKEY_CTRL])	key_jump = 1;
 			}
 			//if (g_iKeys[DJKEY_ALT])		key_shoot = 1;
