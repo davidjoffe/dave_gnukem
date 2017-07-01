@@ -63,14 +63,7 @@ bool g_bBigViewportMode=false;
 // Solution: Die 'asynchronously' - i.e. just set a flag that you've died, and then (still immediately) but once 'safely' past iterating through all
 // the g_apThings update ticks etc., *then* actually restartlevel.
 bool g_bDied = false;
-
-/*--------------------------------------------------------------------------*/
-//
-// Game cheats system (useful for development/testing)
-//
-
 #define DAVEGNUKEM_CHEATS_ENABLED
-
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
 bool g_bGodMode = false;
 #endif
