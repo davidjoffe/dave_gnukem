@@ -575,27 +575,21 @@ int game_startup(bool bLoadGame)
 				// It seems to be difficult to toggle just once ... so we detect key up/down 'edge' and only toggle on that
 				static bool g_bBKeyLast=false;
 				bool bBKey = (g_iKeys[DJKEY_B]!=0);
-				if (bBKey && !g_bBKeyLast)// Detect keydown 'edge'
-				{
+        //Detect key down edge
+				if (bBKey && !g_bBKeyLast){
 					g_bBigViewportMode = !g_bBigViewportMode;
-					if (g_bBigViewportMode)
-					{
+					if (g_bBigViewportMode){
 						VIEW_WIDTH = (pVisView->width / 16) - 10;
 						VIEW_HEIGHT = (pVisView->height - 5*16) / 16;
 						if (VIEW_HEIGHT>=100)VIEW_HEIGHT=100;
 						if (VIEW_WIDTH>=128)VIEW_WIDTH=128;
-					}
-					else
-					{
+					} else {
 						VIEW_WIDTH = VIEW_WIDTH_DEFAULT;
 						VIEW_HEIGHT = 10;
-
 						// NB, TODO, we actually need to also need to redraw score etc. here (though since this is just a dev/editing mode, not a real game mode, it doesn't have to be perfect)
-
 						// When going out of 'big viewport' mode, hero might now be off the (now-tiny) 'viewport' :/ .. so must also 're-center' viewport around hero
 						if (x>xo+VIEW_WIDTH/2) xo = x-VIEW_WIDTH/2;
 						if (y>yo+VIEW_HEIGHT/2) yo = y-VIEW_HEIGHT/2;
-
 						// Redraw everything that needs to be redrawn, as larger viewport will have obliterated right side with score etc.
 						GameDrawSkin();
 						GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT );
