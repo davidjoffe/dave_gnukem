@@ -760,59 +760,45 @@ void GameHeartBeat()
 	CThing * pThing = NULL;
 	int n=0, i=0, j=0;
 	HeroUpdate();
-
 	//update animation counts:
 	anim4_count++;
 	if (anim4_count>3)
 		anim4_count = 0;
-
 	//nSlowDownHeroWalkAnimationCounter ^= 1;
 	// Above line should have same effect and be faster, but is less understandable
 	nSlowDownHeroWalkAnimationCounter++;
 	if (nSlowDownHeroWalkAnimationCounter>1)
 		nSlowDownHeroWalkAnimationCounter = 0;
-
 	//not jumping but about to be, then dont left/right move
 	if (!((key_jump) && (hero_mode != MODE_JUMPING))) {
-		if (key_left)
-		{
-			//debug//printf("L");
+		if (key_left){
 			key_left = 0;
 			move_hero(-1,0);
 		}
-		if (key_right)
-		{
-			//debug//printf("R");
+		if (key_right){
 			key_right = 0;
 			move_hero(1,0);
 		}
 	}
 
-
 	static bool bFallingPrev = false;
 	bool bFalling = false;
-
 	//mode-specific handling
-	switch (hero_mode)
-	{
+	switch (hero_mode){
 	case MODE_NORMAL:
 		//fall:
-
 		n = move_hero(0,1);
 		{
 			bFalling = (n==0);
-			if (bFalling)
-			{
-				if (!bFallingPrev) // <- just started falling?
-				{
+			if (bFalling){
+				if (!bFallingPrev){
 					g_nFalltime = 0;
 				}
 				++g_nFalltime;
 			}
 			else
 				g_nFalltime = 0;
-			if (bFallingPrev && !bFalling) // <- just stopped falling
-			{
+			if (bFallingPrev && !bFalling){
 				// Kick up some dust ..
 				AddThing(CreateDust(x, y, x_small*8,0));
 				djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
@@ -821,52 +807,40 @@ void GameHeartBeat()
 		}
 
 		// standing still and pressing 'up': (just pressing up?)
-		if (key_action)
-		{
+		if (key_action){
 			key_action = 0; // huh?
 			// dj2017-06-22 I think that "huh?" might have something to do with issue encountered of 'freezing on entering teleporter' issue, or else it's just redundant/old code, not sure, as it re-sets key_action anyway from anKeyStates[KEY_ACTION] each heartbeat
 
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
 			// Level cheat key (Ctrl+L)
-			if (g_iKeys[DJKEY_L])
-			{
+			if (g_iKeys[DJKEY_L]){
 				NextLevel();
 				return;
 			}
 #endif
 			// Go-to-exit cheat key
-			if (g_iKeys[DJKEY_I])
-			{
-				for ( i=0; i<(int)g_apThings.size(); i++ )
-				{
-					if (g_apThings[i]->GetTypeID()==TYPE_EXIT)
-					{
+			if (g_iKeys[DJKEY_I]){
+				for ( i=0; i<(int)g_apThings.size(); i++ ){
+					if (g_apThings[i]->GetTypeID()==TYPE_EXIT){
 						relocate_hero(g_apThings[i]->m_x, g_apThings[i]->m_y);
 						HeroFreeze(5);
 						return;
 					}
 				}
 			}
-
 			// Check if you're on anything funny, like an exit
-			for ( i=0; i<(int)g_apThings.size(); i++ )
-			{
+			for ( i=0; i<(int)g_apThings.size(); i++ ){
 				CThing *pThing = g_apThings[i];
-				if (!HeroIsFrozen() && pThing->InBounds(x*16+x_small*8, y*16-16))
-				{
-//					int iRet = pThing->Action();
+				if (!HeroIsFrozen() && pThing->InBounds(x*16+x_small*8, y*16-16)){
 					pThing->Action();
-					// FIXME: Handle return codes
 				}
-				// If hero has been "frozen" by some action (e.g. teleport, exit), return
 				if (HeroIsFrozen())
 					return;
-			} // i
+			}
 
 		}
 
-		if (key_jump)
-		{
+		if (key_jump){
 			key_jump = 0;
 			if (n) { // if hero wasnt busy falling
 				HeroStartJump();
@@ -877,10 +851,8 @@ void GameHeartBeat()
 
 	case MODE_JUMPING:
 		HeroUpdateJump();
-
 		key_jump = 0;
 		break;
-
 	}
 
 	// Viewport auto-scrolling (vertical).
