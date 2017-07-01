@@ -603,22 +603,18 @@ int game_startup(bool bLoadGame)
 				g_bBKeyLast = bBKey;
 
 				// BACKSPACE + P: Powerboots
-				if (g_iKeys[DJKEY_P])
-				{
+				if (g_iKeys[DJKEY_P]){
 					HeroSetJumpMode(JUMP_POWERBOOTS);
 				}
 				// BACKSPACE + PGDN: All power-ups
-				if (g_iKeys[DJKEY_PGDN])
-				{
+				if (g_iKeys[DJKEY_PGDN]){
 					ShowGameMessage("CHEAT: HEALTH+KEYS+FIREPOWER", 96);
 SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 					// Full health
 					SetHealth(MAX_HEALTH);
-
 					// All keys
 					std::vector<int> anKeysHave;
-					for ( i=0; i<InvGetSize(); i++ )
-					{
+					for ( i=0; i<InvGetSize(); i++ ){
 						if (InvGetItem(i)->GetTypeID()==TYPE_KEY
 							||InvGetItem(i)->GetTypeID()==TYPE_ACCESSCARD)//dj2017-06 adding access card
 						{
@@ -626,17 +622,14 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 							anKeysHave.push_back(pKey->GetID());
 						}
 					}
-					for ( i=1; i<=4; i++)
-					{
+					for ( i=1; i<=4; i++){
 						unsigned int j;
 						bool bHave = false;
-						for ( j=0; j<anKeysHave.size(); j++ )
-						{
+						for ( j=0; j<anKeysHave.size(); j++ ){
 							if (i==anKeysHave[j])
 								bHave = true;
 						}
-						if (!bHave)
-						{
+						if (!bHave){
 							CKey *pKey = new CKey;
 							pKey->SetType(TYPE_KEY);
 							pKey->SetSprite(0, 116+i);
@@ -647,13 +640,11 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 					{
 						//dj2017-06 Adding access card - this is gross, it's hardcoded here that '5' is its key/door number. Oh well, not going to lose sleep over it.
 						bool bHave = false;
-						for ( unsigned int j=0; j<anKeysHave.size(); j++ )
-						{
+						for ( unsigned int j=0; j<anKeysHave.size(); j++ ){
 							if (5==anKeysHave[j])//<- [LOW PRIO] this detectioh isn't working correctly [see workaround note above 2017-06]
 								bHave = true;
 						}
-						if (!bHave)
-						{
+						if (!bHave){
 							CKey *pKey = new CAccessCard;
 							pKey->SetType(TYPE_ACCESSCARD);
 							pKey->SetID(5);
@@ -668,31 +659,22 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 				}
 			}
 #endif
-
-//this shouldn't be in 'default' game or something .. ?
+      //this shouldn't be in 'default' game or something .. ?
 			// Debug: hurt self
 			static bool b = false;
 			bool bOld = b;
 			if (g_iKeys[DJKEY_H]) b = true; else b = false;
 			if (b && !bOld)
 				update_health(-1);
-
 			// Debug: toggle display of debug info
 			if (g_iKeys[DJKEY_D] && !g_iKeysLast[DJKEY_D]) bShowDebugInfo = !bShowDebugInfo;
-
-
 			fTimeNow = djTimeGetTime();
 			bForceUpdate = false;
 		}
-		// FIXME: time next should be calculated more absolutely, not relatively.
-//		fTimeNext = fTimeNow + fTIMEFRAME;
 		fTimeNext = fTimeNext + fTIMEFRAME;
-
 		//-- ESC - Pop up the in-game menu
-		if (iEscape==1)
-		{
+		if (iEscape==1){
 			IngameMenu();
-
 			// Redraw everything that needs to be redrawn
 			GameDrawSkin();
 			GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT );
@@ -702,7 +684,6 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 			InvDraw();
 			GraphFlip(!g_bBigViewportMode);
 		}
-
 
 		// Make a simple FPS display for debug purposes
 		float fTimeRun;
@@ -739,33 +720,23 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 		{
 			key_jump   = g_iKeys[DJKEY_CTRL];
 		}
-		//key_jump  |= g_iKeys[DJKEY_P];
-
 		// ensure we don't leave the borders of the level
 		// fixme; is this still necessary what with the (other functions)
 		x = MAX( MIN(x,126), 1 );
 		y = MAX( MIN(y, 99), 2 );
-		//debug//printf("}");
-
 		// "integrated" sprite / level editors [dj2017-06-20 moving these to bottom of this loop, just in case we have any issues comparable to the pungee sticks crash bug, e.g interacting with dangling objects or something in the one single heartbeat update that occurs after exiting level editor]
-		if (g_iKeys[DJKEY_F4])
-		{
+		if (g_iKeys[DJKEY_F4]){
 			SwitchMode ( SWITCH_SPRED );
 			ED_Main ();
-
 			// NB, if we are holding a key down when entering sprite/level editor, we 'miss' the gameloop's KeyUp event as the integrated editor takes over input polling; this leads to potentially "stuck" keystates in anKeyState when exiting, which in turn causes problems like e.g. if you press 'up' before entering the level editor then drop yourself out of the level editor over a teleporter, the game freezes as it keeps re-activating the teleporter since the action key is effectively behaving as if stuck down. TL;DR CLEAR THE KEYSTATES HERE (even if the keys really are down on exit editor). I am not mad about this solution, all feels a little wobbly/workaround-y, but should do for now. [dj2017-06-22]
 			memset( anKeyState, 0, sizeof(anKeyState) );
-			
 			RestartLevel();
 		}
-		else if (g_iKeys[DJKEY_F5])
-		{
+		else if (g_iKeys[DJKEY_F5]){
 			SwitchMode ( SWITCH_LVLED );
 			ED_Main ();
-
 			// NB, if we are holding a key down when entering sprite/level editor, we 'miss' the gameloop's KeyUp event as the integrated editor takes over input polling; this leads to potentially "stuck" keystates in anKeyState when exiting, which in turn causes problems like e.g. if you press 'up' before entering the level editor then drop yourself out of the level editor over a teleporter, the game freezes as it keeps re-activating the teleporter since the action key is effectively behaving as if stuck down. TL;DR CLEAR THE KEYSTATES HERE (even if the keys really are down on exit editor). I am not mad about this solution, all feels a little wobbly/workaround-y, but should do for now. [dj2017-06-22]
 			memset( anKeyState, 0, sizeof(anKeyState) );
-
 			RestartLevel(); // [dj2017-06-20] This replaces PerLevelSetup() call that was after LVLED_Kill(), not 100% sure but suspect this slightly more 'correct'
 		}
 		// NB, not all platforms will have an F1 key. The original DN1 said on the screen
@@ -778,24 +749,16 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 			// NB, if we are holding a key down when entering sprite/level editor, we 'miss' the gameloop's KeyUp event as the integrated editor takes over input polling; this leads to potentially "stuck" keystates in anKeyState when exiting, which in turn causes problems like e.g. if you press 'up' before entering the level editor then drop yourself out of the level editor over a teleporter, the game freezes as it keeps re-activating the teleporter since the action key is effectively behaving as if stuck down. TL;DR CLEAR THE KEYSTATES HERE (even if the keys really are down on exit editor). I am not mad about this solution, all feels a little wobbly/workaround-y, but should do for now. [dj2017-06-22]
 			//memset( anKeyState, 0, sizeof(anKeyState) );
 		}*/
-
 	} // while (game running)
-
 	TRACE("game_startup(): main game loop exited.\n");
-
 	PerGameCleanup();
 	return g_nScore;
 }
 
-/*-----------------------------------------------------------*/
 void GameHeartBeat()
 {
-	//debug//printf("HEARTBEAT[");
 	CThing * pThing = NULL;
 	int n=0, i=0, j=0;
-	//int ifoo = key_action;
-
-	// Update hero basic stuff
 	HeroUpdate();
 
 	//update animation counts:
