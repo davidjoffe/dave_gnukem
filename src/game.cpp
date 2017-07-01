@@ -232,31 +232,22 @@ void GameInitialSetup()
 void GameFinalCleanup()
 {
 	SYS_Debug( "GameFinalCleanup()\n" );
-
 	djDestroyImageHWSurface(pSkinGame);
 	djDEL(pSkinGame);
-
 	// Unload the game sounds (FIXME)
-
 	KillHighScores();
 }
 
-
-// Per-game initialization
 void PerGameSetup()
 {
 	Log("PerGameSetup(): InitLevelSystem()\n");
 	InitLevelSystem();
-
 	g_nHealth = HEALTH_INITIAL; // Initial health
 	HeroSetJumpMode(JUMP_NORMAL);
-
 	g_nLevel = 0;
 	g_bDied = false;
-
 	g_nScore = 0;
 	g_nFirepower = 1;
-
 	djMSG( "PerGameSetup(): Loading sprites\n" );
 	if (0 != GameLoadSprites())
 	{
@@ -268,14 +259,10 @@ void PerGameSetup()
 void PerLevelSetup()
 {
 	int i;
-
 	Log ( "PerLevelSetup()\n" );
-
 	g_nRecentlyFallingOrJumping=0;
-
 	// Start per-level background music
 	std::vector< std::string > asMusicFiles;
-
 	/*//these are sorted smallest to largest .. for now just selected all except the smaller ones as the shorter ones will may drive you too crazy with the looping..
 	// not yet sure if even the longer ones will be too repetitive [dj2016-10]
 	asMusicFiles.push_back("Dont-Mess-with-the-8-Bit-Knight.ogg");
@@ -334,11 +321,8 @@ void PerLevelSetup()
 	key_right = 0;
 	key_jump  = 0;
 	key_shoot = 0;
-
 	g_nHealth = HEALTH_INITIAL;
-
 	HeroReset(); // Reset hero
-
 	anim4_count=0; // animation count 0
 	hero_picoffs=0;
 	x_small = 0; // hero not half-block offset
@@ -359,7 +343,6 @@ void PerLevelSetup()
 
 	// (2) Load the currently selected level
 	const char * szfilename = g_pCurMission->GetLevel( g_nLevel )->GetFilename( );
-
 	// always keep current level loaded at slot 0
 	SYS_Debug ("PerLevelSetup(): level_load( %s )\n", szfilename );
 	if (NULL == level_load( 0, szfilename ))
@@ -368,7 +351,6 @@ void PerLevelSetup()
 		return;
 	}
 	g_pLevel = apLevels[0];
-
 	// Load map background image
 	pBackground = new djImage;
 	if (0!=pBackground->Load(g_pCurMission->GetLevel(g_nLevel)->m_szBackground))
@@ -376,13 +358,9 @@ void PerLevelSetup()
 		djDEL(pBackground);
 	}
 	djCreateImageHWSurface( pBackground );
-
-	// Clear out inventory
 	InvClear();
 	InvDraw();
-
 	g_ThingFactory.PerLevelInitialize();
-
 	parse_level();
 }
 
@@ -390,7 +368,6 @@ void PerLevelSetup()
 void PerGameCleanup()
 {
 	PerLevelCleanup();//dj2016-10 adding this, not quite sure where it 'should' be called
-	
 	// Empty the inventory completely
 	InvEmpty();
 	// Delete game background image
@@ -403,8 +380,7 @@ void PerGameCleanup()
 
 void PerLevelCleanup()
 {
-	if (g_pGameMusic!=NULL)
-	{
+	if (g_pGameMusic!=NULL){
 		Mix_FreeMusic(g_pGameMusic);
 		g_pGameMusic = NULL;
 	}
@@ -426,45 +402,31 @@ int game_startup(bool bLoadGame)
 	// FIXME: Where to determine this?
 	TRACE( "game_startup()\n" );
 	TRACE( "game_startup(): Playing game [%s]\n", g_pCurMission->GetName() );
-
-	// Per game setup
 	PerGameSetup();
-
 	TRACE( "game_startup(): GameDrawSkin()\n" );
 	GameDrawSkin();
 	GraphFlip(!g_bBigViewportMode);
-
-	// Per level setup (fixme, should this get called from withing per-game setup?
+	// Per level setup (fixme, should this get called from within per-game setup?
 	PerLevelSetup();
-
 	TRACE("game_startup(): GameDrawView()\n");
 	// FIXME: Is this necessary?
 	GameDrawView();
-	// Draw inventory
 	InvDraw();
 	TRACE("game_startup(): update_score()\n");
 	update_score(0);
 	TRACE("game_startup(): draw_health()\n");
 	update_health(0);
-
 	g_bGameRunning = true;
-
 	GameDrawFirepower();
-
 	//dj2016-10-28 Used if doing 'Restore Game' from *main* game menu. [This is perhaps slightly spaghetti-ish, it's done this way as LoadGame() has been originally
 	// written under the assumption of doing *in-game* loading of a savegame.
-	if (bLoadGame)
-	{
+	if (bLoadGame){
 		LoadGame();
 	}
-
 	GraphFlip(!g_bBigViewportMode);
-
 	// try maintain a specific frame rate
 	/*const */float fTIMEFRAME = (1.0f / g_fFrameRate);
-
 	float fTimeFirst = djTimeGetTime();
-
 	// Start out by being at next time
 	float fTimeNext = djTimeGetTime();
 	float fTimeNow = fTimeNext;
@@ -473,27 +435,20 @@ int game_startup(bool bLoadGame)
 	int i;
 	while (g_bGameRunning)
 	{
-
-		//debug//printf("{");
 		fTimeNow = djTimeGetTime();
 		bool bForceUpdate = false;
 		// If we're already behind, just force us to get there
-		if (fTimeNext < fTimeNow)
-		{
-			//printf( "slow frame\n" );
+		if (fTimeNext < fTimeNow){
 			fTimeNext = fTimeNow;
 			bForceUpdate = true;
 		}
-
 		int iEscape=0;
 		while (fTimeNow<fTimeNext || bForceUpdate) // until we reach next frames time
 		{
 			// Try to prevent this from hogging the CPU, which can adversely affect other processes
 			SDL_Delay(1);
-
 			// poll keys
 			djiPollBegin();
-			//djiPoll();
 			// only register key presses here, so that key presses aren't missed.
 			SDL_Event Event;
 			//debug//printf("P");
@@ -510,13 +465,10 @@ int game_startup(bool bLoadGame)
 				switch (Event.type)
 				{
 				case SDL_KEYDOWN:
-					for ( i=0; i<KEY_NUMKEYS; i++ )
-					{
-						if (Event.key.keysym.sym==g_anKeys[i])
-						{
+					for ( i=0; i<KEY_NUMKEYS; i++ ){
+						if (Event.key.keysym.sym==g_anKeys[i]){
 							//debug//printf("KEY_DOWN[%d]",i);
 							anKeyState[i] = 1;
-							
 							if (i==KEY_LEFT  && key_left==0)	key_down_edge[KEY_LEFT] = 1;
 							if (i==KEY_RIGHT && key_right==0)	key_down_edge[KEY_RIGHT] = 1;
 							if (i==KEY_ACTION&& key_action==0)	key_down_edge[KEY_ACTION] = 1;
@@ -524,7 +476,6 @@ int game_startup(bool bLoadGame)
 							if (i==KEY_SHOOT && key_shoot==0)	key_down_edge[KEY_SHOOT] = 1;
 						}
 					}
-
 					// Shift + F6/F7: Dec/Inc speed (framerate).
 					// Not sure if this really makes sense in 'production' game,
 					// but note the original DN1 had equivalent speec dec/inc ('<' and
@@ -537,8 +488,7 @@ int game_startup(bool bLoadGame)
 						sprintf(buf,"%08x,%08x,%08x",(int)Event.key.keysym.sym, (int)Event.key.keysym.mod, (int)Event.key.keysym.scancode);
 						ShowGameMessage(buf, 32);
 						}*/
-						if (Event.key.keysym.sym==SDLK_F6)
-						{
+						if (Event.key.keysym.sym==SDLK_F6){
 							g_fFrameRate -= 1.0f;
 							if (g_fFrameRate<1.f)
 								g_fFrameRate = 1.f;
@@ -546,9 +496,7 @@ int game_startup(bool bLoadGame)
 							char buf[1024]={0};
 							sprintf(buf,"Dec framerate %.2f",g_fFrameRate);
 							ShowGameMessage(buf, 32);
-						}
-						else if (Event.key.keysym.sym==SDLK_F7)
-						{
+						} else if (Event.key.keysym.sym==SDLK_F7){
 							g_fFrameRate += 1.0f;
 							fTIMEFRAME = (1.0f / g_fFrameRate);
 							char buf[1024]={0};
@@ -556,7 +504,7 @@ int game_startup(bool bLoadGame)
 							ShowGameMessage(buf, 32);
 						}
 					}
-					
+
 					// [dj2017-06] DEBUG/CHEAT/DEV KEYS
 					/*
 					if (Event.key.keysym.sym==SDLK_F8)
@@ -571,18 +519,13 @@ int game_startup(bool bLoadGame)
 					else
 					*/
 					// 'Global' shortcut keys for adjusting volume [dj2016-10]
-					if (Event.key.keysym.sym==SDLK_PAGEUP)
-					{
+					if (Event.key.keysym.sym==SDLK_PAGEUP){
 						djSoundAdjustVolume(4);
 						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
-					}
-					else if (Event.key.keysym.sym==SDLK_PAGEDOWN)
-					{
+					} else if (Event.key.keysym.sym==SDLK_PAGEDOWN){
 						djSoundAdjustVolume(-4);
 						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
-					}
-					else if (Event.key.keysym.sym==SDLK_INSERT)
-					{
+					} else if (Event.key.keysym.sym==SDLK_INSERT) {
 						if (djSoundEnabled())
 							djSoundDisable();
 						else
@@ -591,20 +534,16 @@ int game_startup(bool bLoadGame)
 					}
 					break;
 				case SDL_KEYUP:
-					for ( i=0; i<KEY_NUMKEYS; i++ )
-					{
-						if (Event.key.keysym.sym==g_anKeys[i])
-						{
+					for ( i=0; i<KEY_NUMKEYS; i++ ){
+						if (Event.key.keysym.sym==g_anKeys[i]){
 							//debug//printf("KEY_UP[%d]",i);
 							anKeyState[i] = 0;
-							
 							// If e.g. key_left is '1' it means we've already 'processed/handled' the 'down' edge event in the 'heartbeat' - so squash the value to 0 now to ensure we don't e.g. do the double-move
 							if (i==KEY_LEFT && key_left==1)		key_left = 0;
 							if (i==KEY_RIGHT && key_right==1)	key_right = 0;
 							if (i==KEY_ACTION && key_action==1)	key_action = 0;
 							if (i==KEY_SHOOT && key_shoot==1)	key_shoot = 0;
 							if (i==KEY_JUMP && key_jump==1)		key_jump = 0;
-								
 						}
 					}
 					break;
