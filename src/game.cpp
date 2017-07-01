@@ -559,8 +559,6 @@ int game_startup(bool bLoadGame)
 			if (!IsGameKeyAssigned(SDLK_RCTRL)){
 				if (g_iKeys[DJKEY_CTRL])	key_jump = 1;
 			}
-			//if (g_iKeys[DJKEY_ALT])		key_shoot = 1;
-			//[dj2016-10 don't think it really makes sense to have P as jump - if anything, pause??[LOW]](g_iKeys[DJKEY_P])		key_jump = 1;
 			if (g_iKeys[DJKEY_ESC])		iEscape = 1;
 
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
