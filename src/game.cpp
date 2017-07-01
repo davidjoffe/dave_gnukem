@@ -1,13 +1,7 @@
-//
-// game.cpp
-//
-// 1995/07/28
 /*
 Copyright (C) 1995-2017 David Joffe
-
 License: GNU GPL Version 2
 */
-/*--------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
