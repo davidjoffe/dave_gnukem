@@ -1,14 +1,65 @@
-See Readme.md for updated history from Oct 2016
+NB: See ReadMe.md for updated history as of October 2016
 
-2016/10/09 - Version 0.6 (0.60)
- - Take the 2015-08-01 v0.56a EMH release from SourceForge, create github project https://github.com/davidjoffe/dave_gnukem
+2017/06/22 - Version 0.71 [Windows only]:
+
+* Add new 'flying robot' monster type
+* Implemented access card and access card 'door' and door activator
+* Added special molecule pickup that gives you full health
+* Level Editor: Add unsaved-changes indication
+* Level Editor: Add level statistics page (Ctrl+F6)
+* Improve character control: Make vertical jumping/falling movement a bit smoother (more similar to the original DN1)
+* Improve viewport vertical auto-scrolling
+* New keyboard shortcuts: Shift+F6/F7: Dec/Inc speed (framerate)
+* Fix soda can not animating
+
+2017/06/22 - Version 0.70 [Windows only]
+
+* Add new basic 'Instructions' option to in-game menu
+* Fix: Potential game 'freeze' in teleporter if exiting level editor (or holding in action key)
+* Added "-scale N" command line option (1 = 320x200, 2=640x400, etc.) (if passed, this overrides the default behavior of attempting to "intelligently" select the scale factor based on e.g. desktop resolution etc.)
+* Fix: "Key polling behavior is subtly incorrect" (this should slightly improve the character control, especially if trying to move left/right one block only)
+* Minor sprite and level improvements
+* Add hero jump/landing sounds (credit for the sounds: Juhani Junkala), key pick-up sound, and more
+* Increase gameplay viewport width from 12 to 13 blocks
+
+2016/10/29 - Version 0.66 [Windows only]
+
+* Add shortcut key to toggle sounds on/off (Insert)
+* Fix: On Windows, game window often starts slightly off bottom of screen
+* Fix: Restore Game from main menu doesn't work
+* Fix: Save/Restore game doesn't save "mission" (i.e. selected "game")
+* New proper exit sound (is "PowerUp13.mp3" by Eric Matyas http://soundimage.org/)
+* Fixed: A monster could kill you in the moments after you entered the exit
+* Better hero shooting sound
+
+2016/10/22 - Version 0.63 / 0.64 / 0.65
+
+* Add background music. So far, have only added music by Eric Matyas http://soundimage.org/
+* Add game volume controls (use PgUp and PgDn keys to increase/decrease volume from menus or in-game)
+* Level Editor: New feature: Hold in Ctrl+Alt and click with the mouse to automatically start level with hero 'dropped in' to the clicked position as starting position (to help with level editing / testing)
+
+2016/10/16 - Version 0.62
+
+* Get Dave Gnukem compiling and running on Mac OS X: https://www.livecoding.tv/david_joffe/videos/jbBvb-dave-gnukem-c-game-side-scrolling-shooter-9
+* Miscellaneous minor aesthetic improvements
+
+2016/10/10 - Version 0.61
+
+* Fix: "Dying in the pungee sticks will often cause a crash" (thank you to porter who pointed that out)
+* Fix a segfault in Linux (possibly VNC only?) when navigating in-game menus and other sub-menus
+* Add semi-experimental 'big viewport mode' (Backspace + B in game to toggle) to make level creation/testing easier for level editors
+
+2016/10/09 - Version 0.6 (0.60) [david]
+ - Take the 2008-08-06 v0.56a EMH release from SourceForge, create github project https://github.com/davidjoffe/dave_gnukem
  - Fixed 'tiny game window'
  - Fix some Linux compile issues, make a few other fixes/improvements (streamed on LiveCoding), call it v0.6 ('un-abandoning' project - DJ)
 
-2008/08/06 - Version 0.56a
+[No active development from ~2008-08 to ~2016-09]
+
+2008/08/06 - Version 0.56a [EMH]
  - Updated to compile on newer compilers. No feature changes.
 
-2004/08/24 - Version 0.56
+2004/08/24 - Version 0.56 [EMH]
  - Added -640 switch; (do not need to recompile to use editor now).
  - Level Ed no longer leaves traces on the screen after exiting.
  - .gam files and macros.txt accept Unix and Windows line breaks.
@@ -17,7 +68,7 @@ See Readme.md for updated history from Oct 2016
  - Added powerboots cheat code. (backspace+P)
  - Updated the documentation.
 
-2004/08/08 - Version 0.55
+2004/08/08 - Version 0.55 [EMH]
  - Some cleaning up, and merging of contributions by EMH and Vytautas Shaltenis
  - Moved to Sourceforge.
 
@@ -385,6 +436,9 @@ See Readme.md for updated history from Oct 2016
  - Decide to have a go at porting djg to ggi. I reckon most the code will
    probably have to be rewritten.
 
-1995
+1995 [david]
  - Original DOS/EGA djg started then placed on hold. Some origins from
-   a previous pascal/assembler version.
+   a previous pascal/assembler version. C/C++ version initiated.
+
+1994/02/22 [david]
+ - Crude origins as a 16-bit x86 assembler implementation

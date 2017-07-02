@@ -15,7 +15,7 @@ Please donate to the project, or else I'll make more games like this: https://pa
 
 Created by: David Joffe http://djoffe.com/ (https://www.livecoding.tv/david_joffe/)
 
-The project was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) for a number of years until Oct 2016. Additional contributions by: T.O.G, Vytautas Shaltenis, Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
+The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: T.O.G, Vytautas Shaltenis, Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
 You can watch recent development on this project being live-streamed at:
 https://www.livecoding.tv/david_joffe/
@@ -25,10 +25,12 @@ https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrol
 
 As of 8 Oct 2016, this project is under 'properly' active development again, and the goal/intention is to get to a 'version 1' by no later than Oct 2017.
 
-![Dave Gnukem Screenshot](http://i.imgur.com/mN12Vtk.png "Dave Gnukem Screenshot")
+![Dave Gnukem Screenshot](http://scorpioncity.com/dave_gnukem/gallery/Dave%20Gnukem%20%280.71%202%20Jul%202017%29.png "Dave Gnukem Screenshot")
 
 ## About Duke Nukem 1
 Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by Apogee Software in 1991 that launched the Duke Nukem series: https://goo.gl/yP4PbS  The original Duke Nukem 1 was created by Todd Replogle (co-creator of the Duke Nukem series), John Carmack (of id Software), Scott Miller (founder of 3D Realms), Allen H. Blum III, George Broussard, and Jim Norwood.
+
+(Note the aim of Dave Gnukem is not to be a 'clone', nor to try match DN1 gameplay 'precisely' - the goal is to be 'similar but different', more like a parody though not really funny. Feasibly, the source could be used to attempt that, but it's not the present purpose or intention of this project. Likewise, it's not the intention to try load actual original level or sprite data into this 'engine', though again it'd probably be feasible to adapt it for such. - David Joffe, 2017-07)
 
 ## Gameplay Instructions
 
@@ -107,7 +109,7 @@ Recent / 2017/06/22 - Version 0.71 [Windows only]:
 
 2016/10/09 - Version 0.6 (0.60)
 
-* Take the 2015-08-01 v0.56a EMH release from SourceForge, create github project https://github.com/davidjoffe/dave_gnukem
+* Take the 2008-08-06 v0.56a EMH release from SourceForge, create github project https://github.com/davidjoffe/dave_gnukem
 * Fixed 'tiny game window'
 * Fix some Linux compile issues, make a few other fixes/improvements (streamed on LiveCoding), call it v0.6 ('un-abandoning' project - DJ)
 
@@ -143,6 +145,7 @@ Dependencies: You may have to first install LibSDL1.2 and LibSDL-Mixer1.2 (these
 
 # Level Editor Instructions
 
+(New 1 Jul 2017) Level Editor how-to video: https://youtu.be/xiznDqg2BHg
 
 Note there is currently no 'undo', so be careful. If happy with a set of work, save your changes.
 
@@ -199,20 +202,6 @@ To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add 
 * Signed executables in binary release?
 * [check] Dying seems to reset score to 0 - is that right? Cf. DN1 behavior
 * Is the -640 flag now basically obsolete? Remove? Or change to do something else useful? E.g. to make window maximum size e.g. same as monitor could be useful for level editing.
-
-## LEVEL/SPRITE EDITOR TODOS:
-
-* Nice to have: If have big screen like 1920x1080, should be able to 'take advantage' to make it nicer to edit levels [partly done]
-* If unsaved changes and accidentally press escape, your changes are lost .. should track 'dirty' and ask are you sure, or something along those lines.
-* [nice to have?] Undo last action?
-* It seems very easy to click sprite in wrong location
-* [nice to have?] Sort of a 'sprite eye-dropper' type tool: Point mouse and press something (e.g. Alt?) to 'pick up' what the mouse is floating over, and set that into the 'sprite palette'
-
-## Maybe make videos (e.g. for youtube etc.?) on:
-	
-* Overview of game
-* Overview level editor
-* Level editor howto
 
 ## Sprite TODOs:
 
