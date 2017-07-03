@@ -1,13 +1,7 @@
-//
-// game.cpp
-//
-// 1995/07/28
 /*
 Copyright (C) 1995-2017 David Joffe
-
 License: GNU GPL Version 2
 */
-/*--------------------------------------------------------------------------*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,14 +63,7 @@ bool g_bBigViewportMode=false;
 // Solution: Die 'asynchronously' - i.e. just set a flag that you've died, and then (still immediately) but once 'safely' past iterating through all
 // the g_apThings update ticks etc., *then* actually restartlevel.
 bool g_bDied = false;
-
-/*--------------------------------------------------------------------------*/
-//
-// Game cheats system (useful for development/testing)
-//
-
 #define DAVEGNUKEM_CHEATS_ENABLED
-
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
 bool g_bGodMode = false;
 #endif
@@ -178,7 +165,6 @@ const char *FILE_GAMESKIN = "data/gameskin.tga";
 djImage *pSkinGame        = NULL; // Main game view skin (while playing)
 djImage *pBackground      = NULL; // Level background image
 
-/*--------------------------------------------------------------------------*/
 struct SMenuItem gameMenuItems[] =
 {
 	{ false, "                   " },
@@ -192,16 +178,10 @@ struct SMenuItem gameMenuItems[] =
 };
 unsigned char gameMenuCursor[] = { 128, 129, 130, 131, 0 };
 CMenu gameMenu ( "game.cpp:gameMenu" );
-/*--------------------------------------------------------------------------*/
 
-//animation
 int anim4_count = 0;
 int nSlowDownHeroWalkAnimationCounter = 0;
 
-
-
-
-//game-play
 unsigned int g_nScore = 0;
 int  g_nHealth = 0;
 bool g_bGameRunning = false;
@@ -216,13 +196,6 @@ int g_nFirepowerOld = 1;
 int g_nScoreOld = 0;
 int g_nHealthOld = 0;
 
-
-
-
-/*-----------------------------------------------------------*/
-// Game functions
-/*-----------------------------------------------------------*/
-// Once off initialization stuff
 void GameInitialSetup()
 {
 	SYS_Debug( "GameInitialSetup()\n" );
@@ -259,31 +232,22 @@ void GameInitialSetup()
 void GameFinalCleanup()
 {
 	SYS_Debug( "GameFinalCleanup()\n" );
-
 	djDestroyImageHWSurface(pSkinGame);
 	djDEL(pSkinGame);
-
 	// Unload the game sounds (FIXME)
-
 	KillHighScores();
 }
 
-
-// Per-game initialization
 void PerGameSetup()
 {
 	Log("PerGameSetup(): InitLevelSystem()\n");
 	InitLevelSystem();
-
 	g_nHealth = HEALTH_INITIAL; // Initial health
 	HeroSetJumpMode(JUMP_NORMAL);
-
 	g_nLevel = 0;
 	g_bDied = false;
-
 	g_nScore = 0;
 	g_nFirepower = 1;
-
 	djMSG( "PerGameSetup(): Loading sprites\n" );
 	if (0 != GameLoadSprites())
 	{
@@ -295,14 +259,10 @@ void PerGameSetup()
 void PerLevelSetup()
 {
 	int i;
-
 	Log ( "PerLevelSetup()\n" );
-
 	g_nRecentlyFallingOrJumping=0;
-
 	// Start per-level background music
 	std::vector< std::string > asMusicFiles;
-
 	/*//these are sorted smallest to largest .. for now just selected all except the smaller ones as the shorter ones will may drive you too crazy with the looping..
 	// not yet sure if even the longer ones will be too repetitive [dj2016-10]
 	asMusicFiles.push_back("Dont-Mess-with-the-8-Bit-Knight.ogg");
@@ -361,11 +321,8 @@ void PerLevelSetup()
 	key_right = 0;
 	key_jump  = 0;
 	key_shoot = 0;
-
 	g_nHealth = HEALTH_INITIAL;
-
 	HeroReset(); // Reset hero
-
 	anim4_count=0; // animation count 0
 	hero_picoffs=0;
 	x_small = 0; // hero not half-block offset
@@ -386,7 +343,6 @@ void PerLevelSetup()
 
 	// (2) Load the currently selected level
 	const char * szfilename = g_pCurMission->GetLevel( g_nLevel )->GetFilename( );
-
 	// always keep current level loaded at slot 0
 	SYS_Debug ("PerLevelSetup(): level_load( %s )\n", szfilename );
 	if (NULL == level_load( 0, szfilename ))
@@ -395,7 +351,6 @@ void PerLevelSetup()
 		return;
 	}
 	g_pLevel = apLevels[0];
-
 	// Load map background image
 	pBackground = new djImage;
 	if (0!=pBackground->Load(g_pCurMission->GetLevel(g_nLevel)->m_szBackground))
@@ -403,13 +358,9 @@ void PerLevelSetup()
 		djDEL(pBackground);
 	}
 	djCreateImageHWSurface( pBackground );
-
-	// Clear out inventory
 	InvClear();
 	InvDraw();
-
 	g_ThingFactory.PerLevelInitialize();
-
 	parse_level();
 }
 
@@ -417,7 +368,6 @@ void PerLevelSetup()
 void PerGameCleanup()
 {
 	PerLevelCleanup();//dj2016-10 adding this, not quite sure where it 'should' be called
-	
 	// Empty the inventory completely
 	InvEmpty();
 	// Delete game background image
@@ -430,8 +380,7 @@ void PerGameCleanup()
 
 void PerLevelCleanup()
 {
-	if (g_pGameMusic!=NULL)
-	{
+	if (g_pGameMusic!=NULL){
 		Mix_FreeMusic(g_pGameMusic);
 		g_pGameMusic = NULL;
 	}
@@ -453,45 +402,31 @@ int game_startup(bool bLoadGame)
 	// FIXME: Where to determine this?
 	TRACE( "game_startup()\n" );
 	TRACE( "game_startup(): Playing game [%s]\n", g_pCurMission->GetName() );
-
-	// Per game setup
 	PerGameSetup();
-
 	TRACE( "game_startup(): GameDrawSkin()\n" );
 	GameDrawSkin();
 	GraphFlip(!g_bBigViewportMode);
-
-	// Per level setup (fixme, should this get called from withing per-game setup?
+	// Per level setup (fixme, should this get called from within per-game setup?
 	PerLevelSetup();
-
 	TRACE("game_startup(): GameDrawView()\n");
 	// FIXME: Is this necessary?
 	GameDrawView();
-	// Draw inventory
 	InvDraw();
 	TRACE("game_startup(): update_score()\n");
 	update_score(0);
 	TRACE("game_startup(): draw_health()\n");
 	update_health(0);
-
 	g_bGameRunning = true;
-
 	GameDrawFirepower();
-
 	//dj2016-10-28 Used if doing 'Restore Game' from *main* game menu. [This is perhaps slightly spaghetti-ish, it's done this way as LoadGame() has been originally
 	// written under the assumption of doing *in-game* loading of a savegame.
-	if (bLoadGame)
-	{
+	if (bLoadGame){
 		LoadGame();
 	}
-
 	GraphFlip(!g_bBigViewportMode);
-
 	// try maintain a specific frame rate
 	/*const */float fTIMEFRAME = (1.0f / g_fFrameRate);
-
 	float fTimeFirst = djTimeGetTime();
-
 	// Start out by being at next time
 	float fTimeNext = djTimeGetTime();
 	float fTimeNow = fTimeNext;
@@ -500,27 +435,20 @@ int game_startup(bool bLoadGame)
 	int i;
 	while (g_bGameRunning)
 	{
-
-		//debug//printf("{");
 		fTimeNow = djTimeGetTime();
 		bool bForceUpdate = false;
 		// If we're already behind, just force us to get there
-		if (fTimeNext < fTimeNow)
-		{
-			//printf( "slow frame\n" );
+		if (fTimeNext < fTimeNow){
 			fTimeNext = fTimeNow;
 			bForceUpdate = true;
 		}
-
 		int iEscape=0;
 		while (fTimeNow<fTimeNext || bForceUpdate) // until we reach next frames time
 		{
 			// Try to prevent this from hogging the CPU, which can adversely affect other processes
 			SDL_Delay(1);
-
 			// poll keys
 			djiPollBegin();
-			//djiPoll();
 			// only register key presses here, so that key presses aren't missed.
 			SDL_Event Event;
 			//debug//printf("P");
@@ -537,13 +465,10 @@ int game_startup(bool bLoadGame)
 				switch (Event.type)
 				{
 				case SDL_KEYDOWN:
-					for ( i=0; i<KEY_NUMKEYS; i++ )
-					{
-						if (Event.key.keysym.sym==g_anKeys[i])
-						{
+					for ( i=0; i<KEY_NUMKEYS; i++ ){
+						if (Event.key.keysym.sym==g_anKeys[i]){
 							//debug//printf("KEY_DOWN[%d]",i);
 							anKeyState[i] = 1;
-							
 							if (i==KEY_LEFT  && key_left==0)	key_down_edge[KEY_LEFT] = 1;
 							if (i==KEY_RIGHT && key_right==0)	key_down_edge[KEY_RIGHT] = 1;
 							if (i==KEY_ACTION&& key_action==0)	key_down_edge[KEY_ACTION] = 1;
@@ -551,7 +476,6 @@ int game_startup(bool bLoadGame)
 							if (i==KEY_SHOOT && key_shoot==0)	key_down_edge[KEY_SHOOT] = 1;
 						}
 					}
-
 					// Shift + F6/F7: Dec/Inc speed (framerate).
 					// Not sure if this really makes sense in 'production' game,
 					// but note the original DN1 had equivalent speec dec/inc ('<' and
@@ -564,8 +488,7 @@ int game_startup(bool bLoadGame)
 						sprintf(buf,"%08x,%08x,%08x",(int)Event.key.keysym.sym, (int)Event.key.keysym.mod, (int)Event.key.keysym.scancode);
 						ShowGameMessage(buf, 32);
 						}*/
-						if (Event.key.keysym.sym==SDLK_F6)
-						{
+						if (Event.key.keysym.sym==SDLK_F6){
 							g_fFrameRate -= 1.0f;
 							if (g_fFrameRate<1.f)
 								g_fFrameRate = 1.f;
@@ -573,9 +496,7 @@ int game_startup(bool bLoadGame)
 							char buf[1024]={0};
 							sprintf(buf,"Dec framerate %.2f",g_fFrameRate);
 							ShowGameMessage(buf, 32);
-						}
-						else if (Event.key.keysym.sym==SDLK_F7)
-						{
+						} else if (Event.key.keysym.sym==SDLK_F7){
 							g_fFrameRate += 1.0f;
 							fTIMEFRAME = (1.0f / g_fFrameRate);
 							char buf[1024]={0};
@@ -583,7 +504,7 @@ int game_startup(bool bLoadGame)
 							ShowGameMessage(buf, 32);
 						}
 					}
-					
+
 					// [dj2017-06] DEBUG/CHEAT/DEV KEYS
 					/*
 					if (Event.key.keysym.sym==SDLK_F8)
@@ -598,18 +519,13 @@ int game_startup(bool bLoadGame)
 					else
 					*/
 					// 'Global' shortcut keys for adjusting volume [dj2016-10]
-					if (Event.key.keysym.sym==SDLK_PAGEUP)
-					{
+					if (Event.key.keysym.sym==SDLK_PAGEUP){
 						djSoundAdjustVolume(4);
 						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
-					}
-					else if (Event.key.keysym.sym==SDLK_PAGEDOWN)
-					{
+					} else if (Event.key.keysym.sym==SDLK_PAGEDOWN){
 						djSoundAdjustVolume(-4);
 						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
-					}
-					else if (Event.key.keysym.sym==SDLK_INSERT)
-					{
+					} else if (Event.key.keysym.sym==SDLK_INSERT) {
 						if (djSoundEnabled())
 							djSoundDisable();
 						else
@@ -618,20 +534,16 @@ int game_startup(bool bLoadGame)
 					}
 					break;
 				case SDL_KEYUP:
-					for ( i=0; i<KEY_NUMKEYS; i++ )
-					{
-						if (Event.key.keysym.sym==g_anKeys[i])
-						{
+					for ( i=0; i<KEY_NUMKEYS; i++ ){
+						if (Event.key.keysym.sym==g_anKeys[i]){
 							//debug//printf("KEY_UP[%d]",i);
 							anKeyState[i] = 0;
-							
 							// If e.g. key_left is '1' it means we've already 'processed/handled' the 'down' edge event in the 'heartbeat' - so squash the value to 0 now to ensure we don't e.g. do the double-move
 							if (i==KEY_LEFT && key_left==1)		key_left = 0;
 							if (i==KEY_RIGHT && key_right==1)	key_right = 0;
 							if (i==KEY_ACTION && key_action==1)	key_action = 0;
 							if (i==KEY_SHOOT && key_shoot==1)	key_shoot = 0;
 							if (i==KEY_JUMP && key_jump==1)		key_jump = 0;
-								
 						}
 					}
 					break;
@@ -643,17 +555,10 @@ int game_startup(bool bLoadGame)
 			if (key_down_edge[KEY_RIGHT])  key_right = 1;
 			if (key_down_edge[KEY_JUMP])   key_jump = 1;
 			if (key_down_edge[KEY_SHOOT])  key_shoot = 1;
-			//if (g_iKeys[DJKEY_UP])		key_action = 1;
-			//if (g_iKeys[DJKEY_LEFT])	key_left = 1;
-			//if (g_iKeys[DJKEY_RIGHT])	key_right = 1;
-			
 			// We allow ctrl as a sort of 'default' fallback jump if (and only if) it isn't assigned/redefined to anything
-			if (!IsGameKeyAssigned(SDLK_RCTRL))
-			{
+			if (!IsGameKeyAssigned(SDLK_RCTRL)){
 				if (g_iKeys[DJKEY_CTRL])	key_jump = 1;
 			}
-			//if (g_iKeys[DJKEY_ALT])		key_shoot = 1;
-			//[dj2016-10 don't think it really makes sense to have P as jump - if anything, pause??[LOW]](g_iKeys[DJKEY_P])		key_jump = 1;
 			if (g_iKeys[DJKEY_ESC])		iEscape = 1;
 
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
@@ -670,27 +575,21 @@ int game_startup(bool bLoadGame)
 				// It seems to be difficult to toggle just once ... so we detect key up/down 'edge' and only toggle on that
 				static bool g_bBKeyLast=false;
 				bool bBKey = (g_iKeys[DJKEY_B]!=0);
-				if (bBKey && !g_bBKeyLast)// Detect keydown 'edge'
-				{
+        //Detect key down edge
+				if (bBKey && !g_bBKeyLast){
 					g_bBigViewportMode = !g_bBigViewportMode;
-					if (g_bBigViewportMode)
-					{
+					if (g_bBigViewportMode){
 						VIEW_WIDTH = (pVisView->width / 16) - 10;
 						VIEW_HEIGHT = (pVisView->height - 5*16) / 16;
 						if (VIEW_HEIGHT>=100)VIEW_HEIGHT=100;
 						if (VIEW_WIDTH>=128)VIEW_WIDTH=128;
-					}
-					else
-					{
+					} else {
 						VIEW_WIDTH = VIEW_WIDTH_DEFAULT;
 						VIEW_HEIGHT = 10;
-
 						// NB, TODO, we actually need to also need to redraw score etc. here (though since this is just a dev/editing mode, not a real game mode, it doesn't have to be perfect)
-
 						// When going out of 'big viewport' mode, hero might now be off the (now-tiny) 'viewport' :/ .. so must also 're-center' viewport around hero
 						if (x>xo+VIEW_WIDTH/2) xo = x-VIEW_WIDTH/2;
 						if (y>yo+VIEW_HEIGHT/2) yo = y-VIEW_HEIGHT/2;
-
 						// Redraw everything that needs to be redrawn, as larger viewport will have obliterated right side with score etc.
 						GameDrawSkin();
 						GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT );
@@ -704,22 +603,18 @@ int game_startup(bool bLoadGame)
 				g_bBKeyLast = bBKey;
 
 				// BACKSPACE + P: Powerboots
-				if (g_iKeys[DJKEY_P])
-				{
+				if (g_iKeys[DJKEY_P]){
 					HeroSetJumpMode(JUMP_POWERBOOTS);
 				}
 				// BACKSPACE + PGDN: All power-ups
-				if (g_iKeys[DJKEY_PGDN])
-				{
+				if (g_iKeys[DJKEY_PGDN]){
 					ShowGameMessage("CHEAT: HEALTH+KEYS+FIREPOWER", 96);
 SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 					// Full health
 					SetHealth(MAX_HEALTH);
-
 					// All keys
 					std::vector<int> anKeysHave;
-					for ( i=0; i<InvGetSize(); i++ )
-					{
+					for ( i=0; i<InvGetSize(); i++ ){
 						if (InvGetItem(i)->GetTypeID()==TYPE_KEY
 							||InvGetItem(i)->GetTypeID()==TYPE_ACCESSCARD)//dj2017-06 adding access card
 						{
@@ -727,17 +622,14 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 							anKeysHave.push_back(pKey->GetID());
 						}
 					}
-					for ( i=1; i<=4; i++)
-					{
+					for ( i=1; i<=4; i++){
 						unsigned int j;
 						bool bHave = false;
-						for ( j=0; j<anKeysHave.size(); j++ )
-						{
+						for ( j=0; j<anKeysHave.size(); j++ ){
 							if (i==anKeysHave[j])
 								bHave = true;
 						}
-						if (!bHave)
-						{
+						if (!bHave){
 							CKey *pKey = new CKey;
 							pKey->SetType(TYPE_KEY);
 							pKey->SetSprite(0, 116+i);
@@ -748,13 +640,11 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 					{
 						//dj2017-06 Adding access card - this is gross, it's hardcoded here that '5' is its key/door number. Oh well, not going to lose sleep over it.
 						bool bHave = false;
-						for ( unsigned int j=0; j<anKeysHave.size(); j++ )
-						{
+						for ( unsigned int j=0; j<anKeysHave.size(); j++ ){
 							if (5==anKeysHave[j])//<- [LOW PRIO] this detectioh isn't working correctly [see workaround note above 2017-06]
 								bHave = true;
 						}
-						if (!bHave)
-						{
+						if (!bHave){
 							CKey *pKey = new CAccessCard;
 							pKey->SetType(TYPE_ACCESSCARD);
 							pKey->SetID(5);
@@ -769,31 +659,22 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 				}
 			}
 #endif
-
-//this shouldn't be in 'default' game or something .. ?
+      //this shouldn't be in 'default' game or something .. ?
 			// Debug: hurt self
 			static bool b = false;
 			bool bOld = b;
 			if (g_iKeys[DJKEY_H]) b = true; else b = false;
 			if (b && !bOld)
 				update_health(-1);
-
 			// Debug: toggle display of debug info
 			if (g_iKeys[DJKEY_D] && !g_iKeysLast[DJKEY_D]) bShowDebugInfo = !bShowDebugInfo;
-
-
 			fTimeNow = djTimeGetTime();
 			bForceUpdate = false;
 		}
-		// FIXME: time next should be calculated more absolutely, not relatively.
-//		fTimeNext = fTimeNow + fTIMEFRAME;
 		fTimeNext = fTimeNext + fTIMEFRAME;
-
 		//-- ESC - Pop up the in-game menu
-		if (iEscape==1)
-		{
+		if (iEscape==1){
 			IngameMenu();
-
 			// Redraw everything that needs to be redrawn
 			GameDrawSkin();
 			GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT );
@@ -803,7 +684,6 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 			InvDraw();
 			GraphFlip(!g_bBigViewportMode);
 		}
-
 
 		// Make a simple FPS display for debug purposes
 		float fTimeRun;
@@ -840,33 +720,23 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 		{
 			key_jump   = g_iKeys[DJKEY_CTRL];
 		}
-		//key_jump  |= g_iKeys[DJKEY_P];
-
 		// ensure we don't leave the borders of the level
 		// fixme; is this still necessary what with the (other functions)
 		x = MAX( MIN(x,126), 1 );
 		y = MAX( MIN(y, 99), 2 );
-		//debug//printf("}");
-
 		// "integrated" sprite / level editors [dj2017-06-20 moving these to bottom of this loop, just in case we have any issues comparable to the pungee sticks crash bug, e.g interacting with dangling objects or something in the one single heartbeat update that occurs after exiting level editor]
-		if (g_iKeys[DJKEY_F4])
-		{
+		if (g_iKeys[DJKEY_F4]){
 			SwitchMode ( SWITCH_SPRED );
 			ED_Main ();
-
 			// NB, if we are holding a key down when entering sprite/level editor, we 'miss' the gameloop's KeyUp event as the integrated editor takes over input polling; this leads to potentially "stuck" keystates in anKeyState when exiting, which in turn causes problems like e.g. if you press 'up' before entering the level editor then drop yourself out of the level editor over a teleporter, the game freezes as it keeps re-activating the teleporter since the action key is effectively behaving as if stuck down. TL;DR CLEAR THE KEYSTATES HERE (even if the keys really are down on exit editor). I am not mad about this solution, all feels a little wobbly/workaround-y, but should do for now. [dj2017-06-22]
 			memset( anKeyState, 0, sizeof(anKeyState) );
-			
 			RestartLevel();
 		}
-		else if (g_iKeys[DJKEY_F5])
-		{
+		else if (g_iKeys[DJKEY_F5]){
 			SwitchMode ( SWITCH_LVLED );
 			ED_Main ();
-
 			// NB, if we are holding a key down when entering sprite/level editor, we 'miss' the gameloop's KeyUp event as the integrated editor takes over input polling; this leads to potentially "stuck" keystates in anKeyState when exiting, which in turn causes problems like e.g. if you press 'up' before entering the level editor then drop yourself out of the level editor over a teleporter, the game freezes as it keeps re-activating the teleporter since the action key is effectively behaving as if stuck down. TL;DR CLEAR THE KEYSTATES HERE (even if the keys really are down on exit editor). I am not mad about this solution, all feels a little wobbly/workaround-y, but should do for now. [dj2017-06-22]
 			memset( anKeyState, 0, sizeof(anKeyState) );
-
 			RestartLevel(); // [dj2017-06-20] This replaces PerLevelSetup() call that was after LVLED_Kill(), not 100% sure but suspect this slightly more 'correct'
 		}
 		// NB, not all platforms will have an F1 key. The original DN1 said on the screen
@@ -879,78 +749,56 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 			// NB, if we are holding a key down when entering sprite/level editor, we 'miss' the gameloop's KeyUp event as the integrated editor takes over input polling; this leads to potentially "stuck" keystates in anKeyState when exiting, which in turn causes problems like e.g. if you press 'up' before entering the level editor then drop yourself out of the level editor over a teleporter, the game freezes as it keeps re-activating the teleporter since the action key is effectively behaving as if stuck down. TL;DR CLEAR THE KEYSTATES HERE (even if the keys really are down on exit editor). I am not mad about this solution, all feels a little wobbly/workaround-y, but should do for now. [dj2017-06-22]
 			//memset( anKeyState, 0, sizeof(anKeyState) );
 		}*/
-
 	} // while (game running)
-
 	TRACE("game_startup(): main game loop exited.\n");
-
 	PerGameCleanup();
 	return g_nScore;
 }
 
-/*-----------------------------------------------------------*/
 void GameHeartBeat()
 {
-	//debug//printf("HEARTBEAT[");
 	CThing * pThing = NULL;
 	int n=0, i=0, j=0;
-	//int ifoo = key_action;
-
-	// Update hero basic stuff
 	HeroUpdate();
-
 	//update animation counts:
 	anim4_count++;
 	if (anim4_count>3)
 		anim4_count = 0;
-
 	//nSlowDownHeroWalkAnimationCounter ^= 1;
 	// Above line should have same effect and be faster, but is less understandable
 	nSlowDownHeroWalkAnimationCounter++;
 	if (nSlowDownHeroWalkAnimationCounter>1)
 		nSlowDownHeroWalkAnimationCounter = 0;
-
 	//not jumping but about to be, then dont left/right move
 	if (!((key_jump) && (hero_mode != MODE_JUMPING))) {
-		if (key_left)
-		{
-			//debug//printf("L");
+		if (key_left){
 			key_left = 0;
 			move_hero(-1,0);
 		}
-		if (key_right)
-		{
-			//debug//printf("R");
+		if (key_right){
 			key_right = 0;
 			move_hero(1,0);
 		}
 	}
 
-
 	static bool bFallingPrev = false;
 	bool bFalling = false;
-
 	//mode-specific handling
-	switch (hero_mode)
-	{
+	switch (hero_mode){
 	case MODE_NORMAL:
 		//fall:
-
 		n = move_hero(0,1);
 		{
 			bFalling = (n==0);
-			if (bFalling)
-			{
-				if (!bFallingPrev) // <- just started falling?
-				{
+			if (bFalling){
+				if (!bFallingPrev){
 					g_nFalltime = 0;
 				}
 				++g_nFalltime;
 			}
 			else
 				g_nFalltime = 0;
-			if (bFallingPrev && !bFalling) // <- just stopped falling
-			{
+			if (bFallingPrev && !bFalling){
 				// Kick up some dust ..
 				AddThing(CreateDust(x, y, x_small*8,0));
 				djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
@@ -959,52 +807,40 @@ void GameHeartBeat()
 		}
 
 		// standing still and pressing 'up': (just pressing up?)
-		if (key_action)
-		{
+		if (key_action){
 			key_action = 0; // huh?
 			// dj2017-06-22 I think that "huh?" might have something to do with issue encountered of 'freezing on entering teleporter' issue, or else it's just redundant/old code, not sure, as it re-sets key_action anyway from anKeyStates[KEY_ACTION] each heartbeat
 
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
 			// Level cheat key (Ctrl+L)
-			if (g_iKeys[DJKEY_L])
-			{
+			if (g_iKeys[DJKEY_L]){
 				NextLevel();
 				return;
 			}
 #endif
 			// Go-to-exit cheat key
-			if (g_iKeys[DJKEY_I])
-			{
-				for ( i=0; i<(int)g_apThings.size(); i++ )
-				{
-					if (g_apThings[i]->GetTypeID()==TYPE_EXIT)
-					{
+			if (g_iKeys[DJKEY_I]){
+				for ( i=0; i<(int)g_apThings.size(); i++ ){
+					if (g_apThings[i]->GetTypeID()==TYPE_EXIT){
 						relocate_hero(g_apThings[i]->m_x, g_apThings[i]->m_y);
 						HeroFreeze(5);
 						return;
 					}
 				}
 			}
-
 			// Check if you're on anything funny, like an exit
-			for ( i=0; i<(int)g_apThings.size(); i++ )
-			{
+			for ( i=0; i<(int)g_apThings.size(); i++ ){
 				CThing *pThing = g_apThings[i];
-				if (!HeroIsFrozen() && pThing->InBounds(x*16+x_small*8, y*16-16))
-				{
-//					int iRet = pThing->Action();
+				if (!HeroIsFrozen() && pThing->InBounds(x*16+x_small*8, y*16-16)){
 					pThing->Action();
-					// FIXME: Handle return codes
 				}
-				// If hero has been "frozen" by some action (e.g. teleport, exit), return
 				if (HeroIsFrozen())
 					return;
-			} // i
+			}
 
 		}
 
-		if (key_jump)
-		{
+		if (key_jump){
 			key_jump = 0;
 			if (n) { // if hero wasnt busy falling
 				HeroStartJump();
@@ -1015,10 +851,8 @@ void GameHeartBeat()
 
 	case MODE_JUMPING:
 		HeroUpdateJump();
-
 		key_jump = 0;
 		break;
-
 	}
 
 	// Viewport auto-scrolling (vertical).
