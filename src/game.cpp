@@ -391,7 +391,8 @@ void PerLevelSetup()
 	if (NULL == level_load( 0, szfilename ))
 	{
 		djMSG("PerLevelSetup(): error loading level %s.\n", szfilename );
-		return;
+		ShowGameMessage("BAD FILENAME FOR LEVEL", 1000);
+		//return;
 	}
 	g_pLevel = apLevels[0];
 
