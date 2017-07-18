@@ -134,7 +134,6 @@ SOUND_HANDLE g_iSounds[SOUND_MAX]={0};
 // Yeah its pretty low but thats what I was aiming for back in the EGA days
 // and I don't feel like changing it right now. I might still though.
 float g_fFrameRate=18.0f;
-#define FRAME_RATE (18.0f)
 
 #define MAX_HEALTH (10)
 #define HEALTH_INITIAL MAX_HEALTH
@@ -1534,10 +1533,23 @@ void GameDrawView()
 
 		xoff = (x_small - xo_small)+1 + ((x-xo)<<1);
 		xoff *= 8;
-		DRAW_SPRITE16A(pVisView,4,  hero_dir*16+hero_picoffs*4,xoff   ,yoff   +y_offset);
-		DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+hero_picoffs*4,xoff   ,yoff+16+y_offset);
-		DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+hero_picoffs*4,xoff+16,yoff   +y_offset);
-		DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+hero_picoffs*4,xoff+16,yoff+16+y_offset);
+		/*
+		if (hero_dir>0)
+		{
+			//tuxtest [dj2017-07 want to make hero sprite simpler to work on ultimately]
+			DRAW_SPRITE16A(pVisView,4,   96+hero_picoffs*2  ,xoff   ,yoff   +y_offset);
+			DRAW_SPRITE16A(pVisView,4,   96+hero_picoffs*2+1,xoff+16,yoff   +y_offset);
+			DRAW_SPRITE16A(pVisView,4,16+96+hero_picoffs*2  ,xoff   ,yoff+16+y_offset);
+			DRAW_SPRITE16A(pVisView,4,16+96+hero_picoffs*2+1,xoff+16,yoff+16+y_offset);
+		}
+		else
+		*/
+		{
+			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+hero_picoffs*4,xoff   ,yoff   +y_offset);
+			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+hero_picoffs*4,xoff   ,yoff+16+y_offset);
+			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+hero_picoffs*4,xoff+16,yoff   +y_offset);
+			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+hero_picoffs*4,xoff+16,yoff+16+y_offset);
+		}
 		if (bShowDebugInfo)
 		{
 			// Light blue box shows hero collision bounding box
