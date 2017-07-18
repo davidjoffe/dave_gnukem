@@ -30,7 +30,8 @@ enum EBlockType
 	TYPE_10,
 	//! 11 Firepower
 	TYPE_FIREPOWER,
-	TYPE_12,
+	//! 12 Crumbling floor (crumbles slightly explosively after hero walks on it a couple of times) [dj2017-07]
+	TYPE_CRUMBLINGFLOOR,
 	//! 13 Conveyor belt
 	TYPE_CONVEYOR,
 	//! 14 Letter (G,N,U,K,E,M)

@@ -1543,7 +1543,7 @@ void GameDrawView()
 			DRAW_SPRITE16A(pVisView,4,16+96+hero_picoffs*2+1,xoff+16,yoff+16+y_offset);
 		}
 		else
-		*/
+		//*/
 		{
 			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+hero_picoffs*4,xoff   ,yoff   +y_offset);
 			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+hero_picoffs*4,xoff   ,yoff+16+y_offset);
@@ -1779,7 +1779,7 @@ void DrawDebugInfo()
 		}
 
 		// Draw action bounds (cyan=overlapping, white=inside, yellow=not interacting)
-		if (pThing->OverlapsBounds(x*16+x_small*8, y*16-16))
+		if (pThing->OverlapsBounds(x*16+x_small*8, y*16+y_offset-16))
 		{
 			if (pThing->IsHeroInside())
 				pThing->DrawActionBounds(djColor(255,255,255));
