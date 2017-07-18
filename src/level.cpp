@@ -54,6 +54,7 @@ void KillLevelSystem()
 // returns NULL on failure
 unsigned char * level_load( int i, const char * szfilename )
 {
+	unsigned char* pRet = NULL;
 	int file_handle;
 	unsigned char * buffer;
 
@@ -70,7 +71,7 @@ unsigned char * level_load( int i, const char * szfilename )
 	if ((file_handle = open( filename, FILEOPEN_FLAGS )) == -1)
 	{
 		printf( "level_load( %s ): failed to open file.\n", filename );
-		return NULL;
+		//return NULL;
 	}
 
 	// allocate memory for level
@@ -79,15 +80,22 @@ unsigned char * level_load( int i, const char * szfilename )
 		printf( "level_load( %s ): failed to allocate level buffer.\n", szfilename );
 		return NULL;
 	}
-	// read level into buffer
-	read( file_handle, buffer, LEVEL_SIZE );
-	// close file
-	close( file_handle );
+	// Initialize level to blank block by default (in case it doesn't load e.g. bad filename passed or whatever, don't want to sit with random memory contents) [dj2017-07]
+	memset(buffer, 0, LEVEL_SIZE);
+	if (file_handle != -1)
+	{
+		// read level into buffer
+		read( file_handle, buffer, LEVEL_SIZE );
+		// close file
+		close( file_handle );
+
+		pRet = buffer;
+	}
 
 	// FIXME: add to tail end incorrect-ness
 	apLevels.insert(apLevels.begin() + i, buffer);
 
-	return buffer;
+	return pRet;
 }
 
 int level_save( int i, const char * szfilename )

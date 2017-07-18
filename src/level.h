@@ -34,7 +34,7 @@ struct SLevelBlock
 
 void InitLevelSystem ();
 void KillLevelSystem ();
-//dj2017-06 First parameter is level 'slot' which I think is now always 0 and thus not used, I think some older version of the code used to load level N datablock in slot N. Now only one level's datablock is actually loaded at any time.
+//Returns NULL if bad filename, but still allocates a default empty level, which will be loaded into apLevels[0]. dj2017-06 First parameter is level 'slot' which I think is now always 0 and thus not used, I think some older version of the code used to load level N datablock in slot N. Now only one level's datablock is actually loaded at any time.
 extern unsigned char * level_load( int i, const char * szfilename );
 int                    level_save( int i, const char * szfilename );
 extern unsigned char * level_pointer( int i, int x, int y );
