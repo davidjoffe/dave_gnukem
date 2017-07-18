@@ -855,6 +855,25 @@ protected:
 };
 /*-----------------------------------------------------------*/
 /*!
+\class CCrumblingFloor
+\nosubgrouping
+
+Crumbling floor (crumbles slightly explosively after hero walks or jumps on it a couple of times)
+*/
+class CCrumblingFloor : public CThing
+{
+public:
+	CCrumblingFloor();
+	virtual int Tick();
+	virtual void Draw();
+	virtual void Initialize(int b0, int b1);
+protected:
+	int m_nStrength;//Starts at e.g. 2, each time hero walks on us we decrement the counter, when counter hits 0, we self-terminate
+	bool m_bHeroTouchingPrev;
+	int m_nWidth;//Width (in level 'blocks', not pixels)
+};
+/*-----------------------------------------------------------*/
+/*!
 \class CConveyor
 \nosubgrouping
 

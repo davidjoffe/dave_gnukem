@@ -117,6 +117,7 @@ REGISTER_THING(CBoots,         TYPE_POWERBOOTS, NULL);
 REGISTER_THING(CRobot,         TYPE_ROBOT, NULL);
 REGISTER_THING(CFlyingRobot,   TYPE_FLYINGROBOT, NULL);
 REGISTER_THING(CLift,          TYPE_LIFT, NULL);
+REGISTER_THING(CCrumblingFloor,TYPE_CRUMBLINGFLOOR, NULL);
 REGISTER_THING(CConveyor,      TYPE_CONVEYOR, NULL);
 REGISTER_THING(CFlameThrow,    TYPE_FLAMETHROW, NULL);
 REGISTER_THING(CDynamite,      TYPE_DYNAMITE, NULL);
@@ -1641,6 +1642,66 @@ int CFlyingRobot::Tick()
 	return CThing::Tick();
 }
 
+/*-----------------------------------------------------------*/
+CCrumblingFloor::CCrumblingFloor() :
+	m_nStrength(2),
+	m_bHeroTouchingPrev(false),
+	m_nWidth(1)
+{
+	m_bSolid = true;
+	SetActionBounds(0, -5, 15, 15);
+	SetSolidBounds(0, 0, 15, 15);
+}
+int CCrumblingFloor::Tick()
+{
+	bool bHeroTouching = OverlapsBounds(x*16+x_small*8, y*16+y_offset-16);
+	//Detect 'edge' when just start touching.
+	if (bHeroTouching && !m_bHeroTouchingPrev)
+	{
+		--m_nStrength;
+	}
+	m_bHeroTouchingPrev = bHeroTouching;
+
+	if (m_nStrength<=0)
+	{
+		for ( int i=0; i<m_nWidth; ++i )
+		{
+			// Every 2nd one to look slightly less silly (fixmeLOW todo later make nicer / fancier explosion visuals) [dj2017-07]
+			if ((i%2)==0)
+			{
+				AddThing(CreateExplosion((m_x+i)*16, m_y*16));
+			}
+		}
+		return THING_DIE;
+	}
+	return CThing::Tick();
+}
+void CCrumblingFloor::Draw()
+{
+	for ( int i=0; i<m_nWidth; ++i )
+	{
+		DRAW_SPRITE16A(pVisView, m_a, m_b+(i%2), CALC_XOFFSET(m_x+i,0), CALC_YOFFSET(m_y));
+	}
+}
+void CCrumblingFloor::Initialize(int b0, int b1)
+{
+	// Expand sideways right/left until we hit solid
+	const int LEVEL_WIDTH=128;
+	while (m_x+m_nWidth<LEVEL_WIDTH && !check_solid(m_x+m_nWidth,m_y,false))
+	{
+		++m_nWidth;
+	}
+	while (m_x>0 && !check_solid(m_x-1,m_y,false))
+	{
+		--m_x;
+		++m_nWidth;
+	}
+	SetActionBounds(0, -5, m_nWidth*16-1, 15);
+	SetSolidBounds(0, 0, m_nWidth*16-1, 15);
+	SetVisibleBounds(0, 0, m_nWidth*16-1, 15);
+
+	CThing::Initialize(b0,b1);
+}
 /*-----------------------------------------------------------*/
 CConveyor::CConveyor()
 {

@@ -58,7 +58,11 @@ Power boots allow you to jump higher. The special molecule pickup gives you full
 
 # History / Changes
 
-Recent / 2017/06/22 - Version 0.71 [Windows only]:
+Recent:
+
+* Add new floor type that auto-crumbles after hero walks or jumps twice on it (2nd spriteset, position 5x4 - place only 1 block per segment)
+
+2017/06/22 - Version 0.71 [Windows only]:
 
 * Add new 'flying robot' monster type
 * Implemented access card and access card 'door' and door activator
