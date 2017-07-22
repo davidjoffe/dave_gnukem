@@ -7,30 +7,43 @@ Dave Gnukem is a 2D scrolling platform shooter similar to, and inspired by, Duke
 
 **Source code repository:** https://github.com/davidjoffe/dave_gnukem
 
-Project page: http://gnukem.sourceforge.net/
+**Project page**: http://gnukem.sourceforge.net/ (this doesn't serve much purpose anymore)
 
-Video: https://youtu.be/Hi7WYnOA_fo
+**Mini Demo Video**: https://youtu.be/Hi7WYnOA_fo
 
 Please donate to the project, or else I'll make more games like this: https://paypal.me/davidjoffe
 
-Created by: David Joffe http://djoffe.com/ (https://www.livecoding.tv/david_joffe/)
+![Dave Gnukem Screenshot](http://scorpioncity.com/dave_gnukem/gallery/Dave%20Gnukem%20%280.71%202%20Jul%202017%29.png "Dave Gnukem Screenshot")
+
+Created by: David Joffe http://djoffe.com/ / https://www.liveedu.tv/david_joffe/
 
 The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: T.O.G, Vytautas Shaltenis, Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
-You can watch recent development on this project being live-streamed at:
-https://www.livecoding.tv/david_joffe/
-e.g.
-https://www.livecoding.tv/david_joffe/videos/wae18-dave-gnukem-c-game-side-scrolling-shooter and 
-https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrolling-shooter-3 etc.
-
 As of 8 Oct 2016, this project is under 'properly' active development again, and the goal/intention is to get to a 'version 1' by no later than Oct 2017.
 
-![Dave Gnukem Screenshot](http://scorpioncity.com/dave_gnukem/gallery/Dave%20Gnukem%20%280.71%202%20Jul%202017%29.png "Dave Gnukem Screenshot")
+### About Duke Nukem 1
 
-## About Duke Nukem 1
 Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by Apogee Software in 1991 that launched the Duke Nukem series: https://goo.gl/yP4PbS  The original Duke Nukem 1 was created by Todd Replogle (co-creator of the Duke Nukem series), John Carmack (of id Software), Scott Miller (founder of 3D Realms), Allen H. Blum III, George Broussard, and Jim Norwood.
 
-(Note the aim of Dave Gnukem is not to be a 'clone', nor to try match DN1 gameplay 'precisely' - the goal is to be 'similar but different', more like a parody though not really funny. Feasibly, the source could be used to attempt that, but it's not the present purpose or intention of this project. Likewise, it's not the intention to try load actual original level or sprite data into this 'engine', though again it'd probably be feasible to adapt it for such. - David Joffe, 2017-07)
+### Development LiveStreaming Channels
+
+You can watch development on this project being live-streamed at:
+
+* https://www.liveedu.tv/david_joffe/
+ * https://www.livecoding.tv/david_joffe/videos/wae18-dave-gnukem-c-game-side-scrolling-shooter and 
+ * https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrolling-shooter-3 etc.
+* https://www.twitch.tv/david_joffe/
+* https://www.youtube.com/user/davidjoffe2
+
+### (Approximate) Roadmap to Version 1
+
+* Jul/Aug 2017: v0.8: Implement many more monster types, and a few other special 'things' (e.g. rockets etc.)
+* Aug/Sep 2017: v0.9: Implement equivalent of Dr Proton and finalize plotline etc.; Finalize one basic set of playable levels. Finalize and round off spritesets to be 'not entirely terrible'.
+* Sep/Oct 2017: v1.0: Final rounding-off and final testing, 'call it version 1'.
+
+### Notes
+
+Note the aim of Dave Gnukem is not to be a 'clone', nor to try match DN1 gameplay 'precisely' - the goal is to be 'similar but different', more like a parody though not really funny. Feasibly, the source could be used to attempt that, but it's not the present purpose or intention of this project. Likewise, it's not the intention to try load actual original level or sprite data into this 'engine', though again it'd probably be feasible to adapt it for such. - David Joffe, 2017-07
 
 ## Gameplay Instructions
 
