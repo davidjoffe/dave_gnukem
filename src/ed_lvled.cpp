@@ -112,6 +112,35 @@ void SetLevel( int x, int y, int a, int b, bool bforeground );
 
 
 //---------------------------------------------------------------------------
+std::string GetFriendlyTypeName( int a, int b )
+{
+	std::string sType;
+	int iType = ED_GetSpriteType( a, b );
+	if (iType>0 && iType<TYPE_LASTONE)
+	{
+		sType = block_type_names[iType];
+
+		// If it's a 'box', handle this as a special case to also show name of what's inside the box
+		if (iType==TYPE_BOX)
+		{
+			int c = ED_GetSpriteExtra(a, b, 10);
+			int d = ED_GetSpriteExtra(a, b, 11);
+			int iTypeContents = ED_GetSpriteType( c,d );
+			sType += " [";
+			if (iTypeContents>=0 && TYPE_LASTONE)
+				sType += block_type_names[iTypeContents];
+			else
+				sType += "(error: invalid box contents - check in spreditor!)";
+			sType += "]";
+		}
+	}
+	else if (iType>=TYPE_LASTONE)//<- dj2017-06 hm, that should probably be ">" as TYPE_LASTONE maybe reserved for possible use? Not sure anyway whatever
+		sType += "(error: invalid type - check in spreditor!)";
+	return sType;
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
 // Level stats
 class CLevelStats
 {
@@ -177,7 +206,7 @@ void CalculateLevelStats(CLevelStats& Stats)
 	Stats.m_nMaxCount = nCountMax;
 	*/
 }
-void DisplayLevelStatus( CLevelStats& Stats)
+void DisplayLevelStats( CLevelStats& Stats)
 {
 	bool	bRunning = true;
 	int nPage = 0;
@@ -255,27 +284,7 @@ void DisplayLevelStatus( CLevelStats& Stats)
 
 				// Sprite type 'friendly name' (from blocks.h)?
 				std::string sType;
-				int iType = ED_GetSpriteType( pair.first, pair.second );
-				if (iType>0 && iType<TYPE_LASTONE)
-				{
-					sType = block_type_names[iType];
-
-					// If it's a 'box', handle this as a special case to also show name of what's inside the box
-					if (iType==TYPE_BOX)
-					{
-						int c = ED_GetSpriteExtra(pair.first, pair.second, 10);
-						int d = ED_GetSpriteExtra(pair.first, pair.second, 11);
-						int iTypeContents = ED_GetSpriteType( c,d );
-						sType += " [";
-						if (iTypeContents>=0 && TYPE_LASTONE)
-							sType += block_type_names[iTypeContents];
-						else
-							sType += "(error: invalid box contents - check in spreditor!)";
-						sType += "]";
-					}
-				}
-				else if (iType>=TYPE_LASTONE)//<- dj2017-06 hm, that should probably be ">" as TYPE_LASTONE maybe reserved for possible use? Not sure anyway whatever
-					sType += "(error: invalid type - check in spreditor!)";
+				sType = GetFriendlyTypeName( pair.first, pair.second );
 
 				djgSetColorFore( pVisMain, djColor(60,60,60) );
 				djgDrawVLine( pVisMain, xleft+16+8 + 136+9*8+9*8, y*16, 16 );
@@ -313,6 +322,7 @@ void DisplayLevelStatus( CLevelStats& Stats)
 		if (g_iKeys[DJKEY_ESC])
 			bRunning = false;
 
+		// dj2017-07 [fixmelow] this isn't quite right, it's the normal handlemouse so if you click on now invisible spriteset, it 'handles' it etc. even though we're in stats view, urgh
 		if (!HandleMouse ())
 			bRunning = false;
 
@@ -320,6 +330,7 @@ void DisplayLevelStatus( CLevelStats& Stats)
 
 	ED_ClearScreen();
 	RedrawView();
+	ED_FlipBuffers();//dj2017-07 Moving this out of RedrawView as we want it after handling keys etc. in level mainloop
 }
 //---------------------------------------------------------------------------
 void SetDocumentDirty(bool bDirty)
@@ -519,7 +530,7 @@ switch_e LVLED_MainLoop ()
 			{
 				CLevelStats Stats;
 				CalculateLevelStats(Stats);
-				DisplayLevelStatus(Stats);
+				DisplayLevelStats(Stats);
 	//crudeworkaround to prevent double-escape-press handling since we do crappy keyhandling all over the palce in here .. really we should be detecting keyup/down events etc. .. but it's "just" the leveleditor so not a prio [dj2017-06]
 	SDL_Delay(200);
 			}
@@ -562,6 +573,8 @@ switch_e LVLED_MainLoop ()
 				}
 			}
 		}
+
+		ED_FlipBuffers();//dj2017-07 Moving this out of RedrawView as we want it after handling keys etc. in level mainloop
 	} // while (bRunning)
 
 	ED_ClearScreen();
@@ -605,6 +618,21 @@ bool HandleMouse ()
 			SetSpriteSelection( ED_GetCurrSpriteSet(), ay * 16 + ax, sprite1a, sprite1b );
 		else if (mouse_b & 2)
 			SetSpriteSelection( sprite0a, sprite0b, ED_GetCurrSpriteSet(), ay * 16 + ax );
+
+		// Rectangle around sprite under mouse
+		djgSetColorFore( pVisMain, djColor(127,127,127) );
+		djgDrawRectangle( pVisMain,
+			POS_LEVELSPRITES_X + ax*16 - 1,
+			POS_LEVELSPRITES_Y + ay*16 - 1,
+			16+2,
+			16+2 );
+
+		//dj2017-07 Show sprite type info
+		std::string sType = GetFriendlyTypeName( ED_GetCurrSpriteSet(), ay * 16 + ax );
+		if (!sType.empty())
+			sType = std::string("Type:") + sType;
+		if (!sType.empty())
+			ED_DrawString( 0, POS_LEVELSPRITES_Y+16*8, sType.c_str() );
 	}
 	// main editting area
 	else if (INBOUNDS( mouse_x, mouse_y, 0, 0, 128 * LEVEL_GRIDSIZE - 1, 100 * LEVEL_GRIDSIZE - 1 ))
@@ -702,7 +730,7 @@ void RedrawView ()
 	DrawMinimap();
 	DrawLevelname();
 	ShowMacros();
-	ED_FlipBuffers ();
+	//ED_FlipBuffers ();
 }
 
 
