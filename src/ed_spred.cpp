@@ -65,7 +65,7 @@ static const char *sprite_instructions[NUM_SPRITE_INSTRUCTIONS] =
 
 
 static void HandleMouse(bool bCtrl);
-static void RedrawView ();
+static void SpriteEd_RedrawView ();
 static void SetSprite ( int new_sprite );
 static void SpriteShowExtras ( int c );
 static void SpriteDrawFlags();
@@ -107,7 +107,7 @@ switch_e SPRED_MainLoop ()
 		// Try prevent CPU hogging a bit ..
 //		SDL_Delay(10);
 
-		RedrawView ();
+		SpriteEd_RedrawView ();
 
 		djiPoll();
 
@@ -244,10 +244,10 @@ void HandleMouse(bool bCtrl)
 
 /*
 ===============
-RedrawView
+SpriteEd_RedrawView
 ===============
 */
-void RedrawView ()
+void SpriteEd_RedrawView ()
 {
 	ED_ClearScreen ();
 	ShowInstructions ();
