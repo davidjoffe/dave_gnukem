@@ -1,3 +1,0 @@
-default.gam
-foo.gam
-tog/tog.gam
