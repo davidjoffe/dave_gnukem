@@ -15,6 +15,7 @@ License: GNU GPL Version 2
 
 #include "game.h"
 #include "hero.h"
+#include "config.h"
 
 //! Convert world X coordinate (level block coordinate) to view (world display buffer) coordinates.
 #define CALC_XOFFSET(x,xsmall) ( 8 * ( (xsmall) - xo_small + 2 + ((( (x) - xo ) << 1))) )
@@ -492,8 +493,6 @@ public:
 	virtual void Draw();
 
 	int m_countdown;
-	int m_xOffset;
-	int m_yOffset;
 };
 /*-----------------------------------------------------------*/
 /*!
@@ -783,7 +782,7 @@ protected:
 \class CAcme
 \nosubgrouping
 
-Acme falling block
+Acme falling block that drops when you walk under it (harms you if it hits you, though you can shoot it for points)
 */
 class CAcme : public CThing
 {
@@ -794,7 +793,8 @@ public:
 	virtual int  Tick();
 	virtual int  OnHeroShot();
 protected:
-	int m_nHeight; // -1 when not moving. Starts at 0, increases as falls downwards
+	int m_nState;
+	int m_nCounter;
 };
 /*-----------------------------------------------------------*/
 /*!

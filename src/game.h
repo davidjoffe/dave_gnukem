@@ -19,6 +19,7 @@ class CBullet;
 #include <cstddef>//NULL
 #include <vector>
 using namespace std;
+#include "config.h"
 
 //! Visible 'blocks' on X axis in game viewport
 extern int VIEW_WIDTH;

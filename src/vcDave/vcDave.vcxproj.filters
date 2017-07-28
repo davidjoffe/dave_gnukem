@@ -278,6 +278,9 @@
     <ClInclude Include="..\thing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\documentation\doxygen\doxygen.cfg">

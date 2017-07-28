@@ -1767,14 +1767,17 @@ void DrawDebugInfo()
 		if (pThing->IsInView())
 		{
 			nNumVisible++;
+			// The following is um 'wrong' the red one. The purple one more 'correct', incorporates m_xoffset,m_yoffset (NB note lowercase) [dj2017-07-28]
 			djgDrawRectangle(pVisView,
 				CALC_XOFFSET(pThing->m_x,pThing->m_xsmall)+pThing->m_iVisibleX1,
 				CALC_YOFFSET(pThing->m_y)+pThing->m_iVisibleY1,
 				(pThing->m_iVisibleX2-pThing->m_iVisibleX1)+1,
 				(pThing->m_iVisibleY2-pThing->m_iVisibleY1)+1);
+			// New purple box [dj2017-07] takes m_xoffset/m_yoffset into account
+			djgSetColorFore(pVisView,djColor(200,0,200));
 			djgDrawRectangle(pVisView,
-				1 + (CALC_XOFFSET(pThing->m_x,pThing->m_xsmall)+pThing->m_iVisibleX1),
-				1 + (CALC_YOFFSET(pThing->m_y)+pThing->m_iVisibleY1),
+				1 + (CALC_XOFFSET(pThing->m_x,pThing->m_xsmall)+pThing->m_iVisibleX1 + pThing->m_xoffset),
+				1 + (CALC_YOFFSET(pThing->m_y)+pThing->m_iVisibleY1                  + pThing->m_yoffset),
 				(pThing->m_iVisibleX2-pThing->m_iVisibleX1)-1,
 				(pThing->m_iVisibleY2-pThing->m_iVisibleY1)-1);
 		}
