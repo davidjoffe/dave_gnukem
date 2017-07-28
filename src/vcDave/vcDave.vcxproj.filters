@@ -159,6 +159,9 @@
     <ClCompile Include="..\thing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\thing_monsters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\djgamelib.h">
@@ -280,6 +283,9 @@
     </ClInclude>
     <ClInclude Include="..\config.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thing_monsters.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

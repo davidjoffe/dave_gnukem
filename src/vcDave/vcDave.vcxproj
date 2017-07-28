@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\thing_monsters.cpp" />
     <ClCompile Include="..\win32\winmain.cpp" />
     <ClCompile Include="..\sdl\djgraph.cpp" />
     <ClCompile Include="..\sdl\djinput.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="..\sys_error.h" />
     <ClInclude Include="..\sys_log.h" />
     <ClInclude Include="..\thing.h" />
+    <ClInclude Include="..\thing_monsters.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\documentation\doxygen\doxygen.cfg">

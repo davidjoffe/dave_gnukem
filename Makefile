@@ -1,10 +1,11 @@
 #
 # David Joffe
-# Copyright 1998-2016 David Joffe
+# Copyright 1998-2017 David Joffe
 # Created 1998/12
-# makefile for Dave Gnukem
+# Makefile for Dave Gnukem
 #
 # 2016-10: Get this working on Mac OS X [dj]
+# 2017-07-29: Remove obsolete standalone-editor-related stuff, and add new thing_monsters.o
 #
 
 CPP = g++
@@ -26,7 +27,6 @@ CCFLAGS = -Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
 
 LIBS = -lSDL -lSDLmain -lSDL_mixer -lpthread 
 BIN = davegnukem
-BINED = ed
 
 
 ifeq ($(OS),Windows_NT)
@@ -66,6 +66,7 @@ OBJFILES = src/main.o     src/graph.o   src/game.o         src/menu.o\
            src/block.o    src/credits.o src/instructions.o src/djstring.o \
            src/djimage.o  src/djlog.o   src/inventory.o    src/mission.o\
            src/hiscores.o src/mixins.o  src/thing.o        src/hero.o \
+           src/thing_monsters.o \
            src/level.o    src/settings.o src/keys.o \
            src/djtypes.o  src/bullet.o \
            src/ed.o src/ed_DrawBoxContents.o src/ed_common.o src/ed_lvled.o \
@@ -74,25 +75,13 @@ OBJFILES = src/main.o     src/graph.o   src/game.o         src/menu.o\
            src/sdl/djtime.o \
            src/sys_error.o src/sys_log.o src/m_misc.cpp
 
-OBJFILESED = src/graph.o   src/ed_standalone_original.o  \
-           src/block.o     src/djstring.o \
-           src/djimage.o  src/djlog.o    src/mission.o\
-           src/mixins.o  src/level.o \
-           src/djtypes.o \
-           src/sdl/djgraph.o src/sdl/djinput.o src/sdl/djsound.o \
-           src/sdl/djtime.o \
-           src/sys_error.o src/sys_log.o src/m_misc.o
-
 default: gnukem
 
 gnukem: $(OBJFILES)
 	$(CPP) -o $(BIN) $(OBJFILES) $(LIBS)
 
-ed: $(OBJFILESED)
-	$(CPP) -o $(BINED) $(OBJFILESED) $(LIBS)
-
 clean:
-	rm -f $(BIN) $(BINED) *~ core \#*
+	rm -f $(BIN) *~ core \#*
 	find src -name '*.o' | xargs rm -f
 
 dist:
@@ -100,10 +89,10 @@ dist:
 	find src -name '*.o' | xargs rm -f
 
 linecount:
-	cat src/*.cpp src/*.h src/linux/*.cpp  | wc -l
+	cat src/*.cpp src/*.h src/sdl/*.h src/sdl/*.cpp | wc -l
 
 fixme:
-	ls src/*.c src/*.cpp src/linux/*.cpp src/*.h | xargs grep -i fixme
+	ls src/*.c src/*.cpp src/*.h | xargs grep -i fixme
 
 %.o: %.c
 	$(CPP) $(CCFLAGS) -c $< -o $@
