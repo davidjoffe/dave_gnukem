@@ -13,13 +13,7 @@ License: GNU GPL Version 2
 /*--------------------------------------------------------------------------*/
 #include <vector>
 using namespace std;
-/*--------------------------------------------------------------------------*/
-// These should be dynamic, to allow any size level. I initially made
-// restrictions because of the memory limitations in the DOS world.
-#define LEVEL_WIDTH  128
-#define LEVEL_HEIGHT 100
-//! Size in bytes of the in-memory level 'data block'. See comments at \ref SLevelBlock below for where this 4 comes from (in short: foreground block (a,b) + background block(a,b), where a=spritesetindex and b=offsetintospriteset)
-#define LEVEL_SIZE   (4 * LEVEL_WIDTH * LEVEL_HEIGHT)
+#include "config.h"
 /*--------------------------------------------------------------------------*/
 extern vector<unsigned char * > apLevels;
 /*--------------------------------------------------------------------------*/

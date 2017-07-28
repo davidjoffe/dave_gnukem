@@ -17,7 +17,7 @@ Please donate to the project, or else I'll make more games like this: https://pa
 
 Created by: David Joffe http://djoffe.com/ / https://www.liveedu.tv/david_joffe/
 
-The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: T.O.G, Vytautas Shaltenis, Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
+The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: T.O.G, [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
 As of 8 Oct 2016, this project is under 'properly' active development again, and the goal/intention is to get to a 'version 1' by no later than Oct 2017.
 
@@ -74,8 +74,9 @@ Power boots allow you to jump higher. The special molecule pickup gives you full
 Recent:
 
 * Add new floor type that auto-crumbles after hero walks or jumps twice on it (2nd spriteset, position 5x4 - place only 1 block per segment)
+* Basic more proper/correct implementation of the CAcme falling blocks
 
-2017/06/22 - Version 0.71 [Windows only]:
+2017/06/22 - Version 0.71 [Linux/Mac source, binary Windows only]:
 
 * Add new 'flying robot' monster type
 * Implemented access card and access card 'door' and door activator
@@ -87,7 +88,7 @@ Recent:
 * New keyboard shortcuts: Shift+F6/F7: Dec/Inc speed (framerate)
 * Fix soda can not animating
 
-2017/06/22 - Version 0.70 [Windows only]
+2017/06/22 - Version 0.70 [Linux/Mac source, binary Windows only]
 
 * Add new basic 'Instructions' option to in-game menu
 * Fix: Potential game 'freeze' in teleporter if exiting level editor (or holding in action key)
@@ -97,7 +98,7 @@ Recent:
 * Add hero jump/landing sounds (credit for the sounds: Juhani Junkala), key pick-up sound, and more
 * Increase gameplay viewport width from 12 to 13 blocks
 
-2016/10/29 - Version 0.66 [Windows only]
+2016/10/29 - Version 0.66 [Linux/Mac source, binary Windows only]
 
 * Add shortcut key to toggle sounds on/off (Insert)
 * Fix: On Windows, game window often starts slightly off bottom of screen

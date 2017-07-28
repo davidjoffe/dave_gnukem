@@ -165,6 +165,7 @@
     <ClCompile Include="..\thing.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\config.h" />
     <ClInclude Include="..\djgamelib.h" />
     <ClInclude Include="..\djgraph.h" />
     <ClInclude Include="..\djimage.h" />

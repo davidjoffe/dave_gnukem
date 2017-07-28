@@ -555,14 +555,12 @@ void CLift::HeroLeave()
 /*-----------------------------------------------------------*/
 CExplosion::CExplosion()
 {
-	m_countdown = 4;
+	m_countdown = 6;
 	m_xoffset   = 0;
 	m_yoffset   = 0;
 	m_width     = 1;
 	m_iType     = -1; // fixme
 	m_eLayer    = LAYER_TOP;
-	m_xOffset   = 0;
-	m_yOffset   = 0;
 }
 
 int CExplosion::Tick()
@@ -575,7 +573,7 @@ int CExplosion::Tick()
 
 void CExplosion::Draw()
 {
-	DRAW_SPRITE16A(pVisView, 5, 16 + (3 - m_countdown), CALC_XOFFSET(m_x,m_xsmall) + m_xOffset, CALC_YOFFSET(m_y) + m_yOffset);
+	DRAW_SPRITE16A(pVisView, 5, 16 + (3 - ((m_countdown+2)%4)), CALC_XOFFSET(m_x,m_xsmall) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 }
 /*-----------------------------------------------------------*/
 CExit::CExit()
@@ -1115,7 +1113,7 @@ void CCrawler::Draw()
 int CCrawler::OnHeroShot()
 {
 	update_score(100, m_x, m_y);
-	AddThing(CreateExplosion(m_x*16, m_y*16));
+	AddThing(CreateExplosion(m_x*16, m_y*16+m_nOffset));
 	return THING_DIE;
 }
 
@@ -1218,72 +1216,95 @@ int CBalloon::OnHeroShot()
 	return THING_DIE;
 }
 /*-----------------------------------------------------------*/
-CAcme::CAcme()
+CAcme::CAcme() :
+	m_nState(0),
+	m_nCounter(0)
 {
-	m_nHeight = -1;
 	m_eLayer = LAYER_TOP;
-	SetActionBounds (0,0,31,15);
-	SetVisibleBounds(0,0,31,15);
+	SetActionBounds (0,0,BLOCKW*2-1,BLOCKH-1);
+	SetVisibleBounds(0,0,BLOCKW*2-1,BLOCKH-1);
+	SetShootBounds  (0,0,BLOCKW*2-1,BLOCKH-1);
+	m_bShootable = true;
 }
 
 int CAcme::HeroOverlaps()
 {
 	// FIXME: Create some sort of explosion here
 	update_health(-1);
+	AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), m_y*BLOCKH+m_yoffset));
 	return THING_DIE;
 }
 
 void CAcme::Draw()
 {
-	if (m_nHeight>=0 && m_nHeight<16) // Shake up and down phase
-	{
-		int nOffset = (m_nHeight/4) % 2;
-		DRAW_SPRITE16(pVisView, m_a, m_b,   CALC_XOFFSET(m_x  ,m_xsmall), CALC_YOFFSET(m_y) + (nOffset==0?-1:1));
-		DRAW_SPRITE16(pVisView, m_a, m_b+1, CALC_XOFFSET(m_x+1,m_xsmall), CALC_YOFFSET(m_y) + (nOffset==0?-1:1));
-	}
-	else
-	{
-		// Falling phase
-		DRAW_SPRITE16(pVisView, m_a, m_b,   CALC_XOFFSET(m_x  ,m_xsmall), CALC_YOFFSET(m_y) + MAX(0, m_nHeight));
-		DRAW_SPRITE16(pVisView, m_a, m_b+1, CALC_XOFFSET(m_x+1,m_xsmall), CALC_YOFFSET(m_y) + MAX(0, m_nHeight));
-	}
+	DRAW_SPRITE16(pVisView, m_a, m_b  , CALC_XOFFSET(m_x  ,0) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
+	DRAW_SPRITE16(pVisView, m_a, m_b+1, CALC_XOFFSET(m_x+1,0) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 }
 
 int CAcme::Tick()
 {
-	// FIXME: Implement some up-n-down etc
-	if (m_nHeight==-1)
+	switch (m_nState)
 	{
-		// Test if we are above hero. FIXME: Also test if within view bounds
+	case 0:// Normal default state
+
+		// Test if we are above hero.
+// FIXME I think this doesn't work for half-block under - it should
+// FIXME Also use check_solid for problem of if solid above us but below Acme, then shouldn't fall (I think (??))
 		if ((x>=m_x) && (x<=m_x+1) && (y>m_y))
 		{
-			m_nHeight = 0; // Start falling
-			m_bShootable = true;
+			// Start breaking off (first shake up & down)
+			++m_nState;
 		}
-	}
-	else if (m_nHeight<16)
-	{
-		m_nHeight += 2;
-	}
-	else
-	{
-		m_nHeight += 8;
-//		if (m_nHeight>512) // FIXME. Implement proper behaviour
-//			return THING_DIE;
-		SetActionBounds (0,m_nHeight,31,15+m_nHeight);
-		// Fixme, set always
-		SetVisibleBounds(0,m_nHeight,31,15+m_nHeight);
-		SetShootBounds  (0,m_nHeight,31,15+m_nHeight);
+		break;
+	case 1:// Shake up and down briefly when activated
+		switch (m_nCounter % 4)//Modulo 4
+		{
+		case 0: m_yoffset = -1; break;
+		case 1: m_yoffset = -1; break;
+		case 2: m_yoffset =  1; break;
+		case 3: m_yoffset =  1; break;
+		}
+		++m_nCounter;
+		if (m_nCounter>20)
+		{
+			++m_nState;
+			m_yoffset = 0;
+		}
+		break;
+	case 2://Falling (initial little bit) - Don't start collision detection until we've fallen at least past the block we're attached to, otherwise it immediately explodes
+		m_yoffset += 2;
+		if (m_yoffset>=BLOCKH)
+		{
+			m_yoffset -= BLOCKH;
+			++m_y;
+			++m_nState;
+		}
+		break;
+	case 3://Falling
+		m_yoffset += 4;
+		while (m_yoffset > BLOCKH)
+		{
+			m_yoffset -= BLOCKH;
+			++m_y;
+		}
 
-		if (CheckCollision(m_x*16+m_iVisibleX1, m_y*16+m_iVisibleY1, m_x*16+m_iVisibleX2, m_y*16+m_iVisibleY2))
+		// If hit bottom of level or collide with solid, explode
+		if (m_y>=LEVEL_HEIGHT-1 || CheckCollision(m_x*16+m_iVisibleX1, m_y*16+m_iVisibleY1 + m_yoffset, m_x*16+m_iVisibleX2, m_y*16+m_iVisibleY2 + m_yoffset))
+		{
+			AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), m_y*BLOCKH+m_yoffset));
 			return THING_DIE;
+		}
+
+		break;
 	}
+	
 	return 0;
 }
 
 int CAcme::OnHeroShot()
 {
-	update_score(500, m_x, m_y);
+	update_score(500, m_x, m_y+m_yoffset);
+	AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), m_y*BLOCKH+m_yoffset));
 	return THING_DIE;
 }
 
@@ -1686,7 +1707,6 @@ void CCrumblingFloor::Draw()
 void CCrumblingFloor::Initialize(int b0, int b1)
 {
 	// Expand sideways right/left until we hit solid
-	const int LEVEL_WIDTH=128;
 	while (m_x+m_nWidth<LEVEL_WIDTH && !check_solid(m_x+m_nWidth,m_y,false))
 	{
 		++m_nWidth;
@@ -2141,9 +2161,8 @@ CThing *CreateFloatingScore(int x, int y, int score)
 CThing *CreateExplosion(int nX, int nY)
 {
 	CExplosion *pExplosion = new CExplosion;
-	pExplosion->SetPosition(nX/16, nY/16);
-	pExplosion->m_xOffset = 0;//nX % 16;
-	pExplosion->m_yOffset = nY % 16;
+	pExplosion->SetLocation( nX/BLOCKW, nY/BLOCKH, nX % BLOCKW, nY % BLOCKH, BLOCKW, BLOCKH );
+	pExplosion->SetVisibleBounds( 0, 0, BLOCKW-1, BLOCKH-1 );
 	djSoundPlay( g_iSounds[SOUND_SOFT_EXPLODE] );
 	return pExplosion;
 }
