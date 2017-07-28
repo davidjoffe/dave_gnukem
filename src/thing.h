@@ -115,6 +115,10 @@ extern CThingFactory g_ThingFactory;
 	} \
 	static int UNIQUEID##ClassName = g_ThingFactory.Register(nTypeID, ALLOCATE##ClassName, pPerLevelInitProc);
 
+/*-----------------------------------------------------------*/
+// [dj2017-07-29] This is to work around, REGISTER_THING doesn't work on MSVC in new separate thing_monsters.cpp
+extern void RegisterThings_Monsters();
+/*-----------------------------------------------------------*/
 
 /*-----------------------------------------------------------*/
 /*!

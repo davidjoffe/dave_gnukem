@@ -12,9 +12,24 @@ License: GNU GPL Version 2
 #include "graph.h"//pVisView etc.
 
 /*-----------------------------------------------------------*/
+//! Macro that "thing"s can use (in the .cpp file) to register handlers in the thing factory
+#define ALLOCATE_FUNCTION(ClassName)	\
+	CThing *ALLOCATE##ClassName() \
+	{ \
+		return new ClassName; \
+	}
+#define REGISTER_THING2(ClassName, nTypeID)	g_ThingFactory.Register(nTypeID, ALLOCATE##ClassName, NULL)
+/*-----------------------------------------------------------*/
+ALLOCATE_FUNCTION(CRobot);
+ALLOCATE_FUNCTION(CFlyingRobot);
+/*-----------------------------------------------------------*/
 // Register these classes in the object factory, for creating instances on level load etc.
-REGISTER_THING(CRobot,         TYPE_ROBOT, NULL);
-REGISTER_THING(CFlyingRobot,   TYPE_FLYINGROBOT, NULL);
+// Register these at runtime (can't use REGISTER_THING as it seems to not work on Windows/MSVC, I think because it gets called before the object factory's constructor gets called - dj2017-07)
+void RegisterThings_Monsters()
+{
+	REGISTER_THING2(CRobot,			TYPE_ROBOT);
+	REGISTER_THING2(CFlyingRobot,	TYPE_FLYINGROBOT);
+}
 /*-----------------------------------------------------------*/
 
 /*-----------------------------------------------------------*/
