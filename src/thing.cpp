@@ -1272,7 +1272,7 @@ int CAcme::Tick()
 		}
 		break;
 	case 2://Falling (initial little bit) - Don't start collision detection until we've fallen at least past the block we're attached to, otherwise it immediately explodes
-		m_yoffset += 2;
+		m_yoffset += 4;
 		if (m_yoffset>=BLOCKH)
 		{
 			m_yoffset -= BLOCKH;
@@ -1281,7 +1281,7 @@ int CAcme::Tick()
 		}
 		break;
 	case 3://Falling
-		m_yoffset += 4;
+		m_yoffset += 8;
 		while (m_yoffset > BLOCKH)
 		{
 			m_yoffset -= BLOCKH;
@@ -1303,7 +1303,7 @@ int CAcme::Tick()
 
 int CAcme::OnHeroShot()
 {
-	update_score(500, m_x, m_y+m_yoffset);
+	update_score(500, m_x, m_y/*+m_yoffset*/);
 	AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), m_y*BLOCKH+m_yoffset));
 	return THING_DIE;
 }
