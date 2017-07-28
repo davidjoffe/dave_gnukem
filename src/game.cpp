@@ -252,6 +252,9 @@ void GameInitialSetup()
 		pSkinGame->Load( FILE_GAMESKIN );
 		djCreateImageHWSurface( pSkinGame );
 	}
+
+	// Register the "thing"'s that need to be registered dynamically at runtime [dj2017-07-29]
+	RegisterThings_Monsters();
 }
 
 // Final cleanup
