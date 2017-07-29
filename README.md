@@ -69,6 +69,10 @@ To open doors, find the correct color key, and press the action key on the 'lock
 
 Power boots allow you to jump higher. The special molecule pickup gives you full health.
 
+### 'Floating' Draft/Beta Storyline:
+
+The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the CIA to infect the world's computers with a virus called SystemD, crippling them. Only you can stop him. You must find a floppy disk with the Devuan Antivirus on it, and install it on the master computer, which is hidden in Vault7.
+
 # Ports
 
 * Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/
