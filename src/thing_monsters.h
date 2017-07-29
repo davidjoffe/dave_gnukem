@@ -58,6 +58,12 @@ protected:
 	bool IsDying() const { return m_nDieAnim>0; }
 };
 /*-----------------------------------------------------------*/
+/*!
+\class CRabbit
+\nosubgrouping
+
+This constitutes the approximate equivalent of DN1 rabbits (for now, or maybe permanently, this is just a sort of 'evil Tux')
+*/
 class CRabbit : public CThing
 {
 public:
@@ -71,6 +77,26 @@ protected:
 	int m_nXDir; // -1=face left, 1=face right
 	int m_nWalkAnimOffset;
 	int m_nWalkAnimOffsetUpdateCounter;
+};
+/*-----------------------------------------------------------*/
+/*!
+\class CHighVoltage
+\nosubgrouping
+
+High-voltage "barrier" that must be shot multiple times to destroy before hero can pass through. Touching it results in immediate death.
+*/
+class CHighVoltage : public CThing
+{
+public:
+	CHighVoltage();
+	virtual void Initialize(int a, int b);
+	virtual void Draw();
+	virtual int Tick();
+	virtual int HeroOverlaps();
+	virtual int OnHeroShot();
+protected:
+	int m_nStrength;
+	int m_nHeight;//Height (in game blocks) - this is comparable to the width of the crumbling floors (same principle, just vertical instead)
 };
 /*-----------------------------------------------------------*/
 
