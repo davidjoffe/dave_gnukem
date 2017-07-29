@@ -345,7 +345,8 @@ int CRabbit::Tick()
 {
 	if (++m_nWalkAnimOffsetUpdateCounter>=2)
 	{
-		m_nWalkAnimOffset = ++m_nWalkAnimOffset % 4;
+		++m_nWalkAnimOffset;
+		m_nWalkAnimOffset = m_nWalkAnimOffset % 4;
 		m_nWalkAnimOffsetUpdateCounter = 0;
 
 		// IF BUMP INTO SOMETHING SOLID, REVERSE DIRECTION
