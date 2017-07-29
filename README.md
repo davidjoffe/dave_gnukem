@@ -77,6 +77,7 @@ Power boots allow you to jump higher. The special molecule pickup gives you full
 
 Recent:
 
+* Add new monster that constitutes the approximate equivalent of DN1 rabbits (for now, or maybe permanently, this is just a sort of 'evil Tux' - not sure yet if placeholder sprite, or part of plot)
 * Add new floor type that auto-crumbles after hero walks or jumps twice on it (2nd spriteset, position 5x4 - place only 1 block per segment)
 * Basic more proper/correct implementation of the CAcme falling blocks
 

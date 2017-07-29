@@ -58,5 +58,20 @@ protected:
 	bool IsDying() const { return m_nDieAnim>0; }
 };
 /*-----------------------------------------------------------*/
+class CRabbit : public CThing
+{
+public:
+	CRabbit();
+	virtual void Initialize(int a, int b);
+	virtual void Draw();
+	virtual int Tick();
+	virtual int HeroOverlaps();
+	virtual int OnHeroShot();
+protected:
+	int m_nXDir; // -1=face left, 1=face right
+	int m_nWalkAnimOffset;
+	int m_nWalkAnimOffsetUpdateCounter;
+};
+/*-----------------------------------------------------------*/
 
 #endif

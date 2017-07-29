@@ -22,6 +22,7 @@ License: GNU GPL Version 2
 /*-----------------------------------------------------------*/
 ALLOCATE_FUNCTION(CRobot);
 ALLOCATE_FUNCTION(CFlyingRobot);
+ALLOCATE_FUNCTION(CRabbit);
 /*-----------------------------------------------------------*/
 // Register these classes in the object factory, for creating instances on level load etc.
 // Register these at runtime (can't use REGISTER_THING as it seems to not work on Windows/MSVC, I think because it gets called before the object factory's constructor gets called - dj2017-07)
@@ -29,6 +30,7 @@ void RegisterThings_Monsters()
 {
 	REGISTER_THING2(CRobot,			TYPE_ROBOT);
 	REGISTER_THING2(CFlyingRobot,	TYPE_FLYINGROBOT);
+	REGISTER_THING2(CRabbit,		TYPE_RABBIT);
 }
 /*-----------------------------------------------------------*/
 
@@ -307,5 +309,91 @@ int CFlyingRobot::Tick()
 	}
 
 	return CThing::Tick();
+}
+/*-----------------------------------------------------------*/
+CRabbit::CRabbit() :
+	m_nXDir(1),
+	m_nWalkAnimOffset(0),
+	m_nWalkAnimOffsetUpdateCounter(0)
+{
+}
+void CRabbit::Initialize(int a, int b)
+{
+	// So if you have a bunch, they aren't necessarily all walking exactly in sync:
+	m_nWalkAnimOffset = rand()%4;
+	SetVisibleBounds(0,-BLOCKH,BLOCKW*2,BLOCKH-1);
+	SetShootBounds  (0,-BLOCKH,BLOCKW*2,BLOCKH-1);
+	SetActionBounds (0,-BLOCKH,BLOCKW*2,BLOCKH-1);
+	SetLayer(LAYER_4);
+	m_bShootable = true;
+}
+void CRabbit::Draw()
+{
+	const int a=6;//Spriteset number
+	const int b=(m_nXDir>0 ? 6*16 : 6*16 + 8);//Sprite number within spriteset
+	int x = CALC_XOFFSET(m_x,0) + m_xoffset;
+	int y = CALC_YOFFSET(m_y  ) + m_yoffset;
+	DRAW_SPRITE16A(pVisView,a,   b+m_nWalkAnimOffset*2  ,x   ,y-16);//TL
+	DRAW_SPRITE16A(pVisView,a,   b+m_nWalkAnimOffset*2+1,x+16,y-16);//TR
+	DRAW_SPRITE16A(pVisView,a,16+b+m_nWalkAnimOffset*2  ,x   ,y   );//BL
+	DRAW_SPRITE16A(pVisView,a,16+b+m_nWalkAnimOffset*2+1,x+16,y   );//BR
+}
+int CRabbit::Tick()
+{
+	if (++m_nWalkAnimOffsetUpdateCounter>=2)
+	{
+		m_nWalkAnimOffset = ++m_nWalkAnimOffset % 4;
+		m_nWalkAnimOffsetUpdateCounter = 0;
+
+		// IF BUMP INTO SOMETHING SOLID, REVERSE DIRECTION
+		if ((check_solid(m_x + m_nXDir, m_y)) || (!check_solid(m_x + m_nXDir, m_y + 1)))
+		{
+			m_nXDir = -m_nXDir;
+			//return 0;
+			m_xoffset = 0;
+		}
+
+		// Walking left?
+		if (m_nXDir<0)
+		{
+			m_xoffset += m_nXDir*2;
+			while (m_xoffset < -BLOCKW)
+			{
+				m_xoffset += BLOCKW;
+				--m_x;
+			}
+		}
+		// Walking right?
+		else if (m_nXDir>0)
+		{
+			m_xoffset += m_nXDir*2;
+			while (m_xoffset > BLOCKW)
+			{
+				m_xoffset -= BLOCKW;
+				++m_x;
+			}
+		}
+	}
+	
+	return CThing::Tick();
+}
+int CRabbit::HeroOverlaps()
+{
+	if (!HeroIsHurting())
+	{
+		update_health(-1);
+		HeroSetHurting();
+	}
+	// Start death animation [TODO]
+	update_score(100, m_x, m_y);
+	AddThing(CreateExplosion(m_x*BLOCKW + 8, m_y*BLOCKH - 8));
+	return THING_DIE;
+}
+int CRabbit::OnHeroShot()
+{
+	// Start death animation [TODO]
+	update_score(200, m_x, m_y);// [fixmeLOW] Should get more points for shooting than stupidly walking into it? [dj2017]
+	AddThing(CreateExplosion(m_x*BLOCKW + 8, m_y*BLOCKH - 8));
+	return THING_DIE;
 }
 /*-----------------------------------------------------------*/
