@@ -10,7 +10,7 @@ License: GNU GPL Version 2
 #ifndef _BLOCK_H_
 #define _BLOCK_H_
 
-//! Block type enumeration
+//! Block type enumeration (NB: If add more here, remember to also extend \ref block_type_names)
 enum EBlockType
 {
 	TYPE_NOTHING = 0,
@@ -92,6 +92,8 @@ enum EBlockType
 	TYPE_ROBOT,
 	//! 45 Monster - Small flying robot that follows you slowly-ish [dj2017-06-30]
 	TYPE_FLYINGROBOT,
+	//! 46 Rabbit-equivalent (disclaimer: may or may not be a rabbit) [dj2017-07-29]
+	TYPE_RABBIT,
 	//! Highest used block value
 	TYPE_LASTONE
 };
