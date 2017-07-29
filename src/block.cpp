@@ -56,5 +56,6 @@ const char * block_type_names[TYPE_LASTONE+1] =
    "44 Robot",
    "45 Flying Robot",
    "46 Rabbit(ish)",
-   "47 LastOne"
+   "47 HighVoltage barrier",
+   "48 LastOne"
 };

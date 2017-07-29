@@ -23,6 +23,7 @@ License: GNU GPL Version 2
 ALLOCATE_FUNCTION(CRobot);
 ALLOCATE_FUNCTION(CFlyingRobot);
 ALLOCATE_FUNCTION(CRabbit);
+ALLOCATE_FUNCTION(CHighVoltage);
 /*-----------------------------------------------------------*/
 // Register these classes in the object factory, for creating instances on level load etc.
 // Register these at runtime (can't use REGISTER_THING as it seems to not work on Windows/MSVC, I think because it gets called before the object factory's constructor gets called - dj2017-07)
@@ -31,6 +32,7 @@ void RegisterThings_Monsters()
 	REGISTER_THING2(CRobot,			TYPE_ROBOT);
 	REGISTER_THING2(CFlyingRobot,	TYPE_FLYINGROBOT);
 	REGISTER_THING2(CRabbit,		TYPE_RABBIT);
+	REGISTER_THING2(CHighVoltage,	TYPE_HIGHVOLTAGE);
 }
 /*-----------------------------------------------------------*/
 
@@ -319,6 +321,7 @@ CRabbit::CRabbit() :
 }
 void CRabbit::Initialize(int a, int b)
 {
+	CThing::Initialize(a,b);
 	// So if you have a bunch, they aren't necessarily all walking exactly in sync:
 	m_nWalkAnimOffset = rand()%4;
 	SetVisibleBounds(0,-BLOCKH,BLOCKW*2,BLOCKH-1);
@@ -349,7 +352,6 @@ int CRabbit::Tick()
 		if ((check_solid(m_x + m_nXDir, m_y)) || (!check_solid(m_x + m_nXDir, m_y + 1)))
 		{
 			m_nXDir = -m_nXDir;
-			//return 0;
 			m_xoffset = 0;
 		}
 
@@ -395,5 +397,68 @@ int CRabbit::OnHeroShot()
 	update_score(200, m_x, m_y);// [fixmeLOW] Should get more points for shooting than stupidly walking into it? [dj2017]
 	AddThing(CreateExplosion(m_x*BLOCKW + 8, m_y*BLOCKH - 8));
 	return THING_DIE;
+}
+/*-----------------------------------------------------------*/
+CHighVoltage::CHighVoltage() :
+	m_nStrength(10),
+	m_nHeight(1)
+{
+}
+void CHighVoltage::Initialize(int a, int b)
+{
+	CThing::Initialize(a,b);
+	SetLayer(LAYER_4);
+	m_bShootable = true;
+
+	// Expand downwards until we hit solid
+	m_nHeight = 1;
+	while (m_y+m_nHeight<LEVEL_HEIGHT&& !check_solid(m_x,m_y+m_nHeight,false))
+	{
+		++m_nHeight;
+	}
+	SetVisibleBounds(0,0,BLOCKW-1,BLOCKH*m_nHeight-1);
+	SetShootBounds  (0,0,BLOCKW-1,BLOCKH*m_nHeight-1);
+	SetActionBounds (0,0,BLOCKW-1,BLOCKH*m_nHeight-1);
+}
+void CHighVoltage::Draw()
+{
+	for ( int i=0; i<m_nHeight; ++i )
+	{
+		int a=m_a;//Spriteset number
+		// This animation is very crude, might need something better here
+		//int b=m_b + ((anim4_count+m_nHeight)%4)*16;//Sprite number within spriteset
+		int b=m_b + ((i+anim4_count)%4)*16;//Sprite number within spriteset
+		int x = CALC_XOFFSET(m_x,0);
+		int y = CALC_YOFFSET(m_y+i);
+		DRAW_SPRITE16A(pVisView,a,b,x,y);
+	}
+}
+int CHighVoltage::Tick()
+{
+	return CThing::Tick();
+}
+int CHighVoltage::HeroOverlaps()
+{
+	update_health(-1000);//Kill hero immediately if touch us
+	return 0;
+}
+int CHighVoltage::OnHeroShot()
+{
+	if (--m_nStrength<=0)
+	{
+		// Actually we want to start death *animation* here [TODO]
+		for ( int i=0; i<m_nHeight; ++i )
+		{
+			// These effects are a little unspectacular
+			// This is very crude death animation, TODO, something fancier/nicer etc.
+			if ( (i%2)==0 )
+			{
+				AddThing(CreateExplosion(m_x*BLOCKW,(m_y+i)*BLOCKH));
+			}
+		}
+		djSoundPlay( g_iSounds[SOUND_EXPLODE] );
+		return THING_DIE;
+	}
+	return 0;
 }
 /*-----------------------------------------------------------*/

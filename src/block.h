@@ -94,6 +94,8 @@ enum EBlockType
 	TYPE_FLYINGROBOT,
 	//! 46 Rabbit-equivalent (disclaimer: may or may not be a rabbit) [dj2017-07-29]
 	TYPE_RABBIT,
+	//! 47 High-voltage "barrier" that must be shot multiple times to destroy before hero can pass through. Touching it results in immediate death.
+	TYPE_HIGHVOLTAGE,
 	//! Highest used block value
 	TYPE_LASTONE
 };

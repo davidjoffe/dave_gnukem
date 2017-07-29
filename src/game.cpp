@@ -1718,6 +1718,9 @@ void RestartLevel()
 	SetScore(g_nScoreOld);
 	HeroSetFirepower(g_nFirepowerOld);
 
+	// Make sure health is full and redrawn as full [dj2017-07-29]
+	SetHealth(MAX_HEALTH);
+
 	// Set level to current level (restarts the level)
 	SetLevel(g_nLevel);
 }
