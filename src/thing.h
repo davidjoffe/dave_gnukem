@@ -625,6 +625,16 @@ class CAccessCard : public CKey
 };
 /*-----------------------------------------------------------*/
 /*!
+\class CAntivirus
+\nosubgrouping
+
+Antivirus. This obviously isn't really a key, but behaviorally and conceptually (in the abstract) it kind of behaves like one, so we derive from CKey.
+*/
+class CAntivirus : public CKey
+{
+};
+/*-----------------------------------------------------------*/
+/*!
 \class CDoorActivator
 \nosubgrouping
 
@@ -637,6 +647,21 @@ public:
 	CDoorActivator();
 	virtual int  Action();
 	virtual void Draw();
+	virtual void OnActivated(){};
+};
+/*-----------------------------------------------------------*/
+/*!
+\class CMasterComputer
+\nosubgrouping
+
+This is what you put antivirus disk in. The 'index'/type is 6, corresponding to CAntivirus.
+*/
+class CMasterComputer : public CDoorActivator
+{
+public:
+	CMasterComputer();
+	virtual void Draw();
+	virtual void OnActivated();
 };
 /*-----------------------------------------------------------*/
 /*!

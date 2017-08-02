@@ -766,6 +766,24 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 							InvAdd(pKey);
 						}
 					}
+					{
+						//dj2017-08 Adding antivirus - this is gross, it's hardcoded here that '6' is its key/door number. Oh well, not going to lose sleep over it.
+						bool bHave = false;
+						for ( unsigned int j=0; j<anKeysHave.size(); j++ )
+						{
+							if (5==anKeysHave[j])//<- [LOW PRIO] this detectioh isn't working correctly [see workaround note above 2017-06]
+								bHave = true;
+						}
+						if (!bHave)
+						{
+							CAntivirus *pKey = new CAntivirus;
+							pKey->SetType(TYPE_ANTIVIRUS);
+							pKey->SetID(6);
+							pKey->SetSprite(1, 98);
+							pKey->Initialize(1, 98);
+							InvAdd(pKey);
+						}
+					}
 
 					// Full firepower
 					HeroSetFirepower(MAX_FIREPOWER);
@@ -1426,13 +1444,13 @@ void SetScore(int nScore)
 	GraphDrawString( pVisBack, g_pFont8x8, SCORE_X, SCORE_Y, (unsigned char*)score_buf );
 }
 
-void update_score(int score_diff, int nFloatingScoreX, int nFloatingScoreY)
+void update_score(int score_diff, int nFloatingScoreXBlockUnits, int nFloatingScoreYBlockUnits)
 {
 	SetScore(g_nScore + score_diff);
 
 	// If requested, create a "floating score" display
-	if (nFloatingScoreX!=-1 && nFloatingScoreY!=-1)
-		AddThing(CreateFloatingScore(nFloatingScoreX, nFloatingScoreY, score_diff));
+	if (nFloatingScoreXBlockUnits!=-1 && nFloatingScoreYBlockUnits!=-1)
+		AddThing(CreateFloatingScore(nFloatingScoreXBlockUnits, nFloatingScoreYBlockUnits, score_diff));
 }
 /*-----------------------------------------------------------*/
 void DrawThingsAtLayer(EdjLayer eLayer)

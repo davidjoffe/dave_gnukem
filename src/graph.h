@@ -36,6 +36,7 @@ extern djImage *g_pFont8x8;
 //! Same as \ref DRAW_SPRITE16 but also uses alpha map for transparency masking
 #define DRAW_SPRITE16A(vis,a,b,x,y) djgDrawImageAlpha( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%16)*16,((b)/16)*16, (x),(y), 16,16 )
 
+#define DRAW_SPRITEA(vis,a,b,x,y,w,h) djgDrawImageAlpha( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%16)*16,((b)/16)*16, (x),(y), (w),(h) )
 
 //! Initialize the graphics system for the game
 extern bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale=-1 );
