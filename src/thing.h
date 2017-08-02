@@ -690,15 +690,15 @@ protected:
 };
 /*-----------------------------------------------------------*/
 /*!
-\class CCoke
+\class CSoda
 \nosubgrouping
 
-Coke can. If you shoot the coke can, it flies up into the air.
+Soda can. If you shoot the coke can, it flies up into the air.
 */
-class CCoke : public CPickup
+class CSoda : public CPickup
 {
 public:
-	CCoke();
+	CSoda();
 	virtual void Draw();
 	virtual int OnHeroShot();
 	virtual int HeroOverlaps();

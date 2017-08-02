@@ -106,7 +106,7 @@ REGISTER_THING(CDoorActivator, TYPE_DOORACTIVATOR, NULL);
 REGISTER_THING(CSoftBlock,     TYPE_SOFTBLOCK, NULL);
 REGISTER_THING(CCamera,        TYPE_CAMERA, CCameraPerLevelInit);
 REGISTER_THING(CBanana,        TYPE_BANANA, NULL);
-REGISTER_THING(CCoke,          TYPE_COKE, NULL);
+REGISTER_THING(CSoda,          TYPE_SODACAN, NULL);
 REGISTER_THING(CFullHealth,    TYPE_FULLHEALTH, NULL);
 REGISTER_THING(CCrawler,       TYPE_CRAWLER, NULL);
 REGISTER_THING(CSpike,         TYPE_SPIKE, NULL);
@@ -993,7 +993,7 @@ int CBanana::HeroOverlaps()
 	return THING_DIE;
 }
 /*-----------------------------------------------------------*/
-CCoke::CCoke()
+CSoda::CSoda()
 {
 	m_nShotHeight = -1;
 	m_nAnim = 0;
@@ -1001,7 +1001,7 @@ CCoke::CCoke()
 	SetShootBounds(0,0,15,15);
 }
 
-void CCoke::Draw()
+void CSoda::Draw()
 {
 	if (IsShot())
 	{
@@ -1011,14 +1011,14 @@ void CCoke::Draw()
 	CPickup::Draw();
 }
 
-int CCoke::OnHeroShot()
+int CSoda::OnHeroShot()
 {
 	m_nShotHeight = 0;
 	m_bShootable = false;
 	return 0;
 }
 
-int CCoke::HeroOverlaps()
+int CSoda::HeroOverlaps()
 {
 	if (IsShot())
 	{
@@ -1028,7 +1028,7 @@ int CCoke::HeroOverlaps()
 	return CPickup::HeroOverlaps();
 }
 
-int CCoke::Tick()
+int CSoda::Tick()
 {
 	if (IsShot())
 	{
