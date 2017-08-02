@@ -37,6 +37,11 @@ void RegisterThings_Monsters()
 /*-----------------------------------------------------------*/
 
 /*-----------------------------------------------------------*/
+CMonster::CMonster() :
+	m_nStrength(1)
+{
+}
+/*-----------------------------------------------------------*/
 CRobot::CRobot()
 {
 	m_bShootable = true;
@@ -144,7 +149,6 @@ void CRobot::Initialize(int b0, int b1)
 /*-----------------------------------------------------------*/
 CFlyingRobot::CFlyingRobot() :
 	CRobot(),
-	m_nStrength(1),
 	m_nDieAnim(-1),
 	m_nXOffset(0),
 	m_nYOffset(0),
@@ -401,9 +405,9 @@ int CRabbit::OnHeroShot()
 }
 /*-----------------------------------------------------------*/
 CHighVoltage::CHighVoltage() :
-	m_nStrength(10),
 	m_nHeight(1)
 {
+	m_nStrength = 10;
 }
 void CHighVoltage::Initialize(int a, int b)
 {
