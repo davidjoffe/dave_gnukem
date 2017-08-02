@@ -44,8 +44,8 @@ enum EBlockType
 	TYPE_18,
 	//! 19 Power boots
 	TYPE_POWERBOOTS,
-	//! 20 Coke can
-	TYPE_COKE,
+	//! 20 Soda can
+	TYPE_SODACAN,
 	//! 21 Full health pickup (DN1 molecule) [dj2017-06-26]
 	TYPE_FULLHEALTH,
 	TYPE_22,
