@@ -75,7 +75,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 # Ports
 
-* Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/
+* Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi)
 
 # History / Changes
 
