@@ -336,10 +336,10 @@ void CRabbit::Draw()
 	const int b=(m_nXDir>0 ? 6*16 : 6*16 + 8);//Sprite number within spriteset
 	int x = CALC_XOFFSET(m_x,0) + m_xoffset;
 	int y = CALC_YOFFSET(m_y  ) + m_yoffset;
-	DRAW_SPRITE16A(pVisView,a,   b+m_nWalkAnimOffset*2  ,x   ,y-16);//TL
-	DRAW_SPRITE16A(pVisView,a,   b+m_nWalkAnimOffset*2+1,x+16,y-16);//TR
-	DRAW_SPRITE16A(pVisView,a,16+b+m_nWalkAnimOffset*2  ,x   ,y   );//BL
-	DRAW_SPRITE16A(pVisView,a,16+b+m_nWalkAnimOffset*2+1,x+16,y   );//BR
+	DRAW_SPRITEA(pVisView,
+		a   ,b+m_nWalkAnimOffset*2,
+		x   ,y-16,
+		32  ,  32);
 }
 int CRabbit::Tick()
 {
