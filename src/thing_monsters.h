@@ -15,13 +15,21 @@ License: GNU GPL Version 2
 #include "thing.h"
 
 /*-----------------------------------------------------------*/
+class CMonster : public CThing
+{
+public:
+	CMonster();
+protected:
+	int m_nStrength;//"Health" of the monster
+};
+/*-----------------------------------------------------------*/
 /*!
 \class CRobot
 \nosubgrouping
 
 Monster - dumb robot
 */
-class CRobot : public CThing
+class CRobot : public CMonster
 {
 public:
 	CRobot();
@@ -47,7 +55,6 @@ protected:
 	virtual int OnHeroShot();
 	virtual void Draw();
 	virtual int Tick();
-	int m_nStrength;
 	int m_nDieAnim;
 	//int m_nDir;//Direction (-1 or 1)
 	int m_nXOffset;
@@ -85,7 +92,7 @@ protected:
 
 High-voltage "barrier" that must be shot multiple times to destroy before hero can pass through. Touching it results in immediate death.
 */
-class CHighVoltage : public CThing
+class CHighVoltage : public CMonster
 {
 public:
 	CHighVoltage();
@@ -95,7 +102,6 @@ public:
 	virtual int HeroOverlaps();
 	virtual int OnHeroShot();
 protected:
-	int m_nStrength;
 	int m_nHeight;//Height (in game blocks) - this is comparable to the width of the crumbling floors (same principle, just vertical instead)
 };
 /*-----------------------------------------------------------*/
