@@ -135,7 +135,7 @@ extern void SetScore(int nScore);
 //! Set current health. On-screen score display is redrawn automatically
 extern void SetHealth(int nHealth);
 //! Modify current score by given amount, optionally creating a "floating score" display
-extern void update_score(int score_diff, int nFloatingScoreX=-1, int nFloatingScoreY=-1);
+extern void update_score(int score_diff, int nFloatingScoreXBlockUnits=-1, int nFloatingScoreYBlockUnits=-1);
 extern void update_health(int health_diff);
 
 //! Set the hero state to "hurting", unless already hurting, unless bReset is set to true

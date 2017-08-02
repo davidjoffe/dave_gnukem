@@ -63,12 +63,14 @@ enum EBlockType
 	TYPE_FAN,
 	//! 29 Access card
 	TYPE_ACCESSCARD,
-	TYPE_30,
+	//! 30 Antivirus
+	TYPE_ANTIVIRUS,
 	//! 31 Level exit
 	TYPE_EXIT,
 	//! 32 Hero starting position
 	TYPE_HEROSTART,
-	TYPE_33,
+	//! 33 Master Computer
+	TYPE_MASTERCOMPUTER,
 	TYPE_34,
 	//! 35 Acme falling block
 	TYPE_ACME,

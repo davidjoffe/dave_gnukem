@@ -102,6 +102,8 @@ REGISTER_THING(CTeleporter,    TYPE_TELEPORTER, NULL);
 REGISTER_THING(CDoor,          TYPE_DOOR, NULL);
 REGISTER_THING(CKey,           TYPE_KEY, NULL);
 REGISTER_THING(CAccessCard,    TYPE_ACCESSCARD, NULL);
+REGISTER_THING(CAntivirus,     TYPE_ANTIVIRUS, NULL);
+REGISTER_THING(CMasterComputer,TYPE_MASTERCOMPUTER, NULL);
 REGISTER_THING(CDoorActivator, TYPE_DOORACTIVATOR, NULL);
 REGISTER_THING(CSoftBlock,     TYPE_SOFTBLOCK, NULL);
 REGISTER_THING(CCamera,        TYPE_CAMERA, CCameraPerLevelInit);
@@ -788,7 +790,9 @@ CDoor::CDoor()
 {
 	m_nOpenState = 0;
 	m_bSolid = true; // <-- fixme, sucks
+	m_bShootable = true;//Set shootable flag, but don't do anything 'special' other than STOP the bullet.
 	SetSolidBounds(0,0,15,15);
+	SetShootBounds(0,0,15,15);
 }
 
 int CDoor::Tick()
@@ -858,6 +862,7 @@ int CDoorActivator::Action()
 		CThing *pThing = InvGetItem(i);
 		if (pThing->GetTypeID()==TYPE_KEY
 			|| pThing->GetTypeID()==TYPE_ACCESSCARD//fixLOW "IsKindOf" would be more appropriate but we don't have that type of RTTI info [yet] [dj2017-06]
+			|| pThing->GetTypeID()==TYPE_ANTIVIRUS//fixLOW "IsKindOf" would be more appropriate but we don't have that type of RTTI info [yet] [dj2017-08]
 			)
 		{
 			if (((CKey*)pThing)->GetID()==m_nID)
@@ -877,6 +882,8 @@ int CDoorActivator::Action()
 							pDoor->OpenDoor();
 					}
 				}
+
+				OnActivated();
 
 				delete pThing; // Delete key
 				return 0;
@@ -898,6 +905,28 @@ void CDoorActivator::Draw()
 	{
 	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
 	}
+}
+/*-----------------------------------------------------------*/
+CMasterComputer::CMasterComputer()
+{
+	SetActionBounds(-8,-16,31+8,15);
+	SetVisibleBounds(0,-16,31,15);
+}
+void CMasterComputer::OnActivated()
+{
+	// The parent class is used to check if activated, meaning, if hero inserted antivirus
+	// floppy into drive. When this happens, the OnActivated() virtual function is called,
+	// so we can do special handling here not relevant to other types of 'activated' key/door type stuff.
+
+	// OK, right here, you've more or less 'won the game' (at least that's the idea),
+	// you've just saved the world. Should do something here slightly less unspectacular.
+
+	// [TODO] What exactly to do over here? You've just saved the world.
+	update_score(10000, m_x, m_y - 1);
+}
+void CMasterComputer::Draw()
+{
+	DRAW_SPRITEA(pVisView, m_a, m_b-16, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y-1),32,32);
 }
 /*-----------------------------------------------------------*/
 CSoftBlock::CSoftBlock()
