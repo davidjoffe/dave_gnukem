@@ -19,8 +19,16 @@ class CMonster : public CThing
 {
 public:
 	CMonster();
+	virtual void Initialize(int a, int b);
+	virtual int OnHeroShot();
+
+	virtual int OnKilled();
 protected:
 	int m_nStrength;//"Health" of the monster
+	int m_nXDir; // Direction on x axis: -1=face left, 1=face right
+	int m_nNoShootCounter;// This ideally shouldn't really be in the base
+	// class because not all monsters shoot, there are better ways design-wise
+	// to do this, but maybe not worth it for small game like this [dj2017-08]
 };
 /*-----------------------------------------------------------*/
 /*!
@@ -36,25 +44,24 @@ public:
 	virtual int HeroOverlaps();
 	virtual void Draw();
 	virtual int Tick();
-	virtual int OnHeroShot();
-	virtual void Initialize(int b0, int b1);
+	virtual void Initialize(int a, int b);
+	virtual int OnKilled();
 protected:
 	int m_nXOffset;
-	int m_nDX; // Either -1 or 1.
 	int m_nType; // Currently 0=normal robot, 1=fireball thingy
 	int m_nHeightOffset; // 0 for robot, -15 for fireball
-	int m_nNoShootCounter;
 };
 /*-----------------------------------------------------------*/
 class CFlyingRobot : public CRobot
 {
 public:
 	CFlyingRobot();
-protected:
 	virtual int HeroOverlaps();
-	virtual int OnHeroShot();
 	virtual void Draw();
 	virtual int Tick();
+	virtual int OnKilled();
+	void Initialize(int a, int b);
+protected:
 	int m_nDieAnim;
 	//int m_nDir;//Direction (-1 or 1)
 	int m_nXOffset;
@@ -71,7 +78,7 @@ protected:
 
 This constitutes the approximate equivalent of DN1 rabbits (for now, or maybe permanently, this is just a sort of 'evil Tux')
 */
-class CRabbit : public CThing
+class CRabbit : public CMonster
 {
 public:
 	CRabbit();
@@ -81,7 +88,6 @@ public:
 	virtual int HeroOverlaps();
 	virtual int OnHeroShot();
 protected:
-	int m_nXDir; // -1=face left, 1=face right
 	int m_nWalkAnimOffset;
 	int m_nWalkAnimOffsetUpdateCounter;
 };
@@ -103,6 +109,18 @@ public:
 	virtual int OnHeroShot();
 protected:
 	int m_nHeight;//Height (in game blocks) - this is comparable to the width of the crumbling floors (same principle, just vertical instead)
+};
+/*-----------------------------------------------------------*/
+class CCannon : public CMonster
+{
+public:
+	CCannon();
+	virtual void Initialize(int a, int b);
+	virtual int Tick();
+	virtual void Draw();
+	virtual int HeroOverlaps();
+	virtual int OnHeroShot();
+	virtual int OnKilled();
 };
 /*-----------------------------------------------------------*/
 
