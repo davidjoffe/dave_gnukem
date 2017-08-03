@@ -69,9 +69,11 @@ To open doors, find the correct color key, and press the action key on the 'lock
 
 Power boots allow you to jump higher. The special molecule pickup gives you full health.
 
-### 'Floating' Draft/Beta Storyline:
+### 'Floating' Draft/Beta Storyline/Plot:
 
 The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the CIA to infect the world's computers with a virus called SystemD, crippling them. Only you can stop him. You must find the floppy disk with the Devuan Antivirus on it, and install it on the master computer, which is hidden in Vault7.
+
+*Any resemblance to actual persons or entities is purely coincidental*
 
 # Ports
 
@@ -247,6 +249,11 @@ To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add 
 * ? Make a list of 'level TODOs' that are must-have for a 'version 1'?
 
 
+# Notes
+
+The name is a pun on 'Duke Nukem' and 'Gnu' as a sort of 'hat-tip'/reference to the open source license/model.
+
+This wasn't a retro game when I started on it (~1994ish), but it's taken so long it's now 'de facto' retro genre. So we are copying also the Duke Nukem Forever model of taking forever to be released.
 
 # Additional Credits
 
