@@ -81,6 +81,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+* Add new 'sort of looks like a cannon on wheels' monster type
 * Implemented new inventory pickup item 'antivirus disk' and corresponding 'master computer' (when we insert AV disk into master computer we save the world) (should only be one of each of these, and in last level of a 'mission')
 * Add new high-voltage "barrier" that must be shot multiple times to destroy before hero can pass through (touching it results in immediate death)
 * Add new monster that constitutes the approximate equivalent of DN1 rabbits (for now, or maybe permanently, this is just a sort of 'evil Tux' - not sure yet if placeholder sprite, or part of plot)

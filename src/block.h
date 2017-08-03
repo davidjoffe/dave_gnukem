@@ -98,6 +98,8 @@ enum EBlockType
 	TYPE_RABBIT,
 	//! 47 High-voltage "barrier" that must be shot multiple times to destroy before hero can pass through. Touching it results in immediate death.
 	TYPE_HIGHVOLTAGE,
+	//! 48 Cannon-on-wheels-ish-type-thing
+	TYPE_CANNON,
 	//! Highest used block value
 	TYPE_LASTONE
 };
