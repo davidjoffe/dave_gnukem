@@ -47,7 +47,6 @@ public:
 	virtual void Initialize(int a, int b);
 	virtual int OnKilled();
 protected:
-	int m_nXOffset;
 	int m_nType; // Currently 0=normal robot, 1=fireball thingy
 	int m_nHeightOffset; // 0 for robot, -15 for fireball
 };
@@ -64,8 +63,6 @@ public:
 protected:
 	int m_nDieAnim;
 	//int m_nDir;//Direction (-1 or 1)
-	int m_nXOffset;
-	int m_nYOffset;
 	int m_nMoveEveryNthFrameX;
 	int m_nMoveEveryNthFrameY;
 	int m_nDieAnimLength;

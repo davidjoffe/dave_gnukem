@@ -75,7 +75,6 @@ CRobot::CRobot()
 {
 	m_bShootable = true;
 	m_nXDir = 0;
-	m_nXOffset = 0;
 	m_nType = 0;
 	m_nHeightOffset = 0;
 	SetLayer(LAYER_4);
@@ -94,17 +93,17 @@ void CRobot::Draw()
 {
 	if (m_nType==0) // Robot?
 	{
-		DRAW_SPRITE16A(pVisView, m_a, 32/*m_b*/ + anim4_count, CALC_XOFFSET(m_x,0) + m_nXOffset, CALC_YOFFSET(m_y));
+		DRAW_SPRITE16A(pVisView, m_a, 32/*m_b*/ + anim4_count, CALC_XOFFSET(m_x,0) + m_xoffset, CALC_YOFFSET(m_y));
 	}
 	else if (m_nType==1) // Fireball?
 	{
-		DRAW_SPRITEA(pVisView, m_a, (m_nXDir>0 ? 16 : 20) + anim4_count - 16, CALC_XOFFSET(m_x,0) + m_nXOffset, CALC_YOFFSET(m_y-1), 16, 32);
+		DRAW_SPRITEA(pVisView, m_a, (m_nXDir>0 ? 16 : 20) + anim4_count - 16, CALC_XOFFSET(m_x,0) + m_xoffset, CALC_YOFFSET(m_y-1), 16, 32);
 	}
 }
 
 int CRobot::Tick()
 {
-	if (m_nXOffset==0)
+	if (m_xoffset==0)
 	{
 		if ((check_solid(m_x + m_nXDir, m_y)) || (!check_solid(m_x + m_nXDir, m_y + 1)))
 		{
@@ -116,15 +115,15 @@ int CRobot::Tick()
 			return 0;
 	}
 
-	m_nXOffset += m_nXDir * 4;//(m_nType==0 ? 4 : 2);
-	if (ABS(m_nXOffset)>=16)
+	m_xoffset += m_nXDir * 4;//(m_nType==0 ? 4 : 2);
+	if (ABS(m_xoffset)>=16)
 	{
-		m_nXOffset = 0;
+		m_xoffset = 0;
 		m_x += m_nXDir;
 	}
-	SetActionBounds (m_nXOffset,m_nHeightOffset,m_nXOffset+15,15);
-	SetVisibleBounds(m_nXOffset,m_nHeightOffset,m_nXOffset+15,15);
-	SetShootBounds  (m_nXOffset,m_nHeightOffset,m_nXOffset+15,15);
+	SetActionBounds (m_xoffset,m_nHeightOffset,m_xoffset+15,15);
+	SetVisibleBounds(m_xoffset,m_nHeightOffset,m_xoffset+15,15);
+	SetShootBounds  (m_xoffset,m_nHeightOffset,m_xoffset+15,15);
 
 	if (m_nType==0) // The robot shoots, not the fireball
 	{
@@ -142,7 +141,7 @@ int CRobot::Tick()
 				{
 					if ((rand()%50)<=2)
 					{
-						MonsterShoot(m_x*16+m_nXOffset, m_y*16, m_nXDir<0?-16:16);
+						MonsterShoot(m_x*16+m_xoffset, m_y*16, m_nXDir<0?-16:16);
 						m_nNoShootCounter = 36;// fixme, should be time, not frame count
 					}
 				}
@@ -178,8 +177,6 @@ void CRobot::Initialize(int a, int b)
 CFlyingRobot::CFlyingRobot() :
 	CRobot(),
 	m_nDieAnim(-1),
-	m_nXOffset(0),
-	m_nYOffset(0),
 	m_nMoveEveryNthFrameX(0),
 	m_nMoveEveryNthFrameY(0),
 	m_nDieAnimLength(20)
@@ -225,8 +222,8 @@ void CFlyingRobot::Draw()
 	{
 		DRAW_SPRITE16A(pVisView,
 			m_a, m_b + anim4_count + 4,
-			CALC_XOFFSET(m_x,0) + m_nXOffset,
-			CALC_YOFFSET(m_y) + m_nYOffset
+			CALC_XOFFSET(m_x,0) + m_xoffset,
+			CALC_YOFFSET(m_y) + m_yoffset
 			);
 	}
 	else
@@ -234,11 +231,11 @@ void CFlyingRobot::Draw()
 		// Spriteset has 8 sprites in a row: First 4 is facing right, next 4 facing left
 		if (m_nXDir>0)//Facing right?
 		{
-			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count    , CALC_XOFFSET(m_x,0) + m_nXOffset, CALC_YOFFSET(m_y) + m_nYOffset);
+			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count    , CALC_XOFFSET(m_x,0) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 		}
 		else//Facing left
 		{
-			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count + 4, CALC_XOFFSET(m_x,0) + m_nXOffset, CALC_YOFFSET(m_y) + m_nYOffset);
+			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count + 4, CALC_XOFFSET(m_x,0) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 		}
 	}
 }
@@ -252,12 +249,12 @@ int CFlyingRobot::Tick()
 			return THING_DIE;
 
 		// Sort of falls off to the left and downwards, off the screen
-		m_nXOffset = -12 - (m_nDieAnimLength-m_nDieAnim)*4;
-		m_nYOffset += (((m_nDieAnimLength-m_nDieAnim)*(m_nDieAnimLength-m_nDieAnim))/2);
+		m_xoffset = -12 - (m_nDieAnimLength-m_nDieAnim)*4;
+		m_yoffset += (((m_nDieAnimLength-m_nDieAnim)*(m_nDieAnimLength-m_nDieAnim))/2);
 
-		SetActionBounds (m_nXOffset,m_nYOffset,m_nXOffset+15,m_nYOffset+15);
-		SetVisibleBounds(m_nXOffset,m_nYOffset,m_nXOffset+15,m_nYOffset+15);
-		SetShootBounds  (m_nXOffset,m_nYOffset,m_nXOffset+15,m_nYOffset+15);
+		SetActionBounds (m_xoffset,m_yoffset,m_xoffset+15,m_yoffset+15);
+		SetVisibleBounds(m_xoffset,m_yoffset,m_xoffset+15,m_yoffset+15);
+		SetShootBounds  (m_xoffset,m_yoffset,m_xoffset+15,m_yoffset+15);
 
 		return CThing::Tick();//Should this be CMonster::Tick()? CRobot::Tick()?
 	}
@@ -276,7 +273,7 @@ int CFlyingRobot::Tick()
 	//if (++m_nMoveEveryNthFrameX>1)
 	{
 
-		if (m_nXOffset==0//<- This seems dubious, surely should check solid if YOffset!=0 [dj2017-06]
+		if (m_xoffset==0//<- This seems dubious, surely should check solid if YOffset!=0 [dj2017-06]
 			&& check_solid(m_x+m_nXDir, m_y)
 			)
 		{
@@ -285,10 +282,10 @@ int CFlyingRobot::Tick()
 		else
 		{
 			//m_nMoveEveryNthFrameX = 0;
-			m_nXOffset += m_nXDir;
-			if (ABS(m_nXOffset)>=16)
+			m_xoffset += m_nXDir;
+			if (ABS(m_xoffset)>=16)
 			{
-				m_nXOffset = 0;
+				m_xoffset = 0;
 				m_x += m_nXDir;
 			}
 		}
@@ -305,7 +302,7 @@ int CFlyingRobot::Tick()
 
 		if (nYDiffDir!=0)
 		{
-			if (m_nYOffset==0//<- This seems dubious, surely should check solid if YOffset!=0 [dj2017-06]
+			if (m_yoffset==0//<- This seems dubious, surely should check solid if YOffset!=0 [dj2017-06]
 				&& check_solid(m_x, m_y+nYDiffDir)
 				)
 			{
@@ -313,10 +310,10 @@ int CFlyingRobot::Tick()
 			}
 			else
 			{
-				m_nYOffset += nYDiffDir;
-				if (ABS(m_nYOffset)>=16)
+				m_yoffset += nYDiffDir;
+				if (ABS(m_yoffset)>=16)
 				{
-					m_nYOffset = 0;
+					m_yoffset = 0;
 					m_y += nYDiffDir;
 				}
 			}
@@ -324,9 +321,9 @@ int CFlyingRobot::Tick()
 	}
 
 
-	SetActionBounds (m_nXOffset,m_nYOffset,m_nXOffset+15,m_nYOffset+15);
-	SetVisibleBounds(m_nXOffset,m_nYOffset,m_nXOffset+15,m_nYOffset+15);
-	SetShootBounds  (m_nXOffset,m_nYOffset,m_nXOffset+15,m_nYOffset+15);
+	SetActionBounds (m_xoffset,m_yoffset,m_xoffset+15,m_yoffset+15);
+	SetVisibleBounds(m_xoffset,m_yoffset,m_xoffset+15,m_yoffset+15);
+	SetShootBounds  (m_xoffset,m_yoffset,m_xoffset+15,m_yoffset+15);
 
 	if (m_nNoShootCounter>0)
 	{
@@ -342,7 +339,7 @@ int CFlyingRobot::Tick()
 			{
 				if ((rand()%50)<=2)
 				{
-					MonsterShoot(m_x*16+m_nXOffset + (m_nXDir*16), m_y*16+m_nYOffset, m_nXDir<0?-16:16);
+					MonsterShoot(m_x*16+m_xoffset + (m_nXDir*16), m_y*16+m_yoffset, m_nXDir<0?-16:16);
 					m_nNoShootCounter = 24;// fixme, should be time, not frame count
 				}
 			}
