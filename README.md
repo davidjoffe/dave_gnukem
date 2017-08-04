@@ -88,6 +88,7 @@ Recent:
 * Add new high-voltage "barrier" that must be shot multiple times to destroy before hero can pass through (touching it results in immediate death)
 * Add new monster that constitutes the approximate equivalent of DN1 rabbits (for now, or maybe permanently, this is just a sort of 'evil Tux' - not sure yet if placeholder sprite, or part of plot)
 * Add new floor type that auto-crumbles after hero walks or jumps twice on it (2nd spriteset, position 5x4 - place only 1 block per segment)
+* Re-do instructions screens to display storyline/plot
 * Basic more proper/correct implementation of the CAcme falling blocks
 * Fixed: Bullets go through doors
 
@@ -265,6 +266,7 @@ This wasn't a retro game when I started on it (~1994ish), but it's taken so long
 
 # Additional Credits
 
+* 2017-08-04 Add font data/fonts/simple_6x8.tga by http://www.zingot.com/ from https://opengameart.org/content/bitmap-font-pack License https://creativecommons.org/licenses/by/3.0/ (small changes made to color, and convert from PNG to TGA)
 * 2016-10-30 data/sounds/soft_explode.wav From same Juhani Junkala collection as per below
 * 2016-10-30 data/sounds/key_pickup.wav http://opengameart.org/content/key-pickup author Vinrax, license 'CC BY 3.0' https://creativecommons.org/licenses/by/3.0/
 * 2016-10-30 data/sounds/jump.wav and data/sounds/jump_landing.wav From same Juhani Junkala collection as per below
