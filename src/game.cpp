@@ -889,6 +889,16 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 		y = MAX( MIN(y, 99), 2 );
 		//debug//printf("}");
 
+#ifdef DAVEGNUKEM_CHEATS_ENABLED
+		if (key_action && g_iKeys[DJKEY_L])
+		{
+			// NB, if we are holding a key down when entering sprite/level editor, we 'miss' the gameloop's KeyUp event as the integrated editor takes over input polling; this leads to potentially "stuck" keystates in anKeyState when exiting, which in turn causes problems like e.g. if you press 'up' before entering the level editor then drop yourself out of the level editor over a teleporter, the game freezes as it keeps re-activating the teleporter since the action key is effectively behaving as if stuck down. TL;DR CLEAR THE KEYSTATES HERE (even if the keys really are down on exit editor). I am not mad about this solution, all feels a little wobbly/workaround-y, but should do for now. [dj2017-06-22]
+			memset( anKeyState, 0, sizeof(anKeyState) );
+			NextLevel();
+			//return;
+		}
+		else
+#endif
 		// "integrated" sprite / level editors [dj2017-06-20 moving these to bottom of this loop, just in case we have any issues comparable to the pungee sticks crash bug, e.g interacting with dangling objects or something in the one single heartbeat update that occurs after exiting level editor]
 		if (g_iKeys[DJKEY_F4])
 		{
@@ -1004,14 +1014,6 @@ void GameHeartBeat()
 			key_action = 0; // huh?
 			// dj2017-06-22 I think that "huh?" might have something to do with issue encountered of 'freezing on entering teleporter' issue, or else it's just redundant/old code, not sure, as it re-sets key_action anyway from anKeyStates[KEY_ACTION] each heartbeat
 
-#ifdef DAVEGNUKEM_CHEATS_ENABLED
-			// Level cheat key (Ctrl+L)
-			if (g_iKeys[DJKEY_L])
-			{
-				NextLevel();
-				return;
-			}
-#endif
 			// Go-to-exit cheat key
 			if (g_iKeys[DJKEY_I])
 			{
