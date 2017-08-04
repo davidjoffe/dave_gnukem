@@ -41,6 +41,7 @@ using namespace std;
 #include "hiscores.h"
 #include "sys_log.h"
 #include "djstring.h"//djStrPrintf
+#include "instructions.h"//Slightly don't like this dependency. For ShowInstructions() from in-game menu. [dj2017-08]
 
 #ifndef NOSOUND
 #include <SDL_mixer.h>//For background music stuff
@@ -913,8 +914,7 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 		// 'press F1 for help' but we can't 'bake that in' to the images etc.
 		/*else if (g_iKeys[DJKEY_F1])
 		{
-			extern void ShowHelpScreen();
-			ShowHelpScreen();
+			ShowInstructions();
 			g_iKeys[DJKEY_F1]=0;//????
 			// NB, if we are holding a key down when entering sprite/level editor, we 'miss' the gameloop's KeyUp event as the integrated editor takes over input polling; this leads to potentially "stuck" keystates in anKeyState when exiting, which in turn causes problems like e.g. if you press 'up' before entering the level editor then drop yourself out of the level editor over a teleporter, the game freezes as it keeps re-activating the teleporter since the action key is effectively behaving as if stuck down. TL;DR CLEAR THE KEYSTATES HERE (even if the keys really are down on exit editor). I am not mad about this solution, all feels a little wobbly/workaround-y, but should do for now. [dj2017-06-22]
 			//memset( anKeyState, 0, sizeof(anKeyState) );
@@ -2143,136 +2143,6 @@ void ShowGameMessage(const char *szMessage, int nFrames)
 	g_nGameMessageCount = nFrames;
 }
 //-------------------------------------------------------
-void ShowHelpScreen()
-{
-	std::vector<std::string> asText;
-	asText.push_back("INSTRUCTIONS:");
-	// This plotline needs a bit more work (fixme dj2017-06-22)
-	asText.push_back(" Find the exit in each level, while");
-	asText.push_back(" dodging or shooting monsters. You");
-	asText.push_back(" must save the world from the evil");
-	asText.push_back(" SystemD.");
-	asText.push_back("");
-	asText.push_back("KEYS:");
-
-	// Show new key
-	char szBuf[1024] = {0};
-	sprintf(szBuf, "%s", GetKeyString(g_anKeys[KEY_LEFT]));
-	asText.push_back(std::string(" Left:   ") + szBuf);
-	sprintf(szBuf, "%s", GetKeyString(g_anKeys[KEY_RIGHT]));
-	asText.push_back(std::string(" Right:  ") + szBuf);
-	sprintf(szBuf, "%s", GetKeyString(g_anKeys[KEY_SHOOT]));
-	asText.push_back(std::string(" Shoot:  ") + szBuf);
-	sprintf(szBuf, "%s", GetKeyString(g_anKeys[KEY_JUMP]));
-	asText.push_back(std::string(" Jump:   ") + szBuf);
-	sprintf(szBuf, "%s", GetKeyString(g_anKeys[KEY_ACTION]));
-	asText.push_back(std::string(" Action: ") + szBuf + std::string(" (Activate doors,"));
-	asText.push_back("  exits, lifts, teleporters etc.)");
-	asText.push_back("");
-	// Hrm, these may be platform specific, fixmeLOW:
-	asText.push_back(" Esc: In-game menu: Save/Restore/Quit");
-	asText.push_back(" PgUp/PgDn: Volume up/down");
-	asText.push_back(" Ins: Toggle sounds");
-	asText.push_back(" F4,F5: Sprite/Level editors");
-	//asText.push_back("Use the action key to open doors, activate lifts, teleporters, etc.");
-	asText.push_back("");
-	asText.push_back("BONUSES:");
-	asText.push_back("-Shoot all security cameras in level");
-	asText.push_back("-Collect letters G,N,U,K,E,M in order");
-
-	const int X = 8;
-	const int Y = 8;
-	const int H = (int)asText.size() + 1;
-	// Calculate widest string, use that for 'dialog' size
-	int W = (320/8)-2;//5;
-	/*for ( int i=0; i<(int)asText.size(); ++i )
-	{
-		if (W < (int)asText[i].length())
-			W = (int)asText[i].length();
-	}*/
-
-	// Draw 'blank' underneath text (pseudo-dialogue-background and border)
-	djImage* pImgBackground = NULL;
-	if (pImgBackground==NULL)
-	{
-		pImgBackground = new djImage;
-		if (pImgBackground->Load( "data/menucharbackground.tga" )>=0)
-		{
-			djCreateImageHWSurface( pImgBackground );
-		}
-	}
-	// This is slightly crass .. clear background
-	for ( int i=0; i<H; ++i )
-	{
-		for ( int j=0; j<W; ++j )
-		{
-			djgDrawImage( pVisBack, pImgBackground, X+j*8, Y+i*8, 8, 8 );
-		}
-	}
-	if (pImgBackground!=NULL)
-	{
-		djDestroyImageHWSurface( pImgBackground );
-		djDEL(pImgBackground);
-	}
-
-	//left+top 'light' lines
-	djgSetColorFore(pVisBack,djColor(80,80,80));
-	djgDrawRectangle( pVisBack,
-		X,
-		Y,
-		1,
-		H*8);
-	//top
-	djgDrawRectangle( pVisBack,
-		X,
-		Y,
-		W*8,
-		1
-		);
-	//bottom+right 'dark' lines
-	djgSetColorFore(pVisBack,djColor(35,35,35));
-	djgDrawRectangle( pVisBack,
-		X+2,
-		Y+H*8,
-		W*8-2,
-		1);
-	//right
-	djgDrawRectangle( pVisBack,
-		X+W*8,
-		Y+2,
-		1,
-		H*8-1
-		);
-
-
-	// Draw lines of text
-	for ( int i=0; i<(int)asText.size(); ++i )
-	{
-		GraphDrawString( pVisBack, g_pFont8x8, X+4, (Y+4)+i*8, (unsigned char*)asText[i].c_str() );
-	}
-
-
-	// OK 'button'
-	struct SMenuItem menuItemsOK[] =
-	{
-	   { false, "        " },
-	   { true,  "   OK   " },
-	   { false, "        " },
-	   { false, NULL }
-	};
-	const unsigned char MenuCursor[] = { 128, 129, 130, 131, 0 };
-	CMenu Menu ( "OK" );
-	Menu.setSize(0);
-	Menu.setItems(menuItemsOK);
-	Menu.setMenuCursor(MenuCursor);
-	Menu.setClrBack(djColor(48,66,128));
-	Menu.setXOffset(320 - (8*8 + 4));
-	Menu.setYOffset(52);
-	//Menu.setXOffset(320/2 - (8*4));
-	//Menu.setYOffset(200 - (8*4) + 4);
-	do_menu( &Menu );
-}
-//-------------------------------------------------------
 void IngameMenu()
 {
 	int nMenuOption = do_menu( &gameMenu );
@@ -2288,7 +2158,7 @@ void IngameMenu()
 		break;
 	case 4://dj2017-06-22 Add in-game help screen
 		{
-			ShowHelpScreen();
+			ShowInstructions();
 		}
 		break;
 	case 5:

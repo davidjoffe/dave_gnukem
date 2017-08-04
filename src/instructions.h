@@ -16,7 +16,4 @@ License: GNU GPL Version 2
 //! Show instructions screen
 extern void ShowInstructions();
 
-//! Instructions screen "skin" (image file)
-#define FILE_IMG_INSTRUCTIONS "data/instructions.tga"
-
 #endif
