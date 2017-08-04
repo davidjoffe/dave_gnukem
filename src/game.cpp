@@ -710,11 +710,30 @@ int game_startup(bool bLoadGame)
 				if (g_iKeys[DJKEY_P])
 				{
 					HeroSetJumpMode(JUMP_POWERBOOTS);
+					ShowGameMessage("CHEAT: POWERBOOTS", 96);
+					//dj2017-08 Adding boots to inventory- this is slightly gross
+					bool bHave = false;
+					for ( i=0; i<InvGetSize(); i++ )
+					{
+						if (InvGetItem(i)->GetTypeID()==TYPE_POWERBOOTS)
+						{
+							bHave = true;
+							break;
+						}
+					}
+					if (!bHave)
+					{
+						CBoots* pThing = new CBoots;
+						pThing->SetType(TYPE_POWERBOOTS);
+						pThing->SetSprite(1, 128-32);//GROSS HARDCODED - if we move to different sprite in metadata, this will break
+						InvAdd(pThing);
+					}
+
 				}
 				// BACKSPACE + PGDN: All power-ups
 				if (g_iKeys[DJKEY_PGDN])
 				{
-					ShowGameMessage("CHEAT: HEALTH+KEYS+FIREPOWER", 96);
+					ShowGameMessage("CHEAT: HealthKeysFirepower", 96);
 SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 					// Full health
 					SetHealth(MAX_HEALTH);
