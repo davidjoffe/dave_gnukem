@@ -875,7 +875,7 @@ int CDoorActivator::Action()
 				unsigned int j;
 				for ( j=0; j<g_apThings.size(); j++ )
 				{
-					if (g_apThings[j]->GetTypeID()==TYPE_DOOR)
+					if (g_apThings[j]->GetTypeID()==TYPE_DOOR)//Should be "IsKindOf(TYPE_DOOR)" [low]
 					{
 						CDoor *pDoor = (CDoor*)g_apThings[j];
 						if (pDoor->GetID()==m_nID)
