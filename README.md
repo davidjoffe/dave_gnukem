@@ -197,6 +197,14 @@ Note there is currently no 'undo', so be careful. If happy with a set of work, s
 * To choose the desired 'game' i.e. 'mission' (i.e. set of levels), use the main game menu 'Select mission'
 * Ctrl+F6: Show level sprite instance statistics
 
+Game Cheats Useful for Testing:
+
+* Up+L - Next level
+* Backspace+P - Get Powerboots
+* Backspace+G - 'God Mode'
+* Backspace+PgDn - Get all keys, access card, antivirus disk, and full firepower
+* H - Damage Health
+
 Note that for active animated objects that consist in the spriteset of multiple sprites (e.g. each conveyor belt piece has 4 sprites, for its animation), you *must* place the *first* of the four in the map for the object to work correctly.
 
 Keep in mind that once the hero has the powerboots, he'll be able to jump higher. So there is a sort of logical progression if you place powerboots in a level, i.e. they should be placed once per 'mission' (i.e. set of levels), and levels prior to that should assume the default lower jump height, levels after that point might possibly assume the higher jump height.
