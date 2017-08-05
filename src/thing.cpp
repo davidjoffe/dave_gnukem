@@ -9,13 +9,11 @@ License: GNU GPL Version 2
 #include "thing.h"
 #include "djtypes.h"
 #include "graph.h"
-#include "mission.h" // FIXME: This dep. canprobly go
+#include "mission.h"//For spriteset data, not sure if mad about this dependency [low]
 #include "block.h" // Class type definitions
 #include "djlog.h"
 #include "hero.h"
 #include <assert.h>
-
-
 #include "game.h"
 #include "inventory.h"
 
@@ -94,7 +92,6 @@ void CCameraPerLevelInit()
 
 /*-----------------------------------------------------------*/
 REGISTER_THING(CSpikeBall,     TYPE_SPIKEBALL, NULL);
-REGISTER_THING(CTest,          TYPE_TEST, NULL);
 REGISTER_THING(CExit,          TYPE_EXIT, NULL);
 REGISTER_THING(CLetter,        TYPE_LETTER, CLetterPerLevelInit);
 REGISTER_THING(CBox,           TYPE_BOX, NULL);
@@ -129,8 +126,7 @@ REGISTER_THING(CDust,          TYPE_DUST, NULL);
 CThing::CThing()
 {
 	m_bFalls = false;
-	m_x = m_y = m_xsmall = 0;
-	m_bxsmall = false;
+	m_x = m_y = 0;
 	m_a = 0;
 	m_b = 0;
 	m_xoffset = 0;
@@ -155,38 +151,6 @@ CThing::CThing()
 	m_iShootY2 = -1;
 	m_bHeroInside = false;
 	m_bShootable = false;
-	m_iVisibleX1 = 0;
-	m_iVisibleY1 = 0;
-	m_iVisibleX2 = 15;
-	m_iVisibleY2 = 15;
-}
-
-CThing::CThing( int x, int y, int xsmall, bool bxsmall )
-{
-	m_bFalls = false;
-	m_x = x;
-	m_y = y;
-	m_xsmall = xsmall;
-	m_bxsmall = bxsmall;
-
-	m_a = 0;
-	m_b = 0;
-	m_xoffset = 0;
-	m_yoffset = 0;
-	m_width = 1;
-	m_height = 1;
-	m_iActionX1 = -1;
-	m_iActionY1 = -1;
-	m_iActionX2 = -1;
-	m_iActionY2 = -1;
-	m_iType = -1;
-	m_eLayer = LAYER_BOTTOM;
-	m_iID = 0;
-	m_bSolid = false;
-	m_iSolidX1 = -1;
-	m_iSolidY1 = -1;
-	m_iSolidX2 = -1;
-	m_iSolidY2 = -1;
 	m_iVisibleX1 = 0;
 	m_iVisibleY1 = 0;
 	m_iVisibleX2 = 15;
@@ -245,10 +209,10 @@ void CThing::DrawActionBounds(const djColor &Color)
 {
 	djgSetColorFore(pVisView, Color);
 	djgDrawRectangle(pVisView,
-		CALC_XOFFSET(m_x,m_xsmall)+m_iActionX1,
-		CALC_YOFFSET(m_y)+m_iActionY1,
-		(m_iActionX2-m_iActionX1)+1,
-		(m_iActionY2-m_iActionY1)+1);
+		CALC_XOFFSET(m_x)+m_iActionX1 + m_xoffset,
+		CALC_YOFFSET(m_y)+m_iActionY1 + m_yoffset,
+		(m_iActionX2 - m_iActionX1)+1,
+		(m_iActionY2 - m_iActionY1)+1);
 }
 
 bool CThing::OverlapsBounds(int x, int y)
@@ -258,90 +222,10 @@ bool CThing::OverlapsBounds(int x, int y)
 	return OVERLAPS(
 		x, y,
 		x+15, y+31,
-		m_x*16+m_iActionX1, m_y*16+m_iActionY1,
-		m_x*16+m_iActionX2, m_y*16+m_iActionY2);
+		m_x*16+m_iActionX1+m_xoffset, m_y*16+m_iActionY1+m_yoffset,
+		m_x*16+m_iActionX2+m_xoffset, m_y*16+m_iActionY2+m_yoffset);
 }
 
-/*-----------------------------------------------------------*/
-CTest::CTest()
-{
-	m_eLayer = LAYER_TOP;
-	m_iActionX1 =  -8;
-	m_iActionY1 =  -16 - 16;
-	m_iActionX2 =  15+8;
-	m_iActionY2 =  15 - 16;
-	m_bSolid = true;
-	m_iSolidX1 = 5;
-	m_iSolidY1 = 5;
-	m_iSolidX2 = 10;
-	m_iSolidY2 = 10;
-	m_bxsmall = true;
-}
-
-void CTest::HeroEnter()
-{
-	CThing::HeroEnter();
-	update_health(-1);
-	HeroSetHurting();
-}
-
-int CTest::Tick()
-{
-	return 0;
-	static int nDir = -1;
-	static int nCount = 0;
-	nCount++;
-	if (nCount<=8)
-		return 0;
-	nCount = 0;
-
-	if (nDir==-1)
-	{
-		if (m_xsmall==1)
-			m_xsmall = 0; // no need to check
-		else
-		{
-			if (check_solid(m_x + nDir, m_y))
-				nDir = -nDir;
-			else
-			{
-				m_xsmall = 1;
-				m_x--;
-			}
-		}
-	}
-	else
-	{
-		if (m_xsmall==1)
-		{
-			m_xsmall = 0;
-			m_x++;
-		}
-		else
-		{
-			if (check_solid(m_x + 1, m_y))
-				nDir = -nDir;
-			else
-			{
-				m_xsmall = 1;
-			}
-		}
-	}
-
-	return 0;
-	//m_bSolid = false; // Otherwise we check ourselves
-	if (check_solid(m_x + nDir, m_y))
-		nDir = -nDir;
-	else
-		m_x += nDir;
-	//m_bSolid = true;
-	return 0;
-}
-
-void CTest::Draw()
-{
-	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x,m_xsmall), CALC_YOFFSET(m_y));
-}
 /*-----------------------------------------------------------*/
 CSpikeBall::CSpikeBall()
 {
@@ -354,7 +238,7 @@ CSpikeBall::CSpikeBall()
 
 void CSpikeBall::Draw()
 {
-	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x,m_xsmall), CALC_YOFFSET(m_y) + m_nYOffset*2);
+	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) + m_nYOffset*2);
 }
 
 void CSpikeBall::OnAdded()
@@ -444,7 +328,7 @@ int CBox::OnHeroShot()
 void CBox::Draw()
 {
 	if ( ( m_a | m_b ) != 0 )
-		DRAW_SPRITE16(pVisView, m_a, m_b, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+		DRAW_SPRITE16(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 /*-----------------------------------------------------------*/
 int CLetter::c_nBonusIndex = 0;
@@ -477,7 +361,7 @@ int CLetter::HeroOverlaps()
 
 void CLetter::Draw()
 {
-	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 /*-----------------------------------------------------------*/
 CLift::CLift()
@@ -500,7 +384,6 @@ int CLift::Tick()
 		// drop the lift a bit, it's no longer in use
 		if (m_height > 1)
 		{
-			m_yoffset++;
 			m_height--;
 		}
 	}
@@ -515,10 +398,10 @@ int CLift::Action()
 	m_bBusy = true;
 	if (move_hero(0, -1)==0)
 	{
-		m_yoffset--;
 		m_height++;
 		// We set these immediately, otherwise the hero may be outside the bounds,
 		// causing the lift to drop.
+		//SetActionBounds(0, -32 - (m_height-1)*16, 15, -1 - (m_height-1)*16);
 		SetActionBounds(0, -32 - (m_height-1)*16, 15, -1 - (m_height-1)*16);
 		SetSolidBounds(0, 0 - (m_height-1)*16, 15, 15);
 		SetVisibleBounds(0, 0 - (m_height-1)*16, 15, 15);
@@ -528,20 +411,20 @@ int CLift::Action()
 
 void CLift::Draw()
 {
-	int i;
-	for ( i=0; i<m_height; i++ )
+	for ( int i=0; i<m_height; ++i )
 	{
+		int nLiftBlockY = m_y-m_height+i+1;
 		// if section of lift is on-screen
-		if ( INBOUNDS( m_x + m_xoffset, m_y + m_yoffset + i,
+		if ( INBOUNDS( m_x, nLiftBlockY,
 			xo, yo, xo + VIEW_WIDTH + xo_small, yo + VIEW_HEIGHT ) )
 		{
 			if (i == 0)
 			{
-				DRAW_SPRITE16(pVisView, 1, 14, CALC_XOFFSET(m_x+m_xoffset,0), CALC_YOFFSET(m_y+m_yoffset));
+				DRAW_SPRITE16(pVisView, 1, 14, CALC_XOFFSET(m_x), CALC_YOFFSET(nLiftBlockY));
 			}
 			else
 			{
-				DRAW_SPRITE16(pVisView, 1, 15, CALC_XOFFSET(m_x+m_xoffset,0), CALC_YOFFSET(m_y+m_yoffset+i));
+				DRAW_SPRITE16(pVisView, 1, 15, CALC_XOFFSET(m_x), CALC_YOFFSET(nLiftBlockY));
 			}
 		}
 	}
@@ -573,7 +456,7 @@ int CExplosion::Tick()
 
 void CExplosion::Draw()
 {
-	DRAW_SPRITE16A(pVisView, 5, 16 + (3 - ((m_countdown+2)%4)), CALC_XOFFSET(m_x,m_xsmall) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
+	DRAW_SPRITE16A(pVisView, 5, 16 + (3 - ((m_countdown+2)%4)), CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 }
 /*-----------------------------------------------------------*/
 CExit::CExit()
@@ -599,10 +482,10 @@ void CExit::Draw()
 {
 	int nOffset;
 	nOffset = (m_nActivated>=1 ? ((djMIN(5,m_nActivated)-1)%4)*2 : 0);
-	DRAW_SPRITE16(pVisView, 5,  96 + nOffset, CALC_XOFFSET(m_x  ,0), CALC_YOFFSET(m_y-1));
-	DRAW_SPRITE16(pVisView, 5,  97 + nOffset, CALC_XOFFSET(m_x+1,0), CALC_YOFFSET(m_y-1));
-	DRAW_SPRITE16(pVisView, 5, 112 + nOffset, CALC_XOFFSET(m_x  ,0), CALC_YOFFSET(m_y  ));
-	DRAW_SPRITE16(pVisView, 5, 113 + nOffset, CALC_XOFFSET(m_x+1,0), CALC_YOFFSET(m_y  ));
+	DRAW_SPRITE16(pVisView, 5,  96 + nOffset, CALC_XOFFSET(m_x  ), CALC_YOFFSET(m_y-1));
+	DRAW_SPRITE16(pVisView, 5,  97 + nOffset, CALC_XOFFSET(m_x+1), CALC_YOFFSET(m_y-1));
+	DRAW_SPRITE16(pVisView, 5, 112 + nOffset, CALC_XOFFSET(m_x  ), CALC_YOFFSET(m_y  ));
+	DRAW_SPRITE16(pVisView, 5, 113 + nOffset, CALC_XOFFSET(m_x+1), CALC_YOFFSET(m_y  ));
 }
 
 int CExit::Action()
@@ -642,9 +525,6 @@ CTeleporter::CTeleporter()
 	m_yoffset = -1;
 	m_width = 3;
 	m_height = 2;
-	// Action key testing box
-	SetActionBounds ( -8, -16, 15+8,  15);
-	SetVisibleBounds(-16, -32, 15+16, 15);
 
 	m_iType = TYPE_TELEPORTER;
 	m_iAnimationCount=0;
@@ -662,6 +542,9 @@ CTeleporter::CTeleporter()
 void CTeleporter::Initialize(int b0, int b1)
 {
 	SetID(GET_EXTRA(b0, b1, 0));
+	// Action key testing box
+	SetActionBounds ( -8, -16, 15+8,  15);
+	SetVisibleBounds(-16, -32, 15+16, 15);
 }
 
 int CTeleporter::Action()
@@ -721,15 +604,15 @@ int CTeleporter::Tick()
 void CTeleporter::Draw()
 {
 	int nOffset = (m_iAnimationCount % 3) * 3;
-	DRAW_SPRITE16A(pVisView, 5,  48+nOffset, CALC_XOFFSET(m_x-1,0), CALC_YOFFSET(m_y-2));
-	DRAW_SPRITE16A(pVisView, 5,  49+nOffset, CALC_XOFFSET(m_x  ,0), CALC_YOFFSET(m_y-2));
-	DRAW_SPRITE16A(pVisView, 5,  50+nOffset, CALC_XOFFSET(m_x+1,0), CALC_YOFFSET(m_y-2));
-	DRAW_SPRITE16A(pVisView, 5,  64, CALC_XOFFSET(m_x-1,0), CALC_YOFFSET(m_y-1));
-	DRAW_SPRITE16A(pVisView, 5,  65, CALC_XOFFSET(m_x  ,0), CALC_YOFFSET(m_y-1));
-	DRAW_SPRITE16A(pVisView, 5,  66, CALC_XOFFSET(m_x+1,0), CALC_YOFFSET(m_y-1));
-	DRAW_SPRITE16A(pVisView, 5,  80, CALC_XOFFSET(m_x-1,0), CALC_YOFFSET(m_y  ));
-	DRAW_SPRITE16A(pVisView, 5,  81, CALC_XOFFSET(m_x  ,0), CALC_YOFFSET(m_y  ));
-	DRAW_SPRITE16A(pVisView, 5,  82, CALC_XOFFSET(m_x+1,0), CALC_YOFFSET(m_y  ));
+	DRAW_SPRITE16A(pVisView, 5,  48+nOffset, CALC_XOFFSET(m_x-1), CALC_YOFFSET(m_y-2));
+	DRAW_SPRITE16A(pVisView, 5,  49+nOffset, CALC_XOFFSET(m_x  ), CALC_YOFFSET(m_y-2));
+	DRAW_SPRITE16A(pVisView, 5,  50+nOffset, CALC_XOFFSET(m_x+1), CALC_YOFFSET(m_y-2));
+	DRAW_SPRITE16A(pVisView, 5,  64, CALC_XOFFSET(m_x-1), CALC_YOFFSET(m_y-1));
+	DRAW_SPRITE16A(pVisView, 5,  65, CALC_XOFFSET(m_x  ), CALC_YOFFSET(m_y-1));
+	DRAW_SPRITE16A(pVisView, 5,  66, CALC_XOFFSET(m_x+1), CALC_YOFFSET(m_y-1));
+	DRAW_SPRITE16A(pVisView, 5,  80, CALC_XOFFSET(m_x-1), CALC_YOFFSET(m_y  ));
+	DRAW_SPRITE16A(pVisView, 5,  81, CALC_XOFFSET(m_x  ), CALC_YOFFSET(m_y  ));
+	DRAW_SPRITE16A(pVisView, 5,  82, CALC_XOFFSET(m_x+1), CALC_YOFFSET(m_y  ));
 }
 /*-----------------------------------------------------------*/
 CFloatingScore::CFloatingScore()
@@ -815,11 +698,11 @@ void CDoor::Draw()
 	if (CHECK_FLAG(m_a, m_b, FLAG_ANIMATED))
 	{
 	extern int anim4_count;//[dj2017-06-26 gross, not mad about this 'global' but will do for now]
-	DRAW_SPRITE16A(pVisView, m_a, m_b+anim4_count, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b+anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 	}
 	else
 	{
-	DRAW_SPRITE16A(pVisView, m_a, m_b+m_nOpenState, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b+m_nOpenState, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 	}
 }
 /*-----------------------------------------------------------*/
@@ -844,7 +727,7 @@ int CKey::HeroOverlaps()
 
 void CKey::Draw()
 {
-	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 /*-----------------------------------------------------------*/
 CDoorActivator::CDoorActivator()
@@ -899,11 +782,11 @@ void CDoorActivator::Draw()
 	if (CHECK_FLAG(m_a, m_b, FLAG_ANIMATED))
 	{
 	extern int anim4_count;//[dj2017-06-26 gross, not mad about this 'global' but will do for now]
-	DRAW_SPRITE16A(pVisView, m_a, m_b+anim4_count, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b+anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 	}
 	else
 	{
-	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 	}
 }
 /*-----------------------------------------------------------*/
@@ -926,7 +809,7 @@ void CMasterComputer::OnActivated()
 }
 void CMasterComputer::Draw()
 {
-	DRAW_SPRITEA(pVisView, m_a, m_b-16, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y-1),32,32);
+	DRAW_SPRITEA(pVisView, m_a, m_b-16, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y-1),32,32);
 }
 /*-----------------------------------------------------------*/
 CSoftBlock::CSoftBlock()
@@ -939,7 +822,7 @@ CSoftBlock::CSoftBlock()
 }
 void CSoftBlock::Draw()
 {
-	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 
 int CSoftBlock::OnHeroShot()
@@ -967,7 +850,7 @@ void CCamera::Draw()
 		nOffset = -1;
 	else if (x > m_x + 1)
 		nOffset = 1;
-	DRAW_SPRITE16A(pVisView, m_a, m_b + nOffset, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b + nOffset, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 
 int CCamera::OnHeroShot()
@@ -993,7 +876,7 @@ CBanana::CBanana()
 
 void CBanana::Draw()
 {
-	DRAW_SPRITE16A(pVisView, m_a, m_b + m_nState, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b + m_nState, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 
 int CBanana::OnHeroShot()
@@ -1034,7 +917,7 @@ void CSoda::Draw()
 {
 	if (IsShot())
 	{
-		DRAW_SPRITE16A(pVisView, 2, 48 + m_nAnim, CALC_XOFFSET(m_x, 0), CALC_YOFFSET(m_y) - m_nShotHeight);
+		DRAW_SPRITE16A(pVisView, 2, 48 + m_nAnim, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) - m_nShotHeight);
 		return;
 	}
 	CPickup::Draw();
@@ -1099,15 +982,13 @@ int CFullHealth::HeroOverlaps()
 CCrawler::CCrawler()
 {
 	m_bShootable = true;
-	SetActionBounds(0,0,15,15);
-	m_nOffset = 0;
 	m_nDir = -1; // direction
 	m_nXDir = 0;
 }
 
 int CCrawler::Tick()
 {
-	if (m_nOffset==0)
+	if (m_yoffset==0)
 	{
 		if ((!check_solid(m_x + m_nXDir, m_y + m_nDir)) || (check_solid(m_x, m_y + m_nDir)))
 		{
@@ -1115,32 +996,29 @@ int CCrawler::Tick()
 			return 0;
 		}
 	}
-	m_nOffset += m_nDir;
-	if (m_nOffset<=-16)
+	m_yoffset += m_nDir;
+	if (m_yoffset<=-16)
 	{
-		m_nOffset = 0;
+		m_yoffset = 0;
 		m_y--;
 	}
-	else if (m_nOffset>=16)
+	else if (m_yoffset>=16)
 	{
-		m_nOffset = 0;
+		m_yoffset = 0;
 		m_y++;
 	}
-	SetActionBounds(0,m_nOffset,15,m_nOffset+15);
-	SetVisibleBounds(0,m_nOffset,15,m_nOffset+15);
-	SetShootBounds(0,m_nOffset,15,m_nOffset+15);
 	return 0;
 }
 
 void CCrawler::Draw()
 {
-	DRAW_SPRITE16A(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y) + m_nOffset);
+	DRAW_SPRITE16A(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) + m_yoffset);
 }
 
 int CCrawler::OnHeroShot()
 {
 	update_score(100, m_x, m_y);
-	AddThing(CreateExplosion(m_x*16, m_y*16+m_nOffset));
+	AddThing(CreateExplosion(m_x*16, m_y*16+m_yoffset));
 	return THING_DIE;
 }
 
@@ -1157,6 +1035,9 @@ int CCrawler::HeroOverlaps()
 void CCrawler::Initialize(int b0, int b1)
 {
 	m_nXDir = (GET_EXTRA(b0, b1, 0)==0 ? -1 : 1);
+	SetActionBounds(0,0,15,15);
+	SetVisibleBounds(0,0,15,15);
+	SetShootBounds(0,0,15,15);
 }
 /*-----------------------------------------------------------*/
 CSpike::CSpike()
@@ -1175,7 +1056,7 @@ int CSpike::Tick()
 
 void CSpike::Draw()
 {
-	DRAW_SPRITE16A(pVisView, m_a, m_b + (m_nSpikePopupCount>0 ? 1 : 0), CALC_XOFFSET(m_x,m_xsmall), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b + (m_nSpikePopupCount>0 ? 1 : 0), CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 
 int CSpike::HeroOverlaps()
@@ -1218,8 +1099,8 @@ int CBalloon::HeroOverlaps()
 
 void CBalloon::Draw()
 {
-	DRAW_SPRITE16A(pVisView, m_a, m_b,                         CALC_XOFFSET(m_x,m_xsmall), CALC_YOFFSET(m_y) - 16 - m_nHeight);
-	DRAW_SPRITE16A(pVisView, m_a, m_b+16+16*((m_nHeight/4)%2), CALC_XOFFSET(m_x,m_xsmall), CALC_YOFFSET(m_y)      - m_nHeight);
+	DRAW_SPRITE16A(pVisView, m_a, m_b,                         CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) - 16 - m_nHeight);
+	DRAW_SPRITE16A(pVisView, m_a, m_b+16+16*((m_nHeight/4)%2), CALC_XOFFSET(m_x), CALC_YOFFSET(m_y)      - m_nHeight);
 }
 
 int CBalloon::Tick()
@@ -1264,8 +1145,8 @@ int CAcme::HeroOverlaps()
 
 void CAcme::Draw()
 {
-	DRAW_SPRITE16(pVisView, m_a, m_b  , CALC_XOFFSET(m_x  ,0) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
-	DRAW_SPRITE16(pVisView, m_a, m_b+1, CALC_XOFFSET(m_x+1,0) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
+	DRAW_SPRITE16(pVisView, m_a, m_b  , CALC_XOFFSET(m_x  ) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
+	DRAW_SPRITE16(pVisView, m_a, m_b+1, CALC_XOFFSET(m_x+1) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 }
 
 int CAcme::Tick()
@@ -1367,7 +1248,7 @@ int CPickup::HeroOverlaps()
 
 void CPickup::Draw()
 {
-	DRAW_SPRITE16A(pVisView, m_a, m_b + (m_nAnimationCount==-1?0:m_nAnimationCount), CALC_XOFFSET(m_x, m_xsmall), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b + (m_nAnimationCount==-1?0:m_nAnimationCount), CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 
 int CPickup::Tick()
@@ -1451,7 +1332,7 @@ void CCrumblingFloor::Draw()
 {
 	for ( int i=0; i<m_nWidth; ++i )
 	{
-		DRAW_SPRITE16A(pVisView, m_a, m_b+(i%2), CALC_XOFFSET(m_x+i,0), CALC_YOFFSET(m_y));
+		DRAW_SPRITE16A(pVisView, m_a, m_b+(i%2), CALC_XOFFSET(m_x+i), CALC_YOFFSET(m_y));
 	}
 }
 void CCrumblingFloor::Initialize(int b0, int b1)
@@ -1491,7 +1372,7 @@ int CConveyor::Tick()
 
 void CConveyor::Draw()
 {
-	DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 
 void CConveyor::Initialize(int b0, int b1)
@@ -1532,22 +1413,22 @@ void CFlameThrow::Draw()
 	{
 		// Flicker small flame
 		if ((m_nCount % 4) < 2)
-			DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+			DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 	}
 	else
 	{
 		// Full flame
 		if ((m_nCount % 4) < 2)
 		{
-			DRAW_SPRITE16A(pVisView, m_a, m_b + m_nDir*1, CALC_XOFFSET(m_x         ,0), CALC_YOFFSET(m_y));
-			DRAW_SPRITE16A(pVisView, m_a, m_b + m_nDir*2, CALC_XOFFSET(m_x+m_nDir*1,0), CALC_YOFFSET(m_y));
-			DRAW_SPRITE16A(pVisView, m_a, m_b + m_nDir*3, CALC_XOFFSET(m_x+m_nDir*2,0), CALC_YOFFSET(m_y));
+			DRAW_SPRITE16A(pVisView, m_a, m_b + m_nDir*1, CALC_XOFFSET(m_x         ), CALC_YOFFSET(m_y));
+			DRAW_SPRITE16A(pVisView, m_a, m_b + m_nDir*2, CALC_XOFFSET(m_x+m_nDir*1), CALC_YOFFSET(m_y));
+			DRAW_SPRITE16A(pVisView, m_a, m_b + m_nDir*3, CALC_XOFFSET(m_x+m_nDir*2), CALC_YOFFSET(m_y));
 		}
 		else
 		{
-			DRAW_SPRITE16A(pVisView, m_a, m_b + m_nDir*2, CALC_XOFFSET(m_x         ,0), CALC_YOFFSET(m_y));
-			DRAW_SPRITE16A(pVisView, m_a, m_b + m_nDir*1, CALC_XOFFSET(m_x+m_nDir*1,0), CALC_YOFFSET(m_y));
-			DRAW_SPRITE16A(pVisView, m_a, m_b + m_nDir*3, CALC_XOFFSET(m_x+m_nDir*2,0), CALC_YOFFSET(m_y));
+			DRAW_SPRITE16A(pVisView, m_a, m_b + m_nDir*2, CALC_XOFFSET(m_x         ), CALC_YOFFSET(m_y));
+			DRAW_SPRITE16A(pVisView, m_a, m_b + m_nDir*1, CALC_XOFFSET(m_x+m_nDir*1), CALC_YOFFSET(m_y));
+			DRAW_SPRITE16A(pVisView, m_a, m_b + m_nDir*3, CALC_XOFFSET(m_x+m_nDir*2), CALC_YOFFSET(m_y));
 		}
 	}
 
@@ -1606,7 +1487,7 @@ void CDynamite::Draw()
 {
 	if (m_nCount < EXPLODECOUNT)
 	{
-		DRAW_SPRITE16A(pVisView, m_a, m_b + (m_nCount % 2), CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+		DRAW_SPRITE16A(pVisView, m_a, m_b + (m_nCount % 2), CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 		return;
 	}
 	int nStage = (m_nCount - EXPLODECOUNT) / 2;
@@ -1621,7 +1502,7 @@ void CDynamite::Draw()
 		m_nCenter = -1;
 	if (m_nCenter!=-1)
 	{
-		DRAW_SPRITE16A(pVisView, m_a, m_b + m_nCenter + 2, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+		DRAW_SPRITE16A(pVisView, m_a, m_b + m_nCenter + 2, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 	}
 
 	// Right side
@@ -1648,7 +1529,7 @@ void CDynamite::Draw()
 		{
 			if (m_nX1Right==0)
 				m_nX1Right = nOffset;
-			DRAW_SPRITE16A(pVisView, m_a, m_b + nGraphicsOffset + 2 + (3-i), CALC_XOFFSET(m_x+nOffset,0), CALC_YOFFSET(m_y));
+			DRAW_SPRITE16A(pVisView, m_a, m_b + nGraphicsOffset + 2 + (3-i), CALC_XOFFSET(m_x+nOffset), CALC_YOFFSET(m_y));
 			m_nX2Right++;
 		}
 	}
@@ -1677,7 +1558,7 @@ void CDynamite::Draw()
 		{
 			if (m_nX1Left==0)
 				m_nX1Left = nOffset;
-			DRAW_SPRITE16A(pVisView, m_a, m_b + nGraphicsOffset + 2 + i, CALC_XOFFSET(m_x-nOffset,0), CALC_YOFFSET(m_y));
+			DRAW_SPRITE16A(pVisView, m_a, m_b + nGraphicsOffset + 2 + i, CALC_XOFFSET(m_x-nOffset), CALC_YOFFSET(m_y));
 			m_nX2Left++;
 		}
 	}
@@ -1735,7 +1616,7 @@ void CDynamite::DrawActionBounds(const djColor &Color)
 	if (m_nCenter!=-1)
 	{
 		djgDrawRectangle(pVisView,
-			CALC_XOFFSET(m_x,0),
+			CALC_XOFFSET(m_x),
 			CALC_YOFFSET(m_y),
 			16,
 			16);
@@ -1743,16 +1624,16 @@ void CDynamite::DrawActionBounds(const djColor &Color)
 	if (m_nX2Right>0)
 	{
 		djgDrawRectangle(pVisView,
-			CALC_XOFFSET(m_x,0)+m_nX1Right*16,
-			CALC_YOFFSET(m_y)+0,
+			CALC_XOFFSET(m_x)+m_nX1Right*16,
+			CALC_YOFFSET(m_y),
 			m_nX2Right*16,
 			16);
 	}
 	if (m_nX2Left>0)
 	{
 		djgDrawRectangle(pVisView,
-			CALC_XOFFSET(m_x,0) - 16 * (m_nX1Left + m_nX2Left - 1),
-			CALC_YOFFSET(m_y)+0,
+			CALC_XOFFSET(m_x) - 16 * (m_nX1Left + m_nX2Left - 1),
+			CALC_YOFFSET(m_y),
 			m_nX2Left*16,
 			16);
 	}
@@ -1799,8 +1680,8 @@ int CFan::Tick()
 
 void CFan::Draw()
 {
-	DRAW_SPRITE16A(pVisView, m_a, m_b + m_nAnim   , CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
-	DRAW_SPRITE16A(pVisView, m_a, m_b + m_nAnim+16, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y+1));
+	DRAW_SPRITE16A(pVisView, m_a, m_b + m_nAnim   , CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b + m_nAnim+16, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y+1));
 }
 
 void CFan::Initialize(int b0, int b1)
@@ -1834,7 +1715,7 @@ CFirepower::CFirepower()
 
 void CFirepower::Draw()
 {
-	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x,0), CALC_YOFFSET(m_y));
+	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 
 int CFirepower::HeroOverlaps()
@@ -1889,7 +1770,7 @@ void CDust::Draw()
 	{
 		if (m_anAnim[i]<=3)
 		{
-			DRAW_SPRITE16A(pVisView, 5, 20 + m_anAnim[i], CALC_XOFFSET(m_anX[i],0)+m_xoffset, CALC_YOFFSET(m_anY[i])+m_yoffset);
+			DRAW_SPRITE16A(pVisView, 5, 20 + m_anAnim[i], CALC_XOFFSET(m_anX[i])+m_xoffset, CALC_YOFFSET(m_anY[i])+m_yoffset);
 		}
 	}
 }

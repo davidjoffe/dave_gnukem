@@ -51,7 +51,7 @@ const char * block_type_names[TYPE_LASTONE+1] =
    "39 Banana",
    "40 Camera",
    "41 SoftBlock",
-   "42 TestBlock",
+   "42 ",
    "43 SpikeBall",
    "44 Robot",
    "45 Flying Robot",

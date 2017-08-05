@@ -18,7 +18,7 @@ License: GNU GPL Version 2
 #include "config.h"
 
 //! Convert world X coordinate (level block coordinate) to view (world display buffer) coordinates.
-#define CALC_XOFFSET(x,xsmall) ( 8 * ( (xsmall) - xo_small + 2 + ((( (x) - xo ) << 1))) )
+#define CALC_XOFFSET(x) ( 8 * ( -xo_small + 2 + ((( (x) - xo ) << 1))) )
 //! Convert world Y coordinate (level block coordinate) to view (world display buffer) coordinates.
 #define CALC_YOFFSET(y) ( 16 + ((y) - yo) * 16 )
 
@@ -154,8 +154,6 @@ public:
 
 	//! Constructor
 	CThing();
-	//! Constructor
-	CThing( int x, int y, int xsmall, bool bxsmall );
 	//! Destructor
 	virtual ~CThing() {}
 
@@ -258,8 +256,6 @@ public:
 	int  m_b;            // sprite index
 	int  m_x;            // x position
 	int  m_y;            // y position
-	int  m_xsmall;       // x small offset (0 or 1)
-	bool m_bxsmall;      // does this block use x small offset?
 
 	//-- gravity
 	bool m_bFalls;       // affected by gravity?
@@ -293,14 +289,14 @@ public:
 	int m_iActionY1; // y offset (pixels) from (m_x*W,m_y*H)
 	int m_iActionX2; // in pixels
 	int m_iActionY2; // in pixels
-	//! Test if hero is completely inside the box
-	inline bool InBounds(int x, int y)
+	//! Test if hero is completely inside the box (not merely overlapping)
+	inline bool HeroInsideActionBounds(int x, int y)
 	{
 		return (
-			(x   >=m_x*16+m_iActionX1) &&
-			(x+15<=m_x*16+m_iActionX2) &&
-			(y   >=m_y*16+m_iActionY1) &&
-			(y+31<=m_y*16+m_iActionY2));
+			(x   >=m_x*16+m_xoffset+m_iActionX1) &&
+			(x+15<=m_x*16+m_xoffset+m_iActionX2) &&
+			(y   >=m_y*16+m_yoffset+m_iActionY1) &&
+			(y+31<=m_y*16+m_yoffset+m_iActionY2));
 	}
 	//! Test if hero is at least partially inside the box. By default this
 	//! just uses the action bounds; override this for things that have
@@ -327,11 +323,11 @@ public:
 
 	EdjLayer m_eLayer;   // Z-depth for drawing in "layers"
 
-	EdjLayer Layer()              { return m_eLayer; }
-	int      Width()              { return m_width; }
-	int      Height()             { return m_height; }
-	int      OffsetX()            { return m_xoffset; }
-	int      OffsetY()            { return m_yoffset; }
+	EdjLayer Layer() const        { return m_eLayer; }
+	int      Width() const        { return m_width; }
+	int      Height() const       { return m_height; }
+	int      OffsetX() const      { return m_xoffset; }
+	int      OffsetY() const      { return m_yoffset; }
 	void     SetType( int iType ) { m_iType = iType; }
 	void     SetLayer(EdjLayer l) { m_eLayer = l; }
 
@@ -349,22 +345,6 @@ protected:
 	bool     m_bShootable;
 
 	//@}
-};
-/*-----------------------------------------------------------*/
-/*!
-\class CTest
-\nosubgrouping
-
-Debug class for testing out stuff
-*/
-class CTest : public CThing
-{
-public:
-	CTest();
-
-	virtual void HeroEnter();
-	virtual void Draw();
-	virtual int  Tick();
 };
 /*-----------------------------------------------------------*/
 /*!
@@ -763,7 +743,6 @@ public:
 	virtual int HeroOverlaps();
 	virtual void Initialize(int b0, int b1);
 protected:
-	int m_nOffset;
 	int m_nDir; // direction
 	int m_nXDir; // -1=face left, 1=face right
 };
