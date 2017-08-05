@@ -93,11 +93,11 @@ void CRobot::Draw()
 {
 	if (m_nType==0) // Robot?
 	{
-		DRAW_SPRITE16A(pVisView, m_a, 32/*m_b*/ + anim4_count, CALC_XOFFSET(m_x,0) + m_xoffset, CALC_YOFFSET(m_y));
+		DRAW_SPRITE16A(pVisView, m_a, 32/*m_b*/ + anim4_count, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y));
 	}
 	else if (m_nType==1) // Fireball?
 	{
-		DRAW_SPRITEA(pVisView, m_a, (m_nXDir>0 ? 16 : 20) + anim4_count - 16, CALC_XOFFSET(m_x,0) + m_xoffset, CALC_YOFFSET(m_y-1), 16, 32);
+		DRAW_SPRITEA(pVisView, m_a, (m_nXDir>0 ? 16 : 20) + anim4_count - 16, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y-1), 16, 32);
 	}
 }
 
@@ -121,9 +121,6 @@ int CRobot::Tick()
 		m_xoffset = 0;
 		m_x += m_nXDir;
 	}
-	SetActionBounds (m_xoffset,m_nHeightOffset,m_xoffset+15,15);
-	SetVisibleBounds(m_xoffset,m_nHeightOffset,m_xoffset+15,15);
-	SetShootBounds  (m_xoffset,m_nHeightOffset,m_xoffset+15,15);
 
 	if (m_nType==0) // The robot shoots, not the fireball
 	{
@@ -164,6 +161,8 @@ void CRobot::Initialize(int a, int b)
 	CMonster::Initialize(a,b);
 
 	SetActionBounds(0,0,15,15);
+	SetVisibleBounds(0,0,15,15);
+	SetShootBounds  (0,0,15,15);
 
 	m_nXDir = (GET_EXTRA(a,b,0)==0 ? -1 : 1);
 	m_nType = GET_EXTRA(a,b,2);
@@ -222,7 +221,7 @@ void CFlyingRobot::Draw()
 	{
 		DRAW_SPRITE16A(pVisView,
 			m_a, m_b + anim4_count + 4,
-			CALC_XOFFSET(m_x,0) + m_xoffset,
+			CALC_XOFFSET(m_x) + m_xoffset,
 			CALC_YOFFSET(m_y) + m_yoffset
 			);
 	}
@@ -231,11 +230,11 @@ void CFlyingRobot::Draw()
 		// Spriteset has 8 sprites in a row: First 4 is facing right, next 4 facing left
 		if (m_nXDir>0)//Facing right?
 		{
-			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count    , CALC_XOFFSET(m_x,0) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
+			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count    , CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 		}
 		else//Facing left
 		{
-			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count + 4, CALC_XOFFSET(m_x,0) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
+			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count + 4, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 		}
 	}
 }
@@ -251,10 +250,6 @@ int CFlyingRobot::Tick()
 		// Sort of falls off to the left and downwards, off the screen
 		m_xoffset = -12 - (m_nDieAnimLength-m_nDieAnim)*4;
 		m_yoffset += (((m_nDieAnimLength-m_nDieAnim)*(m_nDieAnimLength-m_nDieAnim))/2);
-
-		SetActionBounds (m_xoffset,m_yoffset,m_xoffset+15,m_yoffset+15);
-		SetVisibleBounds(m_xoffset,m_yoffset,m_xoffset+15,m_yoffset+15);
-		SetShootBounds  (m_xoffset,m_yoffset,m_xoffset+15,m_yoffset+15);
 
 		return CThing::Tick();//Should this be CMonster::Tick()? CRobot::Tick()?
 	}
@@ -320,11 +315,6 @@ int CFlyingRobot::Tick()
 		}
 	}
 
-
-	SetActionBounds (m_xoffset,m_yoffset,m_xoffset+15,m_yoffset+15);
-	SetVisibleBounds(m_xoffset,m_yoffset,m_xoffset+15,m_yoffset+15);
-	SetShootBounds  (m_xoffset,m_yoffset,m_xoffset+15,m_yoffset+15);
-
 	if (m_nNoShootCounter>0)
 	{
 		m_nNoShootCounter--;
@@ -374,8 +364,8 @@ void CRabbit::Initialize(int a, int b)
 	// So if you have a bunch, they aren't necessarily all walking exactly in sync:
 	m_nWalkAnimOffset = rand()%4;
 	SetVisibleBounds(0,-BLOCKH,BLOCKW*2,BLOCKH-1);
-	SetShootBounds  (0,-BLOCKH,BLOCKW*2,BLOCKH-1);
-	SetActionBounds (0,-BLOCKH,BLOCKW*2,BLOCKH-1);
+	SetShootBounds  (8,-BLOCKH,BLOCKW*2-8,BLOCKH-1);
+	SetActionBounds (8,-BLOCKH,BLOCKW*2-8,BLOCKH-1);
 	SetLayer(LAYER_4);
 	m_bShootable = true;
 }
@@ -383,8 +373,8 @@ void CRabbit::Draw()
 {
 	const int a=6;//Spriteset number
 	const int b=(m_nXDir>0 ? 6*16 : 6*16 + 8);//Sprite number within spriteset
-	int x = CALC_XOFFSET(m_x,0) + m_xoffset;
-	int y = CALC_YOFFSET(m_y  ) + m_yoffset;
+	int x = CALC_XOFFSET(m_x) + m_xoffset;
+	int y = CALC_YOFFSET(m_y) + m_yoffset;
 	DRAW_SPRITEA(pVisView,
 		a   ,b+m_nWalkAnimOffset*2,
 		x   ,y-16,
@@ -458,6 +448,8 @@ void CHighVoltage::Initialize(int a, int b)
 {
 	CMonster::Initialize(a,b);
 
+	m_bFalls = false;
+
 	SetLayer(LAYER_4);
 	m_bShootable = true;
 
@@ -479,7 +471,7 @@ void CHighVoltage::Draw()
 		// This animation is very crude, might need something better here
 		//int b=m_b + ((anim4_count+m_nHeight)%4)*16;//Sprite number within spriteset
 		int b=m_b + ((i+anim4_count)%4)*16;//Sprite number within spriteset
-		int x = CALC_XOFFSET(m_x,0);
+		int x = CALC_XOFFSET(m_x  );
 		int y = CALC_YOFFSET(m_y+i);
 		DRAW_SPRITE16A(pVisView,a,b,x,y);
 	}
@@ -605,8 +597,8 @@ void CCannon::Draw()
 	// Draw sprite
 	int a=m_a;//Spriteset number
 	int b=(m_nXDir>0 ? m_b+4+(anim4_count%2)*2 : m_b+(anim4_count%2)*2);//Sprite number within spriteset
-	int x = CALC_XOFFSET(m_x,0) + m_xoffset;
-	int y = CALC_YOFFSET(m_y  ) + m_yoffset;
+	int x = CALC_XOFFSET(m_x) + m_xoffset;
+	int y = CALC_YOFFSET(m_y) + m_yoffset;
 	DRAW_SPRITEA(pVisView, a, b, x, y, 32, 16);
 
 	// Note that after it's been shot once, it 'smokes', to show it's injured [cf. DN1] [dj2017-08]
@@ -616,10 +608,10 @@ void CCannon::Draw()
 		a=5;//Spriteset number
 		b=36+anim4_count;//Sprite number within spriteset
 		if (m_nXDir<0)
-			x = CALC_XOFFSET(m_x,0) + m_xoffset + BLOCKW*2 - 6;
+			x = CALC_XOFFSET(m_x) + m_xoffset + BLOCKW*2 - 6;
 		else
-			x = CALC_XOFFSET(m_x,0) + m_xoffset - BLOCKW + 6;
-		y = CALC_YOFFSET(m_y  ) + m_yoffset;
+			x = CALC_XOFFSET(m_x) + m_xoffset - BLOCKW + 6;
+		y = CALC_YOFFSET(m_y) + m_yoffset;
 		DRAW_SPRITE16A(pVisView, a, b, x, y);
 	}
 }

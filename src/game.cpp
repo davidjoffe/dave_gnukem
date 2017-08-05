@@ -1032,7 +1032,7 @@ void GameHeartBeat()
 			for ( i=0; i<(int)g_apThings.size(); i++ )
 			{
 				CThing *pThing = g_apThings[i];
-				if (!HeroIsFrozen() && pThing->InBounds(x*16+x_small*8, y*16-16))
+				if (!HeroIsFrozen() && pThing->HeroInsideActionBounds(x*16+x_small*8, y*16-16+y_offset))
 				{
 //					int iRet = pThing->Action();
 					pThing->Action();
@@ -1280,7 +1280,7 @@ NextBullet3:
 		if (pThing!=NULL)
 		{
 			// Test if entering or leaving action bounds box
-			if (pThing->InBounds(x*16+x_small*8, y*16+y_offset-16))
+			if (pThing->HeroInsideActionBounds(x*16+x_small*8, y*16+y_offset-16))
 			{
 				if (!pThing->IsHeroInside())
 					pThing->HeroEnter();
@@ -1813,39 +1813,40 @@ void DrawDebugInfo()
 		{
 			nNumVisible++;
 			// The following is um 'wrong' the red one. The purple one more 'correct', incorporates m_xoffset,m_yoffset (NB note lowercase) [dj2017-07-28]
+			// red = 'wrong', ie not taking m_xoffset into account
 			djgDrawRectangle(pVisView,
-				CALC_XOFFSET(pThing->m_x,pThing->m_xsmall)+pThing->m_iVisibleX1,
+				CALC_XOFFSET(pThing->m_x)+pThing->m_iVisibleX1,
 				CALC_YOFFSET(pThing->m_y)+pThing->m_iVisibleY1,
 				(pThing->m_iVisibleX2-pThing->m_iVisibleX1)+1,
 				(pThing->m_iVisibleY2-pThing->m_iVisibleY1)+1);
 			// New purple box [dj2017-07] takes m_xoffset/m_yoffset into account
-			djgSetColorFore(pVisView,djColor(200,0,200));
+			djgSetColorFore(pVisView,djColor(200,0,200));//purple
 			djgDrawRectangle(pVisView,
-				1 + (CALC_XOFFSET(pThing->m_x,pThing->m_xsmall)+pThing->m_iVisibleX1 + pThing->m_xoffset),
+				1 + (CALC_XOFFSET(pThing->m_x)+pThing->m_iVisibleX1 + pThing->m_xoffset),
 				1 + (CALC_YOFFSET(pThing->m_y)+pThing->m_iVisibleY1                  + pThing->m_yoffset),
-				(pThing->m_iVisibleX2-pThing->m_iVisibleX1)-1,
-				(pThing->m_iVisibleY2-pThing->m_iVisibleY1)-1);
+				(pThing->m_iVisibleX2 - pThing->m_iVisibleX1)-1,
+				(pThing->m_iVisibleY2 - pThing->m_iVisibleY1)-1);
 		}
 
 		// Draw action bounds (cyan=overlapping, white=inside, yellow=not interacting)
 		if (pThing->OverlapsBounds(x*16+x_small*8, y*16+y_offset-16))
 		{
 			if (pThing->IsHeroInside())
-				pThing->DrawActionBounds(djColor(255,255,255));
+				pThing->DrawActionBounds(djColor(255,255,255));//white
 			else
-				pThing->DrawActionBounds(djColor(0,255,255));
+				pThing->DrawActionBounds(djColor(0,255,255));//cyan
 		}
 		else
-			pThing->DrawActionBounds(djColor(255,255,0));
+			pThing->DrawActionBounds(djColor(255,255,0));//yellow
 		// Draw solid bounds (green)
 		if (pThing->m_bSolid)
 		{
-			djgSetColorFore( pVisView, djColor(0,255,0) );
+			djgSetColorFore( pVisView, djColor(0,255,0) );//green
 			djgDrawRectangle( pVisView,
-				CALC_XOFFSET(pThing->m_x,pThing->m_xsmall) + pThing->m_iSolidX1,
-				CALC_YOFFSET(pThing->m_y) + pThing->m_iSolidY1,
-				(pThing->m_iSolidX2-pThing->m_iSolidX1)+1,
-				(pThing->m_iSolidY2-pThing->m_iSolidY1)+1 );
+				CALC_XOFFSET(pThing->m_x) + pThing->m_iSolidX1 + pThing->m_xoffset,
+				CALC_YOFFSET(pThing->m_y) + pThing->m_iSolidY1 + pThing->m_yoffset,
+				(pThing->m_iSolidX2 - pThing->m_iSolidX1)+1,
+				(pThing->m_iSolidY2 - pThing->m_iSolidY1)+1 );
 		}
 	}
 
@@ -1867,6 +1868,8 @@ void DrawDebugInfo()
 	extern int nFrozenCount;
 	sprintf(buf, "frozecount=%d", nFrozenCount);
 	GraphDrawString(pVisView, g_pFont8x8, 32, 56, (unsigned char*)buf );
+	//sprintf(buf, "[%d,%d,%d,%d]", x,y,x_small,y_offset);
+	//GraphDrawString(pVisView, g_pFont8x8, 32, 56+8, (unsigned char*)buf );
 	//sprintf(buf, "hero_mode=%d", hero_mode);
 	//GraphDrawString(pVisView, g_pFont8x8, 32, 62, (unsigned char*)buf );
 }

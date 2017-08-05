@@ -86,8 +86,8 @@ enum EBlockType
 	TYPE_CAMERA,
 	//! 41 Solid block which disappears when gets shot
 	TYPE_SOFTBLOCK,
-	//! 42 Debug block, used for testing stuff out
-	TYPE_TEST,
+	//! 42 Unused [This used to be TYPE_TEST (CTest) - reclaiming it and making it unused - dj2017-08]
+	TYPE_42,
 	//! 43 Bouncing spiked ball
 	TYPE_SPIKEBALL,
 	//! 44 Monster - Dumb robot
