@@ -120,5 +120,68 @@ public:
 	virtual int OnKilled();
 };
 /*-----------------------------------------------------------*/
+/*!
+\class CCrawler
+\nosubgrouping
+
+Green crawler monster, clings to wall going up and down.
+*/
+class CCrawler : public CThing
+{
+public:
+	CCrawler();
+	virtual int Tick();
+	virtual void Draw();
+	virtual int  OnHeroShot();
+	virtual int HeroOverlaps();
+	virtual void Initialize(int b0, int b1);
+protected:
+	int m_nDir; // direction
+	int m_nXDir; // -1=face left, 1=face right
+};
+/*-----------------------------------------------------------*/
+/*!
+\class CSpike
+\nosubgrouping
+
+Spike in ground, hurts hero.
+
+Two types; static (extra[0]=0), and pop-up (extra[0]=1)
+*/
+class CSpike : public CThing
+{
+public:
+	CSpike();
+	virtual int  Tick();
+	virtual void Draw();
+	virtual int  HeroOverlaps();
+	virtual void Initialize(int b0, int b1);
+protected:
+	int m_nType;
+	int m_nSpikePopupCount;
+};
+/*-----------------------------------------------------------*/
+/*
+class CJumpingMonster : public CMonster
+{
+public:
+};
+class CLoopThing : public CMonster
+{
+public:
+};
+class CSpinningThing : public CMonster
+{
+public:
+};
+class CHelicopter : public CMonster
+{
+public:
+};
+class CBoss : public CMonster
+{
+public:
+};
+*/
 
 #endif
