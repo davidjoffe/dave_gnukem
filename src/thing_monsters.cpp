@@ -26,6 +26,8 @@ ALLOCATE_FUNCTION(CFlyingRobot);
 ALLOCATE_FUNCTION(CRabbit);
 ALLOCATE_FUNCTION(CHighVoltage);
 ALLOCATE_FUNCTION(CCannon);
+ALLOCATE_FUNCTION(CCrawler);
+ALLOCATE_FUNCTION(CSpike);
 
 // Register these classes in the object factory, for creating instances on level load etc.
 // Register these at runtime (can't use REGISTER_THING as it seems to not work on Windows/MSVC, I think because it gets called before the object factory's constructor gets called - dj2017-07)
@@ -36,6 +38,8 @@ void RegisterThings_Monsters()
 	REGISTER_THING2(CRabbit,		TYPE_RABBIT);
 	REGISTER_THING2(CHighVoltage,	TYPE_HIGHVOLTAGE);
 	REGISTER_THING2(CCannon,		TYPE_CANNON);
+	REGISTER_THING2(CCrawler,       TYPE_CRAWLER);
+	REGISTER_THING2(CSpike,         TYPE_SPIKE);
 }
 /*-----------------------------------------------------------*/
 
@@ -638,5 +642,109 @@ int CCannon::OnKilled()
 	AddThing(CreateExplosion(m_x*16+8, m_y*16));
 	//[TODO?] later could add a 'dying' animation here [dj2017-08]
 	return THING_DIE;
+}
+/*-----------------------------------------------------------*/
+CCrawler::CCrawler()
+{
+	m_bShootable = true;
+	m_nDir = -1; // direction
+	m_nXDir = 0;
+}
+
+int CCrawler::Tick()
+{
+	if (m_yoffset==0)
+	{
+		if ((!check_solid(m_x + m_nXDir, m_y + m_nDir)) || (check_solid(m_x, m_y + m_nDir)))
+		{
+			m_nDir = -m_nDir;
+			return 0;
+		}
+	}
+	m_yoffset += m_nDir;
+	if (m_yoffset<=-16)
+	{
+		m_yoffset = 0;
+		m_y--;
+	}
+	else if (m_yoffset>=16)
+	{
+		m_yoffset = 0;
+		m_y++;
+	}
+	return 0;
+}
+
+void CCrawler::Draw()
+{
+	DRAW_SPRITE16A(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) + m_yoffset);
+}
+
+int CCrawler::OnHeroShot()
+{
+	update_score(100, m_x, m_y);
+	AddThing(CreateExplosion(m_x*16, m_y*16+m_yoffset));
+	return THING_DIE;
+}
+
+int CCrawler::HeroOverlaps()
+{
+	if (!HeroIsHurting())
+	{
+		update_health(-1);
+		HeroSetHurting();
+	}
+	return 0;
+}
+
+void CCrawler::Initialize(int b0, int b1)
+{
+	m_nXDir = (GET_EXTRA(b0, b1, 0)==0 ? -1 : 1);
+	SetActionBounds(0,0,15,15);
+	SetVisibleBounds(0,0,15,15);
+	SetShootBounds(0,0,15,15);
+}
+/*-----------------------------------------------------------*/
+CSpike::CSpike()
+{
+	m_nType = 0;
+	m_nSpikePopupCount = 0;
+	SetActionBounds(0,0,15,15);
+}
+
+int CSpike::Tick()
+{
+	if (m_nSpikePopupCount>0)
+		m_nSpikePopupCount--;
+	return 0;
+}
+
+void CSpike::Draw()
+{
+	DRAW_SPRITE16A(pVisView, m_a, m_b + (m_nSpikePopupCount>0 ? 1 : 0), CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
+}
+
+int CSpike::HeroOverlaps()
+{
+	if (!HeroIsHurting())
+	{
+		update_health(-1);
+		HeroSetHurting();
+	}
+	if (m_nType==1) // Pop-up type
+	{
+		m_nSpikePopupCount = 10;
+	}
+	return 0;
+}
+
+void CSpike::Initialize(int b0, int b1)
+{
+	m_nType = GET_EXTRA(b0, b1, 0);
+	if (m_nType==1)
+	{
+		SetActionBounds(4,4,11,15);
+		SetVisibleBounds(4,4,11,15);
+	}
 }
 /*-----------------------------------------------------------*/
