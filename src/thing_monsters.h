@@ -161,11 +161,23 @@ protected:
 	int m_nSpikePopupCount;
 };
 /*-----------------------------------------------------------*/
-/*
 class CJumpingMonster : public CMonster
 {
 public:
+	CJumpingMonster();
+	virtual int  Tick();
+	virtual void Draw();
+	virtual void Initialize(int a, int b);
+	virtual int HeroOverlaps();
+	virtual int OnKilled();
+protected:
+	int m_nJumpingIndex;
+	bool m_bFalling;
+	bool IsJumping() const { return m_nJumpingIndex>=0; }
+	bool m_bLinedUpToShoot;
 };
+/*-----------------------------------------------------------*/
+/*
 class CLoopThing : public CMonster
 {
 public:

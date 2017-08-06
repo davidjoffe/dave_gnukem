@@ -101,7 +101,9 @@ enum EBlockType
 	TYPE_HIGHVOLTAGE,
 	//! 48 Cannon-on-wheels-ish-type-thing
 	TYPE_CANNON,
-	//! Highest used block value
+	//! 49 Jumping monster [dj2017-08]
+	TYPE_JUMPINGMONSTER,
+	//! Highest used block value (UNUSED VALUE)
 	TYPE_LASTONE
 };
 
