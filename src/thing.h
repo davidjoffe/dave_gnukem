@@ -894,6 +894,31 @@ public:
 };
 /*-----------------------------------------------------------*/
 /*!
+\class CRocket
+\nosubgrouping
+
+Big rocket. When you shoot it, takes off and flies upwards.
+*/
+class CRocket : public CThing
+{
+public:
+	CRocket();
+	virtual int Tick();
+	virtual void Draw();
+	virtual void Initialize(int a, int b);
+	virtual int OnHeroShot();
+protected:
+	int m_nStrength;
+	bool m_bTakingOff;
+	float m_fVelocity;
+	float m_fAccel;
+	float m_fDeltaAccel;
+	float m_fHeight;
+	int m_nYStart;
+	int m_nFireAnim;
+};
+/*-----------------------------------------------------------*/
+/*!
 \class CDust
 \nosubgrouping
 

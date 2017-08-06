@@ -15,6 +15,7 @@ License: GNU GPL Version 2
 #include "hero.h"
 #include <assert.h>
 #include "game.h"
+#include "level.h"//For LEVCHAR_FOREA etc. for CRocket
 #include "inventory.h"
 
 SOUND_HANDLE CTeleporter::c_iSoundTeleport=SOUNDHANDLE_INVALID;
@@ -96,6 +97,7 @@ REGISTER_THING(CExit,          TYPE_EXIT, NULL);
 REGISTER_THING(CLetter,        TYPE_LETTER, CLetterPerLevelInit);
 REGISTER_THING(CBox,           TYPE_BOX, NULL);
 REGISTER_THING(CTeleporter,    TYPE_TELEPORTER, NULL);
+REGISTER_THING(CRocket,        TYPE_ROCKET, NULL);
 REGISTER_THING(CDoor,          TYPE_DOOR, NULL);
 REGISTER_THING(CKey,           TYPE_KEY, NULL);
 REGISTER_THING(CAccessCard,    TYPE_ACCESSCARD, NULL);
@@ -1597,6 +1599,125 @@ int CFan::OnHeroShot()
 	{
 		m_nSpeed = 1;
 		m_nAnimTimer = m_nSpeed;
+	}
+	return 0;
+}
+/*-----------------------------------------------------------*/
+CRocket::CRocket() :
+	m_nStrength(1),
+	m_bTakingOff(false),
+	m_fVelocity(0.f),
+	m_fAccel(0.f),
+	m_fHeight(0.f),
+	m_nYStart(0),
+	m_nFireAnim(0),
+	m_fDeltaAccel(0.02f)
+{
+}
+
+int CRocket::Tick()
+{
+	if (m_bTakingOff)
+	{
+		m_fAccel += m_fDeltaAccel;
+		m_fVelocity += m_fAccel;
+		if (m_fVelocity>=0.f)
+		{
+			m_fHeight += m_fVelocity;
+			m_y = m_nYStart;
+			m_yoffset = 0;
+			m_yoffset = -(int)(m_fHeight);
+			while (m_yoffset<-BLOCKH)
+			{
+				m_yoffset += BLOCKH;
+				m_y--;
+			}
+			if (m_y<=0)
+				return THING_DIE;
+		}
+	}
+	return 0;
+}
+
+void CRocket::Draw()
+{
+	// Hm, probably one single big blit is more efficient, but would leave 'wasted' space in sprite
+	DRAW_SPRITE16A(pVisView, 16, 1   , CALC_XOFFSET(m_x), CALC_YOFFSET(m_y-3) + m_yoffset);
+	DRAW_SPRITE16A(pVisView, 16, 1+16, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y-2) + m_yoffset);
+	DRAW_SPRITE16A(pVisView, 16, 1+32, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y-1) + m_yoffset);
+	DRAW_SPRITEA(pVisView, 16, 1+48-1, CALC_XOFFSET(m_x-1), CALC_YOFFSET(m_y  ) + m_yoffset, 16*3,16);
+	if (m_bTakingOff)
+	{
+		// Mod 6 so we do, size0, size1, size2, size3, size 2, size1, and loop
+		switch (m_nFireAnim)
+		{
+		case 0:
+			DRAW_SPRITE16A(pVisView, 16, 1+64  , CALC_XOFFSET(m_x), CALC_YOFFSET(m_y+1) + m_yoffset + (rand()%2));
+			break;
+		case 1:
+		case 5:
+			DRAW_SPRITE16A(pVisView, 16, 1+64+1, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y+1) + m_yoffset + (rand()%2));
+			break;
+		case 2:
+		case 4:
+			DRAW_SPRITEA(pVisView, 16, 1+64+1+1, CALC_XOFFSET(m_x)-8, CALC_YOFFSET(m_y+1) + m_yoffset + (rand()%2), 32, 32);
+			break;
+		case 3:
+			DRAW_SPRITEA(pVisView, 16, 1+64+1+1+2, CALC_XOFFSET(m_x)-8, CALC_YOFFSET(m_y+1) + m_yoffset + (rand()%2), 32, 32);
+			break;
+		}
+
+		++m_nFireAnim;
+		m_nFireAnim = (m_nFireAnim % 6);
+	}
+}
+
+void CRocket::Initialize(int a, int b)
+{
+	CThing::Initialize(a, b);
+	SetVisibleBounds(-16,-48,31,15);
+	SetActionBounds (0,-32,15,15);
+	SetShootBounds  (0,-32,15,15);
+	SetSolidBounds  (0,-48,15,15);
+	m_nStrength = 1;
+	m_bSolid = true;
+	m_bFalls = false;
+	m_bShootable = true;
+	SetLayer(LAYER_4);
+	m_fVelocity=-1.f;//Hack: Start velocity negative, this is just a hack, to make it sit on the ground for a second or two before it starts
+}
+
+int CRocket::OnHeroShot()
+{
+	if (m_nStrength>0)
+	{
+		--m_nStrength;
+		if (m_nStrength==0)
+		{
+			// START FLYING
+			m_bTakingOff = true;
+			m_nYStart = m_y;
+			// Increase visiblebounds for fire below
+			SetVisibleBounds(-16,-48,31,15 + 32);
+
+			// In the original DN1, rockets standing on solid block which disappears on takeoff. Do same.
+			// Not sure exactly the 'right' way, but let's say, I think, um, if *solid* block underneath
+			// us in *foreground* layer, remove it. (What about background layer? Think about) [dj2017-08]
+			if (m_y<LEVEL_HEIGHT-1)
+			{
+				// Clear block
+				unsigned char *pBlock = level_pointer( 0, m_x, m_y+1 );
+				*(pBlock + 0) = 0;
+				*(pBlock + 1) = 0;
+			}
+			if (m_y<LEVEL_HEIGHT-2)
+			{
+				// Clear block
+				unsigned char *pBlock = level_pointer( 0, m_x, m_y+2 );
+				*(pBlock + 0) = 0;
+				*(pBlock + 1) = 0;
+			}
+		}
 	}
 	return 0;
 }

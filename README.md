@@ -81,6 +81,10 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 # History / Changes
 
+Recent:
+
+* Add rockets
+
 2017/08/05 - Version 0.72 [Linux/Mac source release, Windows source and binary]:
 
 * Add new 'sort of looks like a cannon on wheels' monster type
