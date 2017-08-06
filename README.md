@@ -33,7 +33,7 @@ Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by A
 
 You can watch development on this project being live-streamed at:
 
-* https://www.liveedu.tv/david_joffe/l98yv-dave-gnukem-side-scrolling-shooter/
+* https://www.liveedu.tv/david_joffe/l98yv-dave-gnukem-side-scrolling-shooter/ (full development video archive here)
  * https://www.livecoding.tv/david_joffe/videos/wae18-dave-gnukem-c-game-side-scrolling-shooter and 
  * https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrolling-shooter-3 etc.
 * https://www.twitch.tv/david_joffe/
