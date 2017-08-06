@@ -36,5 +36,16 @@ extern unsigned char * level_pointer( int i, int x, int y );
 extern SLevelBlock     level_get_block( int i, int x, int y );
 extern void            level_delete( int i );
 
+/*--------------------------------------------------------------------------*/
+#define LEVCHAR_FOREA(x,y) (*( g_pLevel + (y) * 512 + (x) * 4 + 0 ))
+#define LEVCHAR_FOREB(x,y) (*( g_pLevel + (y) * 512 + (x) * 4 + 1 ))
+#define LEVCHAR_BACKA(x,y) (*( g_pLevel + (y) * 512 + (x) * 4 + 2 ))
+#define LEVCHAR_BACKB(x,y) (*( g_pLevel + (y) * 512 + (x) * 4 + 3 ))
+
+#define CHECK_SOLID(a,b)  ( GET_EXTRA( (a), (b), EXTRA_FLAGS ) & FLAG_SOLID )
+
+extern unsigned char *g_pLevel;
+/*--------------------------------------------------------------------------*/
+
 #endif
 

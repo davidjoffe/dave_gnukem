@@ -26,7 +26,8 @@ enum EBlockType
 	TYPE_LIFT,
 	//! 08 Teleporter
 	TYPE_TELEPORTER,
-	TYPE_09,
+	//! 09 Rocket [dj2017-08]
+	TYPE_ROCKET,
 	TYPE_10,
 	//! 11 Firepower
 	TYPE_FIREPOWER,
