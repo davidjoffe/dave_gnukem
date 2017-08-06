@@ -351,6 +351,14 @@ int CFlyingRobot::Tick()
 					m_nNoShootCounter = 24;// fixme, should be time, not frame count
 				}
 			}
+			else
+			{
+				// If we don't do this, then we have slightly really annoying situation
+				// where you sorta jump up, and they immediately shoot when you as soon
+				// as you're at the same level (while jumping) .. this gives you a little
+				// chance.
+				m_nNoShootCounter = 6;//Make lower (or 0) to increase difficulty
+			}
 		}
 		else
 			m_nNoShootCounter = 6;//<- It feels slightly 'unfair' if you walk hurriedly off left/right
