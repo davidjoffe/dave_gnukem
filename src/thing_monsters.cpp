@@ -11,6 +11,17 @@ License: GNU GPL Version 2
 #include "mission.h"//GET_EXTRA
 #include "graph.h"//pVisView etc.
 
+// We define everything's position in blockx,blocky (m_x,m_y), plus a pixel offset relative to that (m_xoffset,m_yoffset).
+// This implies there's more than one way to describe the same ultimate pixel coordinate, e.g.
+// if blocksize is 16 pixels, then e.g.
+// m_x 10 + m_xoffset 20
+// is the same position as
+// m_x 11 + m_xoffset 4 (i.e. 20 - 16)
+// is also the same as
+// m_x  9 + m_xoffset 20+16
+// etc.
+// This helper is just to help 'normalize' it to the smallest/simplest case.
+// (Maybe a silly system, I don't know, but that's how it evolved, as initially everything was block units. dj2017-08)
 #define NORMALIZEX\
 	while (m_xoffset>=BLOCKH)\
 	{\
