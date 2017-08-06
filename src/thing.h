@@ -259,7 +259,7 @@ public:
 
 	//-- gravity
 	bool m_bFalls;       // affected by gravity?
-	bool Falls() { return m_bFalls; }
+	bool Falls() const { return m_bFalls; }
 
 	//-- solidness
 	bool m_bSolid;   // solid?

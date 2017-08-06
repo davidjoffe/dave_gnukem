@@ -83,6 +83,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+* Add jump-monster
 * Add rockets
 
 2017/08/05 - Version 0.72 [Linux/Mac source release, Windows source and binary]:

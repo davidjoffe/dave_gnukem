@@ -11,6 +11,18 @@ License: GNU GPL Version 2
 #include "mission.h"//GET_EXTRA
 #include "graph.h"//pVisView etc.
 
+#define NORMALIZEX\
+	while (m_xoffset>=BLOCKH)\
+	{\
+		m_xoffset -= BLOCKH;\
+		++m_x;\
+	}\
+	while (m_xoffset<=-BLOCKH)\
+	{\
+		m_xoffset += BLOCKH;\
+		--m_x;\
+	}
+
 /*-----------------------------------------------------------*/
 //! Macro that "thing"s can use (in the .cpp file) to register handlers in the thing factory
 #define ALLOCATE_FUNCTION(ClassName)	\
@@ -26,6 +38,7 @@ ALLOCATE_FUNCTION(CFlyingRobot);
 ALLOCATE_FUNCTION(CRabbit);
 ALLOCATE_FUNCTION(CHighVoltage);
 ALLOCATE_FUNCTION(CCannon);
+ALLOCATE_FUNCTION(CJumpingMonster);
 ALLOCATE_FUNCTION(CCrawler);
 ALLOCATE_FUNCTION(CSpike);
 
@@ -38,6 +51,7 @@ void RegisterThings_Monsters()
 	REGISTER_THING2(CRabbit,		TYPE_RABBIT);
 	REGISTER_THING2(CHighVoltage,	TYPE_HIGHVOLTAGE);
 	REGISTER_THING2(CCannon,		TYPE_CANNON);
+	REGISTER_THING2(CJumpingMonster,TYPE_JUMPINGMONSTER);
 	REGISTER_THING2(CCrawler,       TYPE_CRAWLER);
 	REGISTER_THING2(CSpike,         TYPE_SPIKE);
 }
@@ -746,5 +760,192 @@ void CSpike::Initialize(int b0, int b1)
 		SetActionBounds(4,4,11,15);
 		SetVisibleBounds(4,4,11,15);
 	}
+}
+/*-----------------------------------------------------------*/
+CJumpingMonster::CJumpingMonster() :
+	m_nJumpingIndex(-1),
+	m_bFalling(false),
+	m_bLinedUpToShoot(false)
+{
+}
+int CJumpingMonster::Tick()
+{
+	// Turn to face (and move in) direction of hero
+	if (x < m_x - 1)
+		m_nXDir = -1;
+	else if (x > m_x + 1)
+		m_nXDir = 1;
+
+	if (IsInView())
+	{
+		if(m_nJumpingIndex<0 && !m_bFalling)
+		{
+			if ((m_bLinedUpToShoot && ((rand()%100)<2))
+				|| 
+				!m_bLinedUpToShoot && ((rand()%100)<4))
+			//if ((rand()%100)<4)
+			{
+				m_nJumpingIndex = 0;
+				SetVisibleBounds(0,-32,31,15);
+				SetActionBounds (0,-32,31,15);
+				SetShootBounds  (0,-32,31,15);
+			}
+		}
+	}
+
+	// dj2017-08 This if condition is a bit un-obvious - basically,
+	// things should fall by default only if in view, including monsters
+	// (eg if walk such that monster enters view, want to see it drop if it was placed in air) [NOT 100% sure of that but doesn't really matter - LOW]
+	// BUT, if we did actually jump, then we definitely fall. It would be
+	// silly if falling only if in view in that case, as eg we'd see it jump, we
+	// go out of view, wait a while, come back, and then it only finishes falling.
+	if (m_bFalling || ( IsInView() && !IsJumping()) )
+	{
+		if ( check_solid(m_x,m_y+1) || check_solid(m_x+1,m_y+1) )
+		{
+			// If *just* landed, set noshootcounter so we don't immediately shoot upon landing (give slight chance to hero)
+			if (m_bFalling)
+				m_nNoShootCounter = 4;//<- Make this lower to make monster more difficult
+			m_bFalling = false;
+			// make sure we go back to 2x2 square resting state/size
+			SetVisibleBounds(0,-16,31,15);
+			SetActionBounds (0,-16,31,15);
+			SetShootBounds  (0,-16,31,15);
+			m_yoffset = 0;
+		}
+		else
+		{
+			const int FALLSPEED = 4;//pixels
+			m_yoffset += FALLSPEED;//anJumpOffsetsY[m_nJumpingIndex];
+			while (m_yoffset>=BLOCKH)
+			{
+				m_yoffset -= BLOCKH;
+				++m_y;
+			}
+		}
+	}
+	if (IsJumping() || m_bFalling)
+	{
+		//fixme TODO x-direction collision detection here
+		m_xoffset += m_nXDir;
+		NORMALIZEX;
+	}
+
+	// If jumping, apply jump movements
+	if (IsJumping())
+	{
+		const int anJUMPOFFSETSY[] = { -8,-8,-6,-4,-4,-4,-4,-2,-2,-2,-1,0,0,0,99999 };
+
+		int nYSave = m_y;
+		int nYOffsetSave = m_yoffset;
+
+		m_yoffset += anJUMPOFFSETSY[m_nJumpingIndex];
+		while (m_yoffset<=-BLOCKH)
+		{
+			m_yoffset += BLOCKH;
+			m_y--;
+		}
+
+		++m_nJumpingIndex;
+		if (anJUMPOFFSETSY[m_nJumpingIndex]==99999)
+		{
+			m_nJumpingIndex = -1;
+			m_bFalling = true;
+		}
+
+		// If we busy jumping UP, then must collision-detect above us
+		if (check_solid(m_x,m_y-3,true) || check_solid(m_x+1,m_y-3,true))
+		{
+			// 'Disallow'/'revert' the movement itself
+			m_y = nYSave;
+			m_yoffset = nYOffsetSave;
+			//IMMEDIATELY stop jumping, go into falling state
+			m_nJumpingIndex = -1;
+			m_bFalling = true;
+		}
+	}
+
+	// If in view, and NOT jumping OR falling, AND sort of 'in line' with hero, then sometimes shoot
+	m_bLinedUpToShoot = false;
+	if (IsInView() && !m_bFalling && !IsJumping())
+	{
+		// Check we're facing hero, and hero is more or less at same height ..
+		if ((ABS(y-m_y)<3) && ((m_nXDir<0 && x<=m_x) || (m_nXDir>0 && x>=m_x)))
+		{
+			m_bLinedUpToShoot = true;
+			if (m_nNoShootCounter>0)
+			{
+				m_nNoShootCounter--;
+			}
+			else
+			{
+				const int SHOOTPERCENT=10;//<- Make this higher to increase difficulty
+				if ((rand()%100)<=SHOOTPERCENT)
+				{
+					const int nBULLETSPEEDX=10;
+					if (m_nXDir<0)//Facing left?
+						MonsterShoot(m_x*16+m_xoffset-BLOCKW  , m_y*16, m_nXDir*nBULLETSPEEDX,0);
+					else
+						MonsterShoot(m_x*16+m_xoffset+BLOCKW*2, m_y*16, m_nXDir*nBULLETSPEEDX,0);
+					// FIXME PLAY SOUND HERE?
+					m_nNoShootCounter = 12;//<- Make this lower to increase difficulty
+				}
+			}
+		}
+	}
+
+	return CMonster::Tick();
+}
+void CJumpingMonster::Draw()
+{
+	if (IsJumping() || m_bFalling)
+	{
+		const int a=m_a;//Spriteset number
+		const int b=(m_nXDir>0 ? m_b+16-4 : m_b+16-4+2);//Sprite number within spriteset
+		int x = CALC_XOFFSET(m_x) + m_xoffset;
+		int y = CALC_YOFFSET(m_y-2) + m_yoffset;
+		DRAW_SPRITEA(pVisView,
+			a   ,b,//+m_nWalkAnimOffset*2,
+			x   ,y,
+			32  ,  48);
+	}
+	else
+	{
+		const int a=m_a;//Spriteset number
+		const int b=(m_nXDir>0 ? m_b-16 : m_b-16+2);//Sprite number within spriteset
+		int x = CALC_XOFFSET(m_x) + m_xoffset;
+		int y = CALC_YOFFSET(m_y-1) + m_yoffset;
+		DRAW_SPRITEA(pVisView,
+			a   ,b,//+m_nWalkAnimOffset*2,
+			x   ,y,
+			32  ,  32);
+	}
+}
+void CJumpingMonster::Initialize(int a, int b)
+{
+	CMonster::Initialize(a,b);
+	m_bFalls = false;//<- Don't use 'default' fall stuff, since doesn't fall if not in view. We want to fall IF jumped if was in view
+	SetVisibleBounds(0,-16,31,15);
+	SetActionBounds (0,-16,31,15);
+	SetShootBounds  (0,-16,31,15);
+	m_nStrength = 3;//fixme chekc is this 3 or 4?
+	m_nJumpingIndex = -1;
+	m_bFalling = false;
+	m_nNoShootCounter = 12;
+}
+int CJumpingMonster::HeroOverlaps()
+{
+	if (!HeroIsHurting())
+	{
+		update_health(-1);
+		HeroSetHurting();
+	}
+	return 0;
+}
+int CJumpingMonster::OnKilled()
+{
+	update_score(150, m_x, m_y);
+	AddThing(CreateExplosion(m_x*16+8, m_y*16-8));
+	return THING_DIE;
 }
 /*-----------------------------------------------------------*/
