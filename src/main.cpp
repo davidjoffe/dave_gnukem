@@ -290,6 +290,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	// platforms (OpenPandora?
 	// e.g. see discussion thread here which I don't fully follow
 	// https://pyra-handheld.com/boards/threads/dave-gnukem.79533/
+	// Though note, 640x480 vs 640x400?
 	// )
 	// I think in theory -640 should behave the same as if passing "-scale 2" now
 	// but my memory of this stuff is a little vague so this needs to be checked.
