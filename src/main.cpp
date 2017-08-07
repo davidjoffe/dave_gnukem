@@ -279,7 +279,20 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	//-- Initialize graphics
 	//
 	// NOTE: Use 640x480 if you want to use the built-in editor (F4/F5)
-	//
+	// [dj2017-08] The above comment should in most situations no longer be relevant,
+	// and actually probably worse than what you'd now get with the default behavior.
+	// By default it now basically tries to create a window that is the largest
+	// window (that's a 320x200 ratio), so e.g. on a 1920x1080 screen you might
+	// by default get e.g. window that's a scale factor of 5, e.g. 1600x1000,
+	// which is MUCH nicer for level editing than 640x400! The 640 is I think partly
+	// a legacy stemming from the days where 640x480 was a standard/common video
+	// mode ... but I'm not sure if it might still be relevant/helpful on some
+	// platforms (OpenPandora?
+	// e.g. see discussion thread here which I don't fully follow
+	// https://pyra-handheld.com/boards/threads/dave-gnukem.79533/
+	// )
+	// I think in theory -640 should behave the same as if passing "-scale 2" now
+	// but my memory of this stuff is a little vague so this needs to be checked.
 	Log ("DaveStartup(): Initializing graphics system ...\n");
 	int w=320;
 	int h=200;
