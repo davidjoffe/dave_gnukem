@@ -131,7 +131,10 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 
 	// [dj2016-10] Get the user's monitor resolution, and find (basically) largest multiple of 320x200 that fits in
 	// that size, to make for 'largest possible' gameplay window, that also scales from 320x200 'proportionally' nicely
-	// (i.e. square aspect ratio of pixels, etc.)
+	// (i.e. square aspect ratio of pixels, etc.).
+	// The game renders to a 320x200 game view buffer which is either blitted or scale-blitted
+	// to the back(front?)buffer and then 'flipped' each frame. This allows the game to
+	// be basically 320x200 but allows the integrated level editor to be much higher resolution.
 	// [low/future] - if 2 monitors, will this behave 'correct'
 	const SDL_VideoInfo* vidinfo = SDL_GetVideoInfo();
 	int max_w = -1;
@@ -144,7 +147,7 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 		if (max_w>iWidth && max_h>iHeight)
 		{
 			int nMultiple = djMAX(1, djMIN( max_w / iWidth, max_h / iHeight ) );
-			// If a forced scale factor has been passed in, try use that
+			// If a forced scale factor has been passed in by commandline, try use that
 			// what happens if pass in ginormous value? crash .. so limit to make 'not too big' e.g. nMultiple*2 max?
 			if (nForceScale>=1)
 			{
