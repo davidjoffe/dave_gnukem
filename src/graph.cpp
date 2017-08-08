@@ -137,6 +137,7 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 	// be basically 320x200 but allows the integrated level editor to be much higher resolution.
 	// (Note though in full-screen mode I think the above does not apply, it just
 	// tries to set a 'true' 320x200 fullscreen display mode, IIRC - dj2017-08.)
+	// No that doesn't seem to be what happens, press F5 when running with "-f" and see.
 	// [low/future] - if 2 monitors, will this behave 'correct'
 	const SDL_VideoInfo* vidinfo = SDL_GetVideoInfo();
 	int max_w = -1;

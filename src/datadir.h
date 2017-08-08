@@ -11,7 +11,7 @@ License: GNU GPL Version 2
 #ifndef _DATADIR_H_
 #define _DATADIR_H_
 
-//! Data directory
+//! Data directory [dj2017-08 should this move to config.h?]
 #define DATA_DIR "data/"
 
 #endif

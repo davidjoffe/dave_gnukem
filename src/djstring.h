@@ -30,4 +30,11 @@ extern char * djStrPart( const char *str, int i, const char *delim );
 //! Helper to create a std::string with value as per printf-style formatting and variable argument list
 extern std::string djStrPrintf( const char* szFormat, ... );
 
+
+// Some quick n dirty file/path helpers [dj2017-08]
+
+extern void djAppendPathS(std::string& sPath,const char* szAppend);
+extern void djAppendPath(const char* szPath,const char* szAppend);
+extern bool djFileExists(const char* szPath);
+
 #endif

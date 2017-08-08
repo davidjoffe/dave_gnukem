@@ -160,45 +160,6 @@ int main ( int argc, char** argv )
 	return 0;
 }
 
-#ifdef __APPLE__
-// Append a folder to existing path, 'intelligently' handling
-// the trailing slash worries for us.
-void djAppendPath(char* szPath,char* szAppend)
-{
-	if (szPath==NULL)return;
-	if (szAppend==NULL||szAppend[0]==0)return;
-
-	// If doesn't have trailing slash, add one (unless szPath is empty string)
-	if (strlen(szPath)>0)
-	{
-		char cLast = szPath[ strlen(szPath)-1 ];
-		if (cLast!='/' && cLast!='\\')
-		{
-			strcat(szPath,"/");
-		}
-	}
-	strcat(szPath,szAppend);
-}
-/*bool djFolderExists(const char* szPath)
-{
-	struct stat sb;
-	if (stat(szPath, &sb) == 0 && S_ISDIR(sb.st_mode))
-	{
-		return true;
-	}
-	return false;
-}*/
-bool djFileExists(const char* szPath)
-{
-	struct stat sb;
-	if (stat(szPath, &sb) == 0 && S_ISREG(sb.st_mode))
-	{
-		return true;
-	}
-	return false;
-}
-#endif
-
 int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::string >& Parameters)
 {
 	InitLog ();

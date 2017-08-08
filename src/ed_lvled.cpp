@@ -4,6 +4,9 @@
 #include "ed_macros.h"
 #include "djinput.h"
 #include "graph.h"
+#include "djstring.h"//djAppendPathS
+#include "datadir.h"//DATA_DIR
+#include "djtime.h"//djTimeGetTime() (for frame rate control in instructions screen loop)
 #include "mission.h"		// g_pCurMission comes from here.
 				// TODO: think of something to get
 				// rid of that dependency on
@@ -16,6 +19,8 @@
 #include <map>
 #include <utility>//For std::pair
 #include "block.h"//For names of block types for DN1
+//---------------------------------------------------------------------------
+extern int g_nLevel;//points to current level.//fixme dj2017-08 this is slightly gross but not as gross as having effectively two g_nLevel variables as it had been, caused problems
 //---------------------------------------------------------------------------
 
 
@@ -40,17 +45,16 @@ static int	levelview_w = LEVEL_VIEW_WIDTH;	// these two are for representing
 static int	levelview_h = LEVEL_VIEW_HEIGHT;	// a minimap.
 static bool	bShowBack = true;	// toggles display of background blocks (the ones that could be trated as 'world', not the entities)
 static bool	bLevelFore = true;//false;	// toggles drawing of foreground layer
-static int	g_nLevel = 0;		// points to current level.
 static int	sprite0a = 0;
 static int	sprite0b = 0;
 static int	sprite1a = 0;
 static int	sprite1b = 0;
 
 // Unsaved changes flag [dj2017-06-27]
-int g_bDocumentDirty = false;
+bool g_bDocumentDirty = false;
 
 
-#define NUM_LEVEL_INSTRUCTIONS 15
+#define NUM_LEVEL_INSTRUCTIONS 16
 static const char *level_instructions[NUM_LEVEL_INSTRUCTIONS] =
 {
 	"- Instructions: ----------",
@@ -65,6 +69,7 @@ static const char *level_instructions[NUM_LEVEL_INSTRUCTIONS] =
 	"F       Horizontal fill",
 	"M       Next spriteset",
 	"N       Previous spriteset",
+	"Ctl+Alt+N New level",
 	// These two now defunct:[dj2017-06]
 	//"^C+M    Next level",
 	//"^C+N    Previous level",
@@ -372,6 +377,60 @@ void LVLED_Kill ()
 	g_bDocumentDirty=false;
 }
 
+void DoCreateNewLevel()
+{
+	//fixmeLOW if unsaved changes, doens't ask or anythign. Should warn and ask are you sure before just wiping changes and creating new level.
+	g_bDocumentDirty=false;
+
+	//Generate a unique filename (using counter - if file exists, increment counter and try again)
+	//fixLOW handle unicode in paths? Future? [dj2017-08]
+	std::string sPath = DATA_DIR;
+	djAppendPathS(sPath, "levels");
+	std::string sFilenameWithPath;
+	std::string sFilenameWithoutPath;
+	int n = 0;
+	do
+	{
+		++n;
+		char szBuf[8192]={0};//fixLOW MAX_PATH? Some issue with MAX_PATH I can't remember what right now [dj2017-08]
+		sprintf(szBuf,"newlevel%03d.lev", n);
+		sFilenameWithoutPath = szBuf;
+
+		sFilenameWithPath = sPath;
+		djAppendPathS(sFilenameWithPath, szBuf);
+	} while (djFileExists(sFilenameWithPath.c_str()));
+
+	// See config.h for explanation of the size here. Basically create a blank empty map datablock temporarily and save to the new file.
+	unsigned char* szNewLevel = new unsigned char [ LEVEL_SIZE ];
+	memset(szNewLevel, 0, LEVEL_SIZE);
+
+	CLevel* pLevel = new CLevel;
+	std::string sLevelRelativePath="levels";
+	djAppendPathS(sLevelRelativePath, sFilenameWithoutPath.c_str());
+	pLevel->SetFilename(sLevelRelativePath.c_str());
+	pLevel->m_szName		= djStrDeepCopy("");
+	pLevel->m_szBackground	= djStrDeepCopy("data/levels/bg1.tga");//fixme for now hardcoded
+	pLevel->m_szAuthor		= djStrDeepCopy("");
+	g_pCurMission->AddLevel(pLevel);
+
+	//Mode wb = Write file in binary mode, MUST BE BINARY MODE, very important
+	FILE* pOut = fopen(sFilenameWithPath.c_str(), "wb");
+	if (pOut)
+	{
+		fwrite(szNewLevel, LEVEL_SIZE, 1, pOut);
+		fclose(pOut);
+	}
+	delete[] szNewLevel;
+
+	// Select the new level we just added ...
+	SelectLevel ( g_pCurMission->NumLevels() - 1 );
+
+	// .. now 'actually' load it.
+	level_load(0, sLevelRelativePath.c_str());
+
+	// Refresh view.
+	RedrawView();
+}
 
 
 switch_e LVLED_MainLoop ()
@@ -382,6 +441,26 @@ switch_e LVLED_MainLoop ()
 	while ( bRunning )
 	{
 		unsigned long delay = 10;
+
+		//dj2017-08 Adding this framerate stuff to prevent the 100% CPU/core hogging,
+		// but editing now feels slightly less snappy to me, might want to come back
+		// to this again.
+		// Aim for desired frame rate
+		const float fTIMEFRAME = (1.0f / 300.0f);
+		// Start out by being at next time
+		float fTimeNext = djTimeGetTime();
+		float fTimeNow = fTimeNext;
+		
+		{
+			fTimeNow = djTimeGetTime();
+			fTimeNext = fTimeNow + fTIMEFRAME;
+			// Sleep a little to not hog CPU to cap menu update (frame rate) at approx 10Hz
+			while (fTimeNow<fTimeNext)
+			{
+				SDL_Delay(1);
+				fTimeNow = djTimeGetTime();
+			}
+		}
 
 		RedrawView ();
 		djiPoll();
@@ -442,6 +521,7 @@ switch_e LVLED_MainLoop ()
 			bflagdown = false;
 			MoveMinimap( levelview_x, levelview_y + 1);
 		}
+
 
 
 		if ( (mouse_x >= 0) && (mouse_y >= 0) )
@@ -523,7 +603,14 @@ switch_e LVLED_MainLoop ()
 			bShowBack = !bShowBack;
 			DrawMinimap ();
 		}
-		if (g_iKeys[DJKEY_CTRL])
+		if (g_iKeys[DJKEY_CTRL] && g_iKeys[DJKEY_ALT])
+		{
+			if (djiKeyPressed(DJKEY_N))
+			{
+				DoCreateNewLevel();
+			}
+		}
+		else if (g_iKeys[DJKEY_CTRL])
 		{
 			//dj2017-06 Add basic level stats
 			if (djiKeyPressed(DJKEY_F6))
