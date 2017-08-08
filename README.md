@@ -83,6 +83,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+* Level Editor: New "Ctrl+Alt+N" command to generate a new blank level (NB: Still needs to be added manually to default.gam!)
 * Add jump-monster
 * Add rockets
 

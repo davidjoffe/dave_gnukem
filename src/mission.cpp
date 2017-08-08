@@ -245,7 +245,7 @@ CLevel *CMission::GetLevel( int i )
 	return m_apLevels[i];
 }
 
-int CMission::NumLevels()
+int CMission::NumLevels() const
 {
 	return m_apLevels.size();
 }

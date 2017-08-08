@@ -14,6 +14,13 @@ License: GNU GPL Version 2
 
 #include "djstring.h"
 #include <stdarg.h>//va_list etc. [for djStrPrintf dj2016-10]
+#ifdef WIN32
+#include <Windows.h>//GetFileAttributes [for djFileExists]
+#else
+#include <sys/types.h>//stat [for djFileExists]
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
 
 char *djStrDeepCopy( const char * src )
 {
@@ -111,3 +118,77 @@ std::string djStrPrintf( const char* szFormat, ... )
 
 	return buf;
 }
+
+
+// Should actually have a fileutils cpp/h or somethign [low dj2017-08] these don't belong here
+
+// Append a folder to existing path, 'intelligently' handling
+// the trailing slash worries for us.
+void djAppendPath(char* szPath,char* szAppend)
+{
+	if (szPath==NULL)return;
+	if (szAppend==NULL||szAppend[0]==0)return;
+
+	// If doesn't have trailing slash, add one (unless szPath is empty string)
+	if (strlen(szPath)>0)
+	{
+		char cLast = szPath[ strlen(szPath)-1 ];
+		if (cLast!='/' && cLast!='\\')
+		{
+			strcat(szPath,"/");
+		}
+	}
+	strcat(szPath,szAppend);
+}
+void djAppendPathS(std::string& sPath,const char* szAppend)
+{
+	//if (szPath==NULL)return;
+	if (szAppend==NULL||szAppend[0]==0)return;
+
+	// If doesn't have trailing slash, add one (unless szPath is empty string)
+	if (!sPath.empty())
+	{
+		char cLast = sPath.at( sPath.length()-1 );
+		if (cLast!='/' && cLast!='\\')
+		{
+			//strcat(szPath,"/");
+			sPath += L'/';
+		}
+	}
+	//strcat(szPath,szAppend);
+	sPath += szAppend;
+}
+
+#ifdef WIN32
+
+bool djFileExists(const char* szPath)
+{
+	DWORD fileAttr = ::GetFileAttributes(szPath);
+	if (0xFFFFFFFF == fileAttr)
+		return false;
+	return true;
+}
+
+#else
+//#ifdef __APPLE__
+/*bool djFolderExists(const char* szPath)
+{
+	struct stat sb;
+	if (stat(szPath, &sb) == 0 && S_ISDIR(sb.st_mode))
+	{
+		return true;
+	}
+	return false;
+}*/
+bool djFileExists(const char* szPath)
+{
+	struct stat sb;
+	if (stat(szPath, &sb) == 0 && S_ISREG(sb.st_mode))
+	{
+		return true;
+	}
+	return false;
+}
+//#else
+
+#endif

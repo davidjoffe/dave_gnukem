@@ -81,7 +81,7 @@ public:
 
 	void	AddLevel( CLevel * pLevel );
 	CLevel*	GetLevel( int i );
-	int		NumLevels();
+	int		NumLevels() const;
 
 	void			AddSpriteData( int iID, CSpriteData * pSprites );
 	CSpriteData*	GetSpriteData( int iID );
