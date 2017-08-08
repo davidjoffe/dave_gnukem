@@ -799,9 +799,11 @@ int CJumpingMonster::Tick()
 	{
 		if(m_nJumpingIndex<0 && !m_bFalling)
 		{
-			if ((m_bLinedUpToShoot && ((rand()%100)<2))
+			if (
+				( m_bLinedUpToShoot &&  ((rand()%100)<2) )
 				|| 
-				!m_bLinedUpToShoot && ((rand()%100)<4))
+				( !m_bLinedUpToShoot && ((rand()%100)<4) )
+				)
 			//if ((rand()%100)<4)
 			{
 				m_nJumpingIndex = 0;
