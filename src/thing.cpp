@@ -1033,10 +1033,23 @@ CAcme::CAcme() :
 
 int CAcme::HeroOverlaps()
 {
-	// FIXME: Create some sort of explosion here
-	update_health(-1);
-	AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), m_y*BLOCKH+m_yoffset));
-	return THING_DIE;
+	// If walking in a tight passage only 2 blocks in height then it 'immediately'
+	// touches you while shaking still ... so make it only pops on contact if
+	// already past the m_nCounter to get to the 'falling' state ... otherwise
+	// it immediately pops, when in fact you should be able to walk past it entirely.
+	// (If unsure what I mean, see 8/9 Aug 2017 stream 03:03:00) [dj2017-08]
+	// Not sure if this is quite the best way .. alternatively could fiddle
+	// with the bounding boxes. The disadvantage of this approach is if it's overhanging
+	// or floating in mid-air, you won't collide with it until it's falling, which is
+	// 'wrong' (HOWEVER you're not supposed to ever place them that way in the level editor)
+	if (m_nState>=3)
+	{
+		// FIXME: Create some sort of explosion here
+		update_health(-1);
+		AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), m_y*BLOCKH+m_yoffset));
+		return THING_DIE;
+	}
+	return 0;
 }
 
 void CAcme::Draw()
@@ -1050,14 +1063,32 @@ int CAcme::Tick()
 	switch (m_nState)
 	{
 	case 0:// Normal default state
-
+		if (IsInView())
+		{
 		// Test if we are above hero.
 // FIXME I think this doesn't work for half-block under - it should
 // FIXME Also use check_solid for problem of if solid above us but below Acme, then shouldn't fall (I think (??))
 		if ((x>=m_x) && (x<=m_x+1) && (y>m_y))
 		{
-			// Start breaking off (first shake up & down)
-			++m_nState;
+			// Sort of 'cast a ray downwards' from us, to hero's Y position, to see if
+			// there are eg solid floors BETWEEN us and the hero .. if there are, don't
+			// drop. [dj2017-08 - todo maybe confirm if DN1 behaves like this, or else just decide how we want it]
+
+			int nY = m_y+1;
+			bool bClear = true;
+			while (bClear && nY<y)
+			{
+				if (check_solid(m_x,nY) || check_solid(m_x+1,nY))
+					bClear = false;
+				++nY;
+			};
+
+			if (bClear)
+			{
+				// Start breaking off (first shake up & down)
+				++m_nState;
+			}
+		}
 		}
 		break;
 	case 1:// Shake up and down briefly when activated
