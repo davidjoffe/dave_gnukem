@@ -1692,7 +1692,13 @@ void sprite_factory( unsigned char a, unsigned char b, int ix, int iy, int ifore
 			// hero starting position
 			relocate_hero( ix, iy );
 
-			hero_dir = 1;
+			// By default start looking right, unless the start-looking-left is used [dj2017-08]
+			hero_dir = 1;//Right
+			// Check the sprite metadata, the first
+			if (GET_EXTRA(b0, b1, 0) == 0)
+				hero_dir = 0;//Left
+
+
 			bWipeSprite = true;
 			break;
 		} //switch (block type)
