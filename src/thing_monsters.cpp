@@ -986,7 +986,8 @@ int CJumpingMonster::OnKilled()
 CDrProton* CDrProton::g_pGameEnding=NULL;//This is a little weird
 CDrProton::CDrProton() :
 	m_nFlickerCounter(0),
-	m_bEscaping(false)
+	m_bEscaping(false),
+	m_nOrigX(-1)
 {
 }
 CDrProton::~CDrProton()
@@ -995,6 +996,8 @@ CDrProton::~CDrProton()
 }
 int CDrProton::Tick()
 {
+	if (m_nOrigX<0)
+		m_nOrigX = m_x;
 	if (m_bEscaping)
 	{
 		// FLY AWAY! Dr Proton escapes, so we can put him a 'version 2' [dj2017-08]
@@ -1015,6 +1018,20 @@ int CDrProton::Tick()
 	}
 	else if (IsInView())
 	{
+		if (ABS(m_nOrigX - m_x) < 3)
+		{
+			if (m_x<x)
+			{
+				++m_xoffset;
+			}
+			else if (m_x >= x+1)
+			{
+				--m_xoffset;
+			}
+			// THIS IS IMPORTANT:
+			NORMALIZEX;
+		}
+
 
 		if (m_y<y - 2)
 		{

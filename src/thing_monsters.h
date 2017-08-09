@@ -202,6 +202,7 @@ public:
 protected:
 	int m_nFlickerCounter;//Flicker if hurt
 	int m_bEscaping;
+	int m_nOrigX;//Stay close to original X
 	static CDrProton* g_pGameEnding;
 };
 /*-----------------------------------------------------------*/
