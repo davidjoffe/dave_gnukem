@@ -402,7 +402,7 @@ void PerLevelSetup()
 	djCreateImageHWSurface( pBackground );
 
 	// Clear out inventory
-	InvClear();
+	InvClear();//<- Note that this takes care of the fact that some inventory items are 'persistent' between levels eg powerboots
 	InvDraw();
 
 	g_ThingFactory.PerLevelInitialize();
@@ -1736,12 +1736,21 @@ void SetLevel(int nLevel)
 	PerLevelSetup();
 }
 
+EJump g_eSaveJumpModeAtStartOfLevel = JUMP_NORMAL;//fixLOW ugly global, one day we'll make a class, one day. [dj2017-08]
+
 void NextLevel()
 {
 	// Mark non-persistent inventory items as persistent
 	InvMakeAllPersistent();
 	// Go to next level
 	SetLevel(GetCurrentLevel()+1);
+
+	// We need to I think remember the current jumpheight here when we STARTED *THIS* level
+	// So e.g. if you go into level editor and come out to RestartLevel() then your
+	// jumpheight is what it was when you started that level. This is necessary to make
+	// the behaviour work relatively 'correctly' re powerboots, if the powerboots are in
+	// that level (or in a level preceding this one, say). [dj2017-08-09]
+	g_eSaveJumpModeAtStartOfLevel = HeroGetJumpMode();
 }
 
 void RestartLevel()
@@ -1755,6 +1764,8 @@ void RestartLevel()
 
 	// Set level to current level (restarts the level)
 	SetLevel(g_nLevel);
+
+	HeroSetJumpMode(g_eSaveJumpModeAtStartOfLevel);
 }
 
 void DrawDebugInfo()
