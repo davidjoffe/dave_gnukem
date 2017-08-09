@@ -155,6 +155,28 @@ Recent:
 * Fixed 'tiny game window'
 * Fix some Linux compile issues, make a few other fixes/improvements (streamed on LiveCoding), call it v0.6 ('un-abandoning' project - DJ)
 
+## Features
+
+* Game taking forever to complete
+* Now with less crashes
+* Shootable bananas
+* Integrated level editor
+* Subliminal messages
+* Puns
+* Evil SuperTux
+* SystemD integration
+* Big rockets
+* Software doesn't spy on you
+* Cutting edge lighting effects you'd expect from 1990
+* Family friendly
+* Teleporters
+* Fans that blow you ;)
+* Something that sort of resembles a cannon on wheels
+* Nostalgic references to technology nobody uses anymore
+* Red balloons
+* Arcane command-line parameters nobody will use
+* Blistering 18 frames per second
+* Much much more!
 
 # Developer Info / Build Info
 
