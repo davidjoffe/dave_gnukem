@@ -48,14 +48,21 @@ const struct SJumpInfo jumpBoots  = { 10, g_aiJumpBoots  }; // Jump offsets with
 //struct SJumpInfo jumpBoots  = { 11, g_aiJumpBoots  }; // Jump offsets with boots
 const struct SJumpInfo * pJumpInfo; // Points to current jump info, normal or boots
 int jump_pos = 0; // Offset into the "jump info" array of y-axis offsets
+EJump g_eJump = JUMP_NORMAL;
 
 void HeroSetJumpMode(EJump eJump)
 {
+	g_eJump = eJump;
 	switch (eJump)
 	{
 	case JUMP_NORMAL:     pJumpInfo = &jumpNormal; break;
 	case JUMP_POWERBOOTS: pJumpInfo = &jumpBoots; break;
 	}
+}
+
+EJump HeroGetJumpMode()
+{
+	return g_eJump;
 }
 
 void HeroStartJump()

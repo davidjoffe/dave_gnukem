@@ -72,6 +72,8 @@ enum EJump
 };
 //! Set hero's current jump mode (i.e. normal height jump, or higher jump with powerboots)
 extern void HeroSetJumpMode(EJump eJump);
+//! Get hero's current jump mode (i.e. normal height jump, or higher jump with powerboots)
+extern EJump HeroGetJumpMode();
 //! Start hero jump
 extern void HeroStartJump();
 //! Cancel an in-progress jump (e.g. if hero gets hurt)
