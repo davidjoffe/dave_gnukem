@@ -28,6 +28,7 @@ using namespace std;
 #include "hero.h"
 #include "inventory.h"
 #include "thing.h"
+#include "thing_monsters.h"//CDrProton
 #include "graph.h"
 #include "game.h"
 #include "graph.h"
@@ -923,6 +924,25 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 			//memset( anKeyState, 0, sizeof(anKeyState) );
 		}*/
 
+		// If game is ending, and Dr Proton's escaping off the top,
+		// activate the end-game sequence and then move on to next
+		// level (which should end the game as Dr Proton should be
+		// placed on last level only).
+		if (CDrProton::GameEnding())
+		{
+			if (CDrProton::GetDrProton()->m_y<=5)
+			{
+				//ShowInstructions();
+				ShowEndGameSequence();
+				// Next-level is maybe slightly weird, but since this 'should be'
+				// last level, it should at this point just pop out to the main
+				// game menu.
+				// (fixmeLOW I think DN1 had a 'room' between each level showing
+				// the bonuses you got etc. Not sure, don't think we really need to have that.) [dj2017-08]
+				NextLevel();
+			}
+		}
+
 	} // while (game running)
 
 	TRACE("game_startup(): main game loop exited.\n");
@@ -1056,6 +1076,21 @@ void GameHeartBeat()
 
 	}
 
+	// If we're right at the end of the game tackling Dr Proton, and he starts
+	// escaping, then we want the viewport to briefly 'center around' / follow
+	// Dr Proton as he flies upwards to escape (as per original DN1). So we
+	// check here. Else, we center around the hero as per normal. [dj2017-08-09]
+	// (Not sure I'm mad about this dependency but it'll probably do, there
+	// are worse things to worry about in life [dj2017-08])
+	if (CDrProton::GameEnding())
+	{
+		CDrProton* pDrProton = CDrProton::GetDrProton();
+		if (yo+2>pDrProton->m_y)
+			--yo;
+	}
+	else
+	{
+
 	// Viewport auto-scrolling (vertical).
 	// Try auto-scroll viewport if we're going too high/low .. the actual original DN1 behaviour seems to be quite well fine-tuned.
 	// The precisely 'correct' behavior is actually pretty subtle, hard to explain exactly what the below's trying to achieve, must play
@@ -1102,7 +1137,7 @@ void GameHeartBeat()
 		if ( yo > LEVEL_HEIGHT - 10 )
 			yo = LEVEL_HEIGHT - 10;
 	}
-
+	}
 
 	// Check for bullets that have gone out of the view
 	for ( i=0; i<(int)g_apBullets.size(); i++ )

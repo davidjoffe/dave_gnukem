@@ -66,7 +66,7 @@ OBJFILES = src/main.o     src/graph.o   src/game.o         src/menu.o\
            src/block.o    src/credits.o src/instructions.o src/djstring.o \
            src/djimage.o  src/djlog.o   src/inventory.o    src/mission.o\
            src/hiscores.o src/mixins.o  src/thing.o        src/hero.o \
-           src/thing_monsters.o \
+           src/thing_monsters.o src/gameending.o \
            src/level.o    src/settings.o src/keys.o \
            src/djtypes.o  src/bullet.o \
            src/ed.o src/ed_DrawBoxContents.o src/ed_common.o src/ed_lvled.o \

@@ -23,15 +23,26 @@ License: GNU GPL Version 2
 // This helper is just to help 'normalize' it to the smallest/simplest case.
 // (Maybe a silly system, I don't know, but that's how it evolved, as initially everything was block units. dj2017-08)
 #define NORMALIZEX\
-	while (m_xoffset>=BLOCKH)\
+	while (m_xoffset>=BLOCKW)\
 	{\
-		m_xoffset -= BLOCKH;\
+		m_xoffset -= BLOCKW;\
 		++m_x;\
 	}\
-	while (m_xoffset<=-BLOCKH)\
+	while (m_xoffset<=-BLOCKW)\
 	{\
-		m_xoffset += BLOCKH;\
+		m_xoffset += BLOCKW;\
 		--m_x;\
+	}
+#define NORMALIZEY\
+	while (m_yoffset>=BLOCKH)\
+	{\
+		m_yoffset -= BLOCKH;\
+		++m_y;\
+	}\
+	while (m_yoffset<=-BLOCKH)\
+	{\
+		m_yoffset += BLOCKH;\
+		--m_y;\
 	}
 
 /*-----------------------------------------------------------*/
@@ -50,6 +61,7 @@ ALLOCATE_FUNCTION(CRabbit);
 ALLOCATE_FUNCTION(CHighVoltage);
 ALLOCATE_FUNCTION(CCannon);
 ALLOCATE_FUNCTION(CJumpingMonster);
+ALLOCATE_FUNCTION(CDrProton);
 ALLOCATE_FUNCTION(CCrawler);
 ALLOCATE_FUNCTION(CSpike);
 
@@ -63,6 +75,7 @@ void RegisterThings_Monsters()
 	REGISTER_THING2(CHighVoltage,	TYPE_HIGHVOLTAGE);
 	REGISTER_THING2(CCannon,		TYPE_CANNON);
 	REGISTER_THING2(CJumpingMonster,TYPE_JUMPINGMONSTER);
+	REGISTER_THING2(CDrProton,		TYPE_DRPROTON);
 	REGISTER_THING2(CCrawler,       TYPE_CRAWLER);
 	REGISTER_THING2(CSpike,         TYPE_SPIKE);
 }
@@ -968,5 +981,144 @@ int CJumpingMonster::OnKilled()
 	update_score(150, m_x, m_y);
 	AddThing(CreateExplosion(m_x*16+8, m_y*16-8));
 	return THING_DIE;
+}
+/*-----------------------------------------------------------*/
+CDrProton* CDrProton::g_pGameEnding=NULL;//This is a little weird
+CDrProton::CDrProton() :
+	m_nFlickerCounter(0),
+	m_bEscaping(false)
+{
+}
+CDrProton::~CDrProton()
+{
+	g_pGameEnding = NULL;
+}
+int CDrProton::Tick()
+{
+	if (m_bEscaping)
+	{
+		// FLY AWAY! Dr Proton escapes, so we can put him a 'version 2' [dj2017-08]
+		//m_yoffset -= BLOCKH;
+		m_yoffset = 0;
+		--m_y;
+		NORMALIZEY;
+		//if (m_y<=2)//<- Hit top of level?
+		if (m_y<=2)// || m_y<y-20)
+		{
+			m_y = 2;
+			//yo = m_y;
+			// UHM DO SOMETHING COOL HERE
+			// Activate end-game sequence
+			//ActivateEndGameSequence();
+			//return THING_DIE;
+		}
+	}
+	else if (IsInView())
+	{
+
+		if (m_y<y - 2)
+		{
+			++m_yoffset;
+		}
+		else if (m_y > y + 1)
+		{
+			--m_yoffset;
+		}
+		NORMALIZEY;
+
+		// Turn to face direction of hero
+		if (x < m_x - 1)
+			m_nXDir = -1;
+		else if (x > m_x + 1)
+			m_nXDir = 1;
+
+
+		if (IsInView())// && !m_bFalling && !IsJumping())
+		{
+			// Check we're facing hero, and hero is more or less at same height ..
+			if ((ABS(y-m_y)<3) && ((m_nXDir<0 && x<=m_x) || (m_nXDir>0 && x>=m_x)))
+			{
+				//m_bLinedUpToShoot = true;
+				if (m_nNoShootCounter>0)
+				{
+					m_nNoShootCounter--;
+				}
+				else
+				{
+					const int SHOOTPERCENT=10;//<- Make this higher to increase difficulty
+					if ((rand()%100)<=SHOOTPERCENT)
+					{
+						const int nBULLETSPEEDX=10;
+						if (m_nXDir<0)//Facing left?
+							MonsterShoot(m_x*16+m_xoffset-BLOCKW  , m_y*16, m_nXDir*nBULLETSPEEDX,0);
+						else
+							MonsterShoot(m_x*16+m_xoffset+BLOCKW*3, m_y*16, m_nXDir*nBULLETSPEEDX,0);
+						// FIXME PLAY SOUND HERE?
+						m_nNoShootCounter = 12;//<- Make this lower to increase difficulty
+					}
+				}
+			}
+		}
+
+	}
+
+	if (m_nFlickerCounter>0)
+	{
+		--m_nFlickerCounter;
+	}
+
+	return CMonster::Tick();
+}
+void CDrProton::Draw()
+{
+	// If flickering-from-hurting, skip every 2nd frame
+	if (m_nFlickerCounter==0 || ((m_nFlickerCounter%2)==0))
+	{
+		const int a=m_a;//Spriteset number
+		const int b=(m_nXDir>0 ? ((anim4_count % 2)*3) : ((anim4_count % 2)*3) + 6);
+		int x = CALC_XOFFSET(m_x) + m_xoffset;
+		int y = CALC_YOFFSET(m_y-2) + m_yoffset;//Topleft, hence subtract from m_y
+		DRAW_SPRITEA(pVisView,
+			a   ,b,
+			x   ,y,
+			48  ,48);
+	}
+}
+void CDrProton::Initialize(int a, int b)
+{
+	CMonster::Initialize(a,b);
+	m_bFalls = false;
+	m_nStrength = 15;//?fixmeLOW what should Dr Proton strength be
+	m_nNoShootCounter = 5;
+	// This might be slightly too big
+	SetVisibleBounds(0,-31,47,15);
+	SetActionBounds (0,-31,47,15);
+	SetShootBounds  (0,-31,47,15);
+}
+int CDrProton::HeroOverlaps()
+{
+	// If in 'escaping' mode then we don't hurt hero, i.e. while he's flying away
+	if (!m_bEscaping && !HeroIsHurting())
+	{
+		update_health(-1);
+		HeroSetHurting();
+	}
+	return 0;
+}
+int CDrProton::OnHeroShot()
+{
+	if (m_nStrength>0)
+	{
+		m_nFlickerCounter = 8;
+	}
+	int nPrevStrength = m_nStrength;
+	int nRet = CMonster::OnHeroShot();
+	if (nPrevStrength>0 && m_nStrength<=0)
+	{
+		update_score(20000, m_x, m_y);// [fixmeLOW] Should get more points for shooting than stupidly walking into it? [dj2017]
+		m_bEscaping = true;
+		g_pGameEnding = this;
+	}
+	return nRet;
 }
 /*-----------------------------------------------------------*/
