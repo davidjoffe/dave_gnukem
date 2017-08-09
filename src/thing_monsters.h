@@ -177,6 +177,34 @@ protected:
 	bool m_bLinedUpToShoot;
 };
 /*-----------------------------------------------------------*/
+/*!
+\class CDrProton
+\nosubgrouping
+
+The main 'boss' / baddie etc., Dr Proton. In our game, this is Dr Proetton.
+
+Note we don't override OnKilled() because you specifically don't kill him .. he gets away. So we can have him in a sequel of course. [dj2017-08]
+*/
+class CDrProton : public CMonster
+{
+public:
+	CDrProton();
+	virtual ~CDrProton();
+	virtual int  Tick();
+	virtual void Draw();
+	virtual void Initialize(int a, int b);
+	virtual int HeroOverlaps();
+	virtual int OnHeroShot();
+
+	static bool GameEnding() { return (g_pGameEnding!=NULL); }
+	static CDrProton* GetDrProton() { return g_pGameEnding; }
+
+protected:
+	int m_nFlickerCounter;//Flicker if hurt
+	int m_bEscaping;
+	static CDrProton* g_pGameEnding;
+};
+/*-----------------------------------------------------------*/
 /*
 class CLoopThing : public CMonster
 {
@@ -187,10 +215,6 @@ class CSpinningThing : public CMonster
 public:
 };
 class CHelicopter : public CMonster
-{
-public:
-};
-class CBoss : public CMonster
 {
 public:
 };

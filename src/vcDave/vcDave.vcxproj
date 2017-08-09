@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\gameending.cpp" />
     <ClCompile Include="..\thing_monsters.cpp" />
     <ClCompile Include="..\win32\winmain.cpp" />
     <ClCompile Include="..\sdl\djgraph.cpp" />

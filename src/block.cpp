@@ -59,5 +59,6 @@ const char * block_type_names[TYPE_LASTONE+1] =
    "47 HighVoltage barrier",
    "48 Cannon-ish Thing",
    "49 Jumping Monster",
-   "50 LastOne(UnusedNextID)"
+   "50 Dr Proton",
+   "51 LastOne(UnusedNextID)"
 };

@@ -143,4 +143,6 @@ extern void HeroSetHurting(bool bReset=false);
 //! Return true if hero is "hurting" (flashing)
 extern bool HeroIsHurting();
 
+extern void ShowEndGameSequence();
+
 #endif

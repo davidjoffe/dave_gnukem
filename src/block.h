@@ -103,6 +103,8 @@ enum EBlockType
 	TYPE_CANNON,
 	//! 49 Jumping monster [dj2017-08]
 	TYPE_JUMPINGMONSTER,
+	//! 50 Dr Proton [dj2017-08]
+	TYPE_DRPROTON,
 	//! Highest used block value (UNUSED VALUE)
 	TYPE_LASTONE
 };
