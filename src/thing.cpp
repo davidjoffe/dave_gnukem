@@ -963,7 +963,7 @@ int CSoda::Tick()
 /*-----------------------------------------------------------*/
 CFullHealth::CFullHealth()
 {
-	m_bShootable = true;
+	m_bShootable = false;
 	SetShootBounds(0,0,15,15);
 }
 
