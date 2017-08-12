@@ -281,7 +281,7 @@ int CSpikeBall::HeroOverlaps()
 	// If stationary spike, destroy self
 	if (m_eType==TYPE_STATIONARY)
 	{
-		AddThing(CreateExplosion(m_x*16, m_y*16));
+		AddThing(CreateExplosion(PIXELX, PIXELY, 1));
 		return THING_DIE;
 	}
 	return 0;
@@ -319,7 +319,7 @@ void CBox::Initialize(int b0, int b1)
 
 int CBox::OnHeroShot()
 {
-	AddThing(CreateExplosion(m_x*16, m_y*16));
+	AddThing(CreateExplosion(PIXELX, PIXELY));
 
 	// Spawn whatever was inside the box
 	sprite_factory( m_iContentsA, m_iContentsB, m_x, m_y, 0, false );
@@ -458,7 +458,16 @@ int CExplosion::Tick()
 
 void CExplosion::Draw()
 {
-	DRAW_SPRITE16A(pVisView, 5, 16 + (3 - ((m_countdown+2)%4)), CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
+	if (m_iType==1)
+	{
+		DRAW_SPRITE16A(pVisView,
+			16, 16 - (m_countdown+1),//Top right corner of new spriteset '16' [dj2017-08] .. 6 frames of animation
+			CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
+	}
+	else
+	{
+		DRAW_SPRITE16A(pVisView, 5, 16 + (3 - ((m_countdown+2)%4)), CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
+	}
 }
 /*-----------------------------------------------------------*/
 CExit::CExit()
@@ -829,7 +838,7 @@ void CSoftBlock::Draw()
 
 int CSoftBlock::OnHeroShot()
 {
-	AddThing(CreateExplosion(m_x*16, m_y*16));
+	AddThing(CreateExplosion(PIXELX, PIXELY));
 	update_score(10);
 	return THING_DIE;
 }
@@ -858,7 +867,7 @@ void CCamera::Draw()
 int CCamera::OnHeroShot()
 {
 	update_score(100, m_x, m_y);
-	AddThing(CreateExplosion(m_x*16, m_y*16));
+	AddThing(CreateExplosion(PIXELX, PIXELY));
 	c_nNumCameras--;
 	if (c_nNumCameras==0) // Shot all cameras in level, issue a bonus!
 	{
@@ -1010,7 +1019,7 @@ int CBalloon::Tick()
 	// Check if hit ceiling or something
 	if (CheckCollision(m_x*16+m_iVisibleX1, m_y*16+m_iVisibleY1, m_x*16+m_iVisibleX2, m_y*16+m_iVisibleY2))
 	{
-		AddThing(CreateExplosion(m_x*16, 16*(m_y-1)-m_nHeight));
+		AddThing(CreateExplosion(PIXELX, 16*(m_y-1)-m_nHeight));
 		return THING_DIE;
 	}
 	return 0;
@@ -1018,7 +1027,7 @@ int CBalloon::Tick()
 
 int CBalloon::OnHeroShot()
 {
-	AddThing(CreateExplosion(m_x*16, 16*(m_y-1)));
+	AddThing(CreateExplosion(PIXELX, 16*(m_y-1)));
 	return THING_DIE;
 }
 /*-----------------------------------------------------------*/
@@ -1897,12 +1906,21 @@ CThing *CreateFloatingScore(int x, int y, int score)
 	return pScore;
 }
 
-CThing *CreateExplosion(int nX, int nY)
+CThing *CreateExplosion(int nX, int nY, int nType, int nSoundIntensity)
 {
 	CExplosion *pExplosion = new CExplosion;
+	pExplosion->SetType(nType);//added dj2017-08-12
+	// Note we're passed in pixel coordinates, so use modulo operator to 'backcalculate' again the block x/y and pixel x/y offset..
 	pExplosion->SetLocation( nX/BLOCKW, nY/BLOCKH, nX % BLOCKW, nY % BLOCKH, BLOCKW, BLOCKH );
 	pExplosion->SetVisibleBounds( 0, 0, BLOCKW-1, BLOCKH-1 );
-	djSoundPlay( g_iSounds[SOUND_SOFT_EXPLODE] );
+	if (nSoundIntensity<0)
+	{
+		// Don't play any sound
+	}
+	else if (nSoundIntensity==1)
+		djSoundPlay( g_iSounds[SOUND_EXPLODE] );
+	else
+		djSoundPlay( g_iSounds[SOUND_SOFT_EXPLODE] );
 	return pExplosion;
 }
 
