@@ -39,9 +39,6 @@ void ShowEndGameSequence()
 		}
 	}
 
-	unsigned int uWIDTH_STORY = (320 - 16) / FW;
-	unsigned int uWIDTH = (320 - 16) / 8;
-
 	std::vector<std::string> asText;
 	//asText.push_back("012345678901234567890123456789012345678901234567890123456789");
 	//fixme THIS NEEDS to be a bit nicer
@@ -71,7 +68,7 @@ void ShowEndGameSequence()
 			// "Character" 3rd-last from end of [0..255) font character range is for
 			// background clear.
 			const unsigned char szBACKGROUND[2]={255-2,0};
-			GraphDrawString( pVisBack, g_pFont8x8, X+j*8, Y+i*8, szBACKGROUND );
+			GraphDrawString( pVisBack, g_pFont8x8, X+j*8, Y+i*FH, szBACKGROUND );
 		}
 	}
 
@@ -81,7 +78,7 @@ void ShowEndGameSequence()
 		X,
 		Y,
 		1,
-		H*8);
+		H*FH);
 	//top
 	djgDrawRectangle( pVisBack,
 		X,
@@ -93,7 +90,7 @@ void ShowEndGameSequence()
 	djgSetColorFore(pVisBack,djColor(35,35,35));
 	djgDrawRectangle( pVisBack,
 		X+2,
-		Y+H*8,
+		Y+H*FH,
 		W*8-2,
 		1);
 	//right
@@ -108,7 +105,7 @@ void ShowEndGameSequence()
 	//GraphDrawString( pVisBack, g_pFont8x8, X+16, 0, (const unsigned char*)"INSTRUCTIONS");
 	for ( int i=0; i<(int)asText.size(); ++i )
 	{
-		GraphDrawString( pVisBack, g_pFont8x8, X+4, (Y+4)+i*8			+ 8
+		GraphDrawString( pVisBack, g_pFont8x8, X+4, (Y+4)+i*FH			+ 8
 			, (unsigned char*)asText[i].c_str() );
 	}
 
