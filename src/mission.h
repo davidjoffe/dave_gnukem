@@ -34,6 +34,8 @@ class CSpriteData;
 // Fixme again, I don't think this needs optimizing anymore, I think it is only
 // used in initialization (or is supposed to be only)
 #define GET_EXTRA(a,b,i) ( g_pCurMission->GetSpriteData((a))->m_extras[(b)][(i)] )
+// Same as GET_EXTRA but I think the name is more self-explanatory than 'extra' [dj2017-08]
+#define GET_SPRITE_EXTRA_METADATA(a,b,i) ( GET_EXTRA((a),(b),(i)) )
 #define CHECK_FLAG(a,b,f) ( GET_EXTRA( (a), (b), EXTRA_FLAGS ) & (f) )
 
 #define FLAG_SOLID			1

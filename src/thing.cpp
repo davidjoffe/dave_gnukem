@@ -121,6 +121,8 @@ REGISTER_THING(CDynamite,      TYPE_DYNAMITE, NULL);
 REGISTER_THING(CFan,           TYPE_FAN, NULL);
 REGISTER_THING(CFirepower,     TYPE_FIREPOWER, NULL);
 REGISTER_THING(CDust,          TYPE_DUST, NULL);
+REGISTER_THING(CWater,         TYPE_WATER, NULL);
+//REGISTER_THING(CBlock,         TYPE_BLOCK, NULL);
 
 /*-----------------------------------------------------------*/
 CThing::CThing()
@@ -1820,6 +1822,66 @@ void CDust::Draw()
 		}
 	}
 }
+/*-----------------------------------------------------------*/
+CWater::CWater() :
+	m_nAnimationCount(0)
+{
+}
+int CWater::Tick()
+{
+	++m_nAnimationCount;
+	if (m_nAnimationCount>=4*4)
+		m_nAnimationCount = 0;
+	return CThing::Tick();
+}
+void CWater::Draw()
+{
+	DRAW_SPRITE16A(pVisView,
+		m_a, m_b + (m_nAnimationCount/4),
+		CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y));
+}
+void CWater::Initialize(int a, int b)
+{
+	CThing::Initialize(a,b);
+
+	// There is 'background water' layer, and a 'foreground water' layer,
+	// to create the sort of visual effect that he's "in" the water ...
+	// so we assign the extra metadata in sprite editor and use that
+	// to determine which layer we render in during level initalize.
+	EdjLayer eLayer = (EdjLayer)(GET_SPRITE_EXTRA_METADATA(a,b,0)==0 ? LAYER_TOP : LAYER_BOTTOM);
+
+	// Want to draw in front hero, so hero looks 'submerged' in water
+	SetLayer(eLayer);
+	SetVisibleBounds(0,0,BLOCKW-1,BLOCKH-1);
+	SetActionBounds (0,0,BLOCKW-1,BLOCKH-1);
+}
+/*-----------------------------------------------------------*/
+/*
+CBlock::CBlock()
+{
+}
+void CBlock::Draw()
+{
+	DRAW_SPRITE16A(pVisView,
+		m_a, m_b,// + anim4_count,
+		CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y));
+}
+void CBlock::Initialize(int a, int b)
+{
+	CThing::Initialize(a,b);
+
+	// Can maybe add some of these later, dunno [dj2017-08]
+	m_bSolid = false;
+	m_bFalls = false;
+	m_bShootable = false;
+
+	SetVisibleBounds(0,0,BLOCKW-1,BLOCKH-1);
+
+	// Specify the layer in the first sprite metadata 'extra' value
+	EdjLayer eLayer = (EdjLayer)(GET_SPRITE_EXTRA_METADATA(a,b,0));
+	SetLayer(eLayer);
+}
+*/
 /*-----------------------------------------------------------*/
 // Create helpers
 /*-----------------------------------------------------------*/

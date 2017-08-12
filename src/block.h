@@ -14,12 +14,13 @@ License: GNU GPL Version 2
 enum EBlockType
 {
 	TYPE_NOTHING = 0,
-	TYPE_1,
+	TYPE_1,//TYPE_BLOCK,
 	TYPE_2,
 	//! 03 Solid, but can come up from underneath
 	TYPE_SOFTSOLID,
 	TYPE_4,
-	TYPE_5,
+	//! 05 Simple water effect [dj2017-08]
+	TYPE_WATER,
 	//! 06 Dust
 	TYPE_DUST,
 	//! 07 Lift
