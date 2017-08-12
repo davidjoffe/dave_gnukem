@@ -20,6 +20,7 @@ class CMonster : public CThing
 public:
 	CMonster();
 	virtual void Initialize(int a, int b);
+	virtual int Tick();
 	virtual int OnHeroShot();
 
 	virtual int OnKilled();
@@ -29,6 +30,7 @@ protected:
 	int m_nNoShootCounter;// This ideally shouldn't really be in the base
 	// class because not all monsters shoot, there are better ways design-wise
 	// to do this, but maybe not worth it for small game like this [dj2017-08]
+	int m_nFlickerCounter;//Flicker if hurt [some monsters only, if effect desired]
 };
 /*-----------------------------------------------------------*/
 /*!
@@ -200,7 +202,6 @@ public:
 	static CDrProton* GetDrProton() { return g_pGameEnding; }
 
 protected:
-	int m_nFlickerCounter;//Flicker if hurt
 	int m_bEscaping;
 	int m_nOrigX;//Stay close to original X
 	static CDrProton* g_pGameEnding;
