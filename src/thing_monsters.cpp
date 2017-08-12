@@ -478,14 +478,14 @@ int CRabbit::HeroOverlaps()
 	}
 	// Start death animation [TODO]
 	update_score(100, m_x, m_y);
-	AddThing(CreateExplosion(m_x*BLOCKW + 8, m_y*BLOCKH - 8));
+	AddThing(CreateExplosion(m_x*BLOCKW + 8, m_y*BLOCKH - 8, 1));
 	return THING_DIE;
 }
 int CRabbit::OnHeroShot()
 {
 	// Start death animation [TODO]
 	update_score(200, m_x, m_y);// [fixmeLOW] Should get more points for shooting than stupidly walking into it? [dj2017]
-	AddThing(CreateExplosion(m_x*BLOCKW + 8, m_y*BLOCKH - 8));
+	AddThing(CreateExplosion(m_x*BLOCKW + 8, m_y*BLOCKH - 8, 1));
 	return THING_DIE;
 }
 /*-----------------------------------------------------------*/
