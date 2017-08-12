@@ -85,7 +85,8 @@ void RegisterThings_Monsters()
 CMonster::CMonster() :
 	m_nStrength(1),
 	m_nXDir(1),
-	m_nNoShootCounter(1)
+	m_nNoShootCounter(1),
+	m_nFlickerCounter(0)
 {
 }
 void CMonster::Initialize(int a, int b)
@@ -99,11 +100,22 @@ int CMonster::OnKilled()
 {
 	return 0;//Return THING_DIE if want to immediately die (but most will start some sort of 'death animation', and only thereafter die)
 }
+int CMonster::Tick()
+{
+	if (m_nFlickerCounter>0)
+	{
+		--m_nFlickerCounter;
+	}
+	return CThing::Tick();
+}
 int CMonster::OnHeroShot()
 {
 	if (m_nStrength>0)
 	{
 		--m_nStrength;
+
+		m_nFlickerCounter = 4;//Hm, a bit weird, always set even if unused [low dj2017-08 not worth worrying about]
+
 		if (m_nStrength==0)
 		{
 			return OnKilled();
@@ -935,27 +947,30 @@ int CJumpingMonster::Tick()
 }
 void CJumpingMonster::Draw()
 {
-	if (IsJumping() || m_bFalling)
+	if (m_nFlickerCounter==0 || ((m_nFlickerCounter%2)==0))
 	{
-		const int a=m_a;//Spriteset number
-		const int b=(m_nXDir>0 ? m_b+16-4 : m_b+16-4+2);//Sprite number within spriteset
-		int x = CALC_XOFFSET(m_x) + m_xoffset;
-		int y = CALC_YOFFSET(m_y-2) + m_yoffset;
-		DRAW_SPRITEA(pVisView,
-			a   ,b,//+m_nWalkAnimOffset*2,
-			x   ,y,
-			32  ,  48);
-	}
-	else
-	{
-		const int a=m_a;//Spriteset number
-		const int b=(m_nXDir>0 ? m_b-16 : m_b-16+2);//Sprite number within spriteset
-		int x = CALC_XOFFSET(m_x) + m_xoffset;
-		int y = CALC_YOFFSET(m_y-1) + m_yoffset;
-		DRAW_SPRITEA(pVisView,
-			a   ,b,//+m_nWalkAnimOffset*2,
-			x   ,y,
-			32  ,  32);
+		if (IsJumping() || m_bFalling)
+		{
+			const int a=m_a;//Spriteset number
+			const int b=(m_nXDir>0 ? m_b+16-4 : m_b+16-4+2);//Sprite number within spriteset
+			int x = CALC_XOFFSET(m_x) + m_xoffset;
+			int y = CALC_YOFFSET(m_y-2) + m_yoffset;
+			DRAW_SPRITEA(pVisView,
+				a   ,b,//+m_nWalkAnimOffset*2,
+				x   ,y,
+				32  ,  48);
+		}
+		else
+		{
+			const int a=m_a;//Spriteset number
+			const int b=(m_nXDir>0 ? m_b-16 : m_b-16+2);//Sprite number within spriteset
+			int x = CALC_XOFFSET(m_x) + m_xoffset;
+			int y = CALC_YOFFSET(m_y-1) + m_yoffset;
+			DRAW_SPRITEA(pVisView,
+				a   ,b,//+m_nWalkAnimOffset*2,
+				x   ,y,
+				32  ,  32);
+		}
 	}
 }
 void CJumpingMonster::Initialize(int a, int b)
@@ -997,7 +1012,6 @@ int CJumpingMonster::OnKilled()
 /*-----------------------------------------------------------*/
 CDrProton* CDrProton::g_pGameEnding=NULL;//This is a little weird
 CDrProton::CDrProton() :
-	m_nFlickerCounter(0),
 	m_bEscaping(false),
 	m_nOrigX(-1)
 {
@@ -1091,11 +1105,6 @@ int CDrProton::Tick()
 
 	}
 
-	if (m_nFlickerCounter>0)
-	{
-		--m_nFlickerCounter;
-	}
-
 	return CMonster::Tick();
 }
 void CDrProton::Draw()
@@ -1136,10 +1145,6 @@ int CDrProton::HeroOverlaps()
 }
 int CDrProton::OnHeroShot()
 {
-	if (m_nStrength>0)
-	{
-		m_nFlickerCounter = 8;
-	}
 	int nPrevStrength = m_nStrength;
 	int nRet = CMonster::OnHeroShot();
 	if (nPrevStrength>0 && m_nStrength<=0)
