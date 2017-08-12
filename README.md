@@ -81,7 +81,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 # History / Changes
 
-Recent:
+Recent: / 2017/08/12 - Version 0.81 [Linux/Mac source release, Windows source and binary]:
 
 * Add water
 * Add very basic Dr Proetton ('final boss') and basic foundations of game ending sequence when you beat Dr Proetton
