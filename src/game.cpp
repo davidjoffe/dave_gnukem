@@ -1267,7 +1267,10 @@ NextBullet1:
 			x1 + 7,
 			pBullet->y+BULLET_HEIGHT-1, pBullet))
 		{
-			AddThing(CreateExplosion((nXOld + (pBullet->dx<0 ? 0 : 0)), nYOld-4));
+			AddThing(CreateExplosion((nXOld + (pBullet->dx<0 ? 0 : 0)), nYOld-4,
+				// Make the hero's bullet slightly larger than smallest explosion
+				g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
+				));
 			g_apBullets.erase(g_apBullets.begin() + i);
 			i--;
 			goto NextBullet3;

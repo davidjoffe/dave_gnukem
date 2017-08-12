@@ -29,6 +29,9 @@ License: GNU GPL Version 2
 //! Theoretically this should probably eventually replace CALC_YOFFSET
 #define WORLDY2VIEW(y) (                 ((y) - (16*yo)) + 16)
 
+// CThing helpers [dj2017-08]
+#define PIXELX (m_x*BLOCKW+m_xoffset)
+#define PIXELY (m_y*BLOCKH+m_yoffset)
 
 #include "djtypes.h"
 #include "djsound.h"
@@ -476,6 +479,7 @@ public:
 	virtual int  Tick();
 	virtual void Draw();
 
+protected:
 	int m_countdown;
 };
 /*-----------------------------------------------------------*/
@@ -975,8 +979,8 @@ protected:
 //! Create a \ref CFloatingScore at (x,y) with score \b score
 extern CThing *CreateFloatingScore( int x, int y, int score );
 
-//! Create a \ref CExplosion at (nX,nY) (pixel coordinates)
-extern CThing *CreateExplosion(int nX, int nY);
+//! Create a \ref CExplosion at (nX,nY) (pixel coordinates). Type is 0 for default tiny explosion, 1 for slightly bigger more 'fiery' explosion. Sound intensity is 0 by default, 1 for a bigger explosion sound, -1 for no sound.
+extern CThing *CreateExplosion(int nX, int nY, int nType=0, int nSoundIntensity=0);
 
 //! Create a \ref CDust effect at (nX, nY) (level coordinates), plus optional nOffsetX,nOffsetY pixel offsetl
 extern CThing *CreateDust(int nX, int nY, int nOffsetX=0, int nOffsetY=0);

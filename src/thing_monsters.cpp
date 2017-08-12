@@ -180,7 +180,7 @@ int CRobot::Tick()
 				{
 					if ((rand()%50)<=2)
 					{
-						MonsterShoot(m_x*16+m_xoffset, m_y*16, m_nXDir<0?-16:16);
+						MonsterShoot(PIXELX, PIXELY, m_nXDir<0?-16:16);
 						m_nNoShootCounter = 36;// fixme, should be time, not frame count
 					}
 				}
@@ -194,7 +194,7 @@ int CRobot::Tick()
 int CRobot::OnKilled()
 {
 	update_score(100, m_x, m_y);
-	AddThing(CreateExplosion(m_x*16, m_y*16));
+	AddThing(CreateExplosion(PIXELX,PIXELY,1));
 	return THING_DIE;
 }
 
@@ -371,7 +371,7 @@ int CFlyingRobot::Tick()
 			{
 				if ((rand()%50)<=2)
 				{
-					MonsterShoot(m_x*16+m_xoffset + (m_nXDir*16), m_y*16+m_yoffset, m_nXDir<0?-16:16);
+					MonsterShoot(PIXELX + (m_nXDir*16), PIXELY, m_nXDir<0?-16:16);
 					m_nNoShootCounter = 24;// fixme, should be time, not frame count
 				}
 			}
@@ -630,9 +630,9 @@ int CCannon::Tick()
 				{
 					const int nBULLETSPEEDX=10;
 					if (m_nXDir<0)//Facing left?
-						MonsterShoot(m_x*16+m_xoffset-BLOCKW  , m_y*16, m_nXDir*nBULLETSPEEDX,0);
+						MonsterShoot(PIXELX-BLOCKW  , m_y*16, m_nXDir*nBULLETSPEEDX,0);
 					else
-						MonsterShoot(m_x*16+m_xoffset+BLOCKW*2, m_y*16, m_nXDir*nBULLETSPEEDX,0);
+						MonsterShoot(PIXELX+BLOCKW*2, m_y*16, m_nXDir*nBULLETSPEEDX,0);
 					// FIXME PLAY SOUND HERE?
 					m_nNoShootCounter = 12;
 				}
@@ -685,7 +685,10 @@ int CCannon::OnHeroShot()
 int CCannon::OnKilled()
 {
 	update_score(400, m_x, m_y);
-	AddThing(CreateExplosion(m_x*16+8, m_y*16));
+	//AddThing(CreateExplosion(m_x*16+8+m_xoffset, m_y*BLOCKH,1));
+	// Use two explosions as quick n dirty / cheap way to make explosion seem slightly bigger
+	AddThing(CreateExplosion(PIXELX+(BLOCKW/2)-(rand()%4),PIXELY+((rand()%3)-1),1));
+	AddThing(CreateExplosion(PIXELX+(BLOCKW/2)+(rand()%4),PIXELY+((rand()%3)-1),1,-1));
 	//[TODO?] later could add a 'dying' animation here [dj2017-08]
 	return THING_DIE;
 }
@@ -729,7 +732,7 @@ void CCrawler::Draw()
 int CCrawler::OnHeroShot()
 {
 	update_score(100, m_x, m_y);
-	AddThing(CreateExplosion(m_x*16, m_y*16+m_yoffset));
+	AddThing(CreateExplosion(PIXELX,PIXELY));
 	return THING_DIE;
 }
 
@@ -918,9 +921,9 @@ int CJumpingMonster::Tick()
 				{
 					const int nBULLETSPEEDX=10;
 					if (m_nXDir<0)//Facing left?
-						MonsterShoot(m_x*16+m_xoffset-BLOCKW  , m_y*16, m_nXDir*nBULLETSPEEDX,0);
+						MonsterShoot(PIXELX-BLOCKW  , m_y*16, m_nXDir*nBULLETSPEEDX,0);
 					else
-						MonsterShoot(m_x*16+m_xoffset+BLOCKW*2, m_y*16, m_nXDir*nBULLETSPEEDX,0);
+						MonsterShoot(PIXELX+BLOCKW*2, m_y*16, m_nXDir*nBULLETSPEEDX,0);
 					// FIXME PLAY SOUND HERE?
 					m_nNoShootCounter = 12;//<- Make this lower to increase difficulty
 				}
@@ -979,7 +982,16 @@ int CJumpingMonster::HeroOverlaps()
 int CJumpingMonster::OnKilled()
 {
 	update_score(150, m_x, m_y);
-	AddThing(CreateExplosion(m_x*16+8, m_y*16-8));
+	// dj2017-08 Quick n dirty way to make it seem like we have a bigger
+	// explosion effect than we really do for this monster type ... note
+	// in this case only one should produce a sound .. this is all a bit hacky.
+	AddThing(CreateExplosion(PIXELX-(rand()%7)+8,PIXELY-(rand()%6) - 12,1,1));
+	AddThing(CreateExplosion(PIXELX  +8,PIXELY   - 12,1,-1));
+	AddThing(CreateExplosion(PIXELX+(rand()%6)+8,PIXELY+(rand()%6) - 12,1,-1));
+	AddThing(CreateExplosion(PIXELX+(rand()%9)+8,PIXELY-(rand()%6) - 12,1,-1));
+
+	AddThing(CreateExplosion(PIXELX-(rand()%9)+8,PIXELY-(rand()%6) -  5,1,-1));
+	AddThing(CreateExplosion(PIXELX+(rand()%9)+8,PIXELY-(rand()%6) -  5,1,-1));
 	return THING_DIE;
 }
 /*-----------------------------------------------------------*/
@@ -1067,9 +1079,9 @@ int CDrProton::Tick()
 					{
 						const int nBULLETSPEEDX=10;
 						if (m_nXDir<0)//Facing left?
-							MonsterShoot(m_x*16+m_xoffset-BLOCKW  , m_y*16, m_nXDir*nBULLETSPEEDX,0);
+							MonsterShoot(PIXELX-BLOCKW  , m_y*16, m_nXDir*nBULLETSPEEDX,0);
 						else
-							MonsterShoot(m_x*16+m_xoffset+BLOCKW*3, m_y*16, m_nXDir*nBULLETSPEEDX,0);
+							MonsterShoot(PIXELX+BLOCKW*3, m_y*16, m_nXDir*nBULLETSPEEDX,0);
 						// FIXME PLAY SOUND HERE?
 						m_nNoShootCounter = 12;//<- Make this lower to increase difficulty
 					}
