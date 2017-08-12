@@ -14,7 +14,7 @@ const char * block_type_names[TYPE_LASTONE+1] =
    " 2 ",
    " 3 Softsolid",
    " 4 ",
-   " 5 ",
+   " 5 Water",
    " 6 Dust",
    " 7 Lift",
    " 8 Teleporter",

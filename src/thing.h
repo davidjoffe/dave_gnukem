@@ -919,6 +919,39 @@ protected:
 };
 /*-----------------------------------------------------------*/
 /*!
+\class CWater
+\nosubgrouping
+
+Simple water effect
+*/
+class CWater : public CThing
+{
+public:
+	CWater();
+	virtual int Tick();
+	virtual void Draw();
+	virtual void Initialize(int a, int b);
+protected:
+	int m_nAnimationCount;
+};
+/*-----------------------------------------------------------*/
+/*!
+\class CBlock
+\nosubgrouping
+
+[EXPERIMENT - CANCELLED - BUT MIGHT USE LATER! dj2017-08]
+Just draws a normal sprite, but let's us specify things like layer (so we can put things in front of the level)
+*/
+/*class CBlock : public CThing
+{
+public:
+	CBlock();
+	virtual void Draw();
+	virtual void Initialize(int a, int b);
+};
+*/
+/*-----------------------------------------------------------*/
+/*!
 \class CDust
 \nosubgrouping
 
