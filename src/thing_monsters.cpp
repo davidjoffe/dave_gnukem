@@ -432,7 +432,7 @@ int CFlyingRobot::Tick()
 			{
 				if ((rand()%50)<=2)
 				{
-					MonsterShoot(PIXELX + (m_nXDir*16), PIXELY, m_nXDir<0?-16:16);
+					MonsterShoot(PIXELX + (m_nXDir*16), PIXELY, m_nXDir<0?-12:12);
 					m_nNoShootCounter = 24;// fixme, should be time, not frame count
 				}
 			}
