@@ -860,6 +860,10 @@ int game_startup(bool bLoadGame)
 		{
 			IngameMenu();
 
+			// WORKAROUND: If we are holding eg left when entering ingamemenu, we 'miss' the gameloop's KeyUp event as it takes over input polling; this leads to potentially "stuck" keystates in anKeyState when exiting TL;DR CLEAR THE KEYSTATES HERE (even if the keys really are down on exit). I am not mad about this solution, all feels a little wobbly/workaround-y, but should do for now. [dj2017-08-13]
+			// Workaround for: "If press direction key then immediately Escape in-game, then Esc again, doesn't "detect" direction key was released while in game menu again (hero keeps moving)"
+			memset( anKeyState, 0, sizeof(anKeyState) );
+
 			// Redraw everything that needs to be redrawn
 			RedrawEverythingHelper();
 		}
