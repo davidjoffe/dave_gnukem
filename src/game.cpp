@@ -1052,7 +1052,7 @@ void GameHeartBeat()
 			if (bFallingPrev && !bFalling) // <- just stopped falling
 			{
 				// Kick up some dust ..
-				AddThing(CreateDust(x, y, x_small*8,0));
+				AddThing(CreateDust(x, y, x_small*8,y_offset));
 				djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
 			}
 			bFallingPrev = bFalling;
