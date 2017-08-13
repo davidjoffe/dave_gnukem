@@ -663,8 +663,15 @@ int game_startup(bool bLoadGame)
 						}
 					}
 					break;
+				case SDL_QUIT:
+					//If user clicks Windows 'X' with mouse in-game, not quite sure
+					// what behavior makes the most sense, but for now just pop up
+					// in-game menu. I don't think it should immediately exit, in
+					// case you're in the middle of a game and press by mistake.[dj2017-08]
+					iEscape = 1;
+					break;
 				}
-			}
+			}// while (pollevents)
 
 			if (key_down_edge[KEY_ACTION]) key_action = 1;
 			if (key_down_edge[KEY_LEFT])   key_left = 1;
