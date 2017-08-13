@@ -320,6 +320,42 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 				y += ydiff;
 			}
 		}
+		// If there is a solid below (in terms of game BLOCK units), but
+		// we're just slightly floating in the air (y_offset), then bsolid will have
+		// returned true - however, we do still need to fall that tiny bit (e.g. whatever
+		// y_offset is, to drop us back all the way down i.e. get y_offset back to 0)
+		// so we check for that case here.
+		// If we don't do this, then if something hurts us the moment we jump, we
+		// are left floating several pixels in the air. This should fix that [dj2017-08-13]
+		else if (y_offset<0 && ydiff>0)
+		{
+			// Say we had jumped up 4 pixels, but now we try 'fall' 8 pixels. That
+			// could leave us (instead of floating in the air) slightly inside the floor.
+			// So what we do is, drop by nFALL_VERTICAL_PIXELS, but, if m_yoffset has
+			// then become a positive value (remember right now it must be negative, see if)
+			// then set it to 0, to not go into floor (recall also, we KNOW the next thing
+			// below us in block units is solid, because of the bsolid check above).
+			// This should then, if we had eg jumped up say 12 pixels, allow us to not
+			// insta-drop all 12 to the floor, but correctly still fall over multiple
+			// frames back down to the ground.
+
+			// This g_nFalltime thing is to make hero fall initially slower
+			// then faster (full block at a time).
+			// Apart from looking/feeling slightly more natural, it also 'masks'
+			// a current issue where you get a jerky effect that looks like hero
+			// bouncing up and down when falling off bottom of view, as the view
+			// code scrolls vertically always in increments of 16 pixels, whereas
+			// if hero falls at 8 pixels off bottom then relative vertical offset
+			// of hero on screen toggles 8 pixels each consecutive frame. With
+			// this falltime thing, by the time he is falling off the bottom,
+			// he is falling 16 pixels, and the view scrolls 16 pixels too.
+			// It's a bit fiddly but anyway, we have to do fine tweaks like this.
+			// See also liveedu.tv video 2017-06-24 [dj2017-06-24]
+			y_offset += ( g_nFalltime>=6 ? 16 : nFALL_VERTICAL_PIXELS );
+			ret = 0;//Return 'busy falling'
+			if (y_offset>0)
+				y_offset = 0;//We're not going to change hero block-y, as this case is when we're only y_offset (less than a full BLOCKH) above the ground.
+		}
 	}
 	if ((hero_mode != MODE_JUMPING) && (ret == 0)) {
 		if (nSlowDownHeroWalkAnimationCounter == 0)

@@ -1206,6 +1206,7 @@ void GameHeartBeat()
 		}
 		else if (pBullet->eType==CBullet::BULLET_MONSTER)
 		{
+			// Check if monster bullet overlaps with hero
 			if (OVERLAPS(
 				x*16+x_small*8,
 				y*16-16,
