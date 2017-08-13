@@ -145,6 +145,7 @@ float g_fFrameRate=18.0f;
 unsigned char *g_pLevel = NULL;
 int g_nLevel = 0;
 bool bShowDebugInfo = false;
+bool g_bEnableDebugStuff = false;//dj2017-08-13
 vector<CThing *> g_apThings;
 
 string g_sGameMessage;
@@ -571,6 +572,19 @@ int game_startup(bool bLoadGame)
 					if ( (Event.key.keysym.mod & KMOD_LSHIFT)!=0 ||
 					     (Event.key.keysym.mod & KMOD_RSHIFT)!=0)
 					{
+						// Ctrl+Shift?
+						if ( (Event.key.keysym.mod & KMOD_LCTRL)!=0 ||
+							 (Event.key.keysym.mod & KMOD_RCTRL)!=0)
+						{
+							// Ctrl+Shift+G: Enable debug commands (e.g. H for health self-damage etc.)
+							if (Event.key.keysym.sym==SDLK_g)
+							{
+								g_bEnableDebugStuff = true;
+								ShowGameMessage("DebugStuff Enabled", 64);
+							}
+						}
+						else
+						{
 						/*{
 						char buf[1024]={0};
 						sprintf(buf,"%08x,%08x,%08x",(int)Event.key.keysym.sym, (int)Event.key.keysym.mod, (int)Event.key.keysym.scancode);
@@ -593,6 +607,8 @@ int game_startup(bool bLoadGame)
 							char buf[1024]={0};
 							sprintf(buf,"Inc framerate %.2f",g_fFrameRate);
 							ShowGameMessage(buf, 32);
+						}
+
 						}
 					}
 					
@@ -668,161 +684,168 @@ int game_startup(bool bLoadGame)
 			//[dj2016-10 don't think it really makes sense to have P as jump - if anything, pause??[LOW]](g_iKeys[DJKEY_P])		key_jump = 1;
 			if (g_iKeys[DJKEY_ESC])		iEscape = 1;
 
-#ifdef DAVEGNUKEM_CHEATS_ENABLED
-			// CHEAT KEYS
-			if (g_iKeys[DJKEY_BACKSPACE])
+			if (g_bEnableDebugStuff)
 			{
-				// BACKSPACE + G: God mode
-				if (g_iKeys[DJKEY_G])
+
+#ifdef DAVEGNUKEM_CHEATS_ENABLED
+				// CHEAT KEYS
+				if (g_iKeys[DJKEY_BACKSPACE])
 				{
-					ShowGameMessage("CHEAT: GOD MODE", 96);
-					g_bGodMode = true;
-				}
-				// BACKSPACE + B: Toggle 'big viewport mode' [dj2016-10-10]
-				// It seems to be difficult to toggle just once ... so we detect key up/down 'edge' and only toggle on that
-				static bool g_bBKeyLast=false;
-				bool bBKey = (g_iKeys[DJKEY_B]!=0);
-				if (bBKey && !g_bBKeyLast)// Detect keydown 'edge'
-				{
-					g_bBigViewportMode = !g_bBigViewportMode;
-					if (g_bBigViewportMode)
+					// BACKSPACE + G: God mode
+					if (g_iKeys[DJKEY_G])
 					{
-						VIEW_WIDTH = (pVisView->width / 16) - 10;
-						VIEW_HEIGHT = (pVisView->height - 5*16) / 16;
-						if (VIEW_HEIGHT>=100)VIEW_HEIGHT=100;
-						if (VIEW_WIDTH>=128)VIEW_WIDTH=128;
+						ShowGameMessage("CHEAT: GOD MODE", 96);
+						g_bGodMode = true;
 					}
-					else
+					// BACKSPACE + B: Toggle 'big viewport mode' [dj2016-10-10]
+					// It seems to be difficult to toggle just once ... so we detect key up/down 'edge' and only toggle on that
+					static bool g_bBKeyLast=false;
+					bool bBKey = (g_iKeys[DJKEY_B]!=0);
+					if (bBKey && !g_bBKeyLast)// Detect keydown 'edge'
 					{
-						VIEW_WIDTH = VIEW_WIDTH_DEFAULT;
-						VIEW_HEIGHT = 10;
-
-						// NB, TODO, we actually need to also need to redraw score etc. here (though since this is just a dev/editing mode, not a real game mode, it doesn't have to be perfect)
-
-						// When going out of 'big viewport' mode, hero might now be off the (now-tiny) 'viewport' :/ .. so must also 're-center' viewport around hero
-						if (x>xo+VIEW_WIDTH/2) xo = x-VIEW_WIDTH/2;
-						if (y>yo+VIEW_HEIGHT/2) yo = y-VIEW_HEIGHT/2;
-
-						// Redraw everything that needs to be redrawn, as larger viewport will have obliterated right side with score etc.
-						RedrawEverythingHelper();
-					}
-				}
-				g_bBKeyLast = bBKey;
-
-				// BACKSPACE + P: Powerboots
-				if (g_iKeys[DJKEY_P])
-				{
-					HeroSetJumpMode(JUMP_POWERBOOTS);
-					ShowGameMessage("CHEAT: POWERBOOTS", 96);
-					//dj2017-08 Adding boots to inventory- this is slightly gross
-					bool bHave = false;
-					for ( i=0; i<InvGetSize(); i++ )
-					{
-						if (InvGetItem(i)->GetTypeID()==TYPE_POWERBOOTS)
+						g_bBigViewportMode = !g_bBigViewportMode;
+						if (g_bBigViewportMode)
 						{
-							bHave = true;
-							break;
+							VIEW_WIDTH = (pVisView->width / 16) - 10;
+							VIEW_HEIGHT = (pVisView->height - 5*16) / 16;
+							if (VIEW_HEIGHT>=100)VIEW_HEIGHT=100;
+							if (VIEW_WIDTH>=128)VIEW_WIDTH=128;
+						}
+						else
+						{
+							VIEW_WIDTH = VIEW_WIDTH_DEFAULT;
+							VIEW_HEIGHT = 10;
+
+							// NB, TODO, we actually need to also need to redraw score etc. here (though since this is just a dev/editing mode, not a real game mode, it doesn't have to be perfect)
+
+							// When going out of 'big viewport' mode, hero might now be off the (now-tiny) 'viewport' :/ .. so must also 're-center' viewport around hero
+							if (x>xo+VIEW_WIDTH/2) xo = x-VIEW_WIDTH/2;
+							if (y>yo+VIEW_HEIGHT/2) yo = y-VIEW_HEIGHT/2;
+
+							// Redraw everything that needs to be redrawn, as larger viewport will have obliterated right side with score etc.
+							RedrawEverythingHelper();
 						}
 					}
-					if (!bHave)
-					{
-						CBoots* pThing = new CBoots;
-						pThing->SetType(TYPE_POWERBOOTS);
-						pThing->SetSprite(1, 128-32);//GROSS HARDCODED - if we move to different sprite in metadata, this will break
-						InvAdd(pThing);
-					}
+					g_bBKeyLast = bBKey;
 
-				}
-				// BACKSPACE + PGDN: All power-ups
-				if (g_iKeys[DJKEY_PGDN])
-				{
-					ShowGameMessage("CHEAT: HealthKeysFirepower", 96);
-SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
-					// Full health
-					SetHealth(MAX_HEALTH);
-
-					// All keys
-					std::vector<int> anKeysHave;
-					for ( i=0; i<InvGetSize(); i++ )
+					// BACKSPACE + P: Powerboots
+					if (g_iKeys[DJKEY_P])
 					{
-						if (InvGetItem(i)->GetTypeID()==TYPE_KEY
-							||InvGetItem(i)->GetTypeID()==TYPE_ACCESSCARD)//dj2017-06 adding access card
-						{
-							CKey *pKey = (CKey*)InvGetItem(i);
-							anKeysHave.push_back(pKey->GetID());
-						}
-					}
-					for ( i=1; i<=4; i++)
-					{
-						unsigned int j;
+						HeroSetJumpMode(JUMP_POWERBOOTS);
+						ShowGameMessage("CHEAT: POWERBOOTS", 96);
+						//dj2017-08 Adding boots to inventory- this is slightly gross
 						bool bHave = false;
-						for ( j=0; j<anKeysHave.size(); j++ )
+						for ( i=0; i<InvGetSize(); i++ )
 						{
-							if (i==anKeysHave[j])
+							if (InvGetItem(i)->GetTypeID()==TYPE_POWERBOOTS)
+							{
 								bHave = true;
+								break;
+							}
 						}
 						if (!bHave)
 						{
-							CKey *pKey = new CKey;
-							pKey->SetType(TYPE_KEY);
-							pKey->SetSprite(0, 116+i);
-							pKey->Initialize(0, 116+i);
-							InvAdd(pKey);
+							CBoots* pThing = new CBoots;
+							pThing->SetType(TYPE_POWERBOOTS);
+							pThing->SetSprite(1, 128-32);//GROSS HARDCODED - if we move to different sprite in metadata, this will break
+							InvAdd(pThing);
 						}
-					}
-					{
-						//dj2017-06 Adding access card - this is gross, it's hardcoded here that '5' is its key/door number. Oh well, not going to lose sleep over it.
-						bool bHave = false;
-						for ( unsigned int j=0; j<anKeysHave.size(); j++ )
-						{
-							if (5==anKeysHave[j])//<- [LOW PRIO] this detectioh isn't working correctly [see workaround note above 2017-06]
-								bHave = true;
-						}
-						if (!bHave)
-						{
-							CKey *pKey = new CAccessCard;
-							pKey->SetType(TYPE_ACCESSCARD);
-							pKey->SetID(5);
-							pKey->SetSprite(1, 97);
-							pKey->Initialize(1, 97);
-							InvAdd(pKey);
-						}
-					}
-					{
-						//dj2017-08 Adding antivirus - this is gross, it's hardcoded here that '6' is its key/door number. Oh well, not going to lose sleep over it.
-						bool bHave = false;
-						for ( unsigned int j=0; j<anKeysHave.size(); j++ )
-						{
-							if (5==anKeysHave[j])//<- [LOW PRIO] this detectioh isn't working correctly [see workaround note above 2017-06]
-								bHave = true;
-						}
-						if (!bHave)
-						{
-							CAntivirus *pKey = new CAntivirus;
-							pKey->SetType(TYPE_ANTIVIRUS);
-							pKey->SetID(6);
-							pKey->SetSprite(1, 98);
-							pKey->Initialize(1, 98);
-							InvAdd(pKey);
-						}
-					}
 
-					// Full firepower
-					HeroSetFirepower(MAX_FIREPOWER);
+					}
+					// BACKSPACE + PGDN: All power-ups
+					if (g_iKeys[DJKEY_PGDN])
+					{
+						ShowGameMessage("CHEAT: HealthKeysFirepower", 96);
+						SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
+						// Full health
+						SetHealth(MAX_HEALTH);
+
+						// All keys
+						std::vector<int> anKeysHave;
+						for ( i=0; i<InvGetSize(); i++ )
+						{
+							if (InvGetItem(i)->GetTypeID()==TYPE_KEY
+								||InvGetItem(i)->GetTypeID()==TYPE_ACCESSCARD)//dj2017-06 adding access card
+							{
+								CKey *pKey = (CKey*)InvGetItem(i);
+								anKeysHave.push_back(pKey->GetID());
+							}
+						}
+						for ( i=1; i<=4; i++)
+						{
+							unsigned int j;
+							bool bHave = false;
+							for ( j=0; j<anKeysHave.size(); j++ )
+							{
+								if (i==anKeysHave[j])
+									bHave = true;
+							}
+							if (!bHave)
+							{
+								CKey *pKey = new CKey;
+								pKey->SetType(TYPE_KEY);
+								pKey->SetSprite(0, 116+i);
+								pKey->Initialize(0, 116+i);
+								InvAdd(pKey);
+							}
+						}
+						{
+							//dj2017-06 Adding access card - this is gross, it's hardcoded here that '5' is its key/door number. Oh well, not going to lose sleep over it.
+							bool bHave = false;
+							for ( unsigned int j=0; j<anKeysHave.size(); j++ )
+							{
+								if (5==anKeysHave[j])//<- [LOW PRIO] this detectioh isn't working correctly [see workaround note above 2017-06]
+									bHave = true;
+							}
+							if (!bHave)
+							{
+								CKey *pKey = new CAccessCard;
+								pKey->SetType(TYPE_ACCESSCARD);
+								pKey->SetID(5);
+								pKey->SetSprite(1, 97);
+								pKey->Initialize(1, 97);
+								InvAdd(pKey);
+							}
+						}
+						{
+							//dj2017-08 Adding antivirus - this is gross, it's hardcoded here that '6' is its key/door number. Oh well, not going to lose sleep over it.
+							bool bHave = false;
+							for ( unsigned int j=0; j<anKeysHave.size(); j++ )
+							{
+								if (5==anKeysHave[j])//<- [LOW PRIO] this detectioh isn't working correctly [see workaround note above 2017-06]
+									bHave = true;
+							}
+							if (!bHave)
+							{
+								CAntivirus *pKey = new CAntivirus;
+								pKey->SetType(TYPE_ANTIVIRUS);
+								pKey->SetID(6);
+								pKey->SetSprite(1, 98);
+								pKey->Initialize(1, 98);
+								InvAdd(pKey);
+							}
+						}
+
+						// Full firepower
+						HeroSetFirepower(MAX_FIREPOWER);
+					}
 				}
-			}
 #endif
 
-//this shouldn't be in 'default' game or something .. ?
-			// Debug: hurt self
-			static bool b = false;
-			bool bOld = b;
-			if (g_iKeys[DJKEY_H]) b = true; else b = false;
-			if (b && !bOld)
-				update_health(-1);
+				// This is for debugging/testing: hurt self. This definitely
+				// shouldn't be enabled by default in the real game, so we
+				// put it behind the g_bEnableDebugStuff setting. [dj2017-08]
+				// This is of course not a 'cheat', lol .. literally just useful for gamedev/testing.
+				static bool b = false;
+				bool bOld = b;
+				if (g_iKeys[DJKEY_H]) b = true; else b = false;
+				if (b && !bOld)
+					update_health(-1);
 
-			// Debug: toggle display of debug info
-			if (g_iKeys[DJKEY_D] && !g_iKeysLast[DJKEY_D]) bShowDebugInfo = !bShowDebugInfo;
+				// 'D' for Debug: toggle display of debug info
+				if (g_iKeys[DJKEY_D] && !g_iKeysLast[DJKEY_D]) bShowDebugInfo = !bShowDebugInfo;
+			
+			}//if (g_bEnableDebugStuff)
 
 
 			fTimeNow = djTimeGetTime();
@@ -886,7 +909,7 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 		//debug//printf("}");
 
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
-		if (key_action && g_iKeys[DJKEY_L])
+		if (g_bEnableDebugStuff && key_action && g_iKeys[DJKEY_L])
 		{
 			// NB, if we are holding a key down when entering sprite/level editor, we 'miss' the gameloop's KeyUp event as the integrated editor takes over input polling; this leads to potentially "stuck" keystates in anKeyState when exiting, which in turn causes problems like e.g. if you press 'up' before entering the level editor then drop yourself out of the level editor over a teleporter, the game freezes as it keeps re-activating the teleporter since the action key is effectively behaving as if stuck down. TL;DR CLEAR THE KEYSTATES HERE (even if the keys really are down on exit editor). I am not mad about this solution, all feels a little wobbly/workaround-y, but should do for now. [dj2017-06-22]
 			memset( anKeyState, 0, sizeof(anKeyState) );
