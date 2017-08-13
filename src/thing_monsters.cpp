@@ -370,50 +370,51 @@ int CFlyingRobot::Tick()
 	// Move slowly in direction of hero along both axes (but slower in y axis)
 	//if (++m_nMoveEveryNthFrameX>1)
 	{
-
-		if (m_xoffset==0//<- This seems dubious, surely should check solid if YOffset!=0 [dj2017-06]
-			&& check_solid(m_x+m_nXDir, m_y)
-			)
+		bool bSolidInFrontOfUsXAxis = false;
+		if (m_xoffset==0)
 		{
-			//Do nothing
+			if (m_yoffset>0)
+				bSolidInFrontOfUsXAxis = check_solid(m_x+m_nXDir, m_y  ) || check_solid(m_x+m_nXDir, m_y+1);
+			else if (m_yoffset<0)
+				bSolidInFrontOfUsXAxis = check_solid(m_x+m_nXDir, m_y-1) || check_solid(m_x+m_nXDir, m_y  );
+			else
+				bSolidInFrontOfUsXAxis = check_solid(m_x+m_nXDir, m_y);
 		}
-		else
+
+		if (!bSolidInFrontOfUsXAxis)
 		{
 			//m_nMoveEveryNthFrameX = 0;
 			m_xoffset += m_nXDir;
-			if (ABS(m_xoffset)>=16)
-			{
-				m_xoffset = 0;
-				m_x += m_nXDir;
-			}
+			NORMALIZEX;
 		}
 	}
 	if (++m_nMoveEveryNthFrameY>4)
 	{
 		m_nMoveEveryNthFrameY = 0;
 
+		// Work in pixel units here, simplifies things slightly. Compare our center-line, to hero center-line, vertically.
+		int nOurYPixels = PIXELY + (BLOCKH/2);//Add half as we use our center-line vs hero center-line
+		int nHeroYPixels = (y*BLOCKH + y_offset);
 		int nYDiffDir = 0;
-		if (y < m_y - 1)
+		if (nHeroYPixels < nOurYPixels)
 			nYDiffDir = -1;
-		else if (y > m_y + 1)
+		else if (nHeroYPixels > nOurYPixels)
 			nYDiffDir = 1;
 
 		if (nYDiffDir!=0)
 		{
-			if (m_yoffset==0//<- This seems dubious, surely should check solid if YOffset!=0 [dj2017-06]
-				&& check_solid(m_x, m_y+nYDiffDir)
-				)
-			{
-				//Do nothing
-			}
+			bool bSolidInFrontOfUsYAxis = false;
+			if (m_xoffset>0)
+				bSolidInFrontOfUsYAxis = check_solid(m_x, m_y+nYDiffDir) || check_solid(m_x+1, m_y+nYDiffDir);
+			else if (m_xoffset<0)
+				bSolidInFrontOfUsYAxis = check_solid(m_x, m_y+nYDiffDir) || check_solid(m_x-1, m_y+nYDiffDir);
 			else
+				bSolidInFrontOfUsYAxis = check_solid(m_x, m_y+nYDiffDir);
+
+			if (!bSolidInFrontOfUsYAxis)
 			{
 				m_yoffset += nYDiffDir;
-				if (ABS(m_yoffset)>=16)
-				{
-					m_yoffset = 0;
-					m_y += nYDiffDir;
-				}
+				NORMALIZEY;
 			}
 		}
 	}
