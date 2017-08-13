@@ -33,6 +33,17 @@ License: GNU GPL Version 2
 		m_xoffset += BLOCKW;\
 		--m_x;\
 	}
+#define NORMALIZEX2(x,xoffset)\
+	while ((xoffset)>=BLOCKW)\
+	{\
+		xoffset -= BLOCKW;\
+		++(x);\
+	}\
+	while ((xoffset)<=-BLOCKW)\
+	{\
+		xoffset += BLOCKW;\
+		--(x);\
+	}
 #define NORMALIZEY\
 	while (m_yoffset>=BLOCKH)\
 	{\
@@ -147,33 +158,69 @@ void CRobot::Draw()
 {
 	if (m_nType==0) // Robot?
 	{
-		DRAW_SPRITE16A(pVisView, m_a, 32/*m_b*/ + anim4_count, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y));
+		DRAW_SPRITE16A(pVisView, m_a, 32/*m_b*/ + anim4_count, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y)+m_yoffset);
 	}
 	else if (m_nType==1) // Fireball?
 	{
-		DRAW_SPRITEA(pVisView, m_a, (m_nXDir>0 ? 16 : 20) + anim4_count - 16, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y-1), 16, 32);
+		DRAW_SPRITEA(pVisView, m_a, (m_nXDir>0 ? 16 : 20) + anim4_count - 16, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y-1)+m_yoffset, 16, 32);
 	}
 }
 
 int CRobot::Tick()
 {
+	// NOTE: Say the robot is on shootable soft-solid blocks, but with m_xoffset partial e.g.:
+	//
+	//    [robot_]
+	// [solid][solid]
+	// [solid][solid]
+	//
+	// then if i shoot the top-left solid, I probably don't want it to immediately fall -
+	// probably it should stay on the solid (unless its m_xoffset is 0 ie directly on top).
+	// So this testing code looks at the value of m_xoffset, if 0, checks only the single
+	// block below us; if non-zero, checks both blocks - if 'partially' solid below us,
+	// regard basically as solid (i.e. don't fall).
+
+	// FIRST TRY SEE IF WE SHOULD FALL?
+	bool bSolidBelowUs = false;
 	if (m_xoffset==0)
+		bSolidBelowUs = check_solid(m_x,m_y+1);
+	else if (m_xoffset<0)
+		bSolidBelowUs = ( check_solid(m_x,m_y+1) || check_solid(m_x-1,m_y+1) );
+	else
+		bSolidBelowUs = ( check_solid(m_x,m_y+1) || check_solid(m_x+1,m_y+1) );
+	bool bFalling = false;
+	if (!bSolidBelowUs)
 	{
-		if ((check_solid(m_x + m_nXDir, m_y)) || (!check_solid(m_x + m_nXDir, m_y + 1)))
-		{
-			m_nXDir = -m_nXDir;
-			return 0;
-		}
-		// Don't move left/right if nothing below us (i.e. we're busy falling)
-		if (!check_solid(m_x, m_y+1))
-			return 0;
+		const int nFALLSPEED=4;
+		m_yoffset += nFALLSPEED;
+		NORMALIZEY;
+		bFalling = true;
 	}
 
-	m_xoffset += m_nXDir * 4;//(m_nType==0 ? 4 : 2);
-	if (ABS(m_xoffset)>=16)
+	// DON'T DO LEFT/RIGHT MOVEMENT IN THIS TICK() IF WE JUST DID ANY FALLING THIS ROUND
+	if (!bFalling)
 	{
-		m_xoffset = 0;
-		m_x += m_nXDir;
+		// Flame guy speed is faster than robot [I really don't like the fact
+		// designwise (old gross code) that robot 'is also' other things depending
+		// on the m_nType]
+		const int nSPEED = (m_nType==0 ? 3 : 5);
+		int nXNew = m_x;
+		int nXOffset = m_xoffset;
+		nXOffset += m_nXDir * nSPEED;
+		NORMALIZEX2(nXNew,nXOffset);
+
+		if ((check_solid(nXNew+m_nXDir, m_y)) || (!check_solid(nXNew+m_nXDir, m_y + 1)))
+		{
+			// At ends of floor etc. re-"line-up" with block units ie set m_xoffset to 0
+			m_nXDir = -m_nXDir;
+			m_xoffset = 0;
+			nXOffset = 0;
+			m_x = nXNew;
+			return 0;
+		}
+		// 'Apply' the move
+		m_x = nXNew;
+		m_xoffset = nXOffset;
 	}
 
 	if (m_nType==0) // The robot shoots, not the fireball
@@ -190,9 +237,9 @@ int CRobot::Tick()
 				// Check we're facing hero, and hero is more or less at same height ..
 				if ((ABS(y-m_y)<3) && ((m_nXDir<0 && x<=m_x) || (m_nXDir>0 && x>=m_x)))
 				{
-					if ((rand()%50)<=2)
+					if ((rand()%100)<=3)
 					{
-						MonsterShoot(PIXELX, PIXELY, m_nXDir<0?-16:16);
+						MonsterShoot(PIXELX, PIXELY, m_nXDir<0?-12:12);
 						m_nNoShootCounter = 36;// fixme, should be time, not frame count
 					}
 				}
@@ -217,6 +264,8 @@ void CRobot::Initialize(int a, int b)
 	SetActionBounds(0,0,15,15);
 	SetVisibleBounds(0,0,15,15);
 	SetShootBounds  (0,0,15,15);
+
+	m_bFalls = false;//The robot does fall, but we do our own falilng code [for now?] [dj2017-08-13]
 
 	m_nXDir = (GET_EXTRA(a,b,0)==0 ? -1 : 1);
 	m_nType = GET_EXTRA(a,b,2);
