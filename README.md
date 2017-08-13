@@ -219,6 +219,8 @@ Dependencies: You may have to first install LibSDL1.2 and LibSDL-Mixer1.2 (these
 
 Note there is currently no 'undo', so be careful. If happy with a set of work, save your changes.
 
+NB: All in-game cheat/debugging keys (eg level up) must first be turned on by pressing Ctrl+Shift+G
+
 * F5 from within the game invokes the level editor
 * F1: Save current changes (NB: there is currently no 'unsaved changes' warning, so remember to save your changes, if desired)
 * Escape: Exit level editor and start playing current level
