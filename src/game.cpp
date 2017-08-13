@@ -211,6 +211,20 @@ int g_nScoreOld = 0;
 int g_nHealthOld = 0;
 
 
+/*-----------------------------------------------------------*/
+// Redraw everything that needs to be redrawn, as larger viewport will have obliterated right side with score etc.
+void RedrawEverythingHelper()
+{
+	//fixLOW[dj2017-08-13] really not 100% if all this is exactly correct but anyway
+	GameDrawSkin();
+	GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT );
+	update_health( 0 );
+	update_score( 0 );
+	GameDrawFirepower();
+	InvDraw();
+	GraphFlip(!g_bBigViewportMode);
+}
+/*-----------------------------------------------------------*/
 
 
 /*-----------------------------------------------------------*/
@@ -690,13 +704,7 @@ int game_startup(bool bLoadGame)
 						if (y>yo+VIEW_HEIGHT/2) yo = y-VIEW_HEIGHT/2;
 
 						// Redraw everything that needs to be redrawn, as larger viewport will have obliterated right side with score etc.
-						GameDrawSkin();
-						GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT );
-						update_health( 0 );
-						update_score( 0 );
-						GameDrawFirepower();
-						InvDraw();
-						GraphFlip(!g_bBigViewportMode);//Flip
+						RedrawEverythingHelper();
 					}
 				}
 				g_bBKeyLast = bBKey;
@@ -830,13 +838,7 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 			IngameMenu();
 
 			// Redraw everything that needs to be redrawn
-			GameDrawSkin();
-			GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT );
-			update_health( 0 );
-			update_score( 0 );
-			GameDrawFirepower();
-			InvDraw();
-			GraphFlip(!g_bBigViewportMode);
+			RedrawEverythingHelper();
 		}
 
 
@@ -934,6 +936,14 @@ SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
 			{
 				//ShowInstructions();
 				ShowEndGameSequence();
+
+				// Redraw everything that needs to be redrawn, otherwise still see parts of endgame window over right side etc. [dj2017-08-13]
+				RedrawEverythingHelper();
+
+				// ['In theory' the following workaround shouldn't be necessary as boss is supposed to be last level but sometimes during testing isn't, so handle this anyway .. otherwise eg. keys 'stuck down' on start next level]
+				// If we are holding a key down when entering endgamesequence, we 'miss' the gameloop's KeyUp event as it takes over input polling; this leads to potentially "stuck" keystates in anKeyState when exiting, which in turn causes problems like e.g. if you press 'up' before entering the level editor then drop yourself out of the level editor over a teleporter, the game freezes as it keeps re-activating the teleporter since the action key is effectively behaving as if stuck down. TL;DR CLEAR THE KEYSTATES HERE (even if the keys really are down on exit editor). I am not mad about this solution, all feels a little wobbly/workaround-y, but should do for now. [dj2017-08-13]
+				memset( anKeyState, 0, sizeof(anKeyState) );
+				
 				// Next-level is maybe slightly weird, but since this 'should be'
 				// last level, it should at this point just pop out to the main
 				// game menu.
