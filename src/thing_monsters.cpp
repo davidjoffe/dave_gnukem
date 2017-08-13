@@ -859,6 +859,10 @@ void CSpike::Initialize(int b0, int b1)
 	}
 }
 /*-----------------------------------------------------------*/
+// NOTE: the jumping-monster in 'resting' / 'shooting' state
+// is 2x2 'blocks' ... while jumping / falling, it's 2x3 ..
+// that's why on certain state changes, we re-set the various
+// bounding boxes.
 CJumpingMonster::CJumpingMonster() :
 	m_nJumpingIndex(-1),
 	m_bFalling(false),
@@ -877,14 +881,16 @@ int CJumpingMonster::Tick()
 	{
 		if(m_nJumpingIndex<0 && !m_bFalling)
 		{
+			// Likelihood of jumping less if lined up to shoot, as he'd rather try shoot you
 			if (
-				( m_bLinedUpToShoot &&  ((rand()%100)<2) )
+				( m_bLinedUpToShoot &&  ((rand()%1000)<25) )
 				|| 
 				( !m_bLinedUpToShoot && ((rand()%100)<4) )
 				)
 			//if ((rand()%100)<4)
 			{
-				m_nJumpingIndex = 0;
+				// Go to 2x3 size state
+				m_nJumpingIndex = 0;//<- start jump
 				SetVisibleBounds(0,-32,31,15);
 				SetActionBounds (0,-32,31,15);
 				SetShootBounds  (0,-32,31,15);
@@ -900,7 +906,15 @@ int CJumpingMonster::Tick()
 	// go out of view, wait a while, come back, and then it only finishes falling.
 	if (m_bFalling || ( IsInView() && !IsJumping()) )
 	{
-		if ( check_solid(m_x,m_y+1) || check_solid(m_x+1,m_y+1) )
+		bool bSolidBelowUsYAxis = false;
+		if (m_xoffset>0)
+			bSolidBelowUsYAxis = ( check_solid(m_x  ,m_y+1) || check_solid(m_x+1,m_y+1) || check_solid(m_x+2,m_y+1) );
+		else if (m_xoffset<0)
+			bSolidBelowUsYAxis = ( check_solid(m_x-1,m_y+1) || check_solid(m_x  ,m_y+1) || check_solid(m_x+1,m_y+1) );
+		else
+			bSolidBelowUsYAxis = ( check_solid(m_x  ,m_y+1) || check_solid(m_x+1,m_y+1) );
+
+		if ( bSolidBelowUsYAxis )
 		{
 			// If *just* landed, set noshootcounter so we don't immediately shoot upon landing (give slight chance to hero)
 			if (m_bFalling)
@@ -916,18 +930,34 @@ int CJumpingMonster::Tick()
 		{
 			const int FALLSPEED = 4;//pixels
 			m_yoffset += FALLSPEED;//anJumpOffsetsY[m_nJumpingIndex];
-			while (m_yoffset>=BLOCKH)
-			{
-				m_yoffset -= BLOCKH;
-				++m_y;
-			}
+			NORMALIZEY;
 		}
 	}
 	if (IsJumping() || m_bFalling)
 	{
-		//fixme TODO x-direction collision detection here
-		m_xoffset += m_nXDir;
-		NORMALIZEX;
+		// x-axis collision detection
+		const int nSPEEDX = 1;//<- Could try experiment with increasing this to make him sort of 'get to us faster' in terms of X direction
+		bool bSolidInFrontOfUsXAxis = false;
+		//if (m_xoffset==0)
+		{
+			// First translate to world pixel coordinates
+			// Then add our xoffset diff
+			// Then re-translate back to block coordinate is 'in' a solid
+			// If it's not, it means we can move.
+			int nXPixel = PIXELX;
+			int nNewDesiredPixelX = nXPixel + m_nXDir*nSPEEDX;
+			int nNewDesiredBlockX = nNewDesiredPixelX / BLOCKW;
+
+			if (m_nXDir>0)
+				bSolidInFrontOfUsXAxis = check_solid(nNewDesiredBlockX+2, m_y) || check_solid(nNewDesiredBlockX+2, m_y-1) || check_solid(nNewDesiredBlockX+2, m_y-2);
+			else if (m_nXDir<0)
+				bSolidInFrontOfUsXAxis = check_solid(nNewDesiredBlockX, m_y) || check_solid(nNewDesiredBlockX, m_y-1) || check_solid(nNewDesiredBlockX, m_y-2);
+		}
+		if (!bSolidInFrontOfUsXAxis)
+		{
+			m_xoffset += m_nXDir*nSPEEDX;
+			NORMALIZEX;
+		}
 	}
 
 	// If jumping, apply jump movements
@@ -939,11 +969,7 @@ int CJumpingMonster::Tick()
 		int nYOffsetSave = m_yoffset;
 
 		m_yoffset += anJUMPOFFSETSY[m_nJumpingIndex];
-		while (m_yoffset<=-BLOCKH)
-		{
-			m_yoffset += BLOCKH;
-			m_y--;
-		}
+		NORMALIZEY;
 
 		++m_nJumpingIndex;
 		if (anJUMPOFFSETSY[m_nJumpingIndex]==99999)
@@ -953,7 +979,16 @@ int CJumpingMonster::Tick()
 		}
 
 		// If we busy jumping UP, then must collision-detect above us
-		if (check_solid(m_x,m_y-3,true) || check_solid(m_x+1,m_y-3,true))
+
+		bool bSolidAboveUsYAxis = false;
+		if (m_xoffset>0)
+			bSolidAboveUsYAxis = ( check_solid(m_x  ,m_y-3) || check_solid(m_x+1,m_y-3) || check_solid(m_x+2,m_y-3) );
+		else if (m_xoffset<0)
+			bSolidAboveUsYAxis = ( check_solid(m_x-1,m_y-3) || check_solid(m_x  ,m_y-3) || check_solid(m_x+1,m_y-3) );
+		else
+			bSolidAboveUsYAxis = ( check_solid(m_x  ,m_y-3) || check_solid(m_x+1,m_y-3) );
+
+		if (bSolidAboveUsYAxis)//check_solid(m_x,m_y-3,true) || check_solid(m_x+1,m_y-3,true))
 		{
 			// 'Disallow'/'revert' the movement itself
 			m_y = nYSave;
