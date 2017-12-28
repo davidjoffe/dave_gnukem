@@ -83,6 +83,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+* Ctrl+Shift+W Large gameplay viewport mode (currently classified as a 'cheat')
 * All cheat keys (and debug/testing keys like H to inflict self-damage) must now first be enabled by pressing Ctrl+Shift+G to enable in-game debugging stuff
 * Numerous bugfixes and gameplay tweaks
 
