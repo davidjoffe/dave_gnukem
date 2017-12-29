@@ -780,6 +780,7 @@ public:
 	CBoots();
 	virtual int HeroOverlaps();
 	virtual void OnInventoryLoad();
+	virtual void Initialize(int b0, int b1);
 };
 /*-----------------------------------------------------------*/
 /*!
