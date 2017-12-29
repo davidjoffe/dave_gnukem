@@ -23,7 +23,7 @@ Created by: David Joffe http://djoffe.com/ / https://www.liveedu.tv/david_joffe/
 
 The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: [T.O.G](http://www.nuke24.net/ "T.O.G."), [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
-As of 8 Oct 2016, this project is under 'properly' active development again, and the goal/intention is to get to a 'version 1' by no later than Oct 2017.
+As of 8 Oct 2016, this project is under 'properly' active development again, and the goal/intention is to get to a 'version 1' by no later than Oct 2017^H^H^H^H^H^H^H^HApr 2018.
 
 ### About Duke Nukem 1
 
@@ -43,7 +43,7 @@ You can watch development on this project being live-streamed at:
 
 * Jul/Aug 2017: v0.8: Implement many more monster types, and a few other special 'things' (e.g. rockets etc.)
 * Aug/Sep 2017: v0.9: Implement equivalent of Dr Proton and finalize plotline etc.; Finalize one basic set of playable levels. Finalize and round off spritesets to be 'not entirely terrible'.
-* Sep/Oct 2017: v1.0: Final rounding-off and final testing, 'call it version 1'.
+* Apr 2018: v1.0: Final rounding-off and final testing, 'call it version 1'.
 
 ### Notes
 
@@ -69,7 +69,7 @@ To open doors, find the correct color key, and press the action key on the 'lock
 
 Power boots allow you to jump higher. The special molecule pickup gives you full health.
 
-### 'Floating' Draft/Beta Storyline/Plot:
+### Storyline/Plot:
 
 The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the CIA to infect the world's computers with a virus called SystemD, crippling them. Only you can stop him. You must find the floppy disk with the Devuan Antivirus on it, and install it on the master computer, which is hidden in Vault7.
 
