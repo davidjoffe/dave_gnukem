@@ -1167,6 +1167,14 @@ CPickup::CPickup()
 
 int CPickup::HeroOverlaps()
 {
+
+	// [dj2017-12] Moving these to before the m_bInventoryItem test - I think
+	// that's more correct as otherwise inventory items like powerboots the
+	// score etc. doesn't work
+	if (m_nScoreDiff!=0) update_score(m_nScoreDiff, m_x, m_y);
+	if (m_nHealthDiff!=0) update_health(m_nHealthDiff);
+	djSoundPlay(g_iSounds[SOUND_PICKUP]);
+
 	if (m_bInventoryItem)
 	{
 		// Try to add self to hero's inventory, then remove from main list.
@@ -1178,9 +1186,6 @@ int CPickup::HeroOverlaps()
 		}
 		return THING_REMOVE; // remove but don't delete
 	}
-	if (m_nScoreDiff!=0) update_score(m_nScoreDiff, m_x, m_y);
-	if (m_nHealthDiff!=0) update_health(m_nHealthDiff);
-	djSoundPlay(g_iSounds[SOUND_PICKUP]);
 	return THING_DIE;
 }
 
@@ -1214,6 +1219,16 @@ void CPickup::Initialize(int b0, int b1)
 /*-----------------------------------------------------------*/
 CBoots::CBoots()
 {
+	// I think we can't set this in the constructor as CPickup::Initialize will
+	// later override it.
+	//m_nScoreDiff = 1000;
+}
+
+void CBoots::Initialize(int b0, int b1)
+{
+	CPickup::Initialize(b0,b1);
+	// NB, set this after base class Initialize or that will override this.
+	m_nScoreDiff = 1000;
 }
 
 int CBoots::HeroOverlaps()
