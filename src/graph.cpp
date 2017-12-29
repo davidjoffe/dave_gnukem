@@ -92,6 +92,7 @@ void GraphFlip(bool bScaleView)
 			}
 		}
 
+		// should this frame rate stuff be here ?? [dj2017-08]
 		if (bShowFrameRate)
 		{
 			// Simple global frame rate display [?]
@@ -264,9 +265,10 @@ void GraphDone()
 }
 
 // FIXME: , view_height?
-void GraphFlipView( int iViewWidth, int iViewHeight )
+void GraphFlipView( int iViewWidth, int iViewHeight, int nXS, int nYS, int nXD, int nYD )
 {
-	djgDrawVisual( pVisBack, pVisView, 16, 16, 16, 16, iViewWidth*16, iViewHeight*16 );
+	//djgDrawVisual( pVisBack, pVisView, g_bLargeViewport?0:16, g_bLargeViewport?0:16, g_bLargeViewport?0:16, g_bLargeViewport?0:16, iViewWidth*16, iViewHeight*16 );
+	djgDrawVisual( pVisBack, pVisView, nXD, nYD, nXS, nYS, iViewWidth*16, iViewHeight*16 );
 }
 
 // FIXME: Currenetly assumes a 256-char 32x8 character 256x128 pixel alpha-mapped image
