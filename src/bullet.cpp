@@ -45,8 +45,8 @@ void CBullet::Draw()
 			((0)/16)*16,
 			WORLDX2VIEW(x),
 			WORLDY2VIEW(y)-4,
-			16,
-			16);
+			BLOCKW,
+			BLOCKH);
 	}
 	else
 	{
@@ -56,8 +56,8 @@ void CBullet::Draw()
 			bDrawnOnce ? 32 : ((0)/16)*16,
 			WORLDX2VIEW(x),
 			WORLDY2VIEW(y)-4,
-			16,
-			16);
+			BLOCKW,
+			BLOCKH);
 	}
 	bDrawnOnce = true;
 }

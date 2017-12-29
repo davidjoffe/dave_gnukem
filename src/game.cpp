@@ -55,9 +55,17 @@ int g_nRecentlyFallingOrJumping = 0;
 // The original Duke Nukem 1 has a 13x10 'blocks' viewport, though in future we could use this
 // to either allow larger game viewport for this game, or have 'derived' games using this 'engine' with
 // larger viewports [dj2016-10]
-const int VIEW_WIDTH_DEFAULT=13;//In number of game 'blocks'
-int VIEW_WIDTH = VIEW_WIDTH_DEFAULT;
-int VIEW_HEIGHT = 10;
+#ifdef LARGE_VIEWPORT_TEST
+//! 'Large viewport mode' NOT TO BE CONFUSED WITH g_bBigViewportMode! TOTALLY DIFFERENT THINGS.
+bool g_bLargeViewport = false;//true;
+#endif
+// Width/height of gameplay-area viewport (in number of game 'blocks'). The real Duke Nukem 1 was 13x10.
+// These used to be constants, that's why they're all uppercase, but should be renamed according to normal variable naming conventions [dj2017-08]
+int VIEW_WIDTH = -1;
+int VIEW_HEIGHT = -1;
+int g_nViewOffsetX=0;//Top left of game viewport in pixels (X)
+int g_nViewOffsetY=0;//Top left of game viewport in pixels (Y)
+
 
 //[dj2016-10-10]
 bool g_bBigViewportMode=false;
@@ -218,12 +226,60 @@ void RedrawEverythingHelper()
 {
 	//fixLOW[dj2017-08-13] really not 100% if all this is exactly correct but anyway
 	GameDrawSkin();
-	GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT );
-	update_health( 0 );
-	update_score( 0 );
+	GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT, g_nViewOffsetX, g_nViewOffsetY, g_nViewOffsetX, g_nViewOffsetY );
+	DrawHealth();
+	DrawScore();
 	GameDrawFirepower();
 	InvDraw();
 	GraphFlip(!g_bBigViewportMode);
+}
+/*-----------------------------------------------------------*/
+void ReInitGameViewport()
+{
+	// NB keep in mind 'big viewport mode' and 'large viewport' mode are
+	// two totally different things, not to be confused with one another.
+	// 'Big viewport mode' runs the game in a large HIGH RESOLUTION
+	// window, keeping 1:1 pixel ratio for sprites (so sprites draw tiny
+	// and you see a lot more game area); large/wide viewport mode
+	// still scales the game viewport so it's effectively 320x200,
+	// but just uses up more area of the screen (i.e. instead of having
+	// the big right-bar area for score and health etc. and the border
+	// around the gameplay viewport, that space is used for gameplay area).
+
+	if (g_bBigViewportMode)
+	{
+		VIEW_WIDTH = (pVisView->width / 16) - 10;
+		VIEW_HEIGHT = (pVisView->height - 5*16) / 16;
+		if (VIEW_HEIGHT>=100)VIEW_HEIGHT=100;
+		if (VIEW_WIDTH>=128)VIEW_WIDTH=128;
+		//Top left of game viewport in pixels:
+		g_nViewOffsetX=16;//?? or should these be 0, probably [dj2017-08 ??]
+		g_nViewOffsetY=16;//??
+	}
+	else if (g_bLargeViewport)
+	{
+		// This is basically 320x200 divided by the game blocksize
+		VIEW_WIDTH = 20;
+		VIEW_HEIGHT = 13;//<- Note last block will be only half
+		//Top left of game viewport in pixels:
+		g_nViewOffsetX=0;
+		g_nViewOffsetY=0;
+	}
+	else
+	{
+		// The real Duke Nukem 1 was 13x10 (in theory a larger viewport might be 'more fun' but we want to stick to the spirit of the original? Debatable .. dj2017-08):
+		VIEW_WIDTH = 13;
+		VIEW_HEIGHT = 10;
+		//Top left of game viewport in pixels:
+		g_nViewOffsetX=16;
+		g_nViewOffsetY=16;
+
+		// NB, TODO, we actually need to also need to redraw score etc. here (though since this is just a dev/editing mode, not a real game mode, it doesn't have to be perfect)
+
+		// When going out of 'big viewport' mode, hero might now be off the (now-tiny) 'viewport' :/ .. so must also 're-center' viewport around hero
+		//if (x>xo+VIEW_WIDTH/2) xo = x-VIEW_WIDTH/2;
+		//if (y>yo+VIEW_HEIGHT/2) yo = y-VIEW_HEIGHT/2;
+	}
 }
 /*-----------------------------------------------------------*/
 
@@ -235,6 +291,9 @@ void RedrawEverythingHelper()
 void GameInitialSetup()
 {
 	SYS_Debug( "GameInitialSetup()\n" );
+	
+	// Not quite sure where this should go. Does need to be at least after pVisView created. [dj2017-08]
+	ReInitGameViewport();
 
 	InitHighScores();
 	LoadHighScores();		// Load high scores
@@ -482,10 +541,10 @@ int game_startup(bool bLoadGame)
 	GameDrawView();
 	// Draw inventory
 	InvDraw();
-	TRACE("game_startup(): update_score()\n");
-	update_score(0);
-	TRACE("game_startup(): draw_health()\n");
-	update_health(0);
+	TRACE("game_startup(): DrawScore()\n");
+	DrawScore();
+	TRACE("game_startup(): DrawHealth()\n");
+	DrawHealth();
 
 	g_bGameRunning = true;
 
@@ -582,6 +641,19 @@ int game_startup(bool bLoadGame)
 								g_bEnableDebugStuff = true;
 								ShowGameMessage("DebugStuff Enabled", 64);
 							}
+#ifdef DAVEGNUKEM_CHEATS_ENABLED
+							else if (Event.key.keysym.sym==SDLK_w)
+							{
+								// For now regard large-viewport-mode as a cheat but think about it [dj2017-08]
+								if (g_bEnableDebugStuff)
+								{
+									g_bLargeViewport = !g_bLargeViewport;
+									g_bBigViewportMode = false;//Can't have both bigviewport and largeviewport
+									ReInitGameViewport();
+									RedrawEverythingHelper();
+								}
+							}
+#endif
 						}
 						else
 						{
@@ -711,27 +783,10 @@ int game_startup(bool bLoadGame)
 					if (bBKey && !g_bBKeyLast)// Detect keydown 'edge'
 					{
 						g_bBigViewportMode = !g_bBigViewportMode;
-						if (g_bBigViewportMode)
-						{
-							VIEW_WIDTH = (pVisView->width / 16) - 10;
-							VIEW_HEIGHT = (pVisView->height - 5*16) / 16;
-							if (VIEW_HEIGHT>=100)VIEW_HEIGHT=100;
-							if (VIEW_WIDTH>=128)VIEW_WIDTH=128;
-						}
-						else
-						{
-							VIEW_WIDTH = VIEW_WIDTH_DEFAULT;
-							VIEW_HEIGHT = 10;
-
-							// NB, TODO, we actually need to also need to redraw score etc. here (though since this is just a dev/editing mode, not a real game mode, it doesn't have to be perfect)
-
-							// When going out of 'big viewport' mode, hero might now be off the (now-tiny) 'viewport' :/ .. so must also 're-center' viewport around hero
-							if (x>xo+VIEW_WIDTH/2) xo = x-VIEW_WIDTH/2;
-							if (y>yo+VIEW_HEIGHT/2) yo = y-VIEW_HEIGHT/2;
-
-							// Redraw everything that needs to be redrawn, as larger viewport will have obliterated right side with score etc.
-							RedrawEverythingHelper();
-						}
+						g_bLargeViewport = false;//Can't have both bigviewport and largeviewport
+						ReInitGameViewport();
+						// Redraw everything that needs to be redrawn, as larger viewport will have obliterated right side with score etc.
+						RedrawEverythingHelper();
 					}
 					g_bBKeyLast = bBKey;
 
@@ -877,6 +932,7 @@ int game_startup(bool bLoadGame)
 
 
 		// Make a simple FPS display for debug purposes
+		fixme_notworking://in largeviewportmode
 		float fTimeRun;
 		fTimeRun = fTimeNow - fTimeFirst;
 		iFrameCount++;
@@ -887,7 +943,8 @@ int game_startup(bool bLoadGame)
 			iFrameCount /= 2;
 			fTimeFirst += (fTimeRun/2);
 		}
-		djgDrawImage( pVisBack, pSkinGame, 0, 8, 0, 8, 196, 8 );
+		if (!g_bLargeViewport)
+			djgDrawImage( pVisBack, pSkinGame, 0, 8, 0, 8, 196, 8 );
 		GraphDrawString( pVisBack, g_pFont8x8, 0, 8, (unsigned char*)sbuf );
 
 		// update
@@ -1134,6 +1191,74 @@ void GameHeartBeat()
 	}
 	else
 	{
+
+		// Viewport auto-scrolling (horizontal)
+
+		//[was:onmoveright]
+		//if (
+		if (x>=xo+VIEW_WIDTH)//Totally at/off right side of view?
+		{
+			// Snap to it
+			xo = x - VIEW_WIDTH;
+			xo_small = x_small!=0 ? 1 : 0;
+		}
+		if ((x-xo)>=VIEW_WIDTH - 5)
+		{
+			//bool bEven = (((x-xo)%2)==0);
+
+			/*if (!bEven & (x_small==0))
+			{
+				++xo;
+				xo_small = 0;
+			}
+			*/
+			if (((x-xo)==VIEW_WIDTH - 5) & (x_small)) {
+				xo_small = 1;
+
+				//if ((x-xo)>=VIEW_WIDTH - 3)
+				//	++xo;
+			}
+			if ((x-xo)>=VIEW_WIDTH - 4) {
+				//xo++;
+				++xo;
+				xo_small = 0;
+			}
+			/*else
+			{
+				++xo;
+				xo_small = 1;
+			}*/
+
+			if ( (xo + xo_small) > 128 - VIEW_WIDTH )
+			{
+				xo = 128 - VIEW_WIDTH;
+				xo_small = 0;
+			}
+		}
+
+		//[was:onmoveleft]
+		if (x<=xo)
+		{
+			xo = x-4;
+			xo_small = 0;
+		}
+		else if (((x-xo)<=4))
+		{
+			bool bEven = (((x-xo)%2)==0);
+			if (bEven & (!(x_small))) {
+				xo_small = 0;
+			}
+			if (!bEven & (x_small)) {
+				xo--;
+				xo_small = 1;
+			}
+			if (xo < 0)
+			{
+				xo = 0;
+				xo_small = 0;
+			}
+		}
+
 
 	// Viewport auto-scrolling (vertical).
 	// Try auto-scroll viewport if we're going too high/low .. the actual original DN1 behaviour seems to be quite well fine-tuned.
@@ -1427,6 +1552,7 @@ NextBullet3:
 	// Redraw the screen according to the current game state
 	GameDrawView();
 
+
 	if ( nHurtCounter > 0 )
 		nHurtCounter--;
 
@@ -1484,9 +1610,24 @@ bool HeroIsHurting()
 	return nHurtCounter!=0;
 }
 
+void DrawHealth()
+{
+	// Build a string representing health bars (which are in the 8x8 font)
+	char szHealth[MAX_HEALTH+1]={0};
+	for ( unsigned int i=0; i<MAX_HEALTH; ++i )
+	{
+		// 170 = health; 169 = not health
+		szHealth[MAX_HEALTH-1-i] = (i<g_nHealth?170:169);
+	}
+	szHealth[MAX_HEALTH] = 0;
+	if (g_bLargeViewport)
+		GraphDrawString( pVisView, g_pFont8x8, 320-MAX_HEALTH*8, 0, (unsigned char*)szHealth );
+	else
+		GraphDrawString( pVisBack, g_pFont8x8, HEALTH_X, HEALTH_Y, (unsigned char*)szHealth );
+}
+
 void SetHealth(int nHealth)
 {
-	int i;
 	g_nHealth = djCLAMP(nHealth, 0, MAX_HEALTH);
 	if (g_nHealth==0)
 	{
@@ -1503,15 +1644,7 @@ void SetHealth(int nHealth)
 #endif
 	}
 
-	// Build a string representing health bars (which are in the 8x8 font)
-	char szHealth[MAX_HEALTH+1]={0};
-	for ( i=0; i<MAX_HEALTH; ++i )
-	{
-		// 170 = health; 169 = not health
-		szHealth[MAX_HEALTH-1-i] = (i<g_nHealth?170:169);
-	}
-	szHealth[MAX_HEALTH] = 0;
-	GraphDrawString( pVisBack, g_pFont8x8, HEALTH_X, HEALTH_Y, (unsigned char*)szHealth );
+	DrawHealth();
 }
 
 void update_health(int health_diff)
@@ -1532,13 +1665,26 @@ void SetScore(int nScore)
 {
 	g_nScore = nScore;
 
+	DrawScore();
+}
+
+void DrawScore()
+{
 	char score_buf[32]={0};
 	sprintf( score_buf, "%10d", (int)g_nScore );
-	// Clear behind the score with part of the game skin
-	if (pSkinGame)
-		djgDrawImage( pVisBack, pSkinGame, SCORE_X, SCORE_Y, SCORE_X, SCORE_Y, 10*8, 8 );
 	// Display score
-	GraphDrawString( pVisBack, g_pFont8x8, SCORE_X, SCORE_Y, (unsigned char*)score_buf );
+	if (g_bLargeViewport)
+	{
+		// Don't need to clear behind as the game viewport is redrawn every frame underneath us
+		GraphDrawString( pVisView, g_pFont8x8, 320 - 10*8, 8, (unsigned char*)score_buf );
+	}
+	else
+	{
+		// Clear behind the score with part of the game skin
+		if (pSkinGame)
+			djgDrawImage( pVisBack, pSkinGame, SCORE_X, SCORE_Y, SCORE_X, SCORE_Y, 10*8, 8 );
+		GraphDrawString( pVisBack, g_pFont8x8, SCORE_X, SCORE_Y, (unsigned char*)score_buf );
+	}
 }
 
 void update_score(int score_diff, int nFloatingScoreXBlockUnits, int nFloatingScoreYBlockUnits)
@@ -1564,13 +1710,13 @@ void DrawThingsAtLayer(EdjLayer eLayer)
 
 void GameDrawView()
 {
-	int i=0,j=0,a=0,b=0,xoff=0,yoff=0;
+	int i=0,j=0,a=0,b=0,xoff=0;
 	int anim_offset = 0;
-	unsigned char *tempptr=NULL;
+	unsigned char *pLevelBlockPointer=NULL;
 
 	// Draw view background
 	if (pBackground)
-		djgDrawImage(pVisView, pBackground, 0, 0, 16, 16, VIEW_WIDTH*16, VIEW_HEIGHT*16);
+		djgDrawImage(pVisView, pBackground, 0, 0, g_nViewOffsetX, g_nViewOffsetY, VIEW_WIDTH*BLOCKW, VIEW_HEIGHT*BLOCKH);
 
 	// Clear viewport background before starting to draw game view in there
 	// (If we don't, then the background doesn't clear where there are 'bg' (background) sprites)
@@ -1578,26 +1724,27 @@ void GameDrawView()
 	if (g_bBigViewportMode || pBackground==NULL)//<- The (only) reason we don't 'need' to do this if not in 'big viewport mode' is because of the pBackground image draw right above, effectively clears the viewport 'anyway' already for that section where there is background image
 	{
 		SDL_Rect rect;
-		rect.x = 16;
-		rect.y = 16;
-		rect.w = VIEW_WIDTH*16;
-		rect.h = VIEW_HEIGHT*16;
+		rect.x = g_nViewOffsetX;
+		rect.y = g_nViewOffsetY;
+		rect.w = VIEW_WIDTH*BLOCKW;
+		rect.h = VIEW_HEIGHT*BLOCKH;
 		SDL_FillRect(pVisView->pSurface, &rect, SDL_MapRGB(pVisView->pSurface->format, 0, 0, 0));
 		//djgClear(pVisView);
 	}
 
 	//(10 seconds got to just after coke can, purple lab)
-	tempptr = (unsigned char *)(g_pLevel) + yo*512+(xo<<2);
-	yoff = 200+16;
+	pLevelBlockPointer = (unsigned char *)(g_pLevel) + yo*512+(xo<<2);
 	//  c=2;
 	//const unsigned int uLevelPixelW = 128*16;
 	//const unsigned int uLevelPixelH = 100*16;
 
 
+	int nYOffset = g_nViewOffsetY;
 	for ( i=0; i<VIEW_HEIGHT; ++i )
 	{
 		//  d=24;
-		xoff = -xo_small+2;
+		xoff = -xo_small+(g_bLargeViewport?0:2);
+		xoff *= 8;
 		for ( j=0; j<VIEW_WIDTH+xo_small; ++j )
 		{
 			// Bounds-checks to not 'buffer overflow' etc. by going past bottom (or right) of level [dj2016-10]
@@ -1608,8 +1755,8 @@ void GameDrawView()
 			else
 			{
 				// BLOCK[2,3] -> background block
-				a = *(tempptr+2);
-				b = *(tempptr+3);
+				a = *(pLevelBlockPointer+2);
+				b = *(pLevelBlockPointer+3);
 				// Animated block?
 				anim_offset = (GET_EXTRA( a, b, 4 ) & FLAG_ANIMATED) ? anim4_count : 0;
 
@@ -1617,24 +1764,26 @@ void GameDrawView()
 				//djgDrawImage( pVisView, g_pCurMission->GetSpriteData(a)->m_pImage, ((b+anim_offset)%16)*16, ((b+anim_offset)/16)*16, xoff*8,16+i*16,16,16 );
 				if ((a | b) != 0)//<- This if prevents background clearing of 'bg' background block .. etiher we need to clear entire viewport before start drawing map, or must draw a black square here 'manually' .. not sure which is more efficient ultimately
 				{
-					DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff*8, 16+i*16);
+					DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff, nYOffset);
 				}
 
 				// BLOCK[0,1] -> foreground block
-				a = *(tempptr);
-				b = *(tempptr+1);
+				a = *(pLevelBlockPointer);
+				b = *(pLevelBlockPointer+1);
 				// Animated block?
 				anim_offset = (GET_EXTRA( a, b, 4 ) & FLAG_ANIMATED) ? anim4_count : 0;
 
 				// draw foreground block, unless its (0,0)
 				if ((a | b) != 0)
-					DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff*8, 16+i*16);
+					DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff, nYOffset);
 			}
-			xoff+=2;
-			tempptr += 4;
+			xoff += BLOCKW;
+			pLevelBlockPointer += 4;// <- 4 bytes per level 'block' so advance pointer 4 bytes, see comments at definition of LEVEL_SIZE etc.
 		}
-		yoff += 16;
-		tempptr += (512 - ((VIEW_WIDTH+xo_small)<<2));
+		nYOffset += BLOCKH;
+		// The reason xo_small comes into it if advancing level pointer to next row, is that
+		// if xo_small is 1, we literally actually effectively have a 1-block wider game viewport (as two 'halves' on left/right side of viewport) (keep in mind xo_small is either 0 or 1, IIRC) [dj2017-08]
+		pLevelBlockPointer += (512 - ((VIEW_WIDTH+xo_small)<<2));
 	}
 
 	// Draw pre-hero layers, then draw hero, then draw post-hero layers.
@@ -1642,16 +1791,20 @@ void GameDrawView()
 	DrawThingsAtLayer(LAYER_2);
 	DrawThingsAtLayer(LAYER_MIDDLE);
 	// draw hero, but flash if he is currently hurt
+	int yoff=0;
 	if ((nHurtCounter == 0) || (nHurtCounter%3 != 0))
 	{
-		xoff = (x_small - xo_small)+1 + ((x-xo)<<1);
-		yoff = 200+16+(y-yo-1)*16;
+		// no human being can really understand what this code was meant to be doing, surely [dj2017-12]
+		// commenting out bits of it now to try clean it up a bit
+		//xoff = (x_small - xo_small)+1 + ((x-xo)<<1);
+		//yoff = 200+16+(y-yo-1)*16;
 
-		xoff = ((x_small - xo_small)+1)*8 + (x-xo) * 16;
-		yoff = 16 + (y-yo-1) * 16;
+		//xoff = ((x_small - xo_small)+1)*8 + (x-xo) * 16;
+		yoff = g_nViewOffsetY + (y-yo-1) * 16;
 
 		xoff = (x_small - xo_small)+1 + ((x-xo)<<1);
 		xoff *= 8;
+		if (g_bLargeViewport) xoff -= 16;
 		/*
 		if (hero_dir>0)
 		{
@@ -1694,8 +1847,18 @@ void GameDrawView()
 	// Draw debug info
 	if (bShowDebugInfo) DrawDebugInfo();
 
+	// In g_bLargeViewport mode, the health etc. are overlays, so must be drawn every frame.
+	// In DN1-gameviewport mode, they don't need to be drawn every frame.
+	if (g_bLargeViewport)
+	{
+		DrawHealth();
+		DrawScore();
+		InvDraw();
+		GameDrawFirepower();
+	}
+
 	// Flip the off-screen world viewport onto the backbuffer
-	GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT );
+	GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT, g_nViewOffsetX, g_nViewOffsetY, g_nViewOffsetX, g_nViewOffsetY );
 }
 
 // [dj2016-10] [fixme don't like these globals just floating here]
@@ -1799,6 +1962,7 @@ void sprite_factory( unsigned char a, unsigned char b, int ix, int iy, int ifore
 
 void GameDrawSkin()
 {
+	if (g_bLargeViewport) return;
 	// Draw the game skin
 	if (pSkinGame)
 		djgDrawImage( pVisBack, pSkinGame, 0, 0, 320, 200 );
@@ -1965,6 +2129,9 @@ void DrawDebugInfo()
 	//GraphDrawString(pVisView, g_pFont8x8, 32, 56+8, (unsigned char*)buf );
 	//sprintf(buf, "hero_mode=%d", hero_mode);
 	//GraphDrawString(pVisView, g_pFont8x8, 32, 62, (unsigned char*)buf );
+
+	//sprintf(buf, "xo,yo=%d,%d", xo, yo);
+	//GraphDrawString(pVisView, g_pFont8x8, 32, 70, (unsigned char*)buf );
 }
 
 void DrawBullets()
@@ -2109,13 +2276,23 @@ int GameLoadSprites()
 
 void GameDrawFirepower()
 {
-	int i;
-	// First clear firepower display area with game skin
-	djgDrawImage( pVisBack, pSkinGame, FIREPOWER_X, FIREPOWER_Y, FIREPOWER_X, FIREPOWER_Y, 16*5, 16 );
-	// Draw firepower
-	for ( i=0; i<g_nFirepower; i++ )
+	if (g_bLargeViewport)
 	{
-		DRAW_SPRITE16A( pVisBack, 5, 0, FIREPOWER_X + i*16, FIREPOWER_Y );
+		// Draw firepower
+		for ( int i=0; i<g_nFirepower; i++ )
+		{
+			DRAW_SPRITE16A( pVisView, 5, 0, i*16, 200 - 16 );
+		}
+	}
+	else
+	{
+		// First clear firepower display area with game skin
+		djgDrawImage( pVisBack, pSkinGame, FIREPOWER_X, FIREPOWER_Y, FIREPOWER_X, FIREPOWER_Y, 16*5, 16 );
+		// Draw firepower
+		for ( int i=0; i<g_nFirepower; i++ )
+		{
+			DRAW_SPRITE16A( pVisBack, 5, 0, FIREPOWER_X + i*16, FIREPOWER_Y );
+		}
 	}
 }
 

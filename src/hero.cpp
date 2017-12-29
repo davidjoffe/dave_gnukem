@@ -219,7 +219,8 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 				ret = 0;
 				x += (xdiff * x_small);
 				x_small ^= 1;
-				
+
+				/*//dj2017-08/12 moving this auto-viewport scrolling stuff elsewhere
 				if (((x-xo)==(VIEW_WIDTH - 5)) & (x_small)) {
 					xo_small = 1;
 				}
@@ -232,6 +233,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 					xo = 128 - VIEW_WIDTH;
 					xo_small = 0;
 				}
+				*/
 				
 			}
 		}
@@ -255,6 +257,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 				ret = 0;
 				x_small ^= 1;
 				x += (xdiff * x_small);
+				/*
 				if (((x-xo)==4) & (!(x_small))) {
 					xo_small = 0;
 				}
@@ -267,6 +270,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 						xo_small = 0;
 					}
 				}
+				*/
 			}
 			
 		}

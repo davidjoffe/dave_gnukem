@@ -48,7 +48,7 @@ extern void GraphDone();
 extern void GraphFlip(bool bScaleView);
 
 //! Flip the view buffer into the back buffer
-extern void GraphFlipView( int iViewWidth, int iViewHeight );
+extern void GraphFlipView( int iViewWidth, int iViewHeight, int nXS, int nYS, int nXD, int nYD );
 
 //! Draw a string of characters from a font bitmap
 extern void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const unsigned char *szStr );

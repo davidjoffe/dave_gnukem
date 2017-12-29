@@ -18,16 +18,16 @@ License: GNU GPL Version 2
 #include "config.h"
 
 //! Convert world X coordinate (level block coordinate) to view (world display buffer) coordinates.
-#define CALC_XOFFSET(x) ( 8 * ( -xo_small + 2 + ((( (x) - xo ) << 1))) )
+#define CALC_XOFFSET(x) ( 8 * ( -xo_small + (g_bLargeViewport?0:2) + ((( (x) - xo ) << 1))) )
 //! Convert world Y coordinate (level block coordinate) to view (world display buffer) coordinates.
-#define CALC_YOFFSET(y) ( 16 + ((y) - yo) * 16 )
+#define CALC_YOFFSET(y) ( g_nViewOffsetY + ((y) - yo) * 16 )
 
 //! Convert world X coordinate (pixels) to view (world display buffer) coordinates.
 //! Theoretically this should probably eventually replace CALC_XOFFSET
-#define WORLDX2VIEW(x) ( -(8*xo_small) + ((x) - (16*xo)) + 16 )
+#define WORLDX2VIEW(x) ( -(8*xo_small) + ((x) - (16*xo)) + g_nViewOffsetX )
 //! Convert world Y coordinate (pixels) to view (world display buffer) coordinates.
 //! Theoretically this should probably eventually replace CALC_YOFFSET
-#define WORLDY2VIEW(y) (                 ((y) - (16*yo)) + 16)
+#define WORLDY2VIEW(y) (                 ((y) - (16*yo)) + g_nViewOffsetY)
 
 // CThing helpers [dj2017-08]
 #define PIXELX (m_x*BLOCKW+m_xoffset)
