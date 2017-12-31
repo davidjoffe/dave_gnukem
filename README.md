@@ -85,6 +85,7 @@ Recent:
 
 * Ctrl+Shift+W Large gameplay viewport mode (currently classified as a 'cheat')
 * All cheat keys (and debug/testing keys like H to inflict self-damage) must now first be enabled by pressing Ctrl+Shift+G to enable in-game debugging stuff
+* New cheat Backspace+PgUp increases firepower by one (added for testing)
 * Numerous bugfixes and gameplay tweaks
 
 2017/08/12 - Version 0.81 [Linux/Mac source release, Windows source and binary]:
