@@ -1425,17 +1425,28 @@ NextBullet1:
 		// deviate more from this DN1 style behaviour - for version 1
 		// though I want to try stick close to the look n feel of DN1.
 		// This may still need some slight tweaking.
-		if (nNoShootCounter==0 || CountHeroBullets()==0)
+		if (nNoShootCounter==0)
 		{
-			nNoShootCounter = 3 + (MAX_FIREPOWER - g_nFirepower);
-			if (nNoShootCounter<0) nNoShootCounter = 0;
-
 			HeroShoot(
 				x * 16 + (hero_dir==1 ? 16 : -16) + x_small*8,
 				y * 16 - 2,
 				(hero_dir==0 ? -16 : 16)
 				);
+
+			// RESET COUNTER
+			nNoShootCounter = 3 + (MAX_FIREPOWER - g_nFirepower);
 		}
+		// dj2017-12-31 I'm not quite sure if this quite right.
+		// I realized that one big difference with DN1 is that they only
+		// shoot on-key-down ..... I am not quite sure I want to change
+		// Dave Gnukem to be shoot-on-key-down-only at this late stage,
+		// actually I don't want to, I think I want to deviate from the
+		// original in that regard, as it's been like this for 20+ years.
+		if (CountHeroBullets()==0 && nNoShootCounter>2)
+			nNoShootCounter = 3;
+
+		if (nNoShootCounter<0) nNoShootCounter = 0;
+
 	}
 	if (nNoShootCounter != 0)
 		nNoShootCounter--;
