@@ -891,6 +891,14 @@ int game_startup(bool bLoadGame)
 						// Full firepower
 						HeroSetFirepower(MAX_FIREPOWER);
 					}
+					
+					// BACKSPACE + PGUP: Increase firepower by one [dj2017-12]
+					if (g_iKeys[DJKEY_PGUP])
+					{
+						// Note this function does clamping to MAX_FIREPOWER so we don't need to check here
+						HeroSetFirepower(g_nFirepower+1);
+						SDL_Delay(200);//<-'wrong' workaround for, it immediately adds a lot
+					}
 				}
 #endif
 
@@ -1406,9 +1414,22 @@ NextBullet1:
 	static int nNoShootCounter = 0;
 	if (key_shoot)
 	{
-		if (nNoShootCounter==0 && CountHeroBullets()<g_nFirepower)
+		// [dj2017-12] Completely change the firepower behaviour:
+		// In short, the logic is, we can't shoot for N frames,
+		// where it's a higher number of frames to wait if we
+		// have less firepower. There's an exception, if we run
+		// out of active bullets then it resets to (basically 3) frames
+		// to wait so 'almost immediately' ... this is tweaked to
+		// be nearly in line with DN1 behaviour [see stream
+		// of 31 December 2017]. For future games, we might want to
+		// deviate more from this DN1 style behaviour - for version 1
+		// though I want to try stick close to the look n feel of DN1.
+		// This may still need some slight tweaking.
+		if (nNoShootCounter==0 || CountHeroBullets()==0)
 		{
-			nNoShootCounter = 4; // can't shoot for 4 frames
+			nNoShootCounter = 3 + (MAX_FIREPOWER - g_nFirepower);
+			if (nNoShootCounter<0) nNoShootCounter = 0;
+
 			HeroShoot(
 				x * 16 + (hero_dir==1 ? 16 : -16) + x_small*8,
 				y * 16 - 2,
