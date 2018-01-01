@@ -3,7 +3,7 @@
 /* 1999/02 converting over from keys.h/cpp , trying to genericize */
 /* 2001/07 converting to SDL */
 /*
-Copyright (C) 1995-2017 David Joffe
+Copyright (C) 1995-2018 David Joffe
 
 License: GNU GPL Version 2
 */

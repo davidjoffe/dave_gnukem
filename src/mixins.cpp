@@ -7,7 +7,7 @@
 /*
 mixins.cpp
 
-Copyright (C) 1999-2017 David Joffe
+Copyright (C) 1999-2018 David Joffe
 
 License: GNU GPL Version 2
 */

@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------------*/
 // thing.cpp
 /*
-Copyright (C) 2000-2017 David Joffe
+Copyright (C) 2000-2018 David Joffe
 
 License: GNU GPL Version 2
 */

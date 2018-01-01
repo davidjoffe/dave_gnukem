@@ -1,7 +1,7 @@
 /*
 djsound.cpp
 
-Copyright (C) 1999-2017 David Joffe and Kent Mein
+Copyright (C) 1999-2018 David Joffe and Kent Mein
 
 License: GNU GPL Version 2
 */

@@ -3,7 +3,7 @@
 // David Joffe 1998/12
 // replacing the old djgega.cpp graphics interface
 /*
-Copyright (C) 1998-2017 David Joffe
+Copyright (C) 1998-2018 David Joffe
 
 License: GNU GPL Version 2
 */
