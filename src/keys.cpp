@@ -1,7 +1,7 @@
 /*
 keys.cpp
 
-Copyright (C) 2001-2017 David Joffe
+Copyright (C) 2001-2018 David Joffe
 
 License: GNU GPL Version 2
 

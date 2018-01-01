@@ -5,7 +5,7 @@
 
 modified by Vytautas Shaltenis, a.k.a. rtfb
 
-Copyright (C) 1998-2017 David Joffe
+Copyright (C) 1998-2018 David Joffe
 
 License: GNU GPL Version 2
 */

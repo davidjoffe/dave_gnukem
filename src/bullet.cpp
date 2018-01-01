@@ -1,7 +1,7 @@
 /*
 bullet.cpp
 
-Copyright (C) 2002-2017 David Joffe
+Copyright (C) 2002-2018 David Joffe
 
 License: GNU GPL Version 2
 */
