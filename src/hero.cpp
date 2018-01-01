@@ -1,7 +1,7 @@
 /*
 hero.cpp
 
-Copyright (C) 2000-2017 David Joffe
+Copyright (C) 2000-2018 David Joffe
 
 License: GNU GPL Version 2
 */
@@ -18,6 +18,8 @@ int x_small=0, xo_small=0; // x_small == 0 ? hero at x : hero at x + 8 pixels
 int xo = 60, yo = 45;    // xo,yo = top-left corner of view for scrolling
 int hero_dir = 1;        // hero direction, left==0, right==1
 int hero_picoffs = 0;    // hero animation image index offset
+
+int g_nHeroJustFiredWeaponCounter = 0;
 
 bool g_bSmoothVerticalMovementEnabled=true;
 int y_offset = 0;//!< Pixel offset (e.g. [-15,15] relative to the hero's 'block unit' 'y' position. For smooth vertical movement. [Added dj2017-06]

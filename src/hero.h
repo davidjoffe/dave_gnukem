@@ -3,7 +3,13 @@
 \brief   Hero-related stuff
 \author  David Joffe
 
-Copyright (C) 2001-2017 David Joffe
+Copyright (C) 2001-2018 David Joffe
+
+I'm not a fan of the various globals here; they're mostly from the very
+oldest parts of the codebase, when I was still an inexperienced coder ...
+but not necessarily at this stage worth investing time in refactoring,
+unless we want to genericize this codebase more/better for other derived
+games. [dj2018]
 
 License: GNU GPL Version 2
 */
@@ -53,7 +59,20 @@ extern int hero_picoffs;
 //! hero direction, left==0, right==1
 extern int hero_dir;
 
-
+//! Immediately after firing weapon, the hero sprite is drawn slightly differently
+//! briefly, which gives almost a slight 'recoil/kickback' visual effect, this ugly
+//! global variable is to simulate that (this is based on the animation behaviour in
+//! DN1, where it does that).
+//! The visual behaviour still needs a little tweaking, it's not quite correct - in DN1
+//! when 'resting', the hero normally returns to a 'stand-still position', and the
+//! on-fired-weapon offset is relative to that ... in ours, we 'incorrectly' don't return
+//! to standstill (e.g. may 'rest' with one foot forward as if halfway through walking)
+//! so for now we just add a relative offset from whatever the current sprite is [low - dj2018-01]
+//! (Design-wise, there should probably be some sort of hero class or something (or two
+//! classes, e.g. a hero 'state' and hero 'view', e.g. Model/View/Controller paradigm),
+//! and e.g. Nukem/Gnukem-specific stuff like this could be in derived classes from those
+//! ... that's extremely low-prio, I'll probably never bother doing that. ~dj2018-01)
+extern int g_nHeroJustFiredWeaponCounter;
 
 
 //! xo,yo = top-left corner of view for scrolling
