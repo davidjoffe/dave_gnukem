@@ -3,7 +3,7 @@
 //
 // 1995/07/28
 /*
-Copyright (C) 1995-2017 David Joffe
+Copyright (C) 1995-2018 David Joffe
 
 License: GNU GPL Version 2
 */
@@ -439,6 +439,7 @@ void PerLevelSetup()
 
 	anim4_count=0; // animation count 0
 	hero_picoffs=0;
+	g_nHeroJustFiredWeaponCounter = 0;
 	x_small = 0; // hero not half-block offset
 	xo_small = 0; // view not half-block offset
 	y_offset = 0;
@@ -1617,6 +1618,9 @@ void HeroShoot(int nX, int nY, int nXDiff, int nYDiff)
 	pBullet->eType = CBullet::BULLET_HERO;
 	g_apBullets.push_back(pBullet);
 	djSoundPlay( g_iSounds[SOUND_SHOOT] );
+
+	// [DN1 style] Change hero draw slightly right after shooting to show sort of 'kickback' effect
+	g_nHeroJustFiredWeaponCounter = 2;
 }
 
 void MonsterShoot(int nX, int nY, int nXDiff, int nYDiff)
@@ -1848,6 +1852,22 @@ void GameDrawView()
 		}
 		else
 		//*/
+		// See comments at g_nHeroJustFiredWeaponCounter declaration for what this is about
+		// In short:
+		// Immediately after firing weapon, the hero sprite is drawn slightly differently
+		// briefly, which gives almost a slight 'recoil/kickback' visual effect, this ugly
+		// global variable is to simulate that (this is based on the animation behaviour in
+		// DN1, where it does that).
+		if (g_nHeroJustFiredWeaponCounter>0)
+		{
+			--g_nHeroJustFiredWeaponCounter;
+			int nOffs = (hero_picoffs+1)%4;
+			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+nOffs*4,xoff   ,yoff   +y_offset);
+			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+nOffs*4,xoff   ,yoff+16+y_offset);
+			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+nOffs*4,xoff+16,yoff   +y_offset);
+			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+nOffs*4,xoff+16,yoff+16+y_offset);
+		}
+		else
 		{
 			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+hero_picoffs*4,xoff   ,yoff   +y_offset);
 			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+hero_picoffs*4,xoff   ,yoff+16+y_offset);
