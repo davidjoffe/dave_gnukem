@@ -83,6 +83,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+* Level Editor: New "Ctrl+F7" command shows overview of all levels, and some basic stats on 'important' gameplay items
 * Ctrl+Shift+W Large gameplay viewport mode (currently classified as a 'cheat')
 * All cheat keys (and debug/testing keys like H to inflict self-damage) must now first be enabled by pressing Ctrl+Shift+G to enable in-game debugging stuff
 * New cheat Backspace+PgUp increases firepower by one (added for testing)
@@ -237,6 +238,7 @@ NB: All in-game cheat/debugging keys (eg level up) must first be turned on by pr
 * To choose the desired level, use the Up+L 'cheat' from within the game
 * To choose the desired 'game' i.e. 'mission' (i.e. set of levels), use the main game menu 'Select mission'
 * Ctrl+F6: Show level sprite instance statistics
+* Ctrl+F7: Show overview of all levels, with some basic stats on 'important' gameplay items
 
 Game Cheats Useful for Testing:
 
