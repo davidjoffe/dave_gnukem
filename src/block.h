@@ -113,4 +113,7 @@ enum EBlockType
 //! Friendly strings for block types \ref EBlockType, used by editor.
 extern const char * block_type_names[TYPE_LASTONE+1];
 
+//! Friendly strings for block types \ref EBlockType, used by editor. Gets the block_type_names value, but safer, as returns empty string if out of bounds.
+extern const char * GetBlockTypeName(EBlockType eType);
+
 #endif

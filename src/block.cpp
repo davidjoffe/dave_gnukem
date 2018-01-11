@@ -62,3 +62,11 @@ const char * block_type_names[TYPE_LASTONE+1] =
    "50 Dr Proton",
    "51 LastOne(UnusedNextID)"
 };
+
+const char * GetBlockTypeName(EBlockType eType)
+{
+	if ((int)eType < 0) return "";
+	if ((int)eType >= TYPE_LASTONE+1) return "";
+
+	return block_type_names[ eType ];
+}

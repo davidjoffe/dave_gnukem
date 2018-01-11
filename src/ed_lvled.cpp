@@ -54,10 +54,10 @@ static int	sprite1b = 0;
 bool g_bDocumentDirty = false;
 
 
-#define NUM_LEVEL_INSTRUCTIONS 16
+#define NUM_LEVEL_INSTRUCTIONS 17
 static const char *level_instructions[NUM_LEVEL_INSTRUCTIONS] =
 {
-	"- Instructions: ----------",
+	"- Instructions: -----------",
 	"1-9     Place macros 1-9",
 	"Arrows  Move",
 	"Alt+Clk MoveTo",
@@ -74,8 +74,9 @@ static const char *level_instructions[NUM_LEVEL_INSTRUCTIONS] =
 	//"^C+M    Next level",
 	//"^C+N    Previous level",
 	"Ctl+F6  Level Statistics",
+	"Ctl+F7  All Levels Overview",
 	"ESC     Quit",
-	"--------------------------"
+	"---------------------------"
 };
 
 
@@ -163,7 +164,7 @@ CLevelStats::CLevelStats() //:
 	//m_nMaxCount(0)
 {
 }
-void CalculateLevelStats(CLevelStats& Stats)
+void CalculateLevelStats(CLevelStats& Stats, int iLevel=0)
 {
 	// Fill in with 0 by default?
 	for ( int i=0; i<NUM_SPRITE_DATA; ++i)
@@ -188,7 +189,7 @@ void CalculateLevelStats(CLevelStats& Stats)
 	{
 		for ( int x=0; x<LEVEL_WIDTH; ++x )
 		{
-			Block = level_get_block( 0, x, y );//first param used to mean something i think but currently always 0 now, should maybe get rid of ultimately [dj2017-06]
+			Block = level_get_block( iLevel, x, y );//first param used to mean something i think but currently always 0 now, should maybe get rid of ultimately [dj2017-06]
 
 			Stats.SpriteCounts [ std::make_pair(Block.aback,Block.bback) ]++;
 			Stats.SpriteCounts [ std::make_pair(Block.afore,Block.bfore) ]++;
@@ -336,6 +337,226 @@ void DisplayLevelStats( CLevelStats& Stats)
 	ED_ClearScreen();
 	RedrawView();
 	ED_FlipBuffers();//dj2017-07 Moving this out of RedrawView as we want it after handling keys etc. in level mainloop
+}
+//---------------------------------------------------------------------------
+void DoAllLevelsOverview()
+{
+	const int PIXELSIZE = 2;
+
+
+	// Analyze the sprite metadata to get the a,b ID pairs of certain
+	// 'important' sprite types releveant to gameplay, e.g. powerboots etc.
+	std::map< int, std::pair<int,int> > mapBoxTypes;
+	std::map< int, std::pair<int,int> > mapTypes;
+	{
+		CSpriteData* pData=NULL;
+		//iterates through the 256 possible ID's for spritesets
+		for (int a=0;a<256;++a )
+		{
+			pData = g_pCurMission->GetSpriteData(a);
+			if (pData)
+			{
+				for ( int b=0;b<128;++b )
+				{
+					int nType = ED_GetSpriteType( a, b );
+					if (ED_GetSpriteType( a, b )==TYPE_BOX)
+					{
+						// Box contents are an 'extra'
+						int c = ED_GetSpriteExtra(a, b, 10);
+						int d = ED_GetSpriteExtra(a, b, 11);
+						nType = ED_GetSpriteType( c, d );
+						if (nType==TYPE_FIREPOWER) mapBoxTypes[TYPE_FIREPOWER] = std::make_pair( a,b );
+						if (nType==TYPE_ACCESSCARD) mapBoxTypes[TYPE_ACCESSCARD] = std::make_pair( a,b );
+						if (nType==TYPE_POWERBOOTS) mapBoxTypes[TYPE_POWERBOOTS] = std::make_pair( a,b );
+						
+					}
+					
+					if (nType==TYPE_FIREPOWER) mapTypes[TYPE_FIREPOWER] = std::make_pair( a,b );
+					if (nType==TYPE_ACCESSCARD) mapTypes[TYPE_ACCESSCARD] = std::make_pair( a,b );
+					if (nType==TYPE_POWERBOOTS) mapTypes[TYPE_POWERBOOTS] = std::make_pair( a,b );
+					if (nType==TYPE_MASTERCOMPUTER) mapTypes[TYPE_MASTERCOMPUTER] = std::make_pair( a,b );
+				}
+			}
+		}
+	}
+
+
+
+
+	// Load all levels into memory
+	std::vector< unsigned char* > apLevels;
+	std::vector< CLevelStats > aLevelStats;
+	for ( int i=0; i<g_pCurMission->NumLevels(); ++i )
+	{
+		unsigned char* szLevel = level_load( i, g_pCurMission->GetLevel(i)->GetFilename() );
+		apLevels.push_back( szLevel );
+
+		CLevelStats Stats;
+		CalculateLevelStats(Stats, i);
+		aLevelStats.push_back( Stats );
+	}
+
+
+	bool bRunning = true;
+	int nPage = 0;
+	int nRowsPerPage = (pVisMain->height / ((LEVEL_HEIGHT+1)*PIXELSIZE));
+	//this+1is wrong, use ceil(),isok fornow,lowprio
+	int nPages = (int)(g_pCurMission->NumLevels() / nRowsPerPage) + 1;
+	while ( bRunning )
+	{
+		unsigned long delay = 80;
+		SDL_Delay( delay );
+
+		if (g_iKeys[DJKEY_HOME])
+			nPage = 0;
+		if (g_iKeys[DJKEY_END])
+			nPage = nPages-1;
+		if (g_iKeys[DJKEY_PGDN])
+		{
+			nPage++;
+			if (nPage>=nPages) nPage = nPages;
+		}
+		if (g_iKeys[DJKEY_PGUP])
+		{
+			nPage--;
+			if (nPage<0)nPage=0;
+		}
+
+		{
+			// Total status
+			ED_ClearScreen();
+
+			char buf[4096]={0};
+			for ( int i=0;i<nRowsPerPage;++i )
+			{
+				int iLev = i + nPage*nRowsPerPage;
+				if (iLev<0 || iLev>=g_pCurMission->NumLevels())
+					continue;
+				// The +1 is to put a blank row between each level
+				int nLevelDispY = i*(LEVEL_HEIGHT+1)*PIXELSIZE;
+
+				// Draw 'mini view' of the level
+				unsigned char* pLevel = apLevels[iLev];
+				for ( int y=0; y<LEVEL_HEIGHT; ++y )
+				{
+					for ( int x=0; x<LEVEL_WIDTH; ++x )
+					{
+						djgSetColorFore( pVisMain, ED_GetSpriteColor( *(level_pointer( 0, (x), (y) ) + 2) , *(level_pointer( iLev, (x), (y) ) + 3) ) );
+						djgDrawBox( pVisMain, x*PIXELSIZE, y*PIXELSIZE + nLevelDispY, PIXELSIZE, PIXELSIZE );
+					}
+				}
+
+				// Show stats on 'important' pickups/objects etc., e.g. powerboots, firepower
+				const int nTEXTHEIGHT = 8;
+				int nTextY = 0;
+				sprintf(buf,"LEVEL[%d/%d] %s", iLev+1,g_pCurMission->NumLevels(), g_pCurMission->GetLevel(iLev)->GetFilename() );
+				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
+
+				sprintf(buf,"Keys    : [1]%03d [2]%03d [3]%03d [4]%03d",
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,117) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,118) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,119) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,120) ]
+				);
+				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
+
+				sprintf(buf,"KeyLocks: [1]%03d [2]%03d [3]%03d [4]%03d",
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,121) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,122) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,123) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,124) ]
+				);
+				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
+
+				sprintf(buf,"Doors   : [1]%03d [2]%03d [3]%03d [4]%03d",
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 0) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1,16) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1,32) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1,48) ]
+				);
+				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
+
+				sprintf(buf,"Box[GNUKEM]: %-3d %-3d %-3d %-3d %-3d %-3d",
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 117) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 118) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 119) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 120) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 121) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 122) ]
+				);
+				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
+				sprintf(buf,"    GNUKEM : %-3d %-3d %-3d %-3d %-3d %-3d",
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 58) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 59) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 60) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 61) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 62) ],
+					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 63) ]
+				);
+				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
+
+				int n1=0;
+				int n2=0;
+				int nType = TYPE_ACCESSCARD;
+				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
+				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
+				sprintf(buf,"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
+
+				nType = TYPE_FIREPOWER;
+				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
+				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
+				sprintf(buf,"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
+
+				nType = TYPE_MASTERCOMPUTER;
+				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
+				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
+				sprintf(buf,"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
+
+				nType = TYPE_POWERBOOTS;
+				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
+				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
+				sprintf(buf,"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
+
+			}
+
+
+			sprintf(buf,"Level overview. Page %d/%d", nPage+1, nPages);
+			ED_DrawString( 0, pVisMain->height-24, buf );
+
+			ED_DrawString( 0, pVisMain->height-8, "Help: Esc exit stats. PgUp/PgDn to scroll. Home/End 1st/last page." );
+
+			ED_FlipBuffers ();
+		}
+		djiPoll();
+
+		if (g_iKeys[DJKEY_ESC])
+			bRunning = false;
+
+		// [fixmelow] this isn't quite right, it's the normal handlemouse so if you click on now invisible spriteset, it 'handles' it etc. even though we're in stats view, urgh
+		if (!HandleMouse ())
+			bRunning = false;
+
+	} // while (bRunning)
+
+
+	// CLEAN UP
+	for ( int i=0; i<g_pCurMission->NumLevels(); ++i )
+	{
+		level_delete( i );
+	}
+
+	// RE-LOAD THE CURRENT LEVEL THAT WAS LOADED AGAIN BEFORE WE WENT INTO OVERVIEW VIEW
+	const char * szfilename = g_pCurMission->GetLevel( g_nLevel )->GetFilename( );
+	level_load( 0, szfilename );
+
+
+	ED_ClearScreen();
+	RedrawView();
+	ED_FlipBuffers();//Moving this out of RedrawView as we want it after handling keys etc. in level mainloop
 }
 //---------------------------------------------------------------------------
 void SetDocumentDirty(bool bDirty)
@@ -621,6 +842,12 @@ switch_e LVLED_MainLoop ()
 	//crudeworkaround to prevent double-escape-press handling since we do crappy keyhandling all over the palce in here .. really we should be detecting keyup/down events etc. .. but it's "just" the leveleditor so not a prio [dj2017-06]
 	SDL_Delay(200);
 			}
+			else if (djiKeyPressed(DJKEY_F7))
+			{
+				DoAllLevelsOverview();
+	//crudeworkaround to prevent double-escape-press handling since we do crappy keyhandling all over the palce in here .. really we should be detecting keyup/down events etc. .. but it's "just" the leveleditor so not a prio [dj2018-01]
+	SDL_Delay(200);
+			}
 
 // TODO: no level selection at this point
 /*			if (djiKeyPressed(DJKEY_N))
@@ -868,9 +1095,9 @@ void DrawGrid( int x, int y, int w, int h, int nx, int ny, const djColor& clr )
 void DrawLevelGrid()
 {
 	int y, x;
-	for ( y=0; y<100; y++ )
+	for ( y=0; y<LEVEL_HEIGHT; y++ )
 	{
-		for ( x=0; x<128; x++ )
+		for ( x=0; x<LEVEL_WIDTH; x++ )
 		{
 			DRAW_LEVEL_PIXEL(x, y);
 		}
