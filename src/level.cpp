@@ -55,7 +55,6 @@ void KillLevelSystem()
 unsigned char * level_load( int i, const char * szfilename )
 {
 	unsigned char* pRet = NULL;
-	int file_handle;
 	unsigned char * buffer;
 
 	printf( "level_load( %s ): loading at slot %d.\n", szfilename, i );
@@ -68,6 +67,7 @@ unsigned char * level_load( int i, const char * szfilename )
 	sprintf( filename, "%s%s", DATA_DIR, szfilename );
 
 	// open level file
+	int file_handle = -1;
 	if ((file_handle = open( filename, FILEOPEN_FLAGS )) == -1)
 	{
 		printf( "level_load( %s ): failed to open file.\n", filename );
@@ -100,7 +100,6 @@ unsigned char * level_load( int i, const char * szfilename )
 
 int level_save( int i, const char * szfilename )
 {
-	int file_handle=0;
 	unsigned char * level=NULL;
 	char filename[4096]={0};
 
@@ -123,6 +122,7 @@ int level_save( int i, const char * szfilename )
 	}
 
 	// open level file (FIXME: TEST THIS STILL WORKS, I'VE AHCNAGEAD FLAGS)
+	int file_handle=-1;
 	if ((file_handle = open( filename, FILECREATE_FLAGS, FILECREATE_PERM )) == -1)
 	{
 		printf( "level_save( %s ): failed to open file.\n", filename );
