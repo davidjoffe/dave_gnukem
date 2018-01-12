@@ -1461,27 +1461,51 @@ NextBullet1:
 	for ( i=0; i<(int)g_apBullets.size(); ++i )
 	{
 		CBullet *pBullet = g_apBullets[i];
-		int nXOld = pBullet->x;
-		int nYOld = pBullet->y;
-		// Update bullet
 		pBullet->Tick();
-
-		// Check if bullet touching anything solid
-		int x1 = pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
-		if (CheckCollision(
-			x1,
-			pBullet->y,
-			x1 + 7,
-			pBullet->y+BULLET_HEIGHT-1, pBullet))
+		
+		// NB This only handles simple-case 'horizontal-moving' bullets -
+		// for now that's fine, but if we ever make this a generic
+		// 'engine' we'll probably have to handle more complex cases,
+		// e.g. vertical bullets, or even arbitrarily-angled bullets ...
+		// (that last case would probably resemble a 'line algorithm') [dj2018-01]
+		int nXPixelDelta = pBullet->dx < 0 ? -1 : 1;
+		int nY = pBullet->y;
+		int nXNumPixelsToMove = ABS(pBullet->dx);
+		for ( int n=0; n<nXNumPixelsToMove; ++n )
 		{
-			AddThing(CreateExplosion((nXOld + (pBullet->dx<0 ? 0 : 0)), nYOld-4,
-				// Make the hero's bullet slightly larger than smallest explosion
-				g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
+			// [dj2018-01]
+			// The idea is sort of 'try' move a pixel at a time in the directon the
+			// bullet is moving (without drawing at every single pixel movement of
+			// course - just move 'in the model') and do collision detection at every
+			// pixel movement to determine the 'exact pixel' at which we 'should'
+			// collide with something like a wall. This means that we can in theory
+			// even create highly fast-moving bullets (e.g. that move 100 pixels
+			// in a frame even though 16 pixels wide) and they should e.g. 'correctly'
+			// not 'skip over' a small object it collides with, and also if e.g.
+			// colliding 40 pixels on, should show the visuals etc. for collision
+			// at 40 pixels along. To move it 1 pixel at a time is of course slightly
+			// slower but I doubt this is a concern on modern machines. [dj2018-01-12]
+			int nXOld = pBullet->x;
+			// Try move bullet one pixel horizontally
+			pBullet->x += nXPixelDelta;
+			// Check if bullet would touch anything solid at new position
+			int x1 = pBullet->x;//pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
+			if (CheckCollision(
+				x1,
+				nY,
+				x1+BULLET_WIDTH -1,
+				nY+BULLET_HEIGHT-1, pBullet))
+			{
+				AddThing(CreateExplosion(nXOld, nY-4,
+					// Make the hero's bullet slightly larger than smallest explosion
+					g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
 				));
-			g_apBullets.erase(g_apBullets.begin() + i);
-			--i;
-		}
-	}
+				g_apBullets.erase(g_apBullets.begin() + i);
+				--i;
+				break;//NB, break out of the 'n' loop now as bullet is dangling
+			}
+		}//n
+	}//i(bullets)
 
 
 	// Interact with "things"
