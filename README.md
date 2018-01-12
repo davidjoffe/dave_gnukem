@@ -1,5 +1,7 @@
 # Dave Gnukem
-Dave Gnukem is a 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The game is intentionally somewhat 'retro'; the original Duke Nukem 1 had 16-color EGA 320x200 graphics.)
+Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'.)
+
+Please donate to the project, or else I'll make more games like this: https://paypal.me/davidjoffe
 
 **Release Downloads:** https://sourceforge.net/projects/gnukem/
 
@@ -15,7 +17,6 @@ Dave Gnukem is a 2D scrolling platform shooter similar to, and inspired by, Duke
 
 **Mini Demo Video**: https://youtu.be/Hi7WYnOA_fo
 
-Please donate to the project, or else I'll make more games like this: https://paypal.me/davidjoffe
 
 ![Dave Gnukem Screenshot](http://scorpioncity.com/dave_gnukem/gallery/Dave%20Gnukem%20%280.71%202%20Jul%202017%29.png "Dave Gnukem Screenshot")
 
@@ -38,6 +39,7 @@ You can watch development on this project being live-streamed at:
  * https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrolling-shooter-3 etc.
 * https://www.twitch.tv/david_joffe/
 * https://www.youtube.com/user/davidjoffe2
+* https://www.pscp.tv/DavidJoffe
 
 ### (Approximate) Roadmap to Version 1
 
