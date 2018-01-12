@@ -311,6 +311,7 @@ public:
 		return OVERLAPS(
 			x1, y1,
 			x2, y2,
+//fixmeHIGH this looks like it's missing m_xoffset [dj2018-01]
 			m_x*16+m_iActionX1, m_y*16+m_iActionY1,
 			m_x*16+m_iActionX2, m_y*16+m_iActionY2);
 	}
@@ -320,8 +321,8 @@ public:
 		return OVERLAPS(
 			x1, y1,
 			x2, y2,
-			m_x*16+m_iShootX1, m_y*16+m_iShootY1,
-			m_x*16+m_iShootX2, m_y*16+m_iShootY2);
+			m_x*16+m_iShootX1+m_xoffset, m_y*16+m_iShootY1+m_yoffset,
+			m_x*16+m_iShootX2+m_xoffset, m_y*16+m_iShootY2+m_yoffset);
 	}
 
 	EdjLayer m_eLayer;   // Z-depth for drawing in "layers"

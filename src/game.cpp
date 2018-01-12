@@ -1346,11 +1346,15 @@ void GameHeartBeat()
 				CThing *pThing = g_apThings[j];
 				if (pThing->IsShootable())
 				{
+					//fixmeHIGH this + 8 makes NO SENSE to me what the hell is
+					// it doing here!?!? [dj2018-01]
 					int x1 = pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
 					if (pThing->OverlapsShootArea(
 						x1,
 						pBullet->y,
-						x1 + 7,
+						x1 + 7,//fixmeHIGH this makes no sense shoudl be + 15?? Shoudl be, BULLET_WIDTH?
+						// Why the F is it 7? It's possible the sprite used to be smaller, or perhaps
+						// it has something to do  with that + 8 above...
 						pBullet->y+BULLET_HEIGHT-1))
 						/*
 						if (pThing->OverlapsBounds(
@@ -2264,6 +2268,7 @@ bool CheckCollision(int x1, int y1, int x2, int y2, CBullet *pBullet)
 		pThing = g_apThings[i];
 		if (pThing->m_bSolid)
 		{
+			//fixmeHIGH need m_xoffset etc. also here?
 			if (OVERLAPS(
 				x1, y1, x2, y2,
 				pThing->m_x*16 + pThing->m_iShootX1,
