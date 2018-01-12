@@ -493,7 +493,7 @@ void CheckIfHeroShooting()
 		if (g_nNoShootCounter==0)
 		{
 			HeroShoot(
-				x * 16 + (hero_dir==1 ? 16 : -16) + x_small*8,
+				x * 16 /*+ (hero_dir==1 ? 16 : -16)*/ + x_small*8,
 				y * 16 - 2,
 				(hero_dir==0 ? -16 : 16)
 			);
@@ -646,10 +646,21 @@ void UpdateBullets()
 				x1+BULLET_WIDTH -1,
 				nY+BULLET_HEIGHT-1, pBullet))
 			{
-				AddThing(CreateExplosion(nXOld, nY-4,
-					// Make the hero's bullet slightly larger than smallest explosion
-					g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
-				));
+				// [dj2018-01] This if check is so we create the explosion centred around the 'tip' of where the bullet collided
+				if (pBullet->dx<0)
+				{
+					AddThing(CreateExplosion(nXOld - 8, nY-4,
+						// Make the hero's bullet slightly larger than smallest explosion
+						g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
+					));
+				}
+				else
+				{
+					AddThing(CreateExplosion(nXOld + 16 - 8, nY-4,
+						// Make the hero's bullet slightly larger than smallest explosion
+						g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
+					));
+				}
 				g_apBullets.erase(g_apBullets.begin() + i);
 				--i;
 				break;//NB, break out of the 'n' loop now as bullet is dangling

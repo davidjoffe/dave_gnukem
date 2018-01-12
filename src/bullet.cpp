@@ -37,27 +37,57 @@ void CBullet::Tick()
 
 void CBullet::Draw()
 {
-	if (eType==BULLET_HERO)
+	// Draw 'fire animation' if just shot, else draw bullet
+	if (bDrawnOnce)
 	{
-		djgDrawImageAlpha(pVisView,
-			g_pCurMission->GetSpriteData(5)->m_pImage,
-			bDrawnOnce ? ((nAnim)%16)*16 : (dx<0 ? 4 : 5)*16,
-			((0)/16)*16,
-			WORLDX2VIEW(x),
-			WORLDY2VIEW(y)-4,
-			BLOCKW,
-			BLOCKH);
+		if (eType==BULLET_HERO)
+		{
+			djgDrawImageAlpha(pVisView,
+				g_pCurMission->GetSpriteData(5)->m_pImage,
+				/*bDrawnOnce ? */((nAnim)%16)*16,// : (dx<0 ? 4 : 5)*16,
+				((0)/16)*16,
+				WORLDX2VIEW(x),
+				WORLDY2VIEW(y)-4,
+				BLOCKW,
+				BLOCKH);
+		}
+		else
+		{
+			djgDrawImageAlpha(pVisView,
+				g_pCurMission->GetSpriteData(5)->m_pImage,
+				/*bDrawnOnce ? */0,//  : (dx<0 ? 4 : 5)*16,
+				/*bDrawnOnce ? */32,// : ((0)/16)*16,
+				WORLDX2VIEW(x),
+				WORLDY2VIEW(y)-4,
+				BLOCKW,
+				BLOCKH);
+		}
 	}
 	else
 	{
-		djgDrawImageAlpha(pVisView,
-			g_pCurMission->GetSpriteData(5)->m_pImage,
-			bDrawnOnce ? 0  : (dx<0 ? 4 : 5)*16,
-			bDrawnOnce ? 32 : ((0)/16)*16,
-			WORLDX2VIEW(x),
-			WORLDY2VIEW(y)-4,
-			BLOCKW,
-			BLOCKH);
+		if (eType==BULLET_HERO)
+		{
+			djgDrawImageAlpha(pVisView,
+				g_pCurMission->GetSpriteData(5)->m_pImage,
+				(dx<0 ? 4 : 5)*16,
+				((0)/16)*16,
+				WORLDX2VIEW(dx < 0 ? x - 16 : x + 16),
+				WORLDY2VIEW(y)-4,
+				BLOCKW,
+				BLOCKH);
+		}
+		else
+		{
+			djgDrawImageAlpha(pVisView,
+				g_pCurMission->GetSpriteData(5)->m_pImage,
+				(dx<0 ? 4 : 5)*16,
+				((0)/16)*16,
+				WORLDX2VIEW(x),
+				WORLDY2VIEW(y)-4,
+				BLOCKW,
+				BLOCKH);
+		}
 	}
+
 	bDrawnOnce = true;
 }
