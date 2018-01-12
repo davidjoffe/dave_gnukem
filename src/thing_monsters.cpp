@@ -121,6 +121,7 @@ int CMonster::Tick()
 }
 int CMonster::OnHeroShot()
 {
+	//debutest_temp_2018//AddThing(CreateExplosion(PIXELX,PIXELY,1));
 	if (m_nStrength>0)
 	{
 		--m_nStrength;
