@@ -51,6 +51,7 @@ Mix_Music* g_pGameMusic=NULL;
 
 // See comments at viewport vertical auto-scrolling. DN1 vertical viewport auto-re-centering has this subtle feel of almost taking a frame or three to start 'catching up' to jumping upwards etc. ... this variable helps implement that effect. [dj2017-06-29]
 int g_nRecentlyFallingOrJumping = 0;
+int g_nNoShootCounter = 0;
 
 // The original Duke Nukem 1 has a 13x10 'blocks' viewport, though in future we could use this
 // to either allow larger game viewport for this game, or have 'derived' games using this 'engine' with
@@ -153,7 +154,7 @@ float g_fFrameRate=18.0f;
 unsigned char *g_pLevel = NULL;
 int g_nLevel = 0;
 bool bShowDebugInfo = false;
-bool g_bEnableDebugStuff = false;//dj2017-08-13
+bool g_bEnableDebugStuff = false;//dj2017-08-13 Enable 'cheats'/debug-settings at run-time (later might want to distinguish between 'cheats' and 'debug stuff' but for now treat the same - dj2018)
 vector<CThing *> g_apThings;
 
 string g_sGameMessage;
@@ -220,6 +221,442 @@ int g_nScoreOld = 0;
 int g_nHealthOld = 0;
 
 
+/*-----------------------------------------------------------*/
+//
+// GameHeartBeat() helpers
+//
+
+//! GameHeartBeat() helper. These params seem a bit weird to me, design-wise[low][dj2018-01]
+void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
+{
+
+	// If we're right at the end of the game tackling Dr Proton, and he starts
+	// escaping, then we want the viewport to briefly 'center around' / follow
+	// Dr Proton as he flies upwards to escape (as per original DN1). So we
+	// check here. Else, we center around the hero as per normal. [dj2017-08-09]
+	// (Not sure I'm mad about this dependency but it'll probably do, there
+	// are worse things to worry about in life [dj2017-08])
+	if (CDrProton::GameEnding())
+	{
+		CDrProton* pDrProton = CDrProton::GetDrProton();
+		if (yo+2>pDrProton->m_y)
+			--yo;
+	}
+	else
+	{
+
+		// Viewport auto-scrolling (horizontal)
+
+		//[was:onmoveright]
+		//if (
+		if (x>=xo+VIEW_WIDTH)//Totally at/off right side of view?
+		{
+			// Snap to it
+			xo = x - VIEW_WIDTH;
+			xo_small = x_small!=0 ? 1 : 0;
+		}
+		if ((x-xo)>=VIEW_WIDTH - 5)
+		{
+			//bool bEven = (((x-xo)%2)==0);
+
+			/*if (!bEven & (x_small==0))
+			{
+			++xo;
+			xo_small = 0;
+			}
+			*/
+			if (((x-xo)==VIEW_WIDTH - 5) & (x_small)) {
+				xo_small = 1;
+
+				//if ((x-xo)>=VIEW_WIDTH - 3)
+				//	++xo;
+			}
+			if ((x-xo)>=VIEW_WIDTH - 4) {
+				//xo++;
+				++xo;
+				xo_small = 0;
+			}
+			/*else
+			{
+			++xo;
+			xo_small = 1;
+			}*/
+
+			if ( (xo + xo_small) > 128 - VIEW_WIDTH )
+			{
+				xo = 128 - VIEW_WIDTH;
+				xo_small = 0;
+			}
+		}
+
+		//[was:onmoveleft]
+		if (x<=xo)
+		{
+			xo = x-4;
+			xo_small = 0;
+		}
+		else if (((x-xo)<=4))
+		{
+			bool bEven = (((x-xo)%2)==0);
+			if (bEven & (!(x_small))) {
+				xo_small = 0;
+			}
+			if (!bEven & (x_small)) {
+				xo--;
+				xo_small = 1;
+			}
+			if (xo < 0)
+			{
+				xo = 0;
+				xo_small = 0;
+			}
+		}
+
+
+		// Viewport auto-scrolling (vertical).
+		// Try auto-scroll viewport if we're going too high/low .. the actual original DN1 behaviour seems to be quite well fine-tuned.
+		// The precisely 'correct' behavior is actually pretty subtle, hard to explain exactly what the below's trying to achieve, must play
+		// original DN1 or check livestreaming dev video from 29 June 2017 where this was mainly done. [dj2017-06-29]
+		// Note also here we must keep in mind cases like where you jump up and almost immediately hit your head on the roof -
+		// the jump 'cancels' but simultaneously we're also not falling - this creates one frame where we're neither jumping nor falling
+		// as hero's head hits roof, and without this g_nRecentlyFallingOrJumping "buffer" the vertical offset auto-scrolling incorrectly kicks in.
+		{
+			// 'Avoid' scroll yo (unless 'necessary' e.g. if right at top) up if busy jumping up ... likewise for downward movement
+			if (hero_mode == MODE_JUMPING)
+			{
+				if (y-yo<2) yo--;
+				g_nRecentlyFallingOrJumping = 2;
+			}
+			else
+			{
+				bool bIsFalling = bFalling || bFallingPrev || hero_mode==MODE_JUMPING;
+				if (bIsFalling)
+				{
+					g_nRecentlyFallingOrJumping = 2;
+					if (y-yo>=9) yo++;
+				}
+				else
+				{
+					if (g_nRecentlyFallingOrJumping>0)
+					{
+						--g_nRecentlyFallingOrJumping;
+					}
+					else
+					{
+						if (y-yo<7)
+						{
+							yo--;
+						}
+					}
+					if (y-yo>=7)
+					{
+						yo++;
+					}
+				}
+			}
+			if ( yo < 0 )
+				yo = 0;
+			if ( yo > LEVEL_HEIGHT - 10 )
+				yo = LEVEL_HEIGHT - 10;
+		}
+	}
+}
+//! GameHeartBeat() helper
+void InteractWithThings()
+{
+	CThing* pThing=NULL;
+	for ( int i=0; i<(int)g_apThings.size(); ++i )
+	{
+		pThing = g_apThings[i];
+		if (pThing->OverlapsBounds(x*16+x_small*8, y*16+y_offset-16))
+		{
+			// [dj2016-10-10] Note that if inside HeroOverlaps(), it can cause you to die, e.g. if you've interacted with
+			// spikes .. so be aware you may be dead after calling that .. thats g_bDied, which causes level restart below.
+			int nRet = pThing->HeroOverlaps();
+			if (nRet==THING_DIE)
+			{
+				delete pThing;
+				g_apThings.erase(g_apThings.begin() + i);
+				i--;
+				pThing = NULL;
+			}
+			else if (nRet==THING_REMOVE)
+			{
+				g_apThings.erase(g_apThings.begin() + i);
+				i--;
+				pThing = NULL;
+			}
+		}
+		// If thing wasn't deleted on HeroOverlaps, check bounds enter/leave
+		if (pThing!=NULL)
+		{
+			// Test if entering or leaving action bounds box
+			if (pThing->HeroInsideActionBounds(x*16+x_small*8, y*16+y_offset-16))
+			{
+				if (!pThing->IsHeroInside())
+					pThing->HeroEnter();
+			}
+			else // not in bounds
+			{
+				if (pThing->IsHeroInside())
+					pThing->HeroLeave();
+			}
+		}
+	}
+}
+//! GameHeartBeat() helper
+void TickAllThings()
+{
+	CThing* pThing = NULL;
+	for ( int i=0; i<(int)g_apThings.size(); ++i )
+	{
+		pThing = g_apThings[i];
+		// FIXME: THING_REMOVE?
+		if (pThing->Tick()==THING_DIE)
+		{
+			// Delete this
+			delete pThing;
+			g_apThings.erase(g_apThings.begin() + i);
+			i--;
+		}
+	}
+}
+//! GameHeartBeat() helper
+void DropFallableThings()
+{
+	CThing* pThing = NULL;
+	for ( int i=0; i<(int)g_apThings.size(); ++i )
+	{
+		pThing = g_apThings[i];
+		// if (object falls) && (nothing below it) && (inview)
+		if (pThing->Falls())
+		{
+			// If thing is in visible view
+			// FIXME: Small border around view?
+			if (pThing->IsInView())
+			{
+				// if (nothing below it)
+				if ( !check_solid( pThing->m_x, pThing->m_y + 1 ) )
+				{
+					pThing->m_y += 1;
+					// if object falls off bottom of level
+					if (pThing->m_y >= 100)
+					{
+						// delete this object!!!
+						delete pThing;
+						g_apThings.erase(g_apThings.begin() + i);
+						i--;
+					}
+				}
+			}
+		}
+	}
+}
+//! GameHeartBeat() helper
+void CheckForBulletsOutOfView()
+{
+	CBullet* pBullet=NULL;
+	int x1=0;
+	// Check for bullets that have gone out of the view
+	for ( int i=0; i<(int)g_apBullets.size(); ++i )
+	{
+		pBullet = g_apBullets[i];
+		x1 = pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
+		if (!OVERLAPS_VIEW(
+			x1,
+			pBullet->y,
+			x1 + 7,
+			pBullet->y+BULLET_HEIGHT-1))
+		{
+			djDEL(pBullet);
+			g_apBullets.erase(g_apBullets.begin() + i);
+			i--;
+		}
+	}
+}
+//! GameHeartBeat() helper
+void CheckIfHeroShooting()
+{
+	if (key_shoot)
+	{
+		// [dj2017-12] Completely change the firepower behaviour:
+		// In short, the logic is, we can't shoot for N frames,
+		// where it's a higher number of frames to wait if we
+		// have less firepower. There's an exception, if we run
+		// out of active bullets then it resets to (basically 3) frames
+		// to wait so 'almost immediately' ... this is tweaked to
+		// be nearly in line with DN1 behaviour [see stream
+		// of 31 December 2017]. For future games, we might want to
+		// deviate more from this DN1 style behaviour - for version 1
+		// though I want to try stick close to the look n feel of DN1.
+		// This may still need some slight tweaking.
+		if (g_nNoShootCounter==0)
+		{
+			HeroShoot(
+				x * 16 + (hero_dir==1 ? 16 : -16) + x_small*8,
+				y * 16 - 2,
+				(hero_dir==0 ? -16 : 16)
+			);
+
+			// RESET COUNTER [fixme this must reset between games also]
+			g_nNoShootCounter = 3 + (MAX_FIREPOWER - g_nFirepower);
+		}
+		// dj2017-12-31 I'm not quite sure if this quite right.
+		// I realized that one big difference with DN1 is that they only
+		// shoot on-key-down ..... I am not quite sure I want to change
+		// Dave Gnukem to be shoot-on-key-down-only at this late stage,
+		// actually I don't want to, I think I want to deviate from the
+		// original in that regard, as it's been like this for 20+ years.
+		if (CountHeroBullets()==0 && g_nNoShootCounter>2)
+			g_nNoShootCounter = 3;
+
+		if (g_nNoShootCounter<0) g_nNoShootCounter = 0;
+
+	}
+	if (g_nNoShootCounter != 0)
+		g_nNoShootCounter--;
+}
+//! GameHeartBeat() helper
+void UpdateBullets()
+{
+	CBullet* pBullet=NULL;
+
+
+
+	// Check for bullet collisions with things (e.g. shootable boxes, monsters etc).
+	// Also we check for monster bullet collisions against hero.
+	CThing* pThing=NULL;
+	for ( int i=0; i<(int)g_apBullets.size(); ++i )
+	{
+		pBullet = g_apBullets[i];
+		if (pBullet->eType==CBullet::BULLET_HERO)
+		{
+			for ( int j=0; j<(int)g_apThings.size(); ++j )
+			{
+				pThing = g_apThings[j];
+				if (pThing->IsShootable())
+				{
+					//fixmeHIGH this + 8 makes NO SENSE to me what the hell is
+					// it doing here!?!? [dj2018-01]
+					int x1 = pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
+					if (pThing->OverlapsShootArea(
+						x1,
+						pBullet->y,
+						x1 + 7,//fixmeHIGH this makes no sense shoudl be + 15?? Shoudl be, BULLET_WIDTH?
+							   // Why the F is it 7? It's possible the sprite used to be smaller, or perhaps
+							   // it has something to do  with that + 8 above...
+						pBullet->y+BULLET_HEIGHT-1))
+						/*
+						if (pThing->OverlapsBounds(
+						pBullet->x,
+						pBullet->y,
+						pBullet->x+BULLET_WIDTH-1,
+						pBullet->y+BULLET_HEIGHT-1))
+						*/
+					{
+						int nRet = pThing->OnHeroShot();
+						if (nRet==THING_DIE)
+						{
+							delete pThing;
+							g_apThings.erase(g_apThings.begin() + j);
+							j--;
+						}
+						else if (nRet==THING_REMOVE)
+						{
+							g_apThings.erase(g_apThings.begin() + j);
+							j--;
+						}
+
+						// delete bullet i
+						delete g_apBullets[i];
+						g_apBullets.erase(g_apBullets.begin() + i);
+						i--;
+						goto NextBullet1;
+					}
+				}
+			} // j
+		}
+		else if (pBullet->eType==CBullet::BULLET_MONSTER)
+		{
+			// Check if monster bullet overlaps with hero
+			if (OVERLAPS(
+				x*16+x_small*8,
+				y*16-16,
+				(x*16+x_small*8) + 15,
+				(y*16-16) + 31,
+				pBullet->x,
+				pBullet->y,
+				pBullet->x+15,
+				pBullet->y+15))
+			{
+				delete g_apBullets[i];
+				g_apBullets.erase(g_apBullets.begin() + i);
+				i--;
+				if (!HeroIsHurting())
+				{
+					update_health(-1);
+					HeroSetHurting();
+				}
+			}
+		}
+
+	NextBullet1:
+		;
+
+	}
+
+
+
+
+	for ( int i=0; i<(int)g_apBullets.size(); ++i )//I think we must use signed here because we do --i in the loop
+	{
+		pBullet = g_apBullets[i];
+		pBullet->Tick();
+
+		// NB This only handles simple-case 'horizontal-moving' bullets -
+		// for now that's fine, but if we ever make this a generic
+		// 'engine' we'll probably have to handle more complex cases,
+		// e.g. vertical bullets, or even arbitrarily-angled bullets ...
+		// (that last case would probably resemble a 'line algorithm') [dj2018-01]
+		int nXPixelDelta = pBullet->dx < 0 ? -1 : 1;
+		int nY = pBullet->y;
+		int nXNumPixelsToMove = ABS(pBullet->dx);
+		for ( int n=0; n<nXNumPixelsToMove; ++n )
+		{
+			// [dj2018-01]
+			// The idea is sort of 'try' move a pixel at a time in the directon the
+			// bullet is moving (without drawing at every single pixel movement of
+			// course - just move 'in the model') and do collision detection at every
+			// pixel movement to determine the 'exact pixel' at which we 'should'
+			// collide with something like a wall. This means that we can in theory
+			// even create highly fast-moving bullets (e.g. that move 100 pixels
+			// in a frame even though 16 pixels wide) and they should e.g. 'correctly'
+			// not 'skip over' a small object it collides with, and also if e.g.
+			// colliding 40 pixels on, should show the visuals etc. for collision
+			// at 40 pixels along. To move it 1 pixel at a time is of course slightly
+			// slower but I doubt this is a concern on modern machines. [dj2018-01-12]
+			int nXOld = pBullet->x;
+			// Try move bullet one pixel horizontally
+			pBullet->x += nXPixelDelta;
+			// Check if bullet would touch anything solid at new position
+			int x1 = pBullet->x;//pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
+			if (CheckCollision(
+				x1,
+				nY,
+				x1+BULLET_WIDTH -1,
+				nY+BULLET_HEIGHT-1, pBullet))
+			{
+				AddThing(CreateExplosion(nXOld, nY-4,
+					// Make the hero's bullet slightly larger than smallest explosion
+					g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
+				));
+				g_apBullets.erase(g_apBullets.begin() + i);
+				--i;
+				break;//NB, break out of the 'n' loop now as bullet is dangling
+			}
+		}//n
+	}//i(bullets)
+}
 /*-----------------------------------------------------------*/
 // Redraw everything that needs to be redrawn, as larger viewport will have obliterated right side with score etc.
 void RedrawEverythingHelper()
@@ -370,6 +807,7 @@ void PerLevelSetup()
 	Log ( "PerLevelSetup()\n" );
 
 	g_nRecentlyFallingOrJumping=0;
+	g_nNoShootCounter = 0;
 
 	// Start per-level background music
 	std::vector< std::string > asMusicFiles;
@@ -1066,14 +1504,12 @@ void GameHeartBeat()
 {
 	//debug//printf("HEARTBEAT[");
 	CThing * pThing = NULL;
-	int n=0, i=0, j=0;
-	//int ifoo = key_action;
 
 	// Update hero basic stuff
 	HeroUpdate();
 
-	//update animation counts:
-	anim4_count++;
+	// Update global animation counter
+	++anim4_count;
 	if (anim4_count>3)
 		anim4_count = 0;
 
@@ -1104,6 +1540,7 @@ void GameHeartBeat()
 	bool bFalling = false;
 
 	//mode-specific handling
+	int n=0;
 	switch (hero_mode)
 	{
 	case MODE_NORMAL:
@@ -1137,10 +1574,11 @@ void GameHeartBeat()
 			key_action = 0; // huh?
 			// dj2017-06-22 I think that "huh?" might have something to do with issue encountered of 'freezing on entering teleporter' issue, or else it's just redundant/old code, not sure, as it re-sets key_action anyway from anKeyStates[KEY_ACTION] each heartbeat
 
+#ifdef DAVEGNUKEM_CHEATS_ENABLED
 			// Go-to-exit cheat key
-			if (g_iKeys[DJKEY_I])
+			if (g_bEnableDebugStuff && g_iKeys[DJKEY_I])
 			{
-				for ( i=0; i<(int)g_apThings.size(); i++ )
+				for ( int i=0; i<(int)g_apThings.size(); ++i )
 				{
 					if (g_apThings[i]->GetTypeID()==TYPE_EXIT)
 					{
@@ -1150,11 +1588,13 @@ void GameHeartBeat()
 					}
 				}
 			}
+#endif
 
 			// Check if you're on anything funny, like an exit
-			for ( i=0; i<(int)g_apThings.size(); i++ )
+			CThing* pThing=NULL;
+			for ( int i=0; i<(int)g_apThings.size(); ++i )
 			{
-				CThing *pThing = g_apThings[i];
+				pThing = g_apThings[i];
 				if (!HeroIsFrozen() && pThing->HeroInsideActionBounds(x*16+x_small*8, y*16-16+y_offset))
 				{
 //					int iRet = pThing->Action();
@@ -1183,417 +1623,28 @@ void GameHeartBeat()
 
 		key_jump = 0;
 		break;
-
-	}
-
-	// If we're right at the end of the game tackling Dr Proton, and he starts
-	// escaping, then we want the viewport to briefly 'center around' / follow
-	// Dr Proton as he flies upwards to escape (as per original DN1). So we
-	// check here. Else, we center around the hero as per normal. [dj2017-08-09]
-	// (Not sure I'm mad about this dependency but it'll probably do, there
-	// are worse things to worry about in life [dj2017-08])
-	if (CDrProton::GameEnding())
-	{
-		CDrProton* pDrProton = CDrProton::GetDrProton();
-		if (yo+2>pDrProton->m_y)
-			--yo;
-	}
-	else
-	{
-
-		// Viewport auto-scrolling (horizontal)
-
-		//[was:onmoveright]
-		//if (
-		if (x>=xo+VIEW_WIDTH)//Totally at/off right side of view?
-		{
-			// Snap to it
-			xo = x - VIEW_WIDTH;
-			xo_small = x_small!=0 ? 1 : 0;
-		}
-		if ((x-xo)>=VIEW_WIDTH - 5)
-		{
-			//bool bEven = (((x-xo)%2)==0);
-
-			/*if (!bEven & (x_small==0))
-			{
-				++xo;
-				xo_small = 0;
-			}
-			*/
-			if (((x-xo)==VIEW_WIDTH - 5) & (x_small)) {
-				xo_small = 1;
-
-				//if ((x-xo)>=VIEW_WIDTH - 3)
-				//	++xo;
-			}
-			if ((x-xo)>=VIEW_WIDTH - 4) {
-				//xo++;
-				++xo;
-				xo_small = 0;
-			}
-			/*else
-			{
-				++xo;
-				xo_small = 1;
-			}*/
-
-			if ( (xo + xo_small) > 128 - VIEW_WIDTH )
-			{
-				xo = 128 - VIEW_WIDTH;
-				xo_small = 0;
-			}
-		}
-
-		//[was:onmoveleft]
-		if (x<=xo)
-		{
-			xo = x-4;
-			xo_small = 0;
-		}
-		else if (((x-xo)<=4))
-		{
-			bool bEven = (((x-xo)%2)==0);
-			if (bEven & (!(x_small))) {
-				xo_small = 0;
-			}
-			if (!bEven & (x_small)) {
-				xo--;
-				xo_small = 1;
-			}
-			if (xo < 0)
-			{
-				xo = 0;
-				xo_small = 0;
-			}
-		}
+	}//switch (hero_mode)
 
 
-	// Viewport auto-scrolling (vertical).
-	// Try auto-scroll viewport if we're going too high/low .. the actual original DN1 behaviour seems to be quite well fine-tuned.
-	// The precisely 'correct' behavior is actually pretty subtle, hard to explain exactly what the below's trying to achieve, must play
-	// original DN1 or check livestreaming dev video from 29 June 2017 where this was mainly done. [dj2017-06-29]
-	// Note also here we must keep in mind cases like where you jump up and almost immediately hit your head on the roof -
-	// the jump 'cancels' but simultaneously we're also not falling - this creates one frame where we're neither jumping nor falling
-	// as hero's head hits roof, and without this g_nRecentlyFallingOrJumping "buffer" the vertical offset auto-scrolling incorrectly kicks in.
-	{
-		// 'Avoid' scroll yo (unless 'necessary' e.g. if right at top) up if busy jumping up ... likewise for downward movement
-		if (hero_mode == MODE_JUMPING)
-		{
-			if (y-yo<2) yo--;
-			g_nRecentlyFallingOrJumping = 2;
-		}
-		else
-		{
-			bool bIsFalling = bFalling || bFallingPrev || hero_mode==MODE_JUMPING;
-			if (bIsFalling)
-			{
-				g_nRecentlyFallingOrJumping = 2;
-				if (y-yo>=9) yo++;
-			}
-			else
-			{
-				if (g_nRecentlyFallingOrJumping>0)
-				{
-					--g_nRecentlyFallingOrJumping;
-				}
-				else
-				{
-					if (y-yo<7)
-					{
-						yo--;
-					}
-				}
-				if (y-yo>=7)
-				{
-					yo++;
-				}
-			}
-		}
-		if ( yo < 0 )
-			yo = 0;
-		if ( yo > LEVEL_HEIGHT - 10 )
-			yo = LEVEL_HEIGHT - 10;
-	}
-	}
-
-	// Check for bullets that have gone out of the view
-	for ( i=0; i<(int)g_apBullets.size(); i++ )
-	{
-		CBullet *pBullet = g_apBullets[i];
-		int x1 = pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
-		if (!OVERLAPS_VIEW(
-			x1,
-			pBullet->y,
-			x1 + 7,
-			pBullet->y+BULLET_HEIGHT-1))
-		{
-			djDEL(pBullet);
-			g_apBullets.erase(g_apBullets.begin() + i);
-			i--;
-		}
-	}
-
-	// Check for bullet collisions with things (e.g. shootable boxes, monsters etc).
-	// Also we check for monster bullet collisions against hero.
-	for ( i=0; i<(int)g_apBullets.size(); ++i )
-	{
-		CBullet *pBullet = g_apBullets[i];
-		if (pBullet->eType==CBullet::BULLET_HERO)
-		{
-			for ( j=0; j<(int)g_apThings.size(); ++j )
-			{
-				CThing *pThing = g_apThings[j];
-				if (pThing->IsShootable())
-				{
-					//fixmeHIGH this + 8 makes NO SENSE to me what the hell is
-					// it doing here!?!? [dj2018-01]
-					int x1 = pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
-					if (pThing->OverlapsShootArea(
-						x1,
-						pBullet->y,
-						x1 + 7,//fixmeHIGH this makes no sense shoudl be + 15?? Shoudl be, BULLET_WIDTH?
-						// Why the F is it 7? It's possible the sprite used to be smaller, or perhaps
-						// it has something to do  with that + 8 above...
-						pBullet->y+BULLET_HEIGHT-1))
-						/*
-						if (pThing->OverlapsBounds(
-						pBullet->x,
-						pBullet->y,
-						pBullet->x+BULLET_WIDTH-1,
-						pBullet->y+BULLET_HEIGHT-1))
-						*/
-					{
-						int nRet = pThing->OnHeroShot();
-						if (nRet==THING_DIE)
-						{
-							delete pThing;
-							g_apThings.erase(g_apThings.begin() + j);
-							j--;
-						}
-						else if (nRet==THING_REMOVE)
-						{
-							g_apThings.erase(g_apThings.begin() + j);
-							j--;
-						}
-
-						// delete bullet i
-						delete g_apBullets[i];
-						g_apBullets.erase(g_apBullets.begin() + i);
-						i--;
-						goto NextBullet1;
-					}
-				}
-			} // j
-		}
-		else if (pBullet->eType==CBullet::BULLET_MONSTER)
-		{
-			// Check if monster bullet overlaps with hero
-			if (OVERLAPS(
-				x*16+x_small*8,
-				y*16-16,
-				(x*16+x_small*8) + 15,
-				(y*16-16) + 31,
-				pBullet->x,
-				pBullet->y,
-				pBullet->x+15,
-				pBullet->y+15))
-			{
-				delete g_apBullets[i];
-				g_apBullets.erase(g_apBullets.begin() + i);
-				i--;
-				if (!HeroIsHurting())
-				{
-					update_health(-1);
-					HeroSetHurting();
-				}
-			}
-		}
-
-NextBullet1:
-		;
-
-	}
-
-	// Create new bullets
-	static int nNoShootCounter = 0;
-	if (key_shoot)
-	{
-		// [dj2017-12] Completely change the firepower behaviour:
-		// In short, the logic is, we can't shoot for N frames,
-		// where it's a higher number of frames to wait if we
-		// have less firepower. There's an exception, if we run
-		// out of active bullets then it resets to (basically 3) frames
-		// to wait so 'almost immediately' ... this is tweaked to
-		// be nearly in line with DN1 behaviour [see stream
-		// of 31 December 2017]. For future games, we might want to
-		// deviate more from this DN1 style behaviour - for version 1
-		// though I want to try stick close to the look n feel of DN1.
-		// This may still need some slight tweaking.
-		if (nNoShootCounter==0)
-		{
-			HeroShoot(
-				x * 16 + (hero_dir==1 ? 16 : -16) + x_small*8,
-				y * 16 - 2,
-				(hero_dir==0 ? -16 : 16)
-				);
-
-			// RESET COUNTER
-			nNoShootCounter = 3 + (MAX_FIREPOWER - g_nFirepower);
-		}
-		// dj2017-12-31 I'm not quite sure if this quite right.
-		// I realized that one big difference with DN1 is that they only
-		// shoot on-key-down ..... I am not quite sure I want to change
-		// Dave Gnukem to be shoot-on-key-down-only at this late stage,
-		// actually I don't want to, I think I want to deviate from the
-		// original in that regard, as it's been like this for 20+ years.
-		if (CountHeroBullets()==0 && nNoShootCounter>2)
-			nNoShootCounter = 3;
-
-		if (nNoShootCounter<0) nNoShootCounter = 0;
-
-	}
-	if (nNoShootCounter != 0)
-		nNoShootCounter--;
+	// Game viewport auto-scrolling
+	GameViewportAutoscroll(bFalling, bFallingPrev);
 
 
 	// Update bullets
-	for ( i=0; i<(int)g_apBullets.size(); ++i )
-	{
-		CBullet *pBullet = g_apBullets[i];
-		pBullet->Tick();
-		
-		// NB This only handles simple-case 'horizontal-moving' bullets -
-		// for now that's fine, but if we ever make this a generic
-		// 'engine' we'll probably have to handle more complex cases,
-		// e.g. vertical bullets, or even arbitrarily-angled bullets ...
-		// (that last case would probably resemble a 'line algorithm') [dj2018-01]
-		int nXPixelDelta = pBullet->dx < 0 ? -1 : 1;
-		int nY = pBullet->y;
-		int nXNumPixelsToMove = ABS(pBullet->dx);
-		for ( int n=0; n<nXNumPixelsToMove; ++n )
-		{
-			// [dj2018-01]
-			// The idea is sort of 'try' move a pixel at a time in the directon the
-			// bullet is moving (without drawing at every single pixel movement of
-			// course - just move 'in the model') and do collision detection at every
-			// pixel movement to determine the 'exact pixel' at which we 'should'
-			// collide with something like a wall. This means that we can in theory
-			// even create highly fast-moving bullets (e.g. that move 100 pixels
-			// in a frame even though 16 pixels wide) and they should e.g. 'correctly'
-			// not 'skip over' a small object it collides with, and also if e.g.
-			// colliding 40 pixels on, should show the visuals etc. for collision
-			// at 40 pixels along. To move it 1 pixel at a time is of course slightly
-			// slower but I doubt this is a concern on modern machines. [dj2018-01-12]
-			int nXOld = pBullet->x;
-			// Try move bullet one pixel horizontally
-			pBullet->x += nXPixelDelta;
-			// Check if bullet would touch anything solid at new position
-			int x1 = pBullet->x;//pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
-			if (CheckCollision(
-				x1,
-				nY,
-				x1+BULLET_WIDTH -1,
-				nY+BULLET_HEIGHT-1, pBullet))
-			{
-				AddThing(CreateExplosion(nXOld, nY-4,
-					// Make the hero's bullet slightly larger than smallest explosion
-					g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
-				));
-				g_apBullets.erase(g_apBullets.begin() + i);
-				--i;
-				break;//NB, break out of the 'n' loop now as bullet is dangling
-			}
-		}//n
-	}//i(bullets)
+	UpdateBullets();
+	CheckForBulletsOutOfView();
 
+	// Check if hero is shooting and if must create new hero bullets
+	CheckIfHeroShooting();
 
-	// Interact with "things"
-	// Check if you're on anything funny, like an exit
-	for ( i=0; i<(int)g_apThings.size(); ++i )
-	{
-		CThing *pThing = g_apThings[i];
-		if (pThing->OverlapsBounds(x*16+x_small*8, y*16+y_offset-16))
-		{
-			// [dj2016-10-10] Note that if inside HeroOverlaps(), it can cause you to die, e.g. if you've interacted with
-			// spikes .. so be aware you may be dead after calling that .. thats g_bDied, which causes level restart below.
-			int nRet = pThing->HeroOverlaps();
-			if (nRet==THING_DIE)
-			{
-				delete pThing;
-				g_apThings.erase(g_apThings.begin() + i);
-				i--;
-				pThing = NULL;
-			}
-			else if (nRet==THING_REMOVE)
-			{
-				g_apThings.erase(g_apThings.begin() + i);
-				i--;
-				pThing = NULL;
-			}
-		}
-		// If thing wasn't deleted on HeroOverlaps, check bounds enter/leave
-		if (pThing!=NULL)
-		{
-			// Test if entering or leaving action bounds box
-			if (pThing->HeroInsideActionBounds(x*16+x_small*8, y*16+y_offset-16))
-			{
-				if (!pThing->IsHeroInside())
-					pThing->HeroEnter();
-			}
-			else // not in bounds
-			{
-				if (pThing->IsHeroInside())
-					pThing->HeroLeave();
-			}
-		}
-	}
-
+	// Interact with "things", e.g. check if you're on anything funny, like an exit
+	InteractWithThings();
 
 	// Drop all objects that can fall
-	for ( i=0; i<(int)g_apThings.size(); ++i )
-	{
-		pThing = g_apThings[i];
-		// if (object falls) && (nothing below it) && (inview)
-		if (pThing->Falls())
-		{
-			// If thing is in visible view
-			// FIXME: Small border around view?
-			if (pThing->IsInView())
-			{
-				// if (nothing below it)
-				if ( !check_solid( pThing->m_x, pThing->m_y + 1 ) )
-				{
-					pThing->m_y += 1;
-					// if object falls off bottom of level
-					if (pThing->m_y >= 100)
-					{
-						// delete this object!!!
-						delete pThing;
-						g_apThings.erase(g_apThings.begin() + i);
-						i--;
-					}
-				}
-			}
-		}
-	}
-
+	DropFallableThings();
 
 	// "Tick" (update) all objects
-	for ( i=0; i<(int)g_apThings.size(); ++i )
-	{
-		pThing = g_apThings[i];
-		// FIXME: THING_REMOVE?
-		if (pThing->Tick()==THING_DIE)
-		{
-			// Delete this
-			delete pThing;
-			g_apThings.erase(g_apThings.begin() + i);
-			i--;
-		}
-	}
-
-
+	TickAllThings();
 
 	if (g_bDied)
 	{
@@ -1601,8 +1652,6 @@ NextBullet1:
 		RestartLevel();
 		g_bDied = false;
 	}
-
-
 
 	// Redraw the screen according to the current game state
 	GameDrawView();
