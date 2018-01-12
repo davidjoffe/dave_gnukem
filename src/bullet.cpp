@@ -28,8 +28,8 @@ void CBullet::Tick()
 {
 	if (bMovedOnce)
 	{
-		x += dx;
-		y += dy;
+		//x += dx;
+		//y += dy;
 		nAnim = (nAnim+1)%4;
 	}
 	bMovedOnce = true;
