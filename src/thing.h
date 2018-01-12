@@ -237,11 +237,12 @@ public:
 	//! Test if thing is visible (i.e. if visiblebounds are overlapping the view)
 	inline bool IsInView()
 	{
+		//fixmeHIGH should have m_xoffset also?
 		return (bool)(0!=OVERLAPS_VIEW(
-			m_x*16 + m_iVisibleX1,
-			m_y*16 + m_iVisibleY1,
-			m_x*16 + m_iVisibleX2,
-			m_y*16 + m_iVisibleY2));
+			PIXELX + m_iVisibleX1,
+			PIXELY + m_iVisibleY1,
+			PIXELX + m_iVisibleX2,
+			PIXELY + m_iVisibleY2));
 	}
 
 	///\name Attributes
@@ -296,10 +297,10 @@ public:
 	inline bool HeroInsideActionBounds(int x, int y)
 	{
 		return (
-			(x   >=m_x*16+m_xoffset+m_iActionX1) &&
-			(x+15<=m_x*16+m_xoffset+m_iActionX2) &&
-			(y   >=m_y*16+m_yoffset+m_iActionY1) &&
-			(y+31<=m_y*16+m_yoffset+m_iActionY2));
+			(x   >=PIXELX+m_iActionX1) &&
+			(x+15<=PIXELX+m_iActionX2) &&
+			(y   >=PIXELY+m_iActionY1) &&
+			(y+31<=PIXELY+m_iActionY2));
 	}
 	//! Test if hero is at least partially inside the box. By default this
 	//! just uses the action bounds; override this for things that have
@@ -308,12 +309,16 @@ public:
 	//! Test if given rectangle (in pixel coordinates) overlaps action rectangle (fixme, make virtual)
 	inline bool OverlapsBounds(int x1, int y1, int x2, int y2)
 	{
+		// [dj2018-01-12] I am fixing this here to add m_xoffset etc. into the
+		// check - in theory that's more correct, but we must be on the lookout
+		// in case that creates unexpected effects in future (e.g. if that was
+		// already 'worked around' somewhere else (??) not sure - then something
+		// it may not work correctly in that 'elsewhere' place anymore)
 		return OVERLAPS(
 			x1, y1,
 			x2, y2,
-//fixmeHIGH this looks like it's missing m_xoffset [dj2018-01]
-			m_x*16+m_iActionX1, m_y*16+m_iActionY1,
-			m_x*16+m_iActionX2, m_y*16+m_iActionY2);
+			PIXELX+m_iActionX1, PIXELY+m_iActionY1,
+			PIXELX+m_iActionX2, PIXELY+m_iActionY2);
 	}
 	//! Test if given rectangle (in pixel coordinates) overlaps shoot rectangle
 	inline bool OverlapsShootArea(int x1, int y1, int x2, int y2)
@@ -321,8 +326,8 @@ public:
 		return OVERLAPS(
 			x1, y1,
 			x2, y2,
-			m_x*16+m_iShootX1+m_xoffset, m_y*16+m_iShootY1+m_yoffset,
-			m_x*16+m_iShootX2+m_xoffset, m_y*16+m_iShootY2+m_yoffset);
+			PIXELX+m_iShootX1, PIXELY+m_iShootY1,
+			PIXELX+m_iShootX2, PIXELY+m_iShootY2);
 	}
 
 	EdjLayer m_eLayer;   // Z-depth for drawing in "layers"

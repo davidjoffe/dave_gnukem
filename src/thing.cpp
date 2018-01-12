@@ -1057,7 +1057,7 @@ int CAcme::HeroOverlaps()
 	{
 		// FIXME: Create some sort of explosion here
 		update_health(-1);
-		AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), m_y*BLOCKH+m_yoffset));
+		AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), PIXELY));
 		return THING_DIE;
 	}
 	return 0;
@@ -1135,9 +1135,9 @@ int CAcme::Tick()
 		}
 
 		// If hit bottom of level or collide with solid, explode
-		if (m_y>=LEVEL_HEIGHT-1 || CheckCollision(m_x*16+m_iVisibleX1, m_y*16+m_iVisibleY1 + m_yoffset, m_x*16+m_iVisibleX2, m_y*16+m_iVisibleY2 + m_yoffset))
+		if (m_y>=LEVEL_HEIGHT-1 || CheckCollision(m_x*16+m_iVisibleX1, PIXELY+m_iVisibleY1, m_x*16+m_iVisibleX2, PIXELY+m_iVisibleY2))
 		{
-			AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), m_y*BLOCKH+m_yoffset));
+			AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), PIXELY));
 			return THING_DIE;
 		}
 
@@ -1150,7 +1150,7 @@ int CAcme::Tick()
 int CAcme::OnHeroShot()
 {
 	update_score(500, m_x, m_y/*+m_yoffset*/);
-	AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), m_y*BLOCKH+m_yoffset));
+	AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), PIXELY));
 	return THING_DIE;
 }
 
