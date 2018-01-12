@@ -522,7 +522,7 @@ void UpdateBullets()
 	CBullet* pBullet=NULL;
 
 
-
+	/*
 	// Check for bullet collisions with things (e.g. shootable boxes, monsters etc).
 	// Also we check for monster bullet collisions against hero.
 	CThing* pThing=NULL;
@@ -546,13 +546,6 @@ void UpdateBullets()
 							   // Why the F is it 7? It's possible the sprite used to be smaller, or perhaps
 							   // it has something to do  with that + 8 above...
 						pBullet->y+BULLET_HEIGHT-1))
-						/*
-						if (pThing->OverlapsBounds(
-						pBullet->x,
-						pBullet->y,
-						pBullet->x+BULLET_WIDTH-1,
-						pBullet->y+BULLET_HEIGHT-1))
-						*/
 					{
 						int nRet = pThing->OnHeroShot();
 						if (nRet==THING_DIE)
@@ -604,7 +597,7 @@ void UpdateBullets()
 		;
 
 	}
-
+	*/
 
 
 
@@ -638,6 +631,96 @@ void UpdateBullets()
 			int nXOld = pBullet->x;
 			// Try move bullet one pixel horizontally
 			pBullet->x += nXPixelDelta;
+
+
+
+
+			bool bBulletDeleted = false;
+			// Check for bullet collisions with things (e.g. shootable boxes, monsters etc).
+			// Also we check for monster bullet collisions against hero.
+			CThing* pThing=NULL;
+			if (pBullet->eType==CBullet::BULLET_HERO)
+			{
+				for ( int k=0; k<(int)g_apThings.size(); ++k )
+				{
+					pThing = g_apThings[k];
+					if (pThing->IsShootable())
+					{
+						//fixmeHIGH this + 8 makes NO SENSE to me what the hell is
+						// it doing here!?!? [dj2018-01]
+						int x1 = pBullet->x;//pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
+						if (pThing->OverlapsShootArea(
+							x1,
+							pBullet->y,
+							x1 + BULLET_WIDTH-1,//fixmeHIGH this makes no sense shoudl be + 15?? Shoudl be, BULLET_WIDTH?
+									// Why the F is it 7? It's possible the sprite used to be smaller, or perhaps
+									// it has something to do  with that + 8 above...
+							pBullet->y+BULLET_HEIGHT-1))
+						{
+							int nRet = pThing->OnHeroShot();
+							if (nRet==THING_DIE)
+							{
+								delete pThing;
+								g_apThings.erase(g_apThings.begin() + k);
+								k--;
+							}
+							else if (nRet==THING_REMOVE)
+							{
+								g_apThings.erase(g_apThings.begin() + k);
+								k--;
+							}
+
+							// delete bullet i
+							bBulletDeleted=true;
+							delete g_apBullets[i];
+							g_apBullets.erase(g_apBullets.begin() + i);
+							i--;
+							goto NextBullet1b;
+						}
+					}
+				} // k
+			}
+			else if (pBullet->eType==CBullet::BULLET_MONSTER)
+			{
+				// Check if monster bullet overlaps with hero
+				if (OVERLAPS(
+					x*16+x_small*8,
+					y*16-16,
+					(x*16+x_small*8) + 15,
+					(y*16-16) + 31,
+					pBullet->x,
+					pBullet->y,
+					pBullet->x+15,
+					pBullet->y+15))
+				{
+					bBulletDeleted=true;
+					delete g_apBullets[i];
+					g_apBullets.erase(g_apBullets.begin() + i);
+					i--;
+					if (!HeroIsHurting())
+					{
+						update_health(-1);
+						HeroSetHurting();
+					}
+				}
+			}
+
+		NextBullet1b:
+			;
+
+
+
+			// Break out of 'n' loop if bullet 'i' was deleted due to collision
+			if (bBulletDeleted)
+				break;
+
+
+
+
+
+
+
+
 			// Check if bullet would touch anything solid at new position
 			int x1 = pBullet->x;//pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
 			if (CheckCollision(
@@ -665,6 +748,17 @@ void UpdateBullets()
 				--i;
 				break;//NB, break out of the 'n' loop now as bullet is dangling
 			}
+
+
+
+
+
+
+
+
+
+
+
 		}//n
 	}//i(bullets)
 }
