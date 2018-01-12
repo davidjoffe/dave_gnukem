@@ -1458,7 +1458,7 @@ NextBullet1:
 
 
 	// Update bullets
-	for ( i=0; i<(int)g_apBullets.size(); i++ )
+	for ( i=0; i<(int)g_apBullets.size(); ++i )
 	{
 		CBullet *pBullet = g_apBullets[i];
 		int nXOld = pBullet->x;
@@ -1479,14 +1479,8 @@ NextBullet1:
 				g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
 				));
 			g_apBullets.erase(g_apBullets.begin() + i);
-			i--;
-			goto NextBullet3;
+			--i;
 		}
-
-
-NextBullet3:
-		;
-
 	}
 
 
@@ -2226,12 +2220,19 @@ bool check_solid( int ix, int iy, bool bCheckThings )
 			pThing = g_apThings[i];
 			if (pThing->m_bSolid)
 			{
+				//fixmeHIGH 'In theory' we shoudl add m_xoffset etc. but not sure
+				// that's the correct thing to do as e.g. cf. this is the code
+				// that checks a.o. whether things should fall ... could things
+				// end up falling when they're not supposed to or vice versa if
+				// we suddenly change that now, since it's been seemingly working
+				// for so long?? If we change this now a lot of things
+				// must be carefully re-tested .. [dj2018-01-12]
 				if (OVERLAPS(
 					ix*16, iy*16, ix*16+15, iy*16+15,
-					pThing->m_x*16 + pThing->m_iSolidX1,
-					pThing->m_y*16 + pThing->m_iSolidY1,
-					pThing->m_x*16 + pThing->m_iSolidX2,
-					pThing->m_y*16 + pThing->m_iSolidY2))
+					pThing->m_x*BLOCKW + pThing->m_iSolidX1,
+					pThing->m_y*BLOCKH + pThing->m_iSolidY1,
+					pThing->m_x*BLOCKW + pThing->m_iSolidX2,
+					pThing->m_y*BLOCKH + pThing->m_iSolidY2))
 				{
 					return true;
 				}
@@ -2247,7 +2248,6 @@ bool check_solid( int ix, int iy, bool bCheckThings )
 bool CheckCollision(int x1, int y1, int x2, int y2, CBullet *pBullet)
 {
 	int i, j;
-	CThing *pThing;
 	int nX1 = x1 / 16;
 	int nY1 = y1 / 16;
 	int nX2 = x2 / 16;
@@ -2263,18 +2263,14 @@ bool CheckCollision(int x1, int y1, int x2, int y2, CBullet *pBullet)
 			}
 		}
 	}
-	for ( i=0; i<(int)g_apThings.size(); i++ )
+	CThing *pThing;
+	for ( i=0; i<(int)g_apThings.size(); ++i )
 	{
 		pThing = g_apThings[i];
 		if (pThing->m_bSolid)
 		{
 			//fixmeHIGH need m_xoffset etc. also here?
-			if (OVERLAPS(
-				x1, y1, x2, y2,
-				pThing->m_x*16 + pThing->m_iShootX1,
-				pThing->m_y*16 + pThing->m_iShootY1,
-				pThing->m_x*16 + pThing->m_iShootX2,
-				pThing->m_y*16 + pThing->m_iShootY2))
+			if (pThing->OverlapsShootArea(x1,y1,x2,y2))
 			{
 				if (pBullet!=NULL && pBullet->eType==CBullet::BULLET_HERO && pThing->IsShootable())
 				{

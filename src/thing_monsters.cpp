@@ -11,6 +11,9 @@ License: GNU GPL Version 2
 #include "mission.h"//GET_EXTRA
 #include "graph.h"//pVisView etc.
 
+// Temp for debugging/testing [dj2018-01]
+//#define TESTING_INVINCIBLE_ROBOTS
+
 // We define everything's position in blockx,blocky (m_x,m_y), plus a pixel offset relative to that (m_xoffset,m_yoffset).
 // This implies there's more than one way to describe the same ultimate pixel coordinate, e.g.
 // if blocksize is 16 pixels, then e.g.
@@ -121,7 +124,10 @@ int CMonster::Tick()
 }
 int CMonster::OnHeroShot()
 {
-	//debutest_temp_2018//AddThing(CreateExplosion(PIXELX,PIXELY,1));
+#ifdef TESTING_INVINCIBLE_ROBOTS
+	//debutest_temp_2018//
+	AddThing(CreateExplosion(PIXELX,PIXELY,1));
+#endif
 	if (m_nStrength>0)
 	{
 		--m_nStrength;
@@ -255,7 +261,11 @@ int CRobot::OnKilled()
 {
 	update_score(100, m_x, m_y);
 	AddThing(CreateExplosion(PIXELX,PIXELY,1));
+#ifdef TESTING_INVINCIBLE_ROBOTS
+	return 0;
+#else
 	return THING_DIE;
+#endif
 }
 
 void CRobot::Initialize(int a, int b)
