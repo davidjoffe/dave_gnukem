@@ -85,6 +85,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+* Overhauled shooting/bullets code
 * Level Editor: New "Ctrl+F7" command shows overview of all levels, and some basic stats on 'important' gameplay items
 * Ctrl+Shift+W Large gameplay viewport mode (currently classified as a 'cheat')
 * All cheat keys (and debug/testing keys like H to inflict self-damage) must now first be enabled by pressing Ctrl+Shift+G to enable in-game debugging stuff
