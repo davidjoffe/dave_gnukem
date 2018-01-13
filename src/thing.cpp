@@ -219,7 +219,7 @@ void CThing::DrawActionBounds(const djColor &Color)
 
 bool CThing::OverlapsBounds(int x, int y)
 {
-	if (m_iActionX1==-1 && m_iActionY1==-1 && m_iActionX2==-1 && m_iActionY2==-1)
+	if (m_iActionX1<0 && m_iActionY1<0 && m_iActionX2<0 && m_iActionY2<0)
 		return false;
 	return OVERLAPS(
 		x, y,
@@ -1349,7 +1349,7 @@ int CFlameThrow::Tick()
 	}
 	else
 	{
-		if (m_nDir==-1)
+		if (m_nDir<0)
 			SetActionBounds(0-32, 0, 47-32, 15);
 		else
 			SetActionBounds(0, 0, 47, 15);

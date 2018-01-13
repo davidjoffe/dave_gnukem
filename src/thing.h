@@ -273,10 +273,10 @@ public:
 	int  m_iSolidY2;
 
 
-	int  m_iShootX1;
-	int  m_iShootY1;
-	int  m_iShootX2;
-	int  m_iShootY2;
+	int  m_iShootX1;	//!< Shooting bounding box for bullet collision (left)
+	int  m_iShootY1;	//!< Shooting bounding box for bullet collision (top)
+	int  m_iShootX2;	//!< Shooting bounding box for bullet collision (right)
+	int  m_iShootY2;	//!< Shooting bounding box for bullet collision (bottom)
 
 	int m_iID;           // An ID number. Can do with what want. Eg door number, teleporeter nubmer
 	void SetID(int i) { m_iID = i; }
