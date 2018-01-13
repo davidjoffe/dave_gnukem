@@ -33,6 +33,12 @@ extern djImage *g_pFont8x8;
 
 //! Convenience macro to call the sprite draw function for 16x16 sprite b in sprite set a
 #define DRAW_SPRITE16(vis,a,b,x,y) djgDrawImage( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%16)*16,((b)/16)*16, (x),(y), 16,16 )
+
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+extern bool g_bSpriteDropShadows;
+#define DRAW_SPRITEA_SHADOW(vis,a,b,x,y,w,h) if (g_bSpriteDropShadows) djgDrawImageAlpha( vis, g_pCurMission->GetSpriteData(a)->m_pImageShadow, ((b)%16)*16,((b)/16)*16, (x),(y), (w),(h) )
+#endif
+
 //! Same as \ref DRAW_SPRITE16 but also uses alpha map for transparency masking
 #define DRAW_SPRITE16A(vis,a,b,x,y) djgDrawImageAlpha( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%16)*16,((b)/16)*16, (x),(y), 16,16 )
 

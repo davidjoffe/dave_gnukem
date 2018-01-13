@@ -66,6 +66,7 @@ Try find the exit, while dodging or shooting monsters.
 * PgUp/PgDn: Increase/decrease volume
 * Insert: Toggle sounds on/off
 * Shift+F6/F7: Dec/Inc speed (framerate)
+* Shift+F8/F9: Toggle map and sprite auto-shadows on/off, respectively
 
 To open doors, find the correct color key, and press the action key on the 'lock' nearby the door(s).
 
@@ -85,6 +86,8 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+* [13 Jan 2018] New slightly experimental map auto-shadows and sprite auto-drop-shadows
+* [13 Jan 2018] New shortcut keys Shift+F8/F9: Toggle map and sprite auto-shadows on/off, respectively
 * Overhauled shooting/bullets code
 * Level Editor: New "Ctrl+F7" command shows overview of all levels, and some basic stats on 'important' gameplay items
 * Ctrl+Shift+W Large gameplay viewport mode (currently classified as a 'cheat')

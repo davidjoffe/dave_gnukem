@@ -861,6 +861,10 @@ void CCamera::Draw()
 		nOffset = -1;
 	else if (x > m_x + 1)
 		nOffset = 1;
+
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + nOffset, CALC_XOFFSET(m_x)+1, CALC_YOFFSET(m_y)+1,16,16);
+#endif
 	DRAW_SPRITE16A(pVisView, m_a, m_b + nOffset, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 
@@ -887,7 +891,12 @@ CBanana::CBanana()
 
 void CBanana::Draw()
 {
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + m_nState, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y),16,16);
+	DRAW_SPRITE16A(pVisView, m_a, m_b + m_nState, CALC_XOFFSET(m_x)-1, CALC_YOFFSET(m_y)-1);
+#else
 	DRAW_SPRITE16A(pVisView, m_a, m_b + m_nState, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
+#endif
 }
 
 int CBanana::OnHeroShot()
@@ -1055,9 +1064,8 @@ int CAcme::HeroOverlaps()
 	// 'wrong' (HOWEVER you're not supposed to ever place them that way in the level editor)
 	if (m_nState>=3)
 	{
-		// FIXME: Create some sort of explosion here
 		update_health(-1);
-		AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), PIXELY));
+		CreateOnDestroyedEffects();
 		return THING_DIE;
 	}
 	return 0;
@@ -1065,8 +1073,10 @@ int CAcme::HeroOverlaps()
 
 void CAcme::Draw()
 {
-	DRAW_SPRITE16(pVisView, m_a, m_b  , CALC_XOFFSET(m_x  ) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
-	DRAW_SPRITE16(pVisView, m_a, m_b+1, CALC_XOFFSET(m_x+1) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b, 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset, 32, 16);
+#endif
+	DRAW_SPRITEA(pVisView, m_a, m_b, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset, 32, 16);
 }
 
 int CAcme::Tick()
@@ -1137,7 +1147,7 @@ int CAcme::Tick()
 		// If hit bottom of level or collide with solid, explode
 		if (m_y>=LEVEL_HEIGHT-1 || CheckCollision(m_x*16+m_iVisibleX1, PIXELY+m_iVisibleY1, m_x*16+m_iVisibleX2, PIXELY+m_iVisibleY2))
 		{
-			AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), PIXELY));
+			CreateOnDestroyedEffects();
 			return THING_DIE;
 		}
 
@@ -1147,10 +1157,23 @@ int CAcme::Tick()
 	return 0;
 }
 
+void CAcme::CreateOnDestroyedEffects()
+{
+	// [dj2018-01] Create several 'intermixed' smallest-type and next-biggest-type
+	// explosions, intermixed, with a little random variation in x,y position.
+	// Note only 1 plays the sound (or actually 2, combine both sounds? tweak / play around with this later? want a sound similar to 'big' explosion but more 'immediate' [LOW prio] - dj2018-01)
+	AddThing(CreateExplosion(((rand()%4)-2) + m_x*BLOCKW           , PIXELY + ((rand()%6)-3),0, 0));
+	AddThing(CreateExplosion(((rand()%4)-2) + m_x*BLOCKW           , PIXELY + ((rand()%6)-3),1, 1));
+	AddThing(CreateExplosion(((rand()%4)-2) + m_x*BLOCKW+ BLOCKW   , PIXELY + ((rand()%6)-3),0,-1));
+	AddThing(CreateExplosion(((rand()%4)-2) + m_x*BLOCKW+ BLOCKW   , PIXELY + ((rand()%6)-3),1,-1));
+	AddThing(CreateExplosion(((rand()%4)-2) + m_x*BLOCKW+(BLOCKW/2), PIXELY + ((rand()%6)-3),0,-1));
+	AddThing(CreateExplosion(((rand()%4)-2) + m_x*BLOCKW+(BLOCKW/2), PIXELY + ((rand()%6)-3),1,-1));
+}
+
 int CAcme::OnHeroShot()
 {
 	update_score(500, m_x, m_y/*+m_yoffset*/);
-	AddThing(CreateExplosion(m_x*BLOCKW+(BLOCKW/2), PIXELY));
+	CreateOnDestroyedEffects();
 	return THING_DIE;
 }
 
@@ -1191,6 +1214,11 @@ int CPickup::HeroOverlaps()
 
 void CPickup::Draw()
 {
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+	// Note the 15 height here, this is debatable, some things look better with 16
+	// some better with 15, e.g. rugby ball looks better with 15
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + (m_nAnimationCount==-1?0:m_nAnimationCount), CALC_XOFFSET(m_x)+1, CALC_YOFFSET(m_y)+1,16,15);
+#endif
 	DRAW_SPRITE16A(pVisView, m_a, m_b + (m_nAnimationCount==-1?0:m_nAnimationCount), CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 

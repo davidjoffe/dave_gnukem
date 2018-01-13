@@ -333,6 +333,14 @@ void CFlyingRobot::Draw()
 {
 	if (IsDying())
 	{
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+		DRAW_SPRITEA_SHADOW(pVisView,
+			m_a, m_b + anim4_count + 4,
+			1+CALC_XOFFSET(m_x) + m_xoffset,
+			1+CALC_YOFFSET(m_y) + m_yoffset,
+			16,16
+		);
+#endif
 		DRAW_SPRITE16A(pVisView,
 			m_a, m_b + anim4_count + 4,
 			CALC_XOFFSET(m_x) + m_xoffset,
@@ -344,10 +352,16 @@ void CFlyingRobot::Draw()
 		// Spriteset has 8 sprites in a row: First 4 is facing right, next 4 facing left
 		if (m_nXDir>0)//Facing right?
 		{
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+			DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count    , 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset,16,16);
+#endif
 			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count    , CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 		}
 		else//Facing left
 		{
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+			DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count + 4, 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset,16,16);
+#endif
 			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count + 4, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 		}
 	}
@@ -722,7 +736,13 @@ void CCannon::Draw()
 	int b=(m_nXDir>0 ? m_b+4+(anim4_count%2)*2 : m_b+(anim4_count%2)*2);//Sprite number within spriteset
 	int x = CALC_XOFFSET(m_x) + m_xoffset;
 	int y = CALC_YOFFSET(m_y) + m_yoffset;
+
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+	DRAW_SPRITEA_SHADOW(pVisView, a, b, x, y, 32, 16);
+	DRAW_SPRITEA(pVisView, a, b, x-1, y-1, 32, 16);
+#else
 	DRAW_SPRITEA(pVisView, a, b, x, y, 32, 16);
+#endif
 
 	// Note that after it's been shot once, it 'smokes', to show it's injured [cf. DN1] [dj2017-08]
 	if (m_nStrength<2)
@@ -799,6 +819,9 @@ int CCrawler::Tick()
 
 void CCrawler::Draw()
 {
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_yoffset,16,16);
+#endif
 	DRAW_SPRITE16A(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) + m_yoffset);
 }
 

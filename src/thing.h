@@ -772,6 +772,7 @@ public:
 protected:
 	int m_nState;
 	int m_nCounter;
+	void CreateOnDestroyedEffects();
 };
 /*-----------------------------------------------------------*/
 /*!

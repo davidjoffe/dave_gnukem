@@ -23,6 +23,7 @@ using namespace std;
 #include <unistd.h>
 #endif
 
+#include <map>//For map auto-shadows' [dj2018-01]
 
 #include "mission.h"
 #include "hero.h"
@@ -151,6 +152,7 @@ float g_fFrameRate=18.0f;
 
 #define MAX_FIREPOWER (5)
 
+unsigned char* g_pLevelShadowMap = NULL;
 unsigned char *g_pLevel = NULL;
 int g_nLevel = 0;
 bool bShowDebugInfo = false;
@@ -182,6 +184,14 @@ vector<float> afTimeTaken;
 const char *FILE_GAMESKIN = "data/gameskin.tga";
 djImage *pSkinGame        = NULL; // Main game view skin (while playing)
 djImage *pBackground      = NULL; // Level background image
+
+// Game effects [dj2018-01]
+// 'Map auto-shadows' [dj2018-01]
+const char* FILE_SHADOWS = "data/shadows.tga";
+djImage* g_pImgShadows = NULL;
+// Use config options to turn on/off specific effects if need be or desired (ideally these shouldn't be ugly globals, should have some sort of generic properties type thing - LOW prio - dj2018)
+bool g_bAutoShadows = true;
+bool g_bSpriteDropShadows = true;
 
 /*--------------------------------------------------------------------------*/
 struct SMenuItem gameMenuItems[] =
@@ -492,10 +502,12 @@ void CheckIfHeroShooting()
 		// This may still need some slight tweaking.
 		if (g_nNoShootCounter==0)
 		{
+			#define HERO_BULLET_SPEED (16)
+
 			HeroShoot(
 				x * 16 /*+ (hero_dir==1 ? 16 : -16)*/ + x_small*8,
 				y * 16 - 2,
-				(hero_dir==0 ? -16 : 16)
+				(hero_dir==0 ? -HERO_BULLET_SPEED : HERO_BULLET_SPEED)
 			);
 
 			// RESET COUNTER [fixme this must reset between games also]
@@ -787,6 +799,14 @@ void GameInitialSetup()
 		djCreateImageHWSurface( pSkinGame );
 	}
 
+	// Load map shadow effects sprite [new/experimental dj2018-01]
+	if (!g_pImgShadows)
+	{
+		g_pImgShadows = new djImage;
+		g_pImgShadows->Load( FILE_SHADOWS );
+		djCreateImageHWSurface( g_pImgShadows );
+	}
+
 	// Register the "thing"'s that need to be registered dynamically at runtime [dj2017-07-29]
 	RegisterThings_Monsters();
 }
@@ -795,6 +815,9 @@ void GameInitialSetup()
 void GameFinalCleanup()
 {
 	SYS_Debug( "GameFinalCleanup()\n" );
+
+	djDestroyImageHWSurface(g_pImgShadows);
+	djDEL(g_pImgShadows);
 
 	djDestroyImageHWSurface(pSkinGame);
 	djDEL(pSkinGame);
@@ -935,6 +958,119 @@ void PerLevelSetup()
 	}
 	g_pLevel = apLevels[0];
 
+#ifdef EXPERIMENTAL_MAP_AUTO_DROPSHADOWS
+	/*
+	HOW THIS WORKS:
+	[See also streams of 12&13 Jan 2018 where this was implemented. - dj2018-01]
+
+	S = Solid block/floor
+	The numbers are 0-based indexes into shadows.tga
+	So e.g. if we just have one single solid above us,
+	use the (0-based) 4th sprite (which shows slight
+	tapering of the shadows on both sides).
+	Basically, 32 (actually 16) 'combinations' here,
+	so we use a 'table' (in the form of a map of pairs)
+	to get the shadow sprite index, based on the 'pair'
+	of values (bitflags above us, bitflags adjacent to us)
+
+	00000S00000000
+	00000400000000
+
+	0000S0S0000000
+	00004040000000
+
+	000S0   0S000
+	00S30   01S00
+
+	0SS00  0SS00   0SS00
+	0S300  002S0   01S00
+
+	0000SSSSSS0000
+	00001222230000
+
+	0000SSSSSSS000
+	0000122222S000
+
+	000SSSSSSS000
+	000S222223000
+
+	0000SSSSSS000
+	000S222223000
+	*/
+
+	std::map< std::pair< int,int >, unsigned char > mapShadowCases;
+
+	mapShadowCases[ std::make_pair(0,0) ] = 0;
+	mapShadowCases[ std::make_pair(0,1) ] = 0;
+	mapShadowCases[ std::make_pair(0,4) ] = 0;
+	mapShadowCases[ std::make_pair(0,5) ] = 0;
+
+	//mapShadowCases[ std::make_pair(1,0) ] = 0;
+	//mapShadowCases[ std::make_pair(1,1) ] = 0;
+	//mapShadowCases[ std::make_pair(1,4) ] = 0;
+	//mapShadowCases[ std::make_pair(1,5) ] = 0;
+
+	mapShadowCases[ std::make_pair(2,0) ] = 4;
+	mapShadowCases[ std::make_pair(2,1) ] = 1;
+	mapShadowCases[ std::make_pair(2,4) ] = 3;
+	mapShadowCases[ std::make_pair(2,5) ] = 2;
+
+	mapShadowCases[ std::make_pair(3,0) ] = 1;
+	mapShadowCases[ std::make_pair(3,1) ] = 1;
+	mapShadowCases[ std::make_pair(3,4) ] = 2;
+	mapShadowCases[ std::make_pair(3,5) ] = 2;
+
+	//mapShadowCases[ std::make_pair(4,0) ] = 0;
+	//mapShadowCases[ std::make_pair(4,1) ] = 0;
+	//mapShadowCases[ std::make_pair(4,4) ] = 0;
+	//mapShadowCases[ std::make_pair(4,5) ] = 0;
+
+	//mapShadowCases[ std::make_pair(5,0) ] = 0;
+	//mapShadowCases[ std::make_pair(5,1) ] = 0;
+	//mapShadowCases[ std::make_pair(5,4) ] = 0;
+	//mapShadowCases[ std::make_pair(5,5) ] = 0;
+
+	mapShadowCases[ std::make_pair(6,0) ] = 3;
+	mapShadowCases[ std::make_pair(6,1) ] = 2;
+	mapShadowCases[ std::make_pair(6,4) ] = 3;
+	mapShadowCases[ std::make_pair(6,5) ] = 2;
+
+	mapShadowCases[ std::make_pair(7,0) ] = 2;
+	mapShadowCases[ std::make_pair(7,1) ] = 2;
+	mapShadowCases[ std::make_pair(7,4) ] = 2;
+	mapShadowCases[ std::make_pair(7,5) ] = 2;
+
+	g_pLevelShadowMap = new unsigned char[LEVEL_WIDTH * LEVEL_HEIGHT];
+	memset(g_pLevelShadowMap,0,LEVEL_WIDTH * LEVEL_HEIGHT);
+	for ( int y=0;y<LEVEL_HEIGHT;++y )
+	{
+		for ( int x=0;x<LEVEL_WIDTH;++x )
+		{
+			// If 'this' x,y block is a solid block then we don't have auto-shadows on it
+			bool bThisSolid = (CHECK_SOLID( LEVCHAR_BACKA(x,y),   LEVCHAR_BACKB(x,y) ));
+			if (y>0 && !bThisSolid)
+			{
+				int nSolidFlagsAbove=0;//bitflags [4|2|1] representing solidness of blocks above 'this' x,y block
+				int nSolidFlagsAdjac=0;//bitflags [4|  1] representing solidness of blocks adjacent to 'this' x,y block
+				// Check solidness of two blocks adjacent to us, fill in bitflags
+				if (x<=0             || (CHECK_SOLID( LEVCHAR_BACKA(x-1,y  ), LEVCHAR_BACKB(x-1,y  ) ))) nSolidFlagsAdjac |= 4;
+				if (x>=LEVEL_WIDTH-1 || (CHECK_SOLID( LEVCHAR_BACKA(x+1,y  ), LEVCHAR_BACKB(x+1,y  ) ))) nSolidFlagsAdjac |= 1;
+				// Check solidness of three blocks above us, fill in bitflags
+				if (x<=0             || (CHECK_SOLID( LEVCHAR_BACKA(x-1,y-1), LEVCHAR_BACKB(x-1,y-1) ))) nSolidFlagsAbove |= 4;
+				if (                    (CHECK_SOLID( LEVCHAR_BACKA(x  ,y-1), LEVCHAR_BACKB(x  ,y-1) ))) nSolidFlagsAbove |= 2;
+				if (x>=LEVEL_WIDTH-1 || (CHECK_SOLID( LEVCHAR_BACKA(x+1,y-1), LEVCHAR_BACKB(x+1,y-1) ))) nSolidFlagsAbove |= 1;
+
+				// Look up the correct shadow sprite index using the table,
+				// based on bitflags representing solidness above us [4|2|1], and adjacent to us [4| |1].
+				*(g_pLevelShadowMap + (y*LEVEL_WIDTH) + x)
+					 = mapShadowCases[
+						 std::make_pair(nSolidFlagsAbove,nSolidFlagsAdjac)
+					 ];
+			}
+		}
+	}
+#endif
+
 	// Load map background image
 	pBackground = new djImage;
 	if (0!=pBackground->Load(g_pCurMission->GetLevel(g_nLevel)->m_szBackground))
@@ -973,6 +1109,11 @@ void PerLevelCleanup()
 	{
 		Mix_FreeMusic(g_pGameMusic);
 		g_pGameMusic = NULL;
+	}
+
+	if (g_pLevelShadowMap)
+	{
+		djDELV(g_pLevelShadowMap);
 	}
 }
 
@@ -1146,6 +1287,14 @@ int game_startup(bool bLoadGame)
 							char buf[1024]={0};
 							sprintf(buf,"Inc framerate %.2f",g_fFrameRate);
 							ShowGameMessage(buf, 32);
+						}
+						else if (Event.key.keysym.sym==SDLK_F8)
+						{
+							g_bAutoShadows = !g_bAutoShadows;
+						}
+						else if (Event.key.keysym.sym==SDLK_F9)
+						{
+							g_bSpriteDropShadows = !g_bSpriteDropShadows;
 						}
 
 						}
@@ -1891,7 +2040,6 @@ void GameDrawView()
 	int nYOffset = g_nViewOffsetY;
 	for ( i=0; i<VIEW_HEIGHT; ++i )
 	{
-		//  d=24;
 		xoff = -xo_small+(g_bLargeViewport?0:2);
 		xoff *= 8;
 		for ( j=0; j<VIEW_WIDTH+xo_small; ++j )
@@ -1914,6 +2062,26 @@ void GameDrawView()
 				if ((a | b) != 0)//<- This if prevents background clearing of 'bg' background block .. etiher we need to clear entire viewport before start drawing map, or must draw a black square here 'manually' .. not sure which is more efficient ultimately
 				{
 					DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff, nYOffset);
+
+					// We include this in the above 'if' because it's not
+					// strictly correct to have drop-shadows falling onto
+					// the 'background skin' (i.e. when background sprite is 0)
+					// as the background skin may include backdrops like
+					// cityscapes etc. [dj2018-01]
+					if (g_bAutoShadows && g_pLevelShadowMap!=NULL)
+					{
+						// Note several things could be slightly sped up here should this ever be a performance bottleneck
+						unsigned char uShadowVal = *(g_pLevelShadowMap + ((yo+i)*LEVEL_WIDTH) + (xo+j));
+						if (uShadowVal)
+						{
+							djgDrawImageAlpha( pVisView,
+								g_pImgShadows,
+								(uShadowVal % 16) * 16,
+								(uShadowVal / 16) * 16,
+								xoff, nYOffset,
+								16,16 );
+						}
+					}
 				}
 
 				// BLOCK[0,1] -> foreground block
@@ -1924,7 +2092,9 @@ void GameDrawView()
 
 				// draw foreground block, unless its (0,0)
 				if ((a | b) != 0)
+				{
 					DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff, nYOffset);
+				}
 			}
 			xoff += BLOCKW;
 			pLevelBlockPointer += 4;// <- 4 bytes per level 'block' so advance pointer 4 bytes, see comments at definition of LEVEL_SIZE etc.
@@ -1975,6 +2145,12 @@ void GameDrawView()
 		{
 			--g_nHeroJustFiredWeaponCounter;
 			int nOffs = (hero_picoffs+1)%4;
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+nOffs*4,1+xoff   ,1+yoff   +y_offset,16,16);
+			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+nOffs*4,1+xoff   ,1+yoff+16+y_offset,16,15);
+			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+nOffs*4,1+xoff+16,1+yoff   +y_offset,16,16);
+			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+nOffs*4,1+xoff+16,1+yoff+16+y_offset,16,15);
+#endif
 			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+nOffs*4,xoff   ,yoff   +y_offset);
 			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+nOffs*4,xoff   ,yoff+16+y_offset);
 			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+nOffs*4,xoff+16,yoff   +y_offset);
@@ -1982,6 +2158,12 @@ void GameDrawView()
 		}
 		else
 		{
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+hero_picoffs*4,1+xoff   ,1+yoff   +y_offset,16,16);
+			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+hero_picoffs*4,1+xoff   ,1+yoff+16+y_offset,16,15);
+			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+hero_picoffs*4,1+xoff+16,1+yoff   +y_offset,16,16);
+			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+hero_picoffs*4,1+xoff+16,1+yoff+16+y_offset,16,15);
+#endif
 			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+hero_picoffs*4,xoff   ,yoff   +y_offset);
 			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+hero_picoffs*4,xoff   ,yoff+16+y_offset);
 			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+hero_picoffs*4,xoff+16,yoff   +y_offset);
