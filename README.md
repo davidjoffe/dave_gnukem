@@ -18,7 +18,7 @@ Please donate to the project, or else I'll make more games like this: https://pa
 **Mini Demo Video**: https://youtu.be/Hi7WYnOA_fo
 
 
-![Dave Gnukem Screenshot](http://scorpioncity.com/dave_gnukem/gallery/Dave%20Gnukem%20%280.71%202%20Jul%202017%29.png "Dave Gnukem Screenshot")
+![Dave Gnukem Screenshot](http://scorpioncity.com/dave_gnukem/gallery/Dave%20Gnukem%200.90%20%2813%20Jan%202018%29.png "Dave Gnukem Screenshot")
 
 Created by: David Joffe http://djoffe.com/ / https://www.liveedu.tv/david_joffe/
 
