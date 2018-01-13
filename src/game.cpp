@@ -462,12 +462,11 @@ void CheckForBulletsOutOfView()
 	for ( int i=0; i<(int)g_apBullets.size(); ++i )
 	{
 		pBullet = g_apBullets[i];
-		x1 = pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
 		if (!OVERLAPS_VIEW(
-			x1,
+			pBullet->x,
 			pBullet->y,
-			x1 + 7,
-			pBullet->y+BULLET_HEIGHT-1))
+			pBullet->x + BULLET_WIDTH-1,
+			pBullet->y + BULLET_HEIGHT-1))
 		{
 			djDEL(pBullet);
 			g_apBullets.erase(g_apBullets.begin() + i);
