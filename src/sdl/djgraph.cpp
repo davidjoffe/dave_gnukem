@@ -467,6 +467,14 @@ void djgDrawImageAlpha( djVisual *pVis, djImage *pImage, int xS, int yS, int xD,
 		SDL_BlitSurface(pHWSurface, &rectSrc, pVis->pSurface, &rectDest);
 		return;
 	}
+				//dj2018-01 in theory the code from this point below should 'never'
+				// activate anymore? I think? Or are there platforms where it might?
+	// i.e. ideally we just want to stick to doing hardware blits (or "proper correct" software fall-back in worst case - not our crappy software blit, basically :D)
+				//fixmeMedium
+	/* comment comment dj2018-01-13
+	djgDrawImageAlpha: Tentatively remove 'fallback' old sprite drawing code - in theory this could break some platforms if the new g_SurfaceMap stuff fails - if that happens I think we should discover that through testing, and handle it on ad hoc basis - e.g. either add the fallback code back (not ideal, for multiple reasons, including speed, and lack of proper support for semi-transparent alpha, possible lack of support for all pixel formats etc.), or figure out why the new g_SurfaceMap stuff isn't working on whatever new platform, and fix it (more ideal).
+	*/
+				return;
 
 	// clipping
 	if (xD>=pVis->width || yD>=pVis->height) return;
