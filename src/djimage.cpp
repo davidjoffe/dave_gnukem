@@ -91,6 +91,8 @@ djImage::djImage( int iWidth, int iHeight, int ibpp )
 	m_ibpp      = ibpp;
 	m_ipixwidth = CalculatePixelWidth( ibpp );
 
+	//fixmemediumorfuture 2018 something might be wrong with this constructor??????? see attempts to use 12/13 jan 2018 for sprite drop shadow stuff
+
 	m_pData = new unsigned char[iWidth*iHeight*m_ipixwidth];
 
 	if (m_pData != NULL)
@@ -137,8 +139,11 @@ djColor djImage::GetPixelColor( int x, int y )
 	switch (m_ibpp)
 	{
 	case 24: return djColor( (iPixel&0xFF0000)>>16, (iPixel&0xFF00)>>8, (iPixel&0xFF) );
-	case 32: return djColor( (iPixel&0xFF0000)>>16, (iPixel&0xFF00)>>8, (iPixel&0xFF) );
+	case 32: return djColor( (iPixel&0xFF0000)>>16, (iPixel&0xFF00)>>8, (iPixel&0xFF),
+		(iPixel&0xFF000000)>>24);
 	}
+	//dj2018-01 case 32 didn't seem to return the alpha, am adding it now, hopefully won't cause side effects anywhere
+	
 	return djColor(0,0,0);
 }
 

@@ -14,6 +14,7 @@ License: GNU GPL Version 2
 #ifndef _MISSION_H_
 #define _MISSION_H_
 /*--------------------------------------------------------------------------*/
+#include "config.h"
 #include "mixins.h"
 #include "djtypes.h"
 #include "djimage.h"
@@ -137,6 +138,9 @@ public:
 	int          m_iID;
 
 	djImage *m_pImage;
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+	djImage *m_pImageShadow;
+#endif
 	char * m_szImgFilename;
 
 	int          GetID() { return m_iID; }

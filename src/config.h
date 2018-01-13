@@ -15,6 +15,10 @@
 //! Height of a basic game 'block'/'sprite' in pixels
 #define BLOCKH (16)
 
+//! dj2018-01 Experimental auto drop shadows in sprites
+#define EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#define EXPERIMENTAL_MAP_AUTO_DROPSHADOWS
+
 //! [dj2017-08] Experimental
 #define LARGE_VIEWPORT_TEST
 #ifdef LARGE_VIEWPORT_TEST
