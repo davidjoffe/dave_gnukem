@@ -302,7 +302,7 @@ CBox::CBox()
 	m_eLayer = LAYER_BOTTOM;
 	m_bFalls = true;
 	SetActionBounds(0, 0, 15, 15);
-	SetShootBounds(0, 0, 15, 15);
+	SetShootBounds(4, 0, 12, 15);
 	m_bShootable = true;
 }
 
@@ -849,7 +849,7 @@ CCamera::CCamera()
 {
 	m_bShootable = true;
 	SetActionBounds(0, 0, 15, 15);
-	SetShootBounds(0, 0, 15, 15);
+	SetShootBounds(7, 0, 8, 15);//dj2018-01-12 (To fix "the banana problem",) make shoot bounds 'thin vertical line' so that the visual effect of rendering bullet 'one last frame' that collided with us, shows us visually with that bullet impacting near the center, looks a bit odd otherwise
 	c_nNumCameras++;
 }
 
@@ -882,7 +882,7 @@ CBanana::CBanana()
 	m_bFalls = true;
 	m_bShootable = true;
 	SetActionBounds(0, 0, 15, 15);
-	SetShootBounds(0, 0, 15, 15);
+	SetShootBounds(7, 0, 8, 15);//dj2018-01-12 (To fix "the banana problem",) make shoot bounds 'thin vertical line' so that the visual effect of rendering bullet 'one last frame' that collided with us, shows us visually with that bullet impacting near the center, looks a bit odd otherwise
 }
 
 void CBanana::Draw()
@@ -921,7 +921,7 @@ CSoda::CSoda()
 	m_nShotHeight = -1;
 	m_nAnim = 0;
 	m_bShootable = true;
-	SetShootBounds(0,0,15,15);
+	SetShootBounds(7, 0, 8, 15);//dj2018-01-12 (To fix "the banana problem",) make shoot bounds 'thin vertical line' so that the visual effect of rendering bullet 'one last frame' that collided with us, shows us visually with that bullet impacting near the center, looks a bit odd otherwise
 }
 
 void CSoda::Draw()

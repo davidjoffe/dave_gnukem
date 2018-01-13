@@ -161,6 +161,7 @@ string g_sGameMessage;
 int g_nGameMessageCount = -1;
 
 vector<CBullet*> g_apBullets;
+vector<CBullet*> g_apBulletsDeleted;//This is perhaps slightly kludgy but the purpose of this is to draw bullets 'one last frame' just as/after they've been destroyed when they collide with something - looks better visually I think - dj2018-01-12/13 (see livestream of same date) ... in theory these could even 'look different' later but that's very low prio
 
 // Return number of bullets in bullet system that were fired by hero
 int CountHeroBullets()
@@ -522,84 +523,6 @@ void UpdateBullets()
 	CBullet* pBullet=NULL;
 
 
-	/*
-	// Check for bullet collisions with things (e.g. shootable boxes, monsters etc).
-	// Also we check for monster bullet collisions against hero.
-	CThing* pThing=NULL;
-	for ( int i=0; i<(int)g_apBullets.size(); ++i )
-	{
-		pBullet = g_apBullets[i];
-		if (pBullet->eType==CBullet::BULLET_HERO)
-		{
-			for ( int j=0; j<(int)g_apThings.size(); ++j )
-			{
-				pThing = g_apThings[j];
-				if (pThing->IsShootable())
-				{
-					//fixmeHIGH this + 8 makes NO SENSE to me what the hell is
-					// it doing here!?!? [dj2018-01]
-					int x1 = pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
-					if (pThing->OverlapsShootArea(
-						x1,
-						pBullet->y,
-						x1 + 7,//fixmeHIGH this makes no sense shoudl be + 15?? Shoudl be, BULLET_WIDTH?
-							   // Why the F is it 7? It's possible the sprite used to be smaller, or perhaps
-							   // it has something to do  with that + 8 above...
-						pBullet->y+BULLET_HEIGHT-1))
-					{
-						int nRet = pThing->OnHeroShot();
-						if (nRet==THING_DIE)
-						{
-							delete pThing;
-							g_apThings.erase(g_apThings.begin() + j);
-							j--;
-						}
-						else if (nRet==THING_REMOVE)
-						{
-							g_apThings.erase(g_apThings.begin() + j);
-							j--;
-						}
-
-						// delete bullet i
-						delete g_apBullets[i];
-						g_apBullets.erase(g_apBullets.begin() + i);
-						i--;
-						goto NextBullet1;
-					}
-				}
-			} // j
-		}
-		else if (pBullet->eType==CBullet::BULLET_MONSTER)
-		{
-			// Check if monster bullet overlaps with hero
-			if (OVERLAPS(
-				x*16+x_small*8,
-				y*16-16,
-				(x*16+x_small*8) + 15,
-				(y*16-16) + 31,
-				pBullet->x,
-				pBullet->y,
-				pBullet->x+15,
-				pBullet->y+15))
-			{
-				delete g_apBullets[i];
-				g_apBullets.erase(g_apBullets.begin() + i);
-				i--;
-				if (!HeroIsHurting())
-				{
-					update_health(-1);
-					HeroSetHurting();
-				}
-			}
-		}
-
-	NextBullet1:
-		;
-
-	}
-	*/
-
-
 
 	for ( int i=0; i<(int)g_apBullets.size(); ++i )//I think we must use signed here because we do --i in the loop
 	{
@@ -672,7 +595,7 @@ void UpdateBullets()
 
 							// delete bullet i
 							bBulletDeleted=true;
-							delete g_apBullets[i];
+							g_apBulletsDeleted.push_back(pBullet);//delete g_apBullets[i];
 							g_apBullets.erase(g_apBullets.begin() + i);
 							i--;
 							goto NextBullet1b;
@@ -694,7 +617,7 @@ void UpdateBullets()
 					pBullet->y+15))
 				{
 					bBulletDeleted=true;
-					delete g_apBullets[i];
+					g_apBulletsDeleted.push_back(pBullet);//delete g_apBullets[i];
 					g_apBullets.erase(g_apBullets.begin() + i);
 					i--;
 					if (!HeroIsHurting())
@@ -744,6 +667,7 @@ void UpdateBullets()
 						g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
 					));
 				}
+				g_apBulletsDeleted.push_back(pBullet);
 				g_apBullets.erase(g_apBullets.begin() + i);
 				--i;
 				break;//NB, break out of the 'n' loop now as bullet is dangling
@@ -1761,6 +1685,20 @@ void GameHeartBeat()
 	// Redraw the screen according to the current game state
 	GameDrawView();
 
+	//static int nnn=0;
+	//if (++nnn>100)
+	//{
+	//nnn=0;
+	// Clear the to-be-deleted bullets that have just hit something (after
+	// drawing them one last time) [dj2018-01-13]
+	for ( int i=0; i<g_apBulletsDeleted.size(); ++i )
+	{
+		delete g_apBulletsDeleted[i];
+	}
+	g_apBulletsDeleted.clear();
+	//}
+
+
 
 	if ( nHurtCounter > 0 )
 		nHurtCounter--;
@@ -2291,6 +2229,17 @@ void DrawDebugInfo()
 	{
 		pThing = g_apThings[i];
 
+		// Draw 'shoot bounds' if applicable (grey?)
+		djgSetColorFore(pVisView,djColor(128,128,128));
+		if (pThing->IsShootable() && pThing->IsInView())
+		{
+			djgDrawRectangle( pVisView,
+				CALC_XOFFSET(pThing->m_x) + pThing->m_iShootX1 + pThing->m_xoffset,
+				CALC_YOFFSET(pThing->m_y) + pThing->m_iShootY1 + pThing->m_yoffset,
+				(pThing->m_iShootX2 - pThing->m_iShootX1)+1,
+				(pThing->m_iShootY2 - pThing->m_iShootY1)+1 );
+		}
+
 		// Draw "visible" bounds (red)
 		// "Visible" box (red)
 		djgSetColorFore(pVisView,djColor(255,0,0));
@@ -2365,9 +2314,18 @@ void DrawDebugInfo()
 void DrawBullets()
 {
 	unsigned int i;
+	CBullet* pBullet=NULL;
+	for ( i=0; i<g_apBulletsDeleted.size(); ++i )
+	{
+		pBullet = g_apBulletsDeleted[i];
+		if (OVERLAPS_VIEW(pBullet->x, pBullet->y, pBullet->x+BULLET_WIDTH, pBullet->y+BULLET_HEIGHT))
+		{
+			pBullet->Draw();
+		}
+	}
 	for ( i=0; i<g_apBullets.size(); ++i )
 	{
-		CBullet *pBullet = g_apBullets[i];
+		pBullet = g_apBullets[i];
 		if (OVERLAPS_VIEW(pBullet->x, pBullet->y, pBullet->x+BULLET_WIDTH, pBullet->y+BULLET_HEIGHT))
 		{
 			pBullet->Draw();
