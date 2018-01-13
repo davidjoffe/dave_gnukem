@@ -19,20 +19,17 @@ CBullet::CBullet()
 	dx = 0;
 	dy = 0;
 	nAnim = 0;
-	bMovedOnce = false;
 	bDrawnOnce = false;
 	eType = BULLET_HERO;
 }
 
 void CBullet::Tick()
 {
-	if (bMovedOnce)
-	{
-		//x += dx;
-		//y += dy;
-		nAnim = (nAnim+1)%4;
-	}
-	bMovedOnce = true;
+	// NB, NOTE [dj2018-01] In theory the bullet move belongs in here,
+	// but it's no longer in here due to refactoring - see the new
+	// UpdateBullets() function. Could later try move things in here
+	// but not a priority.
+	nAnim = (nAnim+1)%4;
 }
 
 void CBullet::Draw()
