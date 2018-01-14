@@ -6,11 +6,15 @@ Copyright (C) 2002-2018 David Joffe
 License: GNU GPL Version 2
 */
 
+#include "config.h"
 #include "bullet.h"
 #include "djgraph.h"
 #include "graph.h"
 #include "mission.h"
 #include "thing.h"
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#include "graph.h"//DRAW_SPRITEA_SHADOW
+#endif
 
 CBullet::CBullet()
 {
@@ -39,6 +43,15 @@ void CBullet::Draw()
 	{
 		if (eType==BULLET_HERO)
 		{
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+			DRAW_SPRITEA_SHADOW(pVisView,
+				5,
+				nAnim,
+				1 + WORLDX2VIEW(x),
+				1 + WORLDY2VIEW(y)-4,
+				16,16
+			);
+#endif
 			djgDrawImageAlpha(pVisView,
 				g_pCurMission->GetSpriteData(5)->m_pImage,
 				/*bDrawnOnce ? */((nAnim)%16)*16,// : (dx<0 ? 4 : 5)*16,
