@@ -240,6 +240,9 @@ CSpikeBall::CSpikeBall()
 
 void CSpikeBall::Draw()
 {
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_nYOffset*2,16,16);
+#endif
 	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) + m_nYOffset*2);
 }
 
@@ -1353,6 +1356,9 @@ int CConveyor::Tick()
 
 void CConveyor::Draw()
 {
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y),16,16);
+#endif
 	DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 
