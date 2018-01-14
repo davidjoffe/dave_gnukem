@@ -172,8 +172,8 @@ Recent:
 
 ## Features
 
-* Game taking forever to complete
 * Now with less crashes
+* Game taking forever to complete, like Duke Nukem Forever
 * Shootable bananas
 * Integrated level editor
 * Subliminal messages
@@ -190,7 +190,13 @@ Recent:
 * Nostalgic references to technology nobody uses anymore
 * Red balloons
 * Arcane command-line parameters nobody will use
-* Blistering 18 frames per second
+* Overweight hero to represent rise in obesity rates since original 1991 release
+* A surprisingly bearable 18 frames per second
+* Detects and corrects wrongthink
+* Bugs older than your children
+* Floors
+* Walls
+* Doors
 * Much much more!
 
 # Developer Info / Build Info
