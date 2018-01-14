@@ -597,7 +597,7 @@ void CHighVoltage::Initialize(int a, int b)
 		++m_nHeight;
 	}
 	SetVisibleBounds(0,0,BLOCKW-1,BLOCKH*m_nHeight-1);
-	SetShootBounds  (0,0,BLOCKW-1,BLOCKH*m_nHeight-1);
+	SetShootBounds  (6,0,BLOCKW-7,BLOCKH*m_nHeight-1);//[dj2018-01] Thin shootbounds, in middle, for new bullet code, so it looks like bullets hit around center
 	SetActionBounds (0,0,BLOCKW-1,BLOCKH*m_nHeight-1);
 }
 void CHighVoltage::Draw()
@@ -627,13 +627,22 @@ int CHighVoltage::OnHeroShot()
 	if (--m_nStrength<=0)
 	{
 		// Actually we want to start death *animation* here [TODO]
+		int nNumSoundsGenerated = 0;
 		for ( int i=0; i<m_nHeight; ++i )
 		{
 			// These effects are a little unspectacular
 			// This is very crude death animation, TODO, something fancier/nicer etc.
+			// Note only the first one or two should generate sound, I think
 			if ( (i%2)==0 )
 			{
-				AddThing(CreateExplosion(m_x*BLOCKW,(m_y+i)*BLOCKH));
+				AddThing(CreateExplosion(m_x*BLOCKW,(m_y+i)*BLOCKH,0,nNumSoundsGenerated++>1?-1:0));
+			}
+			else
+			{
+				AddThing(CreateExplosion(m_x*BLOCKW  ,(m_y+i)*BLOCKH - 7,1,nNumSoundsGenerated++>1?-1:1));
+				AddThing(CreateExplosion(m_x*BLOCKW  ,(m_y+i)*BLOCKH + 7,1,nNumSoundsGenerated++>1?-1:1));
+				AddThing(CreateExplosion(m_x*BLOCKW-6,(m_y+i)*BLOCKH    ,1,nNumSoundsGenerated++>1?-1:1));
+				AddThing(CreateExplosion(m_x*BLOCKW+6,(m_y+i)*BLOCKH    ,1,nNumSoundsGenerated++>1?-1:1));
 			}
 		}
 		djSoundPlay( g_iSounds[SOUND_EXPLODE] );
