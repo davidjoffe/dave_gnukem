@@ -30,7 +30,6 @@ public:
 	int y; // World (pixel) Y coordinate
 	int dx;
 	int dy;
-	bool bMovedOnce;
 	bool bDrawnOnce;
 	int nAnim;
 	EType eType;
