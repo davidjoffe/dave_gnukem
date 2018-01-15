@@ -34,7 +34,7 @@ extern std::string djStrPrintf( const char* szFormat, ... );
 // Some quick n dirty file/path helpers [dj2017-08]
 
 extern void djAppendPathS(std::string& sPath,const char* szAppend);
-extern void djAppendPath(const char* szPath,const char* szAppend);
+extern void djAppendPath(char* szPath,const char* szAppend);
 extern bool djFileExists(const char* szPath);
 
 #endif
