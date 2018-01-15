@@ -124,7 +124,7 @@ std::string djStrPrintf( const char* szFormat, ... )
 
 // Append a folder to existing path, 'intelligently' handling
 // the trailing slash worries for us.
-void djAppendPath(char* szPath,char* szAppend)
+void djAppendPath(char* szPath,const char* szAppend)
 {
 	if (szPath==NULL)return;
 	if (szAppend==NULL||szAppend[0]==0)return;
