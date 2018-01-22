@@ -89,6 +89,7 @@ static void DrawSprites ();
 static void DrawGrid( int x, int y, int w, int h, int nx, int ny, const djColor& clr );
 static void DrawLevelGrid();
 static void DrawLevelname();
+void ShowSettings();
 static void DrawMinimap();
 static void ShowInstructions();
 static void DrawSpritesel ();
@@ -110,6 +111,7 @@ void SetLevel( int x, int y, int a, int b, bool bforeground );
 
 // New flickering stuff, more ugly globals dj2018-01
 bool g_bFlashingIndicatorTimer=false;
+bool g_bFlashingIndicatorEnabled=true;//User option to turn off flashing stuff
 //a,b spriteset,spritenumber of the sprite the mouse is floating over, if any
 unsigned char g_aMouseHighlighted = 0;
 unsigned char g_bMouseHighlighted = 0;
@@ -455,7 +457,7 @@ void DoAllLevelsOverview()
 		unsigned long delay = 80;
 		SDL_Delay( delay );
 
-		g_bFlashingIndicatorTimer = (((int)(djTimeGetTime()*2.0f) % 2)==0);
+		g_bFlashingIndicatorTimer = g_bFlashingIndicatorEnabled && (((int)(djTimeGetTime()*2.0f) % 2)==0);
 
 		if (g_iKeys[DJKEY_HOME])
 			nPage = 0;
@@ -854,6 +856,11 @@ switch_e LVLED_MainLoop ()
 		{
 			return SWITCH_SPRED;
 		}
+		if (g_iKeys[DJKEY_F3])
+		{
+			g_bFlashingIndicatorEnabled = !g_bFlashingIndicatorEnabled;
+			SDL_Delay(200);//HORRIBLE Ugly hack because i'm too lazy to detect keypress edges properly[dj2018-01] [to prevent toggling every frame rapidly effectively - give a bit of time to key-up]
+		}
 		if (djiKeyPressed(DJKEY_X))
 		{
 			bLevelFore = !bLevelFore;
@@ -1089,7 +1096,7 @@ void RedrawView ()
 	// Slightly cheap n kludgy way of determining flickering on/off
 	// (use time of day in seconds, %2, so every second second we're on, and every other
 	// second we're off (but use a multiplying factor to speed that up) [dj2018-01-22]
-	g_bFlashingIndicatorTimer = (((int)(djTimeGetTime()*2.0f) % 2)==0);
+	g_bFlashingIndicatorTimer = g_bFlashingIndicatorEnabled && (((int)(djTimeGetTime()*2.0f) % 2)==0);
 
 	ED_ClearScreen();
 	ShowInstructions();
@@ -1103,6 +1110,7 @@ void RedrawView ()
 	DrawSpritesel();
 	DrawMinimap();
 	DrawLevelname();
+	ShowSettings();
 	ShowMacros();
 	//ED_FlipBuffers ();
 }
@@ -1184,6 +1192,15 @@ void DrawLevelname()
 		"                           " );*/
 	ED_DrawString( 0, POS_LEVELVIEW_Y + 16 * levelview_h + 8,
 		sLevelName.c_str() );
+}
+void ShowSettings()
+{
+	char szBuf[4096]={0};
+	sprintf(szBuf, "Selected Sprite Indicators: %s", g_bFlashingIndicatorEnabled ? "ON" : "OFF");
+	// Clear background
+	djgSetColorFore(pVisMain, djColor(0,0,80));//blue
+	djgDrawBox(pVisMain, 0, POS_LEVELVIEW_Y + 16 * levelview_h + 8 + 8, pVisMain->width/2, 8);
+	ED_DrawString( 0, POS_LEVELVIEW_Y + 16 * levelview_h + 8 + 8, szBuf );
 }
 
 void DrawMinimapRectangle()

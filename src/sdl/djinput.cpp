@@ -22,10 +22,17 @@ int g_iKeysLast[DJKEY_MAX] = { 0 };
 SdjKeyMapping key_pairs[] =
 {
 	{ DJKEY_F1,        SDLK_F1 },
+	{ DJKEY_F2,        SDLK_F2 },
+	{ DJKEY_F3,        SDLK_F3 },
 	{ DJKEY_F4,        SDLK_F4 },
 	{ DJKEY_F5,        SDLK_F5 },
 	{ DJKEY_F6,        SDLK_F6 },
 	{ DJKEY_F7,        SDLK_F7 },
+	{ DJKEY_F8,        SDLK_F8 },
+	{ DJKEY_F9,        SDLK_F9 },
+	{ DJKEY_F10,       SDLK_F10 },
+	{ DJKEY_F11,       SDLK_F11 },
+	{ DJKEY_F12,       SDLK_F12 },
 	{ DJKEY_SPACE,     SDLK_SPACE },
 	{ DJKEY_ENTER,     SDLK_RETURN },
 	{ DJKEY_ESC,       SDLK_ESCAPE },
