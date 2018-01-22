@@ -81,6 +81,35 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 *Any resemblance to actual persons or entities is purely coincidental*
 
+## Features
+
+* Now with less crashes
+* Game taking forever to complete, like Duke Nukem Forever
+* Shootable bananas
+* Integrated level editor
+* Subliminal messages
+* Puns
+* Evil SuperTux
+* SystemD integration
+* Big rockets
+* Software doesn't spy on you
+* Cutting edge lighting effects you'd expect from 1990
+* Family friendly
+* Teleporters
+* Fans that blow you ;)
+* Something that sort of resembles a cannon on wheels
+* Nostalgic references to technology nobody uses anymore
+* Red balloons
+* Arcane command-line parameters nobody will use
+* Overweight hero to represent rise in obesity rates since original 1991 release
+* A surprisingly bearable 18 frames per second
+* Detects and corrects wrongthink
+* Bugs older than your children
+* Floors
+* Walls
+* Doors
+* Much much more!
+
 # Ports
 
 * Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi)
@@ -174,35 +203,6 @@ Recent:
 * Take the 2008-08-06 v0.56a EMH release from SourceForge, create github project https://github.com/davidjoffe/dave_gnukem
 * Fixed 'tiny game window'
 * Fix some Linux compile issues, make a few other fixes/improvements (streamed on LiveCoding), call it v0.6 ('un-abandoning' project - DJ)
-
-## Features
-
-* Now with less crashes
-* Game taking forever to complete, like Duke Nukem Forever
-* Shootable bananas
-* Integrated level editor
-* Subliminal messages
-* Puns
-* Evil SuperTux
-* SystemD integration
-* Big rockets
-* Software doesn't spy on you
-* Cutting edge lighting effects you'd expect from 1990
-* Family friendly
-* Teleporters
-* Fans that blow you ;)
-* Something that sort of resembles a cannon on wheels
-* Nostalgic references to technology nobody uses anymore
-* Red balloons
-* Arcane command-line parameters nobody will use
-* Overweight hero to represent rise in obesity rates since original 1991 release
-* A surprisingly bearable 18 frames per second
-* Detects and corrects wrongthink
-* Bugs older than your children
-* Floors
-* Walls
-* Doors
-* Much much more!
 
 # Developer Info / Build Info
 
