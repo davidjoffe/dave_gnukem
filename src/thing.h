@@ -951,17 +951,16 @@ protected:
 \class CBlock
 \nosubgrouping
 
-[EXPERIMENT - CANCELLED - BUT MIGHT USE LATER! dj2017-08]
-Just draws a normal sprite, but let's us specify things like layer (so we can put things in front of the level)
+Generic sprite/block/object etc.
+Basically just draws a normal sprite, but let's us specify things like layer in the sprite metadata (so we can put things that draw in front of the hero)
 */
-/*class CBlock : public CThing
+class CBlock : public CThing
 {
 public:
 	CBlock();
 	virtual void Draw();
 	virtual void Initialize(int a, int b);
 };
-*/
 /*-----------------------------------------------------------*/
 /*!
 \class CDust

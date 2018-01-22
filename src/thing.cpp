@@ -122,7 +122,7 @@ REGISTER_THING(CFan,           TYPE_FAN, NULL);
 REGISTER_THING(CFirepower,     TYPE_FIREPOWER, NULL);
 REGISTER_THING(CDust,          TYPE_DUST, NULL);
 REGISTER_THING(CWater,         TYPE_WATER, NULL);
-//REGISTER_THING(CBlock,         TYPE_BLOCK, NULL);
+REGISTER_THING(CBlock,         TYPE_BLOCK, NULL);
 
 /*-----------------------------------------------------------*/
 CThing::CThing()
@@ -1914,7 +1914,6 @@ void CWater::Initialize(int a, int b)
 	SetActionBounds (0,0,BLOCKW-1,BLOCKH-1);
 }
 /*-----------------------------------------------------------*/
-/*
 CBlock::CBlock()
 {
 }
@@ -1939,7 +1938,6 @@ void CBlock::Initialize(int a, int b)
 	EdjLayer eLayer = (EdjLayer)(GET_SPRITE_EXTRA_METADATA(a,b,0));
 	SetLayer(eLayer);
 }
-*/
 /*-----------------------------------------------------------*/
 // Create helpers
 /*-----------------------------------------------------------*/
