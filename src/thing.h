@@ -953,6 +953,7 @@ protected:
 
 Generic sprite/block/object etc.
 Basically just draws a normal sprite, but let's us specify things like layer in the sprite metadata (so we can put things that draw in front of the hero)
+[dj2018-01] I don't like the name block - implies things must be blocky or blocks, which isn't true, maybe 'CGenericSprite' rather or something like that?
 */
 class CBlock : public CThing
 {
