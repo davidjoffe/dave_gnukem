@@ -14,7 +14,7 @@ License: GNU GPL Version 2
 enum EBlockType
 {
 	TYPE_NOTHING = 0,
-	TYPE_1,//TYPE_BLOCK,
+	TYPE_BLOCK,//[dj2018-01-22]
 	TYPE_2,
 	//! 03 Solid, but can come up from underneath
 	TYPE_SOFTSOLID,

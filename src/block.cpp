@@ -10,7 +10,7 @@ License: GNU GPL Version 2
 const char * block_type_names[TYPE_LASTONE+1] =
 {
    " 0 Nothing",
-   " 1 ",
+   " 1 Generic sprite/block",
    " 2 ",
    " 3 Softsolid",
    " 4 ",
