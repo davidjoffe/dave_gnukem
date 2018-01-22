@@ -20,7 +20,9 @@ Please donate to the project, or else I'll make more games like this: https://pa
 
 ![Dave Gnukem Screenshot](http://scorpioncity.com/dave_gnukem/gallery/Dave%20Gnukem%200.90%20%2813%20Jan%202018%29.png "Dave Gnukem Screenshot")
 
-Created by: David Joffe http://djoffe.com/ / https://www.liveedu.tv/david_joffe/
+### Who is to blame for this?
+
+Created by: David Joffe http://djoffe.com/ / https://www.liveedu.tv/david_joffe/ / https://minds.com/David_Joffe
 
 The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: [T.O.G](http://www.nuke24.net/ "T.O.G."), [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
@@ -34,7 +36,8 @@ Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by A
 
 You can watch development on this project being live-streamed at:
 
-* https://www.liveedu.tv/david_joffe/l98yv-dave-gnukem-side-scrolling-shooter/ (full development video archive here)
+* https://www.liveedu.tv/david_joffe/
+ * https://www.liveedu.tv/david_joffe/l98yv-dave-gnukem-side-scrolling-shooter/ (full development video archive here)
  * https://www.livecoding.tv/david_joffe/videos/wae18-dave-gnukem-c-game-side-scrolling-shooter and 
  * https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrolling-shooter-3 etc.
 * https://www.twitch.tv/david_joffe/
@@ -86,6 +89,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+* [22 Jan 2018] Level editor highlights instances of selected sprite (yellow), and sprite selection mouse-over sprite (cyan)
 * [13 Jan 2018] New slightly experimental map auto-shadows and sprite auto-drop-shadows
 * [13 Jan 2018] New shortcut keys Shift+F8/F9: Toggle map and sprite auto-shadows on/off, respectively
 * Overhauled shooting/bullets code

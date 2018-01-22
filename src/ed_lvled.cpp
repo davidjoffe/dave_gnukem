@@ -108,12 +108,60 @@ void SetLevel( int x, int y, int a, int b, bool bforeground );
 //void level_show_instructions();
 // </Unrefined>
 
+// New flickering stuff, more ugly globals dj2018-01
+bool g_bFlashingIndicatorTimer=false;
+//a,b spriteset,spritenumber of the sprite the mouse is floating over, if any
+unsigned char g_aMouseHighlighted = 0;
+unsigned char g_bMouseHighlighted = 0;
+
 #define LEVEL_GRIDSIZE (2)
 
 #define DRAW_LEVEL_PIXEL(x, y) \
 {\
-	djgSetColorFore( pVisMain, ED_GetSpriteColor( *(level_pointer( 0, (x), (y) ) + 2) , *(level_pointer( 0, (x), (y) ) + 3) ) );\
+	unsigned char a = *(level_pointer( 0, (x), (y) ) + 2);\
+	unsigned char b = *(level_pointer( 0, (x), (y) ) + 3);\
+	unsigned char fa = *(level_pointer( 0, (x), (y) ) + 0);\
+	unsigned char fb = *(level_pointer( 0, (x), (y) ) + 1);\
+	djgSetColorFore( pVisMain, ED_GetSpriteColor(  a, b ) );\
 	djgDrawBox( pVisMain, (x)*LEVEL_GRIDSIZE, (y)*LEVEL_GRIDSIZE, LEVEL_GRIDSIZE, LEVEL_GRIDSIZE );\
+	if ( g_bFlashingIndicatorTimer  &&  (sprite0a | sprite0b)!=0  &&\
+	( ( a==sprite0a&&b==sprite0b) || (fa==sprite0a && fb==sprite0b) )\
+	)\
+	{\
+		djgSetColorFore( pVisMain, djColor(255,255,0,150) );\
+		djgDrawBox( pVisMain, (x)*LEVEL_GRIDSIZE, (y)*LEVEL_GRIDSIZE, 1, 1);\
+	}\
+	if ( g_bFlashingIndicatorTimer  &&  (g_aMouseHighlighted | g_bMouseHighlighted)!=0  &&\
+	( (a==g_aMouseHighlighted&&b==g_bMouseHighlighted) || (fa==g_aMouseHighlighted&&fb==g_bMouseHighlighted) )\
+	)\
+	{\
+		djgSetColorFore( pVisMain, djColor(0,255,255,180) );\
+		djgDrawBox( pVisMain, 1+(x)*LEVEL_GRIDSIZE, (y)*LEVEL_GRIDSIZE, 1, 1);\
+	}\
+}
+//[dj2018-01] Currently only used by the level overview stuff
+#define DRAW_LEVEL_PIXEL2(nLevel, x, y,xOffset,yOffset) \
+{\
+	unsigned char a = *(level_pointer( (nLevel), (x), (y) ) + 2);\
+	unsigned char b = *(level_pointer( (nLevel), (x), (y) ) + 3);\
+	unsigned char fa = *(level_pointer( (nLevel), (x), (y) ) + 0);\
+	unsigned char fb = *(level_pointer( (nLevel), (x), (y) ) + 1);\
+	djgSetColorFore( pVisMain, ED_GetSpriteColor(  a, b ) );\
+	djgDrawBox( pVisMain, (xOffset)+(x)*LEVEL_GRIDSIZE, (yOffset)+(y)*LEVEL_GRIDSIZE, LEVEL_GRIDSIZE, LEVEL_GRIDSIZE );\
+	if ( g_bFlashingIndicatorTimer  &&  (sprite0a | sprite0b)!=0  &&\
+	( ( a==sprite0a&&b==sprite0b) || (fa==sprite0a && fb==sprite0b) )\
+	)\
+	{\
+		djgSetColorFore( pVisMain, djColor(255,255,0,150) );\
+		djgDrawBox( pVisMain, (xOffset)+(x)*LEVEL_GRIDSIZE, (yOffset)+(y)*LEVEL_GRIDSIZE, 1, 1);\
+	}\
+	if ( g_bFlashingIndicatorTimer  &&  (g_aMouseHighlighted | g_bMouseHighlighted)!=0  &&\
+	( (a==g_aMouseHighlighted&&b==g_bMouseHighlighted) || (fa==g_aMouseHighlighted&&fb==g_bMouseHighlighted) )\
+	)\
+	{\
+		djgSetColorFore( pVisMain, djColor(0,255,255,180) );\
+		djgDrawBox( pVisMain, (xOffset)+1+(x)*LEVEL_GRIDSIZE, (yOffset)+(y)*LEVEL_GRIDSIZE, 1, 1);\
+	}\
 }
 
 
@@ -407,6 +455,8 @@ void DoAllLevelsOverview()
 		unsigned long delay = 80;
 		SDL_Delay( delay );
 
+		g_bFlashingIndicatorTimer = (((int)(djTimeGetTime()*2.0f) % 2)==0);
+
 		if (g_iKeys[DJKEY_HOME])
 			nPage = 0;
 		if (g_iKeys[DJKEY_END])
@@ -441,8 +491,7 @@ void DoAllLevelsOverview()
 				{
 					for ( int x=0; x<LEVEL_WIDTH; ++x )
 					{
-						djgSetColorFore( pVisMain, ED_GetSpriteColor( *(level_pointer( 0, (x), (y) ) + 2) , *(level_pointer( iLev, (x), (y) ) + 3) ) );
-						djgDrawBox( pVisMain, x*PIXELSIZE, y*PIXELSIZE + nLevelDispY, PIXELSIZE, PIXELSIZE );
+						DRAW_LEVEL_PIXEL2(iLev,x,y,0,nLevelDispY);
 					}
 				}
 
@@ -921,20 +970,26 @@ bool HandleMouse ()
 	int ax=0, ay=0;
 
 	// sprites area
+	g_aMouseHighlighted = 0;
+	g_bMouseHighlighted = 0;
 	if (INBOUNDS( mouse_x, mouse_y,
 		POS_LEVELSPRITES_X, POS_LEVELSPRITES_Y,
 		POS_LEVELSPRITES_X + 16 * 16 - 1,
 		POS_LEVELSPRITES_Y + 16 * 8 - 1 ))
 	{
+		//a,b spriteset,spritenumber that mouse is floating over
 		ax = (mouse_x - POS_LEVELSPRITES_X) / 16;
 		ay = (mouse_y - POS_LEVELSPRITES_Y) / 16;
+		g_aMouseHighlighted = ED_GetCurrSpriteSet();
+		g_bMouseHighlighted = ay * 16 + ax;
 		if (mouse_b & 1)
-			SetSpriteSelection( ED_GetCurrSpriteSet(), ay * 16 + ax, sprite1a, sprite1b );
+			SetSpriteSelection( g_aMouseHighlighted, g_bMouseHighlighted, sprite1a, sprite1b );
 		else if (mouse_b & 2)
-			SetSpriteSelection( sprite0a, sprite0b, ED_GetCurrSpriteSet(), ay * 16 + ax );
+			SetSpriteSelection( sprite0a, sprite0b, g_aMouseHighlighted, g_bMouseHighlighted );
 
 		// Rectangle around sprite under mouse
-		djgSetColorFore( pVisMain, djColor(127,127,127) );
+		//djgSetColorFore( pVisMain, djColor(127,127,127) );
+		djgSetColorFore( pVisMain, djColor(0,255,255,150) );//[dj2018-01]cyan to match mouse-over sprite flicker stuff
 		djgDrawRectangle( pVisMain,
 			POS_LEVELSPRITES_X + ax*16 - 1,
 			POS_LEVELSPRITES_Y + ay*16 - 1,
@@ -1031,6 +1086,11 @@ static void MoveMinimap( int ox, int oy )
 
 void RedrawView ()
 {
+	// Slightly cheap n kludgy way of determining flickering on/off
+	// (use time of day in seconds, %2, so every second second we're on, and every other
+	// second we're off (but use a multiplying factor to speed that up) [dj2018-01-22]
+	g_bFlashingIndicatorTimer = (((int)(djTimeGetTime()*2.0f) % 2)==0);
+
 	ED_ClearScreen();
 	ShowInstructions();
 	if (bLevelFore)
@@ -1094,10 +1154,9 @@ void DrawGrid( int x, int y, int w, int h, int nx, int ny, const djColor& clr )
 
 void DrawLevelGrid()
 {
-	int y, x;
-	for ( y=0; y<LEVEL_HEIGHT; y++ )
+	for ( int y=0; y<LEVEL_HEIGHT; ++y )
 	{
-		for ( x=0; x<LEVEL_WIDTH; x++ )
+		for ( int x=0; x<LEVEL_WIDTH; ++x )
 		{
 			DRAW_LEVEL_PIXEL(x, y);
 		}
@@ -1145,12 +1204,16 @@ void DrawMinimap()
 	// Draw the purple rectangle indicating where your zoomed view is
 	DrawMinimapRectangle();
 	// Draw the zoomed view
+	bool bHighlightBack = false;//Must be drawn after the foreground block's drawn, that's why we use this flag
+	bool bHighlightBackMouseOver = false;//Must be drawn after the foreground block's drawn, that's why we use this flag
 	for ( i=0; i<levelview_h; i++ )
 	{
 		for ( j=0; j<levelview_w; j++ )
 		{
 			a = *(level_pointer( 0, levelview_x + j, levelview_y + i) + 2);
 			b = *(level_pointer( 0, levelview_x + j, levelview_y + i) + 3);
+			bHighlightBack = false;//dj2018-01 Flickering display to highlight selected sprite
+			bHighlightBackMouseOver = false;//dj2018-01 Flickering display to highlight mouse-over sprite
 			// Draw a black block if ShowBack is disabled
 			if (!bShowBack)
 			{
@@ -1162,15 +1225,64 @@ void DrawMinimap()
 				ED_DrawSprite( POS_LEVELVIEW_X + j * 16,
 					POS_LEVELVIEW_Y + i * 16,
 					a, b );
+				if ( ((a) || (b)) )
+				{
+					if (a==sprite0a && b==sprite0b)
+						bHighlightBack = true;
+					
+					if ((g_aMouseHighlighted | g_bMouseHighlighted) != 0 &&
+						(a == g_aMouseHighlighted&&b == g_bMouseHighlighted))
+						bHighlightBackMouseOver = true;
+				}
+
 			}
 			if (bLevelFore)
 			{
 				a = *(level_pointer( 0, levelview_x + j, levelview_y + i) + 0);
 				b = *(level_pointer( 0, levelview_x + j, levelview_y + i) + 1);
 				if ((a) || (b))
+				{
 					ED_DrawSprite( POS_LEVELVIEW_X + j * 16,
 					POS_LEVELVIEW_Y + i * 16,
 					a, b );
+					if (g_bFlashingIndicatorTimer)
+					{
+						const int nCROSSHAIRSIZE=8;
+						if (a==sprite0a && b==sprite0b)
+						{
+							djgSetColorFore( pVisMain, djColor(0,0,0,200) );//black
+							djgDrawBox( pVisMain, -1+POS_LEVELVIEW_X + j*16, -2+POS_LEVELVIEW_Y + i*16   ,18,4);
+							djgDrawBox( pVisMain, -1+POS_LEVELVIEW_X + j*16,    POS_LEVELVIEW_Y + i*16+12,18,4);
+							djgSetColorFore( pVisMain, djColor(255,255,0,200) );//yellow
+							djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*16, -2+POS_LEVELVIEW_Y + i*16 +1,16,2);
+							djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*16,    POS_LEVELVIEW_Y + i*16+13,16,2);
+						}
+
+						if ( (g_aMouseHighlighted | g_bMouseHighlighted)!=0  &&
+							(a==g_aMouseHighlighted&&b==g_bMouseHighlighted))
+						{
+							const int nCROSSHAIROFFSET=4;
+							djgSetColorFore( pVisMain, djColor(0,255,255,200) );//cyan
+							djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*16,nCROSSHAIRSIZE,1);
+							djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*16,1,nCROSSHAIRSIZE);
+						}
+					}
+				}
+			}//bLevelFore
+			const int nCROSSHAIRSIZE=5;
+			if (g_bFlashingIndicatorTimer && bHighlightBack)
+			{
+				const int nCROSSHAIROFFSET=0;
+				djgSetColorFore( pVisMain, djColor(255,255,0,150) );//yellow
+				djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*16,nCROSSHAIRSIZE,1);
+				djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*16,1,nCROSSHAIRSIZE);
+			}
+			if (g_bFlashingIndicatorTimer && bHighlightBackMouseOver)
+			{
+				const int nCROSSHAIROFFSET=8;
+				djgSetColorFore( pVisMain, djColor(0,255,255,200) );//cyan
+				djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*16,nCROSSHAIRSIZE,1);
+				djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*16,1,nCROSSHAIRSIZE);
 			}
 		}
 	}
