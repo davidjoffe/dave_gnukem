@@ -1296,6 +1296,12 @@ int game_startup(bool bLoadGame)
 						{
 							g_bSpriteDropShadows = !g_bSpriteDropShadows;
 						}
+						//else if (Event.key.keysym.sym==SDLK_F10)
+						//{
+							//SDL_SaveBMP(pVisView->pSurface, "c:\\dj\\DelmeTestView.bmp");
+							//SDL_SaveBMP(pVisBack->pSurface, "c:\\dj\\DelmeTestBack.bmp");
+							//SDL_SaveBMP(pVisMain->pSurface, "c:\\dj\\DelmeTestMain.bmp");
+						//}
 
 						}
 					}
@@ -1574,6 +1580,13 @@ int game_startup(bool bLoadGame)
 		// update
 		float fT1 = djTimeGetTime();
 		GameHeartBeat();
+		
+		//static int nFrameCounter=0;
+		//char szFilename[4096]={0};
+		//sprintf(szFilename,"c:\\dj\\rectest\\dave_gnukem_%08d.bmp",nFrameCounter);
+		//SDL_SaveBMP(pVisMain->pSurface, szFilename);//"c:\\dj\\DelmeTestMain.bmp");
+		//nFrameCounter++;
+
 		float fT2 = djTimeGetTime();
 		afTimeTaken.push_back((fT2 - fT1)*1000.0f);
 		if (afTimeTaken.size()>MAX_DEBUGGRAPH)
