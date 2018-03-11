@@ -290,6 +290,9 @@
     <ClInclude Include="..\thing_monsters.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\documentation\doxygen\doxygen.cfg">
@@ -377,6 +380,15 @@
       <Filter>Data</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\HISTORY.txt" />
-    <CustomBuild Include="..\..\TODO.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="vcDave.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="application_icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
