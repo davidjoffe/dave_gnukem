@@ -23,6 +23,7 @@
 
 #include <time.h>
 #include "sys_defs.h"
+#include "djstring.h"//djAppendPathStr [should move elsewhere?? dj2018-03]
 
 #ifdef WIN32
 //#include <windows.h>//OutputDebugString
@@ -60,7 +61,9 @@ void InitLog ()
 
 	num_logs = 0;
 
-	sys_log = CreateLog ( "DaveGnukem.log", "System" );
+	std::string sPath = djAppendPathStr(djGetFolderUserSettings().c_str(), "logs");
+	sPath = djAppendPathStr(sPath.c_str(), "DaveGnukem.log");
+	sys_log = CreateLog ( sPath.c_str(), "System" );
 }
 
 
@@ -231,7 +234,7 @@ void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 
 
 
-void PushBackup2 ( const char *filename, int bklevel )
+/*void PushBackup2 ( const char *filename, int bklevel )
 {
 	char		oldname[SYS_MAX_FILE]={0};
 	char		newname[SYS_MAX_FILE]={0};
@@ -261,7 +264,7 @@ void PushBackup2 ( const char *filename, int bklevel )
 			fclose ( ff );
 		bklevel++;
 	}
-}
+}*/
 
 
 

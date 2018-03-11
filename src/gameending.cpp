@@ -18,8 +18,8 @@ License: GNU GPL Version 2
 
 void ShowEndGameSequence()
 {
-	unsigned int FW=8;
-	unsigned int FH=8;
+	unsigned int FW=8;//fontwidth
+	unsigned int FH=8;//fontheight
 	std::string sALPHABET=
 		" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}";
 	djImage* pImgFont = NULL;

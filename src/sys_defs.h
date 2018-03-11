@@ -47,9 +47,9 @@ extern "C"
 
 
 
-#define SYS_MAX_FULL_PATH	1024	// Don't forget these are with
-#define SYS_MAX_PATH		128	// terminating zeroes. So the real
-#define SYS_MAX_FILE		32	// length is (SYS_MAX_* -1)
+#define SYS_MAX_FULL_PATH	4096	// Don't forget these are with
+#define SYS_MAX_PATH		1024	// terminating zeroes. So the real
+#define SYS_MAX_FILE		256	// length is (SYS_MAX_* -1)
 #define SYS_MAX_EXT		5
 
 

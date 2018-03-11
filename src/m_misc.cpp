@@ -435,7 +435,7 @@ char* M_GetFileRootAlloc ( const char* filename )
 
 
 
-char* M_GetFileExtensionAlloc ( const char* filename )
+/*char* M_GetFileExtensionAlloc ( const char* filename )
 {
 	char	*ext;
 	const char	*ptr = strrchr ( filename, '.' );
@@ -450,7 +450,7 @@ char* M_GetFileExtensionAlloc ( const char* filename )
 		*ext = '\0';
 
 	return ext;
-}
+}*/
 
 
 /*
