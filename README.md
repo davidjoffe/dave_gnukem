@@ -118,6 +118,9 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+2018/03/11 - Version 0.91
+
+* [11 Mar 2018] Create a Windows installer
 * [22 Jan 2018] Add 'easter egg' [arin_j stream viewer suggestion]
 * [22 Jan 2018] Level editor highlights instances of selected sprite (yellow), and sprite selection mouse-over sprite (cyan) (F3 toggles this ON/OFF if/when it gets annoying)
 * [13 Jan 2018] New slightly experimental map auto-shadows and sprite auto-drop-shadows
