@@ -16,10 +16,12 @@ License: GNU GPL Version 2
 #include <stdarg.h>//va_list etc. [for djStrPrintf dj2016-10]
 #ifdef WIN32
 #include <Windows.h>//GetFileAttributes [for djFileExists]
+#include "Shlobj.h"//SHCreateDirectoryEx
 #else
 #include <sys/types.h>//stat [for djFileExists]
 #include <sys/stat.h>
 #include <unistd.h>
+#include <errno.h>//mkpath
 #endif
 
 char *djStrDeepCopy( const char * src )
@@ -158,8 +160,21 @@ void djAppendPathS(std::string& sPath,const char* szAppend)
 	//strcat(szPath,szAppend);
 	sPath += szAppend;
 }
+std::string djAppendPathStr(const char* szBase,const char* szAppend)
+{
+	std::string sPath = szBase;
+	djAppendPathS(sPath,szAppend);
+	return sPath;
+}
 
 #ifdef WIN32
+
+bool djFolderExists(const char* szPath)
+{
+	DWORD dwAttrib = GetFileAttributes(szPath);
+	return (dwAttrib != INVALID_FILE_ATTRIBUTES && 
+		(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+}
 
 bool djFileExists(const char* szPath)
 {
@@ -169,9 +184,18 @@ bool djFileExists(const char* szPath)
 	return true;
 }
 
+bool djEnsureFolderTreeExists(const char* szPath)
+{
+	if (djFolderExists(szPath))return true;
+	// "Returns ERROR_SUCCESS if successful"
+	if (::SHCreateDirectoryEx(NULL,szPath,NULL)==ERROR_SUCCESS)
+		return true;
+	return false;
+}
+
 #else
 //#ifdef __APPLE__
-/*bool djFolderExists(const char* szPath)
+bool djFolderExists(const char* szPath)
 {
 	struct stat sb;
 	if (stat(szPath, &sb) == 0 && S_ISDIR(sb.st_mode))
@@ -179,7 +203,7 @@ bool djFileExists(const char* szPath)
 		return true;
 	}
 	return false;
-}*/
+}
 bool djFileExists(const char* szPath)
 {
 	struct stat sb;
@@ -189,6 +213,87 @@ bool djFileExists(const char* szPath)
 	}
 	return false;
 }
+
+//[dj2018-03]https://stackoverflow.com/questions/675039/how-can-i-create-directory-tree-in-c-linux
+typedef struct stat Stat;
+static int do_mkdir(const char *path, mode_t mode)
+{
+	Stat            st;
+	int             status = 0;
+
+	if (stat(path, &st) != 0)
+	{
+		/* Directory does not exist. EEXIST for race condition */
+		if (mkdir(path, mode) != 0 && errno != EEXIST)
+			status = -1;
+	}
+	else if (!S_ISDIR(st.st_mode))
+	{
+		errno = ENOTDIR;
+		status = -1;
+	}
+
+	return(status);
+}
+/**
+** mkpath - ensure all directories in path exist
+** Algorithm takes the pessimistic view and works top-down to ensure
+** each directory in path exists, rather than optimistically creating
+** the last element and working backwards.
+*/
+int mkpath(const char *path, mode_t mode)
+{
+	char           *pp;
+	char           *sp;
+	int             status;
+	char           *copypath = strdup(path);
+
+	status = 0;
+	pp = copypath;
+	while (status == 0 && (sp = strchr(pp, '/')) != 0)
+	{
+		if (sp != pp)
+		{
+			/* Neither root nor double slash in path */
+			*sp = '\0';
+			status = do_mkdir(copypath, mode);
+			*sp = '/';
+		}
+		pp = sp + 1;
+	}
+	if (status == 0)
+		status = do_mkdir(path, mode);
+	free(copypath);
+	return (status);
+}
+bool djEnsureFolderTreeExists(const char* szPath)
+{
+	printf("djEnsureFolderTreeExists(%s)\n",szPath);fflush(NULL);
+	if (djFolderExists(szPath))return true;
+	printf("2");
+	mkpath(szPath, 0777);
+	//mkdir(szPath, 0777);
+	printf("(Exists?=%s)\n",djFolderExists(szPath)?"YES":"NO");fflush(NULL);
+	return djFolderExists(szPath);
+	//return mkpath(szPath);
+}
 //#else
 
 #endif
+
+std::string djGetFolderUserSettings()
+{
+#ifdef WIN32
+	std::string s = getenv("APPDATA");
+	djAppendPathS(s, "DaveGnukem");
+#else
+	std::string s = getenv("HOME");
+	djAppendPathS(s, ".gnukem");//?
+#endif
+	
+	//dj2018-03 If it somehow to create/use the 'desired' datafolder, then perhaps fall back on current folder again as default, as it used to be? not sure - think about.
+	//if (!djFolderExists(s.c_str()))
+		//s.clear();
+
+	return s;
+}

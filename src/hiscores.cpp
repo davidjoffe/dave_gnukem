@@ -8,6 +8,7 @@ License: GNU GPL Version 2
 
 #include <stdio.h>
 #include <string.h>
+#include "djstring.h"
 
 #include "mmgr/nommgr.h"
 #include <vector>
@@ -93,7 +94,8 @@ bool LoadHighScores(const char *szFilename)
 {
 	g_aScores.clear();
 
-	FILE *pIn = fopen(szFilename, "r");
+	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), szFilename);
+	FILE *pIn = fopen(s.c_str(), "r");
 	if (pIn==NULL)
 	{
 		djMSG("LoadHighScores: Failed to open file (%s): Creating default list\n", szFilename);
@@ -133,7 +135,8 @@ bool LoadHighScores(const char *szFilename)
 
 bool SaveHighScores(const char *szFilename)
 {
-	FILE *pOut = fopen(szFilename, "w");
+	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), szFilename);
+	FILE *pOut = fopen(s.c_str(), "w");
 	if (pOut==NULL)
 	{
 		djMSG("SaveHighScores(%s): Failed to create file\n", szFilename);

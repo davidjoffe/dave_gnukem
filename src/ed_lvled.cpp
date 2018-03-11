@@ -488,7 +488,7 @@ void DoAllLevelsOverview()
 				int nLevelDispY = i*(LEVEL_HEIGHT+1)*PIXELSIZE;
 
 				// Draw 'mini view' of the level
-				unsigned char* pLevel = apLevels[iLev];
+				//unsigned char* pLevel = apLevels[iLev];
 				for ( int y=0; y<LEVEL_HEIGHT; ++y )
 				{
 					for ( int x=0; x<LEVEL_WIDTH; ++x )

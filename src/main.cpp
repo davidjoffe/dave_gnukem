@@ -162,6 +162,14 @@ int main ( int argc, char** argv )
 
 int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::string >& Parameters)
 {
+	// Note the order of things in here can be very important, eg InitLog saves stuff under userdatafolder, so that must be created first
+
+	// Create user data folder (if doesn't exist) [dj2018-03]
+	djEnsureFolderTreeExists(djGetFolderUserSettings().c_str());
+
+	djEnsureFolderTreeExists(
+		djAppendPathStr(djGetFolderUserSettings().c_str(), "logs").c_str()
+	);
 	InitLog ();
 
 #ifdef __APPLE__
@@ -216,7 +224,9 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 	Log ( "\n================[ Starting Application Init ]===============\n" );
 
-	g_Settings.Load(CONFIG_FILE);	// Load saved settings
+	g_Settings.Load(
+		djAppendPathStr(djGetFolderUserSettings().c_str(), CONFIG_FILE).c_str()
+		);	// Load saved settings
 	// We need to first check the setting is *actually there*, not just call e.g. FindSettingInt(), otherwise
 	// if volume setting has never been set/saved before, it will return a value of 0 which will set the volume to 0.
 	// We need to distinguish between 'never been set', and 'actually set to 0'. [dj2016-10]
@@ -334,7 +344,9 @@ void DaveCleanup()
 	djTimeDone();			// Timer stuff
 	Log ( "djTimeDone() ok\n" );
 
-	g_Settings.Save(CONFIG_FILE);	// Save settings
+	g_Settings.Save(
+		djAppendPathStr(djGetFolderUserSettings().c_str(), CONFIG_FILE).c_str()
+	);	// Save settings
 	Log ( "g_Settings.Save(CONFIG_FILE) ok\n" );
 
 	Log ( "================[ Application Kill Complete ]===============\n\n" );
@@ -358,7 +370,7 @@ void DoMainMenu()
 		if (g_pImgMain)
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
 		char sz[100]={0};
-		sprintf(sz,"%s","v0.90 (13 Jan 2018)");
+		sprintf(sz,"%s","v0.91 (11 Mar 2018)");
 		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8*2, (unsigned char*)sz);
 		sprintf(sz,"%s","djoffe.com");
 		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8, (unsigned char*)sz);

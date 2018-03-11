@@ -56,7 +56,7 @@ void M_FixFilename ( char *filename );
 // this set allocates space for storage: YOU are responsible for freeing it!
 char* M_GetFilePathAlloc ( const char* filename );
 char* M_GetFileRootAlloc ( const char* filename );
-char* M_GetFileExtensionAlloc ( const char* filename );
+//char* M_GetFileExtensionAlloc ( const char* filename );
 char* M_GetFirstPathDirAlloc ( char *filename );
 
 void M_SuggestFileExtension ( char* filename, const char* extension );
