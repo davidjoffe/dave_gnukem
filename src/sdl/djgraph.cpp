@@ -602,10 +602,16 @@ bool djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 		pImage->Height(),
 		32,
 		pImage->Pitch(),
+		// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
+		#if SDL_BYTEORDER==SDL_BIG_ENDIAN
+		0xFF000000, 0X00FF0000, 0x0000FF00, 0x000000FF
+		#else
 		0xFF0000,
 		0xFF00,
 		0xFF,
-		0xFF000000);
+		0xFF000000
+		#endif
+	);
 	g_SurfaceMap[ pImage ] = pSurfaceFoo;
 
 	return true;
