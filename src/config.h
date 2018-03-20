@@ -3,6 +3,11 @@
 #define _CONFIG_H_
 /*--------------------------------------------------------------------------*/
 
+#ifdef WIN32
+//! [dj2018-03] Enable this if you want the application to still support Windows XP. Off by default. See comments at the fix for https://github.com/davidjoffe/dave_gnukem/issues/98 - we end up with an overly large game window on if DPI scaling is set, but the SetProcessDPIAware() APIs to fix this are only supported on later versions of Windows.
+//#define djWINXP_SUPPORT
+#endif
+
 // These should be dynamic, to allow any size level. I initially made
 // restrictions because of the memory limitations in the DOS world.
 #define LEVEL_WIDTH  128

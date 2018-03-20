@@ -44,6 +44,14 @@ License: GNU GPL Version 2
 #include <mach-o/dyld.h>//_NSGetExecutablePath
 #include <sys/stat.h>//For djFolderExists stuff
 #endif
+#ifndef djWINXP_SUPPORT
+#ifdef WIN32
+// [dj2018-03] For DPI scaling overly-large-Window issue https://github.com/davidjoffe/dave_gnukem/issues/98
+//#include <ShellScalingApi.h>//<'Newer' 'more correct' way rather than SetProcessDPIAware() but only Win8.1 or higher supported so commenting that out for
+//#pragma comment (lib,"Shcore.lib")//<'Newer' 'more correct' way rather than SetProcessDPIAware()
+#include <Windows.h>//SetProcessDPIAware();
+#endif
+#endif
 
 #include <SDL_mixer.h>//For background music stuff
 
@@ -171,6 +179,21 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		djAppendPathStr(djGetFolderUserSettings().c_str(), "logs").c_str()
 	);
 	InitLog ();
+
+#ifndef djWINXP_SUPPORT
+#ifdef WIN32
+	// [dj2018-03] This is to fix https://github.com/davidjoffe/dave_gnukem/issues/98 .. note we effectively ignore DPI scaling,
+	// which is probably OK in our situation as by default we automatically our scaling our Window to the largest size that fits in the display that is a multiple of 320x200.
+	// Fix: Application window is being scaled with DPI scaling setting, and doesn't fit on screen by default, it's too large
+	//::SetProcessDpiAwareness(PROCESS_SYSTEM_DPI_AWARE);// Note we don't a manifest; this seems to work at the moment. "The DPI awareness for an application should be set through the application manifest so that it is determined before any actions are taken which depend on the DPI of the system. Alternatively, you can set the DPI awareness using SetProcessDpiAwareness, but if you do so, you need to make sure to set it before taking any actions dependent on the system DPI. Once you set the DPI awareness for a process, it cannot be changed."
+	// NB: Unfortunately it looks like SetProcessDPIAware(); is only Vista or later,
+	// the more correct newer way SetProcessDpiAwareness() is Win8.1 or later (doesn't build on VS2010)
+	// so it looks like we miiight have to leave XP behind for correct behaviour on a system with DPI scaling set? :/
+	// There will [esp going forward] probably be more users with overly-large DPI-scaled Windows, than XP users, so if it's one or the other, we might have
+	// to leave XP behind rather. Would be interesting though if ReactOS, or WINE etc. support are negatively affected. I'm guessing not.
+	::SetProcessDPIAware();//<- Note this apparently 'may cause race conditions' under some conditions - if we encounter that, then we may have to put this as a manifest setting instead.
+#endif
+#endif
 
 #ifdef __APPLE__
 	// Basically what we want to do here is:
