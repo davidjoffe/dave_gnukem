@@ -731,7 +731,11 @@ int CKey::HeroOverlaps()
 	// Try to add self to hero's inventory. If succeeded, remove from main list.
 	if (InvAdd(this))
 	{
-		update_score(1000, m_x, m_y);
+		//dj2018-03 Use the sprite metadata score for the key's pickup score value
+		int nScoreDiff = GET_EXTRA(m_a, m_b, EXTRA_SCOREHI) * 100 + GET_EXTRA(m_a, m_b, EXTRA_SCORELO);
+		if (nScoreDiff<0) nScoreDiff = 0;
+		if (nScoreDiff>0)
+			update_score(nScoreDiff, m_x, m_y);
 		djSoundPlay( g_iSounds[SOUND_KEY_PICKUP] );
 		return THING_REMOVE;
 	}
