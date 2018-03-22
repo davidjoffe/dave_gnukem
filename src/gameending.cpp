@@ -43,14 +43,14 @@ void ShowEndGameSequence()
 	//asText.push_back("012345678901234567890123456789012345678901234567890123456789");
 	//fixme THIS NEEDS to be a bit nicer
 	asText.push_back("Well done, you've reached the end");
-	asText.push_back("of the game.");
+	asText.push_back("of the game!");
 	asText.push_back("");
-	asText.push_back("Unfortunately, Dr Proetton escaped!");
+	asText.push_back("Unfortunately, Dr Proetton escaped.");
 	asText.push_back("");
-	asText.push_back("To be continued in 'version 2'?");
-	asText.push_back("");
-	asText.push_back("[Need better game ending text/graphics");
-	asText.push_back("etc. here.]");
+	asText.push_back("To be continued ... ?");
+	//asText.push_back("");
+	//asText.push_back("[Need better game ending text/graphics");
+	//asText.push_back("etc. here.]");
 	asText.push_back("");
 	asText.push_back("");
 
