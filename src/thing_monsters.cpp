@@ -1141,7 +1141,10 @@ int CJumpingMonster::OnKilled()
 CDrProton* CDrProton::g_pGameEnding=NULL;//This is a little weird
 CDrProton::CDrProton() :
 	m_bEscaping(false),
-	m_nOrigX(-1)
+	//m_nOrigX(-1),
+	m_nDesiredXRandomVariation(0),
+	m_nDesiredYRandomVariation(0),
+	m_bActivated(false)
 {
 }
 CDrProton::~CDrProton()
@@ -1150,8 +1153,8 @@ CDrProton::~CDrProton()
 }
 int CDrProton::Tick()
 {
-	if (m_nOrigX<0)
-		m_nOrigX = m_x;
+	//if (m_nOrigX<0)
+		//m_nOrigX = m_x;
 	if (m_bEscaping)
 	{
 		// FLY AWAY! Dr Proton escapes, so we can put him a 'version 2' [dj2017-08]
@@ -1170,30 +1173,62 @@ int CDrProton::Tick()
 			//return THING_DIE;
 		}
 	}
-	else if (IsInView())
+	else if (IsInView() || m_bActivated)
 	{
-		if (ABS(m_nOrigX - m_x) < 3)
+		m_bActivated = true;//<- First time in view, 'activate', then don't stop following
+		// otherwise he stops following you as he goes out of view, which makes it a bit easy maybe?
+		// Not sure - again, this may need tweaking; also careful placement in level. [dj2018-03]
+
+		if ((rand()%36)<2)
 		{
-			if (m_x<x)
+			m_nDesiredXRandomVariation = ((rand()%5)-2)*2;//[-4,-2,0,2,4]
+		}
+		//if (ABS(m_nOrigX - m_x) < 3)
+		{
+			if (m_x<(x+m_nDesiredXRandomVariation))
 			{
-				++m_xoffset;
+				bool bSolid = false;
+				bSolid |= check_solid(m_x+1,m_y-1);//headblock [top right block is 'basically' empty]
+				bSolid |= check_solid(m_x+2,m_y  );
+				//bSolid |= check_solid(m_x+2,m_y-1);
+				if (m_yoffset<0)bSolid |= check_solid(m_x+2,m_y-1);
+				if (m_yoffset>0)bSolid |= check_solid(m_x+2,m_y+1);
+				if (!bSolid)//! (check_solid(m_x+2,m_y) || check_solid(m_x+2,m_y-1) || check_solid(m_x+1,m_y-2)) )
+					++m_xoffset;
 			}
-			else if (m_x >= x+1)
+			else if (m_x >= (x+m_nDesiredXRandomVariation)+1)
 			{
-				--m_xoffset;
+				bool bSolid = false;
+				bSolid |= check_solid(m_x  ,m_y-1);//headblock [top left block is 'basically' empty]
+				bSolid |= check_solid(m_x-1,m_y  );
+				//bSolid |= check_solid(m_x+2,m_y-1);
+				if (m_yoffset<0)bSolid |= check_solid(m_x-1,m_y-1);
+				if (m_yoffset>0)bSolid |= check_solid(m_x-1,m_y+1);
+				if (!bSolid)//! (check_solid(m_x-1,m_y) || check_solid(m_x-1,m_y-1) || check_solid(m_x-1,m_y-2)) )
+					--m_xoffset;
 			}
 			// THIS IS IMPORTANT:
 			NORMALIZEX;
 		}
 
-
-		if (m_y<y - 2)
+		// We generally aim to level with hero y, but try add some random variation
+		// for a couple of reasons, 1, so it's not boringly predictable/simple, and
+		// 2, to help navitage past blockages effectively sometimes. [dj2018-03] ..
+		// it also means hero can't as easily 'sit still' at the 'right' y to avoid being shot.
+		// this we can maybe make more complex later, may be too simple still ..
+		if ((rand()%18)<3)
 		{
-			++m_yoffset;
+			m_nDesiredYRandomVariation = ((rand()%6)-2);//[-2,-1,0,1,2,3]
 		}
-		else if (m_y > y + 1)
+		if (m_y<(y+m_nDesiredYRandomVariation) - 2)
 		{
-			--m_yoffset;
+			if (! (check_solid(m_x,m_y+1) || check_solid(m_x+1,m_y+1)) )
+				++m_yoffset;
+		}
+		else if (m_y > (y+m_nDesiredYRandomVariation) + 1)
+		{
+			if (! (check_solid(m_x,m_y-2) || check_solid(m_x+1,m_y-2)) )
+				--m_yoffset;
 		}
 		NORMALIZEY;
 
@@ -1221,9 +1256,9 @@ int CDrProton::Tick()
 					{
 						const int nBULLETSPEEDX=10;
 						if (m_nXDir<0)//Facing left?
-							MonsterShoot(PIXELX-BLOCKW  , m_y*16, m_nXDir*nBULLETSPEEDX,0);
+							MonsterShoot(PIXELX-BLOCKW  , m_y*BLOCKH + m_yoffset - 4, m_nXDir*nBULLETSPEEDX,0);
 						else
-							MonsterShoot(PIXELX+BLOCKW*3, m_y*16, m_nXDir*nBULLETSPEEDX,0);
+							MonsterShoot(PIXELX+BLOCKW*2, m_y*BLOCKH + m_yoffset - 4, m_nXDir*nBULLETSPEEDX,0);
 						// FIXME PLAY SOUND HERE?
 						m_nNoShootCounter = 12;//<- Make this lower to increase difficulty
 					}
@@ -1241,13 +1276,24 @@ void CDrProton::Draw()
 	if (m_nFlickerCounter==0 || ((m_nFlickerCounter%2)==0))
 	{
 		const int a=m_a;//Spriteset number
-		const int b=(m_nXDir>0 ? ((anim4_count % 2)*3) : ((anim4_count % 2)*3) + 6);
+		const int b=(m_nXDir>0 ? 0 : 2);
 		int x = CALC_XOFFSET(m_x) + m_xoffset;
-		int y = CALC_YOFFSET(m_y-2) + m_yoffset;//Topleft, hence subtract from m_y
+		int y = CALC_YOFFSET(m_y-1) + m_yoffset;//Topleft, hence subtract from m_y
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+		DRAW_SPRITEA_SHADOW(pVisView, a, b, x+1,y+1,32,32);
+#endif
 		DRAW_SPRITEA(pVisView,
 			a   ,b,
 			x   ,y,
-			48  ,48);
+			32  ,32);
+		// Draw flickering flame?
+		if ((anim4_count % 2)==0)
+		{
+			DRAW_SPRITEA(pVisView,
+				a   ,(m_nXDir<0 ? 32+2 : 32),
+				x   ,y+32-1,
+				32  ,16);
+		}
 	}
 }
 void CDrProton::Initialize(int a, int b)
@@ -1256,10 +1302,9 @@ void CDrProton::Initialize(int a, int b)
 	m_bFalls = false;
 	m_nStrength = 15;//?fixmeLOW what should Dr Proton strength be
 	m_nNoShootCounter = 5;
-	// This might be slightly too big
-	SetVisibleBounds(0,-31,47,15);
-	SetActionBounds (0,-31,47,15);
-	SetShootBounds  (0,-31,47,15);
+	SetVisibleBounds(0,-15,31,15+8);//<-Slightly bigger because of flames at bottom
+	SetActionBounds (0,-15,31,15+8);
+	SetShootBounds  (0,-15,31,15);
 }
 int CDrProton::HeroOverlaps()
 {
