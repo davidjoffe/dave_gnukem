@@ -118,6 +118,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+* [22 Mar 2018] Boot sprite; Improve Dr Proetton (Dr Proton) sprite and behavior
 * [20 Mar 2018] Fix overly-large window if Windows DPI scaling settings are enabled (unfortunately the fix breaks Windows XP support - but you can enable djWINXP_SUPPORT in config.h if you want to generate a build that supports Windows XP)
 
 2018/03/11 - Version 0.91
@@ -330,6 +331,7 @@ This wasn't a retro game when I started on it (~1994ish), but it's taken so long
 
 # Additional Credits
 
+* 2018-03-22 Add boots sprite made by freepik.com, 7from flaticon.com, license Creative Commons BY 3.0
 * 2017-08-04 Add font data/fonts/simple_6x8.tga by http://www.zingot.com/ from https://opengameart.org/content/bitmap-font-pack License https://creativecommons.org/licenses/by/3.0/ (small changes made to color, and convert from PNG to TGA)
 * 2016-10-30 data/sounds/soft_explode.wav From same Juhani Junkala collection as per below
 * 2016-10-30 data/sounds/key_pickup.wav http://opengameart.org/content/key-pickup author Vinrax, license 'CC BY 3.0' https://creativecommons.org/licenses/by/3.0/

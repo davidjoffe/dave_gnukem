@@ -203,7 +203,10 @@ public:
 
 protected:
 	int m_bEscaping;
-	int m_nOrigX;//Stay close to original X
+	//int m_nOrigX;//Stay close to original X
+	int m_nDesiredXRandomVariation;
+	int m_nDesiredYRandomVariation;
+	bool m_bActivated;	
 	static CDrProton* g_pGameEnding;
 };
 /*-----------------------------------------------------------*/
