@@ -91,8 +91,8 @@ struct SMenuItem mainMenuItems[] =
 	{ false, "[~~~~~~~~~~~~~~~~~]" },*/
 	{ false, "                   " },
 	{ true,  "   Start gnu game  " },
-	{ true,  "   Select Mission  " },
 	{ true,  "   Restore game    " },
+	{ true,  "   Select Mission  " },
 	{ true,  "   Ordering info   " },
 	{ true,  "    (not!)         " },
 	{ true,  "   Instructions    " },
@@ -417,10 +417,7 @@ void DoMainMenu()
 				Mix_FadeInMusic(pMusic, -1, 800);
 			break;
 		}
-		case 2: // select mission
-			SelectMission();
-			break;
-		case 3: // restore game [dj2016-10 adding implementation for this - it did nothing before]
+		case 2: // restore game [dj2016-10 adding implementation for this - it did nothing before]
 			{
 				int score = game_startup(true);
 				CheckHighScores( score );
@@ -428,6 +425,9 @@ void DoMainMenu()
 				if (pMusic!=NULL)
 					Mix_FadeInMusic(pMusic, -1, 800);
 			}
+			break;
+		case 3: // select mission
+			SelectMission();
 			break;
 		case 6: // instructions
 			ShowInstructions();
