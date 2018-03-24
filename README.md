@@ -113,6 +113,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 # Ports
 
 * Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi)
+* MorphOS [Mar 2018, by Bruno Peloille]: http://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_0.91.lha
 
 # History / Changes
 
