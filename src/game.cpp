@@ -1147,16 +1147,8 @@ int game_startup(bool bLoadGame)
 	TRACE("game_startup(): GameDrawView()\n");
 	// FIXME: Is this necessary?
 	GameDrawView();
-	// Draw inventory
-	InvDraw();
-	TRACE("game_startup(): DrawScore()\n");
-	DrawScore();
-	TRACE("game_startup(): DrawHealth()\n");
-	DrawHealth();
 
 	g_bGameRunning = true;
-
-	GameDrawFirepower();
 
 	//dj2016-10-28 Used if doing 'Restore Game' from *main* game menu. [This is perhaps slightly spaghetti-ish, it's done this way as LoadGame() has been originally
 	// written under the assumption of doing *in-game* loading of a savegame.
@@ -1164,6 +1156,14 @@ int game_startup(bool bLoadGame)
 	{
 		LoadGame();
 	}
+
+	// Draw inventory
+	InvDraw();
+	TRACE("game_startup(): DrawScore()\n");
+	DrawScore();
+	TRACE("game_startup(): DrawHealth()\n");
+	DrawHealth();
+	GameDrawFirepower();// This must come after LoadGame() else draws 'out of date' default firepower instead of value from loadgame [dj2018-03-25]
 
 	GraphFlip(!g_bBigViewportMode);
 
@@ -1384,6 +1384,7 @@ int game_startup(bool bLoadGame)
 			//if (g_iKeys[DJKEY_ALT])		key_shoot = 1;
 			//[dj2016-10 don't think it really makes sense to have P as jump - if anything, pause??[LOW]](g_iKeys[DJKEY_P])		key_jump = 1;
 			if (g_iKeys[DJKEY_ESC])		iEscape = 1;
+			// oh dear now can't get out of menu if do this ?? if (g_iKeys[DJKEY_F1])		iEscape = 1;//dj2018-03
 
 			if (g_bEnableDebugStuff)
 			{
@@ -1644,6 +1645,8 @@ int game_startup(bool bLoadGame)
 
 			RestartLevel(); // [dj2017-06-20] This replaces PerLevelSetup() call that was after LVLED_Kill(), not 100% sure but suspect this slightly more 'correct'
 		}
+		//fixme maybe add F1 check to show menu like in DN1? so ppl who play original
+		// can have that behaviour, even tho still don't bake 'F1' into gameskin. [dj2018-03]
 		// NB, not all platforms will have an F1 key. The original DN1 said on the screen
 		// 'press F1 for help' but we can't 'bake that in' to the images etc.
 		/*else if (g_iKeys[DJKEY_F1])
