@@ -250,6 +250,12 @@ int CRobot::Tick()
 						m_nNoShootCounter = 36;// fixme, should be time, not frame count
 					}
 				}
+				else
+				{
+					// If we don't do this, then we have slightly annoying situation where 
+					// *immediately* as you get to the same height you're shot, which feels 'unfair'.
+					m_nNoShootCounter = 8;//Make lower (or 0) to increase difficulty
+				}
 			}
 		}
 	}
@@ -313,7 +319,7 @@ int CFlyingRobot::HeroOverlaps()
 		
 		// We initiate dying if hero touches us
 		update_score(100, m_x, m_y);
-		AddThing(CreateExplosion(m_x*16, m_y*16));
+		AddThing(CreateExplosion(m_x*16+m_xoffset, m_y*16+m_yoffset));
 		m_nDieAnim = m_nDieAnimLength;
 	}
 	return 0;
@@ -323,7 +329,7 @@ int CFlyingRobot::OnKilled()
 	if (m_nDieAnim<0)//If we've 'just been killed' for the first time (um, as if we can be killed more than once)
 	{
 		update_score(100, m_x, m_y);
-		AddThing(CreateExplosion(m_x*16, m_y*16));
+		AddThing(CreateExplosion(m_x*16+m_xoffset, m_y*16+m_yoffset));
 		// Start the 'dying' animation 'countdown'
 		m_nDieAnim = m_nDieAnimLength;
 	}
@@ -376,7 +382,7 @@ int CFlyingRobot::Tick()
 			return THING_DIE;
 
 		// Sort of falls off to the left and downwards, off the screen
-		m_xoffset = -12 - (m_nDieAnimLength-m_nDieAnim)*4;
+		m_xoffset = -10 - (m_nDieAnimLength-m_nDieAnim)*4;
 		m_yoffset += (((m_nDieAnimLength-m_nDieAnim)*(m_nDieAnimLength-m_nDieAnim))/2);
 
 		return CThing::Tick();//Should this be CMonster::Tick()? CRobot::Tick()?
@@ -468,7 +474,7 @@ int CFlyingRobot::Tick()
 				// where you sorta jump up, and they immediately shoot when you as soon
 				// as you're at the same level (while jumping) .. this gives you a little
 				// chance.
-				m_nNoShootCounter = 6;//Make lower (or 0) to increase difficulty
+				m_nNoShootCounter = 10;//Make lower (or 0) to increase difficulty
 			}
 		}
 		else
@@ -487,6 +493,11 @@ void CFlyingRobot::Initialize(int a, int b)
 	CRobot::Initialize(a,b);
 	// This is a flying robot, so of course it doesn't fall
 	m_bFalls = false;
+	//dj2018-03-25 There is an issue where basically if flyingrobot behind barrel
+	// you can't even shoot it ... try mitigate/fix this ... not sure if this is
+	// quite the right way to go. I think in DN1 if we stood against a barrel(yellow nuke can) I
+	// think our bullets would go through/over it.
+	SetShootBounds  (-2,-3,17,18);
 }
 
 /*-----------------------------------------------------------*/

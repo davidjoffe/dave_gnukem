@@ -506,7 +506,7 @@ void CheckIfHeroShooting()
 
 			HeroShoot(
 				x * 16 /*+ (hero_dir==1 ? 16 : -16)*/ + x_small*8,
-				y * 16 - 2,
+				(y-1) * 16+11,
 				(hero_dir==0 ? -HERO_BULLET_SPEED : HERO_BULLET_SPEED)
 			);
 
@@ -2584,7 +2584,13 @@ bool CheckCollision(int x1, int y1, int x2, int y2, CBullet *pBullet)
 	int nX1 = x1 / 16;
 	int nY1 = y1 / 16;
 	int nX2 = x2 / 16;
+#ifdef tBUILD_GNUKEM1
+	//dj2018-03 Hacky - technically "wrong" but emulates DN1 behavior, and I quite like it because it squares the unfairness in some situations eg flyingrobot shoot over barrel cf 25 Mar 2018 issue. Basically in DN1 your monsters fly over solid single block in front of you like barrel(yellow can), but still hit boxes [which are same position/size etc.] ... so technically that aspect of the physics "doesn't make sense" but this setting nY2 to nY1 emulates the not-making-sense for solid-blocks (check_solid() function) but NOT for CThing's (which boxes are) - so boxes remain shootable, but we can 'shoot over' barrels :)
+	// This is um basically 'very Duke-Nukem-1-specific', probably, I think [dj2018-03] - if we ever make this more generic engine for other games, may want nY2 = y2 / 16; rather
+	int nY2 = nY1;
+#else
 	int nY2 = y2 / 16;
+#endif
 	for ( i=nX1; i<=nX2; i++ )
 	{
 		for ( j=nY1; j<=nY2; j++ )
