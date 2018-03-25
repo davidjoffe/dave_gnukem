@@ -464,7 +464,8 @@ int CFlyingRobot::Tick()
 			{
 				if ((rand()%50)<=2)
 				{
-					MonsterShoot(PIXELX + (m_nXDir*16), PIXELY, m_nXDir<0?-12:12);
+					//dj2018-03-25 Change initial startpos from m_nXDir*16 to *8, this fixes a bug where it can shoot us through solid walls if we're against the wall
+					MonsterShoot(PIXELX + (m_nXDir*(BLOCKW/2)), PIXELY, m_nXDir<0?-12:12);
 					m_nNoShootCounter = 24;// fixme, should be time, not frame count
 				}
 			}
