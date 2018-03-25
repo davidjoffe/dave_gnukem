@@ -42,6 +42,9 @@
 extern bool g_bLargeViewport;
 #endif
 
+//dj2018-03 Start making a (forward-looking) #define if we want to genericize this and make other games off it, then wrap 'very DN1-specific stuff' in a #define - for Dave Gnukem 1 it's always on
+#define tBUILD_GNUKEM1
+
 /*--------------------------------------------------------------------------*/
 #endif
 /*--------------------------------------------------------------------------*/
