@@ -119,6 +119,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+* [26 Mar 2018] Bugfixes and level improvements (also fixed a level bug where one of the levels was impossible to complete)
 * [22 Mar 2018] Boot sprite; Improve Dr Proetton (Dr Proton) sprite and behavior
 * [20 Mar 2018] Fix overly-large window if Windows DPI scaling settings are enabled (unfortunately the fix breaks Windows XP support - but you can enable djWINXP_SUPPORT in config.h if you want to generate a build that supports Windows XP)
 
