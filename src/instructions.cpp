@@ -144,7 +144,7 @@ void ShowInstructions()
 	asText.push_back("ESC: In-game menu: Save/Restore/Quit");
 	//asText.push_back("F4,F5: Sprite/Level editors");
 	//asText.push_back("Use the action key to open doors, activate lifts, teleporters, etc.");
-	asText.push_back("BONUSES:");
+	asText.push_back("SECRET BONUSES:");
 	asText.push_back("-Shoot all security cameras in level");
 	asText.push_back("-Collect letters G,N,U,K,E,M in order");
 
