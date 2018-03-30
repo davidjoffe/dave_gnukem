@@ -572,6 +572,8 @@ void DoAllLevelsOverview()
 				sprintf(buf,"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
+				sprintf(buf,"HIGHVOLTAGE: %-3d", aLevelStats[iLev].SpriteCounts[ std::make_pair(5, 31) ] );
+				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 			}
 
 
