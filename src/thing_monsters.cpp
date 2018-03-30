@@ -622,6 +622,11 @@ void CHighVoltage::Draw()
 		int b=m_b + ((i+anim4_count)%4)*16;//Sprite number within spriteset
 		int x = CALC_XOFFSET(m_x  );
 		int y = CALC_YOFFSET(m_y+i);
+
+#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+		DRAW_SPRITEA_SHADOW(pVisView,a,b,x-1,y,BLOCKW,BLOCKH);
+		DRAW_SPRITEA_SHADOW(pVisView,a,b,x+1,y,BLOCKW,BLOCKH);
+#endif
 		DRAW_SPRITE16A(pVisView,a,b,x,y);
 	}
 }
