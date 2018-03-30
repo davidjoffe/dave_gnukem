@@ -166,12 +166,38 @@ int g_nGameMessageCount = -1;
 vector<CBullet*> g_apBullets;
 vector<CBullet*> g_apBulletsDeleted;//This is perhaps slightly kludgy but the purpose of this is to draw bullets 'one last frame' just as/after they've been destroyed when they collide with something - looks better visually I think - dj2018-01-12/13 (see livestream of same date) ... in theory these could even 'look different' later but that's very low prio
 
+void DestroyBullets(vector<CBullet*>& apBullets)
+{
+	for ( unsigned int i=0; i<apBullets.size(); ++i )
+	{
+		delete apBullets[i];
+	}
+	apBullets.clear();
+}
+// Completely cleanup/destroy all active bullets (for level init/re-init/cleanup). [dj2018-03-31] Add this to fix bug: Bullets that you fire persist and keep going and shooting things in the loaded game if you fire bullets, then do a loadgame while they're in the air
+void DestroyAllBullets()
+{
+	DestroyBullets(g_apBullets);
+	DestroyBullets(g_apBulletsDeleted);
+}
+
+//dj2018-03-31
+void DestroyAllThings()
+{
+	for ( unsigned int i=0; i<(int)g_apThings.size(); i++ )
+	{
+		delete g_apThings[i];
+	}
+	g_apThings.clear();
+}
+
+
 // Return number of bullets in bullet system that were fired by hero
 int CountHeroBullets()
 {
 	unsigned int i;
 	int nCount = 0;
-	for ( i=0; i<g_apBullets.size(); i++ )
+	for ( i=0; i<g_apBullets.size(); ++i )
 	{
 		if (g_apBullets[i]->eType==CBullet::BULLET_HERO)
 			nCount++;
@@ -939,12 +965,8 @@ void PerLevelSetup()
 	relocate_hero( 20, 20 );
 	hero_dir = 1;
 
-	// clear list of "things"
-	for ( i=0; i<(int)g_apThings.size(); i++ )
-	{
-		delete g_apThings[i];
-	}
-	g_apThings.clear();
+	DestroyAllThings();// clear list of "things"
+	DestroyAllBullets();//Make sure no bullets, for good measure [dj2018-03]
 
 	// (2) Load the currently selected level
 	const char * szfilename = g_pCurMission->GetLevel( g_nLevel )->GetFilename( );
@@ -1106,6 +1128,10 @@ void PerGameCleanup()
 
 void PerLevelCleanup()
 {
+	//Not quite sure if correct place for this [dj2018-03]
+	DestroyAllThings();// clear list of "things"
+	DestroyAllBullets();//Make sure no bullets, for good measure [dj2018-03]
+
 	if (g_pGameMusic!=NULL)
 	{
 		Mix_FreeMusic(g_pGameMusic);
@@ -1871,20 +1897,9 @@ void GameHeartBeat()
 	// Redraw the screen according to the current game state
 	GameDrawView();
 
-	//static int nnn=0;
-	//if (++nnn>100)
-	//{
-	//nnn=0;
 	// Clear the to-be-deleted bullets that have just hit something (after
-	// drawing them one last time) [dj2018-01-13]
-	for ( int i=0; i<g_apBulletsDeleted.size(); ++i )
-	{
-		delete g_apBulletsDeleted[i];
-	}
-	g_apBulletsDeleted.clear();
-	//}
-
-
+	// drawing them one last time) [dj2018-01-13] [This is a 'kludge' for effective visual effect of drawing these one last frame after they've hit something]
+	DestroyBullets(g_apBulletsDeleted);
 
 	if ( nHurtCounter > 0 )
 		nHurtCounter--;
