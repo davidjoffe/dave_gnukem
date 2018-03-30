@@ -1055,7 +1055,8 @@ CAcme::CAcme() :
 	SetActionBounds (0,0,BLOCKW*2-1,BLOCKH-1);
 	SetVisibleBounds(0,0,BLOCKW*2-1,BLOCKH-1);
 	SetShootBounds  (0,0,BLOCKW*2-1,BLOCKH-1);
-	m_bShootable = true;
+	//[dj2018-03] It's very important we NOT be shootable until after we start falling, otherwise there's a bug where you can shoot the acme by shooting just above it along the floor it's attached to, from the side
+	m_bShootable = false;
 }
 
 int CAcme::HeroOverlaps()
@@ -1130,6 +1131,7 @@ int CAcme::Tick()
 		++m_nCounter;
 		if (m_nCounter>20)
 		{
+			m_bShootable = true;//dj2018-03-30 Fix bug that you could shoot this from the side [sort of above] by shooting over the top of the floor we're attached to - make shootable only once we're falling
 			++m_nState;
 			m_yoffset = 0;
 		}
@@ -1179,9 +1181,14 @@ void CAcme::CreateOnDestroyedEffects()
 
 int CAcme::OnHeroShot()
 {
-	update_score(500, m_x, m_y/*+m_yoffset*/);
-	CreateOnDestroyedEffects();
-	return THING_DIE;
+	//dj2018-03-30 This only becomes shootable once it starts falling (otherwise there's a bug where we can shoot it by shooting just along the top of the floor we're attached to)
+	if (m_bShootable)
+	{
+		update_score(500, m_x, m_y/*+m_yoffset*/);
+		CreateOnDestroyedEffects();
+		return THING_DIE;
+	}
+	return 0;
 }
 
 /*-----------------------------------------------------------*/
