@@ -673,7 +673,7 @@ public:
 \nosubgrouping
 
 Security camera. Turns to look at you. Can be shot.
-If you shoot all of them in a level, you get a bonus (fixme, not implemented)
+If you shoot all of them in a level, you get a bonus.
 */
 class CCamera : public CThing
 {
