@@ -9,6 +9,7 @@ License: GNU GPL Version 2
 */
 /*--------------------------------------------------------------------------*/
 
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -2710,7 +2711,8 @@ void HeroSetFirepower(int nFirepower)
 
 bool SaveGame()
 {
-	FILE *pOut = fopen("savegame.gnukem", "w");
+	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), FILE_SAVEGAME);
+	FILE *pOut = fopen(s.c_str(), "w");
 	if (pOut==NULL)
 		return false;
 
@@ -2734,7 +2736,8 @@ bool SaveGame()
 
 bool LoadGame()
 {
-	FILE *pIn = fopen("savegame.gnukem", "r");
+	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), FILE_SAVEGAME);
+	FILE *pIn = fopen(s.c_str(), "r");
 	if (pIn==NULL)
 		return false;
 	int nLevel=0, nScore=0, nFirepower=0, nHealth=0;
