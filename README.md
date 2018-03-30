@@ -70,6 +70,7 @@ Try find the exit, while dodging or shooting monsters.
 * Insert: Toggle sounds on/off
 * Shift+F6/F7: Dec/Inc speed (framerate)
 * Shift+F8/F9: Toggle map and sprite auto-shadows on/off, respectively
+* F10 Save screenshot
 
 To open doors, find the correct color key, and press the action key on the 'lock' nearby the door(s).
 
@@ -119,6 +120,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+* [30 Mar 2018] Add new F10 save screenshot function (saves on Windows under \Users\USERNAME\AppData\Roaming\DaveGnukem\screenshots and on Linux under $HOME/.gnukem/screenshots)
 * [26 Mar 2018] Bugfixes and level improvements (also fixed a level bug where one of the levels was impossible to complete)
 * [22 Mar 2018] Boot sprite; Improve Dr Proetton (Dr Proton) sprite and behavior
 * [20 Mar 2018] Fix overly-large window if Windows DPI scaling settings are enabled (unfortunately the fix breaks Windows XP support - but you can enable djWINXP_SUPPORT in config.h if you want to generate a build that supports Windows XP)
