@@ -157,8 +157,8 @@ int do_menu( CMenu *pMenu )
 
 
 
-	// We want to maintain 10 fps on menu cursor animations
-	const float fTimeFrame = (1.0f / 10.0f);
+	// [dj2018-03] Changing this from 10 to 30 for faster key response, but we must maintain ~10 fps on menu cursor animations, so we do some stuff at the cursor animation to compensate for htis.
+	const float fTimeFrame = (1.0f / 30.0f);
 
 	// Start out by being at next time
 	float fTimeNext = djTimeGetTime();
@@ -174,7 +174,7 @@ int do_menu( CMenu *pMenu )
 		// Sleep a little to not hog CPU to cap menu update (frame rate) at approx 10Hz
 		while (fTimeNow<fTimeNext)
 		{
-			SDL_Delay(5);
+			SDL_Delay(1);
 			fTimeNow = djTimeGetTime();
 		}
 
@@ -254,7 +254,12 @@ int do_menu( CMenu *pMenu )
 			// if want to e.g. increase menu frame rate in future to say 20Hz or whatever, then the cursor will
 			// animate two times too fast (say) .. if do that in future then must just make this update slightly
 			// 'smarter' on the animation - not a priority now at all. dj2016-10]
-			szCursor++;
+			static int nCursorAnimUpdateEvery=3;//<-dj2018-03-30 compensate to try keep cursor animation around ~10Hz
+			if (--nCursorAnimUpdateEvery<=0)
+			{
+				szCursor++;
+				nCursorAnimUpdateEvery = 3;
+			}
 			if (*szCursor == 0)
 				szCursor = pMenu->getMenuCursor ();
 
