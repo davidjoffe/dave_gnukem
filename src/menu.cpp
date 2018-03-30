@@ -189,12 +189,12 @@ int do_menu( CMenu *pMenu )
 			case SDL_KEYDOWN:
 
 				// 'Global' shortcut keys for adjusting volume [dj2016-10]
-				if (Event.key.keysym.sym==SDLK_PAGEUP)
+				if (Event.key.keysym.sym==SDLK_7)//SDLK_PAGEUP)
 				{
 					djSoundAdjustVolume(4);
 					SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
 				}
-				else if (Event.key.keysym.sym==SDLK_PAGEDOWN)
+				else if (Event.key.keysym.sym==SDLK_6)//SDLK_PAGEDOWN)
 				{
 					djSoundAdjustVolume(-4);
 					SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );

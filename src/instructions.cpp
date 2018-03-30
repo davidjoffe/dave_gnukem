@@ -342,7 +342,7 @@ void ShowInstructions()
 	asText.push_back(std::string("ACTION:") + szBuf + std::string(" Activate doors, lifts, etc."));
 
 	// Hrm, these may be platform specific, fixmeLOW:
-	asText.push_back("PGUP/DN: Volume   INS: Toggle sounds");
+	asText.push_back("6/7: Volume Dn/Up  INS: Toggle sounds");
 	asText.push_back("ESC: In-game menu: Save/Restore/Quit");
 	//asText.push_back("F4,F5: Sprite/Level editors");
 	//asText.push_back("Use the action key to open doors, activate lifts, teleporters, etc.");

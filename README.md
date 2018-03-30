@@ -66,7 +66,7 @@ Try find the exit, while dodging or shooting monsters.
 * Up Arrow: Action key (for e.g. opening doors, using teleporters or lifts, activating the exit, etc.)
 * Escape: In-game menu
 
-* PgUp/PgDn: Increase/decrease volume
+* 7/6: Increase/decrease volume
 * Insert: Toggle sounds on/off
 * Shift+F6/F7: Dec/Inc speed (framerate)
 * Shift+F8/F9: Toggle map and sprite auto-shadows on/off, respectively
@@ -120,6 +120,7 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+* [30 Mar 2018] Change volume control keys from PgUp/PgDn to 7/6 (as PgUp/PgDn conflict on some keyboards, e.g. Pandora, and also some laptops don't have 'actual' PgUp/PgDn etc.)
 * [30 Mar 2018] Add 'About' page to main menu
 * [30 Mar 2018] Add new F10 save screenshot function (saves on Windows under \Users\USERNAME\AppData\Roaming\DaveGnukem\screenshots and on Linux under $HOME/.gnukem/screenshots)
 * [26 Mar 2018] Bugfixes and level improvements (also fixed a level bug where one of the levels was impossible to complete)
@@ -195,7 +196,7 @@ Recent:
 2016/10/22 - Version 0.63 / 0.64 / 0.65
 
 * Add background music. So far, have only added music by Eric Matyas http://soundimage.org/
-* Add game volume controls (use PgUp and PgDn keys to increase/decrease volume from menus or in-game)
+* Add game volume controls (use 7 and 6 keys to increase/decrease volume from menus or in-game)
 * Level Editor: New feature: Hold in Ctrl+Alt and click with the mouse to automatically start level with hero 'dropped in' to the clicked position as starting position (to help with level editing / testing)
 
 2016/10/16 - Version 0.62
