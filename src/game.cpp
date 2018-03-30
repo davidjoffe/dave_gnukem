@@ -1297,15 +1297,32 @@ int game_startup(bool bLoadGame)
 						{
 							g_bSpriteDropShadows = !g_bSpriteDropShadows;
 						}
-						//else if (Event.key.keysym.sym==SDLK_F10)
-						//{
-							//SDL_SaveBMP(pVisView->pSurface, "c:\\dj\\DelmeTestView.bmp");
-							//SDL_SaveBMP(pVisBack->pSurface, "c:\\dj\\DelmeTestBack.bmp");
-							//SDL_SaveBMP(pVisMain->pSurface, "c:\\dj\\DelmeTestMain.bmp");
-						//}
 
 						}
+					}//shift
+
+					//dj2018-03-30 F10 saves a screenshot
+					if (Event.key.keysym.sym==SDLK_F10)
+					{
+						//Generate a unique filename (using counter - if file exists, increment counter and try again)
+						//fixLOW handle unicode in paths? Future? [dj2017-08]
+						std::string sPath = djGetFolderUserSettings();//<- for now use this, not really the right place, should be under user Documents or something [todo-future-lowprio - dj2018-03]
+						djAppendPathS(sPath, "screenshots");
+						djEnsureFolderTreeExists(sPath.c_str());
+						std::string sFilenameWithPath;
+						int n = 0;
+						do
+						{
+							++n;
+							char szBuf[8192]={0};//fixLOW MAX_PATH? Some issue with MAX_PATH I can't remember what right now [dj2017-08]
+							sprintf(szBuf,"gnukem_screenshot_%03d.bmp", n);
+
+							sFilenameWithPath = djAppendPathStr(sPath.c_str(),szBuf);
+						} while (djFileExists(sFilenameWithPath.c_str()));
+						SDL_SaveBMP(pVisMain->pSurface, sFilenameWithPath.c_str());
+						ShowGameMessage("Screenshot saved", 7);
 					}
+
 					
 					// [dj2017-06] DEBUG/CHEAT/DEV KEYS
 					/*
