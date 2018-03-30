@@ -1338,12 +1338,16 @@ int game_startup(bool bLoadGame)
 					else
 					*/
 					// 'Global' shortcut keys for adjusting volume [dj2016-10]
-					if (Event.key.keysym.sym==SDLK_PAGEUP)
+					// [dj2018-03-30] Changing from PgUp/PgDn for two reasons:
+					// 1. Some keyboards - like my Asus laptop - don't seem to have regular PgUp/PgDn
+					// 2. It conflicts with keyboards like OpenPandora where PgUp/PgDn are mapped to important game keys
+					// (Not mad about the 6/7 choice might change that in future, or make it configurable or something.)
+					if (Event.key.keysym.sym==SDLK_7)//SDLK_PAGEUP)
 					{
 						djSoundAdjustVolume(4);
 						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
 					}
-					else if (Event.key.keysym.sym==SDLK_PAGEDOWN)
+					else if (Event.key.keysym.sym==SDLK_6)//SDLK_PAGEDOWN)
 					{
 						djSoundAdjustVolume(-4);
 						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
@@ -1541,7 +1545,7 @@ int game_startup(bool bLoadGame)
 						SDL_Delay(200);//<-'wrong' workaround for, it immediately adds a lot
 					}
 				}
-#endif
+#endif//#ifdef DAVEGNUKEM_CHEATS_ENABLED
 
 				// This is for debugging/testing: hurt self. This definitely
 				// shouldn't be enabled by default in the real game, so we
