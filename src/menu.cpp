@@ -72,12 +72,31 @@ int do_menu( CMenu *pMenu )
 		;
 
 	pMenu->setSize ( size );
+	if (size==0)return -1;//error[dj2018-03]
 
 	// Calculate position of menu on screen, if "asked" to do so (== -1)
 	if ( pMenu->getXOffset() == -1 )
 		pMenu->setXOffset ( 8 * (20 - (strlen(pMenu->getItems()[0].m_szText) / 2)));
 	if ( pMenu->getYOffset() == -1 )
 		pMenu->setYOffset( 8 * (12 - (size / 2)) );
+
+	// Draw dropshadows [dj2018-03-30]
+	const unsigned char szTR[2]={(unsigned char)251,0};//top right
+	const unsigned char szR [2]={(unsigned char)252,0};//right
+	const unsigned char szBR[2]={(unsigned char)250,0};//bottom right
+	const unsigned char szB [2]={(unsigned char)249,0};//bottom
+	const unsigned char szBL[2]={(unsigned char)248,0};//bottom left
+	unsigned int uWidth = strlen(pMenu->getItems()[0].m_szText);//[dj2018-03] *Assumes* (true for v1) that strlen the same for all items
+	for ( i=0; i<size; ++i )
+	{
+		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+(strlen(pMenu->getItems()[i].m_szText))*8, pMenu->getYOffset()+i*8, i==0?szTR:szR );
+	}
+	for ( i=1; i<uWidth; ++i )
+	{
+		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+i*8, pMenu->getYOffset()+size*8, szB );
+	}
+	GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+uWidth*8, pMenu->getYOffset()+size*8, szBR );
+	GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset(), pMenu->getYOffset()+size*8, szBL );
 
 	// draw menu
 	for ( i=0; i<size; i++ )
@@ -93,7 +112,6 @@ int do_menu( CMenu *pMenu )
 			{
 				djgDrawImage( pVisBack, g_pImgMenuBackground8x8, pMenu->getXOffset()+j*8, pMenu->getYOffset()+i*8, 8, 8 );
 			}
-
 
 			//left+top 'light' lines
 			djgSetColorFore(pVisBack,djColor(80,80,80));

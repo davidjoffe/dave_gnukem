@@ -15,5 +15,6 @@ License: GNU GPL Version 2
 
 //! Show instructions screen
 extern void ShowInstructions();
+extern void ShowAbout();
 
 #endif

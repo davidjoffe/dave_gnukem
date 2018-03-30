@@ -99,6 +99,7 @@ struct SMenuItem mainMenuItems[] =
 	{ true,  "   Redefine keys   " },
 	{ true,  "   High scores     " },
 	{ true,  "   Credits         " },
+	{ true,  "   About           " },
 	{ true,  "   Quit            " },
 	{ false, "                   " },
 	{ false, NULL }
@@ -393,7 +394,7 @@ void DoMainMenu()
 		if (g_pImgMain)
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
 		char sz[100]={0};
-		sprintf(sz,"%s","v0.91 (11 Mar 2018)");
+		sprintf(sz,"%s","v0.95 (30 Mar 2018)");
 		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8*2, (unsigned char*)sz);
 		sprintf(sz,"%s","djoffe.com");
 		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8, (unsigned char*)sz);
@@ -441,8 +442,11 @@ void DoMainMenu()
 		case 9: // credits
 			ShowCredits();
 			break;
+		case 10: // about
+			ShowAbout();
+			break;
 		case -1: // escape
-		case 10: // quit
+		case 11: // quit
 			bRunning = false;
 			break;
 		}
