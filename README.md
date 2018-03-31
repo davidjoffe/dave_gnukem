@@ -120,6 +120,8 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+2018/03/31 - Version 0.96
+
 * [30 Mar 2018] Change volume control keys from PgUp/PgDn to 7/6 (as PgUp/PgDn conflict on some keyboards, e.g. Pandora, and also some laptops don't have 'actual' PgUp/PgDn etc.)
 * [30 Mar 2018] Add 'About' page to main menu
 * [30 Mar 2018] Add new F10 save screenshot function (saves on Windows under \Users\USERNAME\AppData\Roaming\DaveGnukem\screenshots and on Linux under $HOME/.gnukem/screenshots)
