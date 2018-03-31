@@ -130,6 +130,11 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 	// Initialize graphics library
 	SDL_Init(SDL_INIT_VIDEO);
 
+#ifdef PANDORA
+	//[dj2018-03] Not sure if this is quite the right way to go, but this is based roughly on
+	// diff patch of Magic Sam for OpenPandora port - https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ and http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam
+	iWidth = 320; iHeight = 200;
+#else
 	// [dj2016-10] Get the user's monitor resolution, and find (basically) largest multiple of 320x200 that fits in
 	// that size, to make for 'largest possible' gameplay window, that also scales from 320x200 'proportionally' nicely
 	// (i.e. square aspect ratio of pixels, etc.).
@@ -165,6 +170,7 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 
 		Log( "GraphInit(): DisplayResolution(%d,%d).\n", max_w, max_h );
 	}
+#endif
 
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
