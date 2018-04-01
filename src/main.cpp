@@ -394,7 +394,7 @@ void DoMainMenu()
 		if (g_pImgMain)
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
 		char sz[100]={0};
-		sprintf(sz,"%s","v0.96 31 Mar 2018");
+		sprintf(sz,"%s","v0.97 1 Apr 2018");
 		//GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8*2, (unsigned char*)sz);
 		GraphDrawString(pVisBack, g_pFont8x8, 0, 200 - 8, (unsigned char*)sz);
 		sprintf(sz,"%s","djoffe.com");
@@ -810,6 +810,9 @@ void InitMainMenu()
 	mainMenu.setMenuCursor ( mainMenuCursor );
 	mainMenu.setXOffset (-1);
 	mainMenu.setYOffset (-1);
+	//dj2018-04-01 make the Y position sightly higher by 4 pixel than the default, looks slightly better with new city background
+	mainMenu.setYOffset( 8 * (12 - (13 / 2)) - 4 );//13 = num items
+
 	mainMenu.setSoundMove ( djSoundLoad( "data/sounds/cardflip.wav" ) );
 }
 
