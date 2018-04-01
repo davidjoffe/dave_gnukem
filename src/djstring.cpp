@@ -268,12 +268,12 @@ int mkpath(const char *path, mode_t mode)
 }
 bool djEnsureFolderTreeExists(const char* szPath)
 {
-	printf("djEnsureFolderTreeExists(%s)\n",szPath);fflush(NULL);
+	//debug//printf("djEnsureFolderTreeExists(%s)\n",szPath);fflush(NULL);
 	if (djFolderExists(szPath))return true;
-	printf("2");
+	//debug//printf("2");
 	mkpath(szPath, 0777);
 	//mkdir(szPath, 0777);
-	printf("(Exists?=%s)\n",djFolderExists(szPath)?"YES":"NO");fflush(NULL);
+	//debug//printf("(Exists?=%s)\n",djFolderExists(szPath)?"YES":"NO");fflush(NULL);
 	return djFolderExists(szPath);
 	//return mkpath(szPath);
 }
