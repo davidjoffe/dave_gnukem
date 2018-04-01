@@ -120,6 +120,8 @@ The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the C
 
 Recent:
 
+* [1 Apr 2018] Add Shift+F10 to start/stop auto-save screenshot-per-frame sequence (warning, eats disk space very fast)
+
 2018/03/31 - Version 0.96
 
 * [30 Mar 2018] Change volume control keys from PgUp/PgDn to 7/6 (as PgUp/PgDn conflict on some keyboards, e.g. Pandora, and also some laptops don't have 'actual' PgUp/PgDn etc.)
