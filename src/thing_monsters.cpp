@@ -512,9 +512,10 @@ void CRabbit::Initialize(int a, int b)
 	CMonster::Initialize(a,b);
 	// So if you have a bunch, they aren't necessarily all walking exactly in sync:
 	m_nWalkAnimOffset = rand()%4;
-	SetVisibleBounds(0,-BLOCKH,BLOCKW*2,BLOCKH-1);
-	SetShootBounds  (8,-BLOCKH,BLOCKW*2-8,BLOCKH-1);
-	SetActionBounds (8,-BLOCKH,BLOCKW*2-8,BLOCKH-1);
+	// Note: See the Draw() function also, we *draw* him 8 pixels more left than he 'is'
+	SetVisibleBounds(-10,-BLOCKH,BLOCKW*2-6,BLOCKH-1);
+	SetShootBounds  (0,-BLOCKH,BLOCKW,BLOCKH-1);
+	SetActionBounds (0,-BLOCKH,BLOCKW,BLOCKH-1);
 	SetLayer(LAYER_4);
 	m_bShootable = true;
 }
@@ -524,9 +525,11 @@ void CRabbit::Draw()
 	const int b=(m_nXDir>0 ? 6*16 : 6*16 + 8);//Sprite number within spriteset
 	int x = CALC_XOFFSET(m_x) + m_xoffset;
 	int y = CALC_YOFFSET(m_y) + m_yoffset;
+	//dj2018-04-01 Note we draw him 8 pixels more left than he actually 'is' - the reason
+	// for this is clear if you look at the sprite - 32x32, but he's +/- 16x32 body is 'centered' in sprite.
 	DRAW_SPRITEA(pVisView,
 		a   ,b+m_nWalkAnimOffset*2,
-		x   ,y-16,
+		x -8   ,y-16,
 		32  ,  32);
 }
 int CRabbit::Tick()
