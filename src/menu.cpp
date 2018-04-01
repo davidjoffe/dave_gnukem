@@ -4,8 +4,6 @@
 menu.cpp
 
 Copyright (C) 1995-2018 David Joffe
-
-License: GNU GPL Version 2
 */
 
 #include "graph.h"

@@ -1,10 +1,7 @@
-// David Joffe, 1999/12 GNU etc.
 /*
 instructions.cpp
 
 Copyright (C) 1999-2018 David Joffe
-
-License: GNU GPL Version 2
 */
 #include "djtypes.h"
 #include "instructions.h"

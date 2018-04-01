@@ -10,8 +10,6 @@ oldest parts of the codebase, when I was still an inexperienced coder ...
 but not necessarily at this stage worth investing time in refactoring,
 unless we want to genericize this codebase more/better for other derived
 games. [dj2018]
-
-License: GNU GPL Version 2
 */
 #ifndef _HERO_H_
 #define _HERO_H_

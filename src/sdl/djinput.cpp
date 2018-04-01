@@ -3,8 +3,6 @@ djinput.cpp
 
 Copyright (C) 1995-2018 David Joffe
 
-License: GNU GPL Version 2
-
 Created: '95/07/20 (originally as a test keyboard interrupt hook)
 */
 

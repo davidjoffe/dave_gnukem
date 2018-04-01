@@ -4,8 +4,6 @@
 \author  David Joffe
 
 Copyright (C) 2000-2018 David Joffe
-
-License: GNU GPL Version 2
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _MIXINS_H_

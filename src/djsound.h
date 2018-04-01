@@ -2,11 +2,8 @@
 // djsound.h
 //
 // Sound interface
-/*
-Copyright (C) 1999-2018 David Joffe
-
-License: GNU GPL Version 2
-*/
+//
+// Copyright (C) 1999-2018 David Joffe
 /*--------------------------------------------------------------------------*/
 #ifndef _DJSOUND_H_
 #define _DJSOUND_H_

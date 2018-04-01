@@ -2,8 +2,6 @@
 djlog.cpp
 
 Copyright (C) 1998-2018 David Joffe
-
-License: GNU GPL Version 2
 */
 
 #ifdef WIN32

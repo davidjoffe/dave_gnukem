@@ -3,8 +3,6 @@ settings.cpp
 
 Copyright (C) 2001-2018 David Joffe
 
-License: GNU GPL Version 2
-
 09/2001
 */
 

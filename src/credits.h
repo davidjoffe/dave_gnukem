@@ -4,8 +4,6 @@
 \author  David Joffe
 
 Copyright (C) 1999-2018 David Joffe
-
-License: GNU GPL Version 2
 */
 #ifndef _CREDITS_H_
 #define _CREDITS_H_

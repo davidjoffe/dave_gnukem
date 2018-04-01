@@ -3,8 +3,6 @@
 djgraph.cpp
 
 Copyright (C) 1997-2018 David Joffe
-
-License: GNU GPL Version 2
 */
 
 
