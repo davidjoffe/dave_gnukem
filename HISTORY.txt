@@ -1,4 +1,47 @@
-NB: See ReadMe.md for updated history as of October 2016
+NB: See README.md for most up-to-date history as of October 2016, this file is not always updated.
+
+2018/03/31 - Version 0.96
+
+* [30 Mar 2018] Change volume control keys from PgUp/PgDn to 7/6 (as PgUp/PgDn conflict on some keyboards, e.g. Pandora, and also some laptops don't have 'actual' PgUp/PgDn etc.)
+* [30 Mar 2018] Add 'About' page to main menu
+* [30 Mar 2018] Add new F10 save screenshot function (saves on Windows under \Users\USERNAME\AppData\Roaming\DaveGnukem\screenshots and on Linux under $HOME/.gnukem/screenshots)
+* [26 Mar 2018] Bugfixes and level improvements (also fixed a level bug where one of the levels was impossible to complete)
+* [22 Mar 2018] Boot sprite; Improve Dr Proetton (Dr Proton) sprite and behavior
+* [20 Mar 2018] Fix overly-large window if Windows DPI scaling settings are enabled (unfortunately the fix breaks Windows XP support - but you can enable djWINXP_SUPPORT in config.h if you want to generate a build that supports Windows XP)
+
+2018/03/11 - Version 0.91
+
+* [11 Mar 2018] Create a Windows installer
+* [22 Jan 2018] Add 'easter egg' [arin_j stream viewer suggestion]
+* [22 Jan 2018] Level editor highlights instances of selected sprite (yellow), and sprite selection mouse-over sprite (cyan) (F3 toggles this ON/OFF if/when it gets annoying)
+* [13 Jan 2018] New slightly experimental map auto-shadows and sprite auto-drop-shadows
+* [13 Jan 2018] New shortcut keys Shift+F8/F9: Toggle map and sprite auto-shadows on/off, respectively
+* Overhauled shooting/bullets code
+* Level Editor: New "Ctrl+F7" command shows overview of all levels, and some basic stats on 'important' gameplay items
+* Ctrl+Shift+W Large gameplay viewport mode (currently classified as a 'cheat')
+* All cheat keys (and debug/testing keys like H to inflict self-damage) must now first be enabled by pressing Ctrl+Shift+G to enable in-game debugging stuff
+* New cheat Backspace+PgUp increases firepower by one (added for testing)
+* Numerous bugfixes and gameplay tweaks
+
+2017/08/12 - Version 0.81
+
+* Add water
+* Add very basic Dr Proetton ('final boss') and basic foundations of game ending sequence when you beat Dr Proetton
+* Add jump-monster
+* Add rockets
+* Level Editor: New "Ctrl+Alt+N" command to generate a new blank level (NB: Still needs to be added manually to default.gam!)
+* Fix a couple of bugs relating to jump height and powerboots
+
+2017/08/05 - Version 0.72
+
+* Add new 'sort of looks like a cannon on wheels' monster type
+* Implemented new inventory pickup item 'antivirus disk' and corresponding 'master computer' (when we insert AV disk into master computer we save the world) (should only be one of each of these, and in last level of a 'mission')
+* Add new high-voltage "barrier" that must be shot multiple times to destroy before hero can pass through (touching it results in immediate death)
+* Add new monster that constitutes the approximate equivalent of DN1 rabbits (for now, or maybe permanently, this is just a sort of 'evil Tux' - not sure yet if placeholder sprite, or part of plot)
+* Add new floor type that auto-crumbles after hero walks or jumps twice on it (2nd spriteset, position 5x4 - place only 1 block per segment)
+* Re-do instructions screens to display storyline/plot
+* Basic more proper/correct implementation of the CAcme falling blocks
+* Fixed: Bullets go through doors
 
 2017/06/22 - Version 0.71 [Windows only]:
 
@@ -50,11 +93,11 @@ NB: See ReadMe.md for updated history as of October 2016
 * Add semi-experimental 'big viewport mode' (Backspace + B in game to toggle) to make level creation/testing easier for level editors
 
 2016/10/09 - Version 0.6 (0.60) [david]
- - Take the 2008-08-06 v0.56a EMH release from SourceForge, create github project https://github.com/davidjoffe/dave_gnukem
+ - Un-abandon project; create github project https://github.com/davidjoffe/dave_gnukem
  - Fixed 'tiny game window'
- - Fix some Linux compile issues, make a few other fixes/improvements (streamed on LiveCoding), call it v0.6 ('un-abandoning' project - DJ)
+ - Fix some Linux compile issues, make a few other fixes/improvements (streamed on LiveCoding), call it v0.6
 
-[No active development from ~2008-08 to ~2016-09]
+[No development from ~2008-08 to ~2016-09]
 
 2008/08/06 - Version 0.56a [EMH]
  - Updated to compile on newer compilers. No feature changes.
