@@ -1838,6 +1838,7 @@ void CFirepower::Draw()
 int CFirepower::HeroOverlaps()
 {
 	HeroModifyFirepower(1);
+	update_score(1000,m_x,m_y);
 	return THING_DIE;
 }
 /*-----------------------------------------------------------*/
