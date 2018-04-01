@@ -52,7 +52,7 @@ You can watch development on this project being live-streamed at:
 
 ### Notes
 
-Note the aim of Dave Gnukem is not to be a 'clone', nor to try match DN1 gameplay 'precisely' - the goal is to be 'similar but different', more like a parody though not really funny. Feasibly, the source could be used to attempt that, but it's not the present purpose or intention of this project. Likewise, it's not the intention to try load actual original level or sprite data into this 'engine', though again it'd probably be feasible to adapt it for such. - David Joffe, 2017-07
+Note the aim of Dave Gnukem is not to be a 'clone', nor to try match DN1 gameplay 'precisely' - the goal is to be 'similar but different', sort of a parody though not terribly funny. Feasibly, the source could be used to attempt that, but it's not the present purpose or intention of this project. Likewise, it's not the intention to try load actual original level or sprite data into this 'engine'. - David Joffe, 2017-07
 
 ## Gameplay Instructions
 
@@ -339,9 +339,13 @@ The name is a pun on 'Duke Nukem' and 'Gnu' as a sort of 'hat-tip'/reference to 
 
 This wasn't a retro game when I started on it (~1994ish), but it's taken so long it's now 'de facto' retro genre. So we are copying also the Duke Nukem Forever model of taking forever to be released.
 
-# Additional Credits
+# License and Additional Credits
 
-* 2018-03-22 Add boots sprite made by freepik.com, 7from flaticon.com, license Creative Commons BY 3.0
+The source code itself (and most of the data/sprites) for Dave Gnukem are dual-licensed under MIT license or GPL.
+
+With respect to particular data items, the following license conditions apply:
+
+* 2018-03-22 Add boots sprite made by freepik.com, from flaticon.com, license Creative Commons BY 3.0
 * 2017-08-04 Add font data/fonts/simple_6x8.tga by http://www.zingot.com/ from https://opengameart.org/content/bitmap-font-pack License https://creativecommons.org/licenses/by/3.0/ (small changes made to color, and convert from PNG to TGA)
 * 2016-10-30 data/sounds/soft_explode.wav From same Juhani Junkala collection as per below
 * 2016-10-30 data/sounds/key_pickup.wav http://opengameart.org/content/key-pickup author Vinrax, license 'CC BY 3.0' https://creativecommons.org/licenses/by/3.0/
@@ -352,3 +356,6 @@ This wasn't a retro game when I started on it (~1994ish), but it's taken so long
 	Hosted on opengameart.org"
 * 2016-10-23 data/sounds/sfx\_weapon_singleshot7.wav by Juhani Junkala (CC0 creative commons license) ("The Essential Retro Video Game Sound Effects Collection [512 sounds]")
 * 2016-10 Thanks to daveywavey @ livecoding https://www.livecoding.tv/daveywavey/ for help with setting up github repo
+
+Apart from the abovementioned, all other data included with 'version 1' is dual-licensed under MIT license or GPL.
+
