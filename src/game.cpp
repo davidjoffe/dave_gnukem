@@ -2,11 +2,9 @@
 // game.cpp
 //
 // 1995/07/28
-/*
-Copyright (C) 1995-2018 David Joffe
-
-License: GNU GPL Version 2
-*/
+//
+// Copyright (C) 1995-2018 David Joffe
+//
 /*--------------------------------------------------------------------------*/
 
 #include "config.h"
@@ -1207,6 +1205,8 @@ int game_startup(bool bLoadGame)
 	int i;
 	while (g_bGameRunning)
 	{
+		static std::string g_sAutoScreenshotFolder;//<- If !empty it's busy recording into this folder [dj2018-04]
+		static int g_nScreenshotNumber=0;
 
 		//debug//printf("{");
 		fTimeNow = djTimeGetTime();
@@ -1327,8 +1327,47 @@ int game_startup(bool bLoadGame)
 						}
 					}//shift
 
-					//dj2018-03-30 F10 saves a screenshot
+
+					// F10? Screenshot and auto-screenshot stuff
 					if (Event.key.keysym.sym==SDLK_F10)
+					{
+					// Ctrl+Shift+F10? Start/stop screenshot recording [dj2018-04-01]
+					if (((Event.key.keysym.mod & KMOD_LSHIFT)!=0 ||
+						(Event.key.keysym.mod & KMOD_RSHIFT)!=0)/*
+						&&
+						((Event.key.keysym.mod & KMOD_LCTRL)!=0 ||
+						(Event.key.keysym.mod & KMOD_RCTRL)!=0)*/)
+					{
+						if (!g_sAutoScreenshotFolder.empty())
+						{
+							g_sAutoScreenshotFolder.clear();//Stop recording
+							g_nScreenshotNumber=0;
+						}
+						else
+						{
+							// Start recording
+							std::string sBasePath = djGetFolderUserSettings();//<- for now use this, not really the right place, should be under user Documents or something [todo-future-lowprio - dj2018-03]
+							djAppendPathS(sBasePath, "screenshots");
+							djEnsureFolderTreeExists(sBasePath.c_str());
+							std::string sFilenameWithPath;
+							int n = 0;
+							do
+							{
+								++n;
+								char szBuf[8192]={0};//fixLOW MAX_PATH? Some issue with MAX_PATH I can't remember what right now [dj2017-08]
+								sprintf(szBuf,"gnukem_recording_%03d", n);
+								sFilenameWithPath = djAppendPathStr(sBasePath.c_str(),szBuf);
+							} while (djFolderExists(sFilenameWithPath.c_str()));
+							djEnsureFolderTreeExists(sFilenameWithPath.c_str());
+							if (djFolderExists(sFilenameWithPath.c_str()))
+							{
+								// Start recording
+								g_sAutoScreenshotFolder = sFilenameWithPath;
+								g_nScreenshotNumber=1;
+							}
+						}
+					}
+					else//dj2018-03-30 F10 saves a screenshot
 					{
 						//Generate a unique filename (using counter - if file exists, increment counter and try again)
 						//fixLOW handle unicode in paths? Future? [dj2017-08]
@@ -1348,6 +1387,7 @@ int game_startup(bool bLoadGame)
 						SDL_SaveBMP(pVisMain->pSurface, sFilenameWithPath.c_str());
 						ShowGameMessage("Screenshot saved", 7);
 					}
+					}//if(F10)
 
 					
 					// [dj2017-06] DEBUG/CHEAT/DEV KEYS
@@ -1630,11 +1670,21 @@ int game_startup(bool bLoadGame)
 		float fT1 = djTimeGetTime();
 		GameHeartBeat();
 		
-		//static int nFrameCounter=0;
-		//char szFilename[4096]={0};
-		//sprintf(szFilename,"c:\\dj\\rectest\\dave_gnukem_%08d.bmp",nFrameCounter);
-		//SDL_SaveBMP(pVisMain->pSurface, szFilename);//"c:\\dj\\DelmeTestMain.bmp");
-		//nFrameCounter++;
+		if (!g_sAutoScreenshotFolder.empty())
+		{
+			char szFilename[4096]={0};
+			sprintf(szFilename,"gnukem_%08d.bmp",g_nScreenshotNumber);
+			std::string sPath = djAppendPathStr(g_sAutoScreenshotFolder.c_str(),szFilename);
+			SDL_SaveBMP(pVisMain->pSurface, sPath.c_str());//"c:\\dj\\DelmeTestMain.bmp");
+			++g_nScreenshotNumber;
+			//SDL_SaveBMP(pVisMain->pSurface, szFilename);//"c:\\dj\\DelmeTestMain.bmp");
+
+			//static int nFrameCounter=0;
+			//char szFilename[4096]={0};
+			//sprintf(szFilename,"c:\\dj\\rectest\\dave_gnukem_%08d.bmp",nFrameCounter);
+			//SDL_SaveBMP(pVisMain->pSurface, szFilename);//"c:\\dj\\DelmeTestMain.bmp");
+			//nFrameCounter++;
+		}
 
 		float fT2 = djTimeGetTime();
 		afTimeTaken.push_back((fT2 - fT1)*1000.0f);
