@@ -4,8 +4,6 @@
 \author  David Joffe
 
 Copyright (C) 1998-2018 David Joffe
-
-License: GNU GPL Version 2
 */
 
 #ifndef _DJTYPES_H_

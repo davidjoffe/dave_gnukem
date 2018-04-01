@@ -6,8 +6,6 @@
 modified by Vytautas Shaltenis, a.k.a. rtfb
 
 Copyright (C) 1998-2018 David Joffe
-
-License: GNU GPL Version 2
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _DJLOG_H_

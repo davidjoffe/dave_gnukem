@@ -2,8 +2,6 @@
 djtime.cpp
 
 Copyright (C) 1999-2018 David Joffe
-
-License: GNU GPL Version 2
 */
 
 #include "../djtime.h"

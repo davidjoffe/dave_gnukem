@@ -4,11 +4,9 @@
 \author  David Joffe
 
 Copyright (C) 1995-2018 David Joffe
-
-License: GNU GPL Version 2
 */
 /*--------------------------------------------------------------------------*/
-/* David Joffe '95/07/28 */
+/* [File created] David Joffe '95/07/28 */
 /* Game playing stuff for djg */
 /*--------------------------------------------------------------------------*/
 #ifndef _GAME_H_
