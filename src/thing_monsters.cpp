@@ -646,6 +646,10 @@ int CHighVoltage::OnHeroShot()
 {
 	if (--m_nStrength<=0)
 	{
+		// SCORE! Original DN1 seems to be double 10,000s [dj2018-04]
+		update_score(10000, m_x-1, m_y+m_nHeight-1);
+		update_score(10000, m_x+1, m_y+m_nHeight-1);
+
 		// Actually we want to start death *animation* here [TODO]
 		int nNumSoundsGenerated = 0;
 		for ( int i=0; i<m_nHeight; ++i )
