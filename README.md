@@ -1,5 +1,5 @@
 # Dave Gnukem
-Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'. It is kind of a parody of the original. It is not a 'clone', and not a 're-make'.)
+Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'. It is kind of a parody of the original. Please note it is not a 'clone', and not a 're-make'.)
 
 **Release Downloads:** https://sourceforge.net/projects/gnukem/
 
@@ -50,7 +50,7 @@ You can watch development on this project being live-streamed at:
 
 ### Notes
 
-Note the aim of Dave Gnukem is not to be a 'clone', nor to try match DN1 gameplay 'precisely' - the goal is to be 'similar but different', sort of a parody though not terribly funny. It's not the present purpose or intention of this project to produce a 'clone', nor is it the intention to try load actual original level or sprite data into this 'engine'. - David Joffe, 2017-07
+Note the aim of Dave Gnukem is not to be a 'clone', nor to try match DN1 gameplay precisely - the goal is to be 'similar but different', sort of a parody though not terribly funny. It's not the purpose or intention of this project to produce a 'clone', nor is it the intention to try load actual original level or sprite data into this 'engine'. The included levels have been created from scratch by users. The included sprites (apart from a few small exceptions mentioned at the bottom of this README) have been drawn by hand from scratch. The game is sort of a hat tip to the original. - David Joffe
 
 ## Gameplay Instructions
 
@@ -79,6 +79,8 @@ Power boots allow you to jump higher. The special molecule pickup gives you full
 The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the CIA to infect the world's computers with a virus called SystemD, crippling them. Only you can stop him. You must find the floppy disk with the Devuan Antivirus on it, and install it on the master computer, which is hidden in Vault7.
 
 *Any resemblance to actual persons or entities is purely coincidental*
+
+TL;DR Shoot anything that moves
 
 ## Features
 
