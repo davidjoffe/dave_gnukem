@@ -1723,7 +1723,7 @@ int game_startup(bool bLoadGame)
 		else
 #endif
 		// "integrated" sprite / level editors [dj2017-06-20 moving these to bottom of this loop, just in case we have any issues comparable to the pungee sticks crash bug, e.g interacting with dangling objects or something in the one single heartbeat update that occurs after exiting level editor]
-		if (g_iKeys[DJKEY_F4])
+		if (g_bEnableDebugStuff && g_iKeys[DJKEY_F4])
 		{
 			SwitchMode ( SWITCH_SPRED );
 			ED_Main ();
@@ -1733,7 +1733,7 @@ int game_startup(bool bLoadGame)
 			
 			RestartLevel();
 		}
-		else if (g_iKeys[DJKEY_F5])
+		else if (g_bEnableDebugStuff && g_iKeys[DJKEY_F5])
 		{
 			SwitchMode ( SWITCH_LVLED );
 			ED_Main ();

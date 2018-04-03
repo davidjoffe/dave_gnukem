@@ -120,6 +120,7 @@ TL;DR Shoot anything that moves
 
 Recent:
 
+* [3 Apr 2018] Change it so that you must first turn cheat/debugging stuff (Ctrl+Shift+G) on before using F4 or F5 for sprite/level editor
 * [1 Apr 2018] Add Shift+F10 to start/stop auto-save screenshot-per-frame sequence (warning, eats disk space very fast)
 
 2018/03/31 - Version 0.96
@@ -257,6 +258,7 @@ Note there is currently no 'undo', so be careful. If happy with a set of work, s
 
 NB: All in-game cheat/debugging keys (eg level up) must first be turned on by pressing Ctrl+Shift+G
 
+* NB: As of Apr 2018, you must first turn cheat/debugging stuff (Ctrl+Shift+G) on before using F4 or F5 for sprite/level editor
 * F5 from within the game invokes the level editor
 * F1: Save current changes (NB: there is currently no 'unsaved changes' warning, so remember to save your changes, if desired)
 * Escape: Exit level editor and start playing current level
