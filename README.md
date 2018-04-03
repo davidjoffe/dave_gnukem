@@ -120,6 +120,8 @@ TL;DR Shoot anything that moves
 
 Recent:
 
+2018/04/03 - Version 1.0
+
 * [3 Apr 2018] Change it so that you must first turn cheat/debugging stuff (Ctrl+Shift+G) on before using F4 or F5 for sprite/level editor
 * [1 Apr 2018] Add Shift+F10 to start/stop auto-save screenshot-per-frame sequence (warning, eats disk space very fast)
 
