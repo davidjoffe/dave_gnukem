@@ -24,7 +24,7 @@ Created by: David Joffe http://djoffe.com/ / https://www.liveedu.tv/david_joffe/
 
 The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: [T.O.G](http://www.nuke24.net/ "T.O.G."), [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
-As of 8 Oct 2016, this project is under 'properly' active development again, and the goal/intention is to get to a 'version 1' by no later than Oct 2017^H^H^H^H^H^H^H^HApr 2018.
+As of 8 Oct 2016, this project is under 'properly' active development again, and on 3 Apr 2018, 'version 1.0' has been released. (Note - this game wasn't 'retro genre' when I started it - it just took so long to complete that it's now 'de facto' "retro"! - David)
 
 ### About Duke Nukem 1
 
@@ -32,21 +32,16 @@ Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by A
 
 ### Development LiveStreaming Channels
 
-You can watch development on this project being live-streamed at:
+Development live-stream channel(s):
 
 * https://www.liveedu.tv/david_joffe/
  * https://www.liveedu.tv/david_joffe/l98yv-dave-gnukem-side-scrolling-shooter/ (full development video archive here)
  * https://www.livecoding.tv/david_joffe/videos/wae18-dave-gnukem-c-game-side-scrolling-shooter and 
  * https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrolling-shooter-3 etc.
 * https://www.twitch.tv/david_joffe/
-* https://www.youtube.com/user/davidjoffe2
+* https://www.youtube.com/user/davidjoffe2 (partial archive)
 * https://www.pscp.tv/DavidJoffe
-
-### (Approximate) Roadmap to Version 1
-
-* Jul/Aug 2017: v0.8: Implement many more monster types, and a few other special 'things' (e.g. rockets etc.)
-* Aug/Sep 2017: v0.9: Implement equivalent of Dr Proton and finalize plotline etc.; Finalize one basic set of playable levels. Finalize and round off spritesets to be 'not entirely terrible'.
-* Apr 2018: v1.0: Final rounding-off and final testing, 'call it version 1'.
+* https://mixer.com/gnukem111
 
 ### Notes
 
@@ -341,7 +336,7 @@ To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add 
 
 The name is a pun on 'Duke Nukem' and 'Gnu' as a sort of 'hat-tip'/reference to the open source license/model.
 
-This wasn't a retro game when I started on it (~1994ish), but it's taken so long it's now 'de facto' retro genre. So we are copying also the Duke Nukem Forever model of taking forever to be released.
+The game took forever to complete to mimic the Duke Nukem Forever model of taking forever to be released.
 
 # License and Additional Credits
 
