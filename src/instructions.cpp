@@ -18,7 +18,7 @@ Copyright (C) 1999-2018 David Joffe
 #include "keys.h"
 #include"djinput.h"//GetKeyString()
 
-const std::string sPLOT("STORY: The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the CIA to infect the world's computers with a virus called SystemD, crippling them. Only you can stop him. You must find the floppy disk with the Devuan Antivirus on it, and install it on the master computer, which is hidden in Vault7.\n*Any resemblance to actual persons or entities is purely coincidental");
+const std::string sPLOT("STORY: The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the CIA to infect the world's computers with a virus called SystemD, crippling them. Only you can stop him. You must find the floppy disk with the Devuan Antivirus on it, and install it on the master computer, which is hidden in Vault7.\n*Any resemblance to actual persons or entities is purely coincidental.\nTL;DR Shoot anything that moves.");
 const std::string sABOUT("Dave Gnukem is an open source retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (a famous 1991 game). It has no affiliation with the original game; this is a \"spare-time\" project created by David Joffe, with contributions by others. It includes a level editor and cross-platform support.\n\nThe original DN1 had 16-color 320x200 graphics. The aim here is similar but different gameplay & 'look and feel' - kind of a parody.\n\nSOURCE: github.com/davidjoffe/dave_gnukem\n\n### ABOUT DUKE NUKEM 1 ###\nDuke Nukem 1 was a famous original 16-color 320x200 'classic' game released by Apogee Software in 1991 that launched the Duke Nukem series. The original Duke Nukem 1 was created by Todd Replogle (co-creator of the Duke Nukem series), John Carmack (of id Software), Scott Miller (founder of 3D Realms), Allen H. Blum III, George Broussard, and Jim Norwood.");
 
 std::string GetKeyStringS(int nSDLKeyCode)
@@ -318,13 +318,13 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 void ShowInstructions()
 {
 	std::vector<std::string> asText;
-	asText.push_back("");
-	asText.push_back("INSTRUCTIONS");
+	//asText.push_back("");
+	asText.push_back("### INSTRUCTIONS ###");
 	unsigned int uWIDTH = (320 - 16) / 8;
 	WrapString("Find the exit in each level, while dodging or shooting monsters.", uWIDTH, asText);
 
 	asText.push_back("");
-	asText.push_back("KEYS:");
+	asText.push_back("### KEYS ###");
 
 	char szBuf[1024] = {0};
 	sprintf(szBuf, "%s", GetKeyString(g_anKeys[KEY_LEFT]));
