@@ -1,5 +1,10 @@
 NB: See README.md for most up-to-date history as of October 2016, this file is not always updated.
 
+2018/04/03 - Version 1.0
+
+* [3 Apr 2018] Change it so that you must first turn cheat/debugging stuff (Ctrl+Shift+G) on before using F4 or F5 for sprite/level editor
+* [1 Apr 2018] Add Shift+F10 to start/stop auto-save screenshot-per-frame sequence (warning, eats disk space very fast)
+
 2018/03/31 - Version 0.96
 
 * [30 Mar 2018] Change volume control keys from PgUp/PgDn to 7/6 (as PgUp/PgDn conflict on some keyboards, e.g. Pandora, and also some laptops don't have 'actual' PgUp/PgDn etc.)
