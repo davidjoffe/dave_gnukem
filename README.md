@@ -115,6 +115,8 @@ TL;DR Shoot anything that moves
 
 Recent:
 
+* [4 Apr 2018] Got it running on TrueOS (use make -f Makefile.bsd)
+
 2018/04/03 - Version 1.0
 
 * [3 Apr 2018] Change it so that you must first turn cheat/debugging stuff (Ctrl+Shift+G) on before using F4 or F5 for sprite/level editor
