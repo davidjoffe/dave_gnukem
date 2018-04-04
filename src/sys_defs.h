@@ -21,7 +21,7 @@ extern "C"
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__FreeBSD__)
 #include <stdlib.h>//Fixing malloc.h 'not found' error compiling on Mac [dj2016-10]
 #else
 #include <malloc.h>
