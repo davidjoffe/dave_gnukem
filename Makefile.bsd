@@ -1,0 +1,63 @@
+#
+# David Joffe
+# Copyright 1998-2017 David Joffe
+# Created 1998/12
+# Makefile for Dave Gnukem
+#
+# 2016-10: Get this working on Mac OS X [dj]
+# 2017-07-29: Remove obsolete standalone-editor-related stuff, and add new thing_monsters.o
+#
+
+CPP = c++
+CC = c++
+
+
+# dj2016-10 Add L -I/usr/local/include/SDL in process of getting this working on Mac OS X - not sure if this is 'bad' to just have both /usr/include and /usr/local/include??
+INCLUDEDIRS= -I/usr/include/SDL -I/usr/local/include/SDL 
+
+#CCFLAGS = -O -Wall $(INCLUDEDIRS)
+
+# Un/recomment as needed for removing sound support, optimizations etc
+# If you don't -DDATA_DIR to a valid dir, then data files will be assumed
+# to be in current directory
+#CCFLAGS = -Wall -I/usr/local/include -DHAVE_SOUND -DDEBUG -O -m486
+CCFLAGS = -Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
+#Release version:
+#CCFLAGS = -O -Wall -I/usr/local/include -DHAVE_SOUND $(INCLUDEDIRS)
+
+LIBS = -L/usr/local/lib -lSDL -lSDLmain -lSDL_mixer -lpthread 
+BIN = davegnukem
+
+OBJFILES = src/main.o     src/graph.o   src/game.o         src/menu.o\
+           src/block.o    src/credits.o src/instructions.o src/djstring.o \
+           src/djimage.o  src/djlog.o   src/inventory.o    src/mission.o\
+           src/hiscores.o src/mixins.o  src/thing.o        src/hero.o \
+           src/thing_monsters.o src/gameending.o \
+           src/level.o    src/settings.o src/keys.o \
+           src/djtypes.o  src/bullet.o \
+           src/ed.o src/ed_DrawBoxContents.o src/ed_common.o src/ed_lvled.o \
+           src/ed_macros.o src/ed_spred.o \
+           src/sdl/djgraph.o src/sdl/djinput.o src/sdl/djsound.o \
+           src/sdl/djtime.o \
+           src/sys_error.o src/sys_log.o src/m_misc.o
+SRCFILES=${OBJFILES:.o=.cpp}
+
+default: gnukem
+
+gnukem: $(OBJFILES)
+	$(CPP) -DFOO3 -o $(BIN) $(OBJFILES) $(LIBS)
+
+clean:
+	rm -f $(BIN) *~ core \#*
+	find src -name '*.o' | xargs rm -f
+
+dist:
+	rm -f core *~ \#*
+	find src -name '*.o' | xargs rm -f
+
+.cpp.o:
+	@echo CC $<
+	$(CPP) $(CCFLAGS) -c $< -o $@
+
+#%.o: %.cpp
+#	dklfjlsdkjflds $(CPP) -DFOO1 $(CCFLAGS) -c $< -o $@
