@@ -340,6 +340,8 @@ The name is a pun on 'Duke Nukem' and 'Gnu' as a sort of 'hat-tip'/reference to 
 
 The game took forever to complete to mimic the Duke Nukem Forever model of taking forever to be released.
 
+The underlying 'engine' supports high frame rates and smooth scrolling etc.; the reason the frame rate is artificially capped to 18fps is that the earliest versions (~1994/1995-ish) were written for 16-bit 8086/80286, which used hardware timer interrupts that ran at around 18Hz. (Though it's possible to uncap the frame-rate, the CThing's are unfortunately currently hardcoded for 18Hz, so they just run silly-fast if one uncaps the frame rate ... if writing a new game or a 'version 2' it should be easy to use a higher frame rate and write new CThing's movement code to be based on time-passed-since-last-frame or some-such. Likewise the blocky viewport scrolling itself should be easy to replace with smooth viewport-scrolling.)
+
 # License and Additional Credits
 
 The source code itself (and most of the data/sprites) for Dave Gnukem are dual-licensed under MIT license or GPL.
