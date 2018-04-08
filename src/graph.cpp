@@ -130,7 +130,7 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 
 #ifdef PANDORA
 	//[dj2018-03] Not sure if this is quite the right way to go, but this is based roughly on
-	// diff patch of Magic Sam for OpenPandora port - https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ and http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam
+	// diff patch of Magic Sam (and/or probably 'ptitSeb'?) for OpenPandora port - https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ and http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam
 	iWidth = 320; iHeight = 200;
 #else
 	// [dj2016-10] Get the user's monitor resolution, and find (basically) largest multiple of 320x200 that fits in
