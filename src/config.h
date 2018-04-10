@@ -4,7 +4,11 @@
 /*--------------------------------------------------------------------------*/
 
 #ifdef WIN32
+//! [dj2018-04-10] See comments at this stuff. If this works nicely and is stable, can probably get rid of the djWINXP_SUPPORT stuff ultimately ???
+//! NB if this causes crashiness or other issues, then maybe go back to static binding?
+#define djDYNAMICALLY_BIND_SETPROCESSDPIAWARE
 //! [dj2018-03] Enable this if you want the application to still support Windows XP. Off by default. See comments at the fix for https://github.com/davidjoffe/dave_gnukem/issues/98 - we end up with an overly large game window on if DPI scaling is set, but the SetProcessDPIAware() APIs to fix this are only supported on later versions of Windows.
+//! Not sure if this still makes sense, unless djDYNAMICALLY_BIND_SETPROCESSDPIAWARE is not defined
 //#define djWINXP_SUPPORT
 #endif
 
