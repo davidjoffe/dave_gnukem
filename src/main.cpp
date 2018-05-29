@@ -37,6 +37,7 @@ Copyright (C) 1995-2018 David Joffe
 #include "instructions.h"
 #include "sys_log.h"
 #include "sys_error.h"
+#include "datadir.h"//DATA_DIR [might move later - dj2018-05]
 
 #ifdef __APPLE__
 #include <mach-o/dyld.h>//_NSGetExecutablePath
@@ -296,6 +297,16 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 #endif
 
 	Log ( "\n================[ Starting Application Init ]===============\n" );
+
+	// Check the data folder is present, and if not, try give the user some basic guidance as to how to address this. [dj2018-05]
+	// This is pretty 'critical' in that we can't recover from it, but not really critical in that the cause is
+	// likely simply that the data subfolder is either missing, or in a different path.
+	// Better to offer the user a little guidance rather than just exiting with no clue at all, e.g. [dj2018-05] cf. https://github.com/davidjoffe/dave_gnukem/issues/114
+	if (!djFolderExists( DATA_DIR ))
+	{
+		printf("Unable to find data folder '%s'. Please note this is in a separate repo - see the ReadMe.md for details.\n",DATA_DIR);
+		return -1;
+	}
 
 	g_Settings.Load(
 		djAppendPathStr(djGetFolderUserSettings().c_str(), CONFIG_FILE).c_str()
