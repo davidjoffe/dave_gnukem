@@ -33,7 +33,7 @@ int LoadMissions( const char * szfilename )
 	if (szfilename==NULL) return -1; // NULL string
 	if (szfilename[0]==0) return -2; // empty string
 	FILE * fin=NULL;
-	char buf[1024]={0};
+	char buf[4096]={0};
 
 	// open file
 	// FIXME: We need a consistent way to handle "DATA_DIR"
