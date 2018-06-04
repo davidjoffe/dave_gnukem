@@ -114,7 +114,7 @@ void CSettings::SetSetting(const char *szKey, const char *szValue)
 	{
 		if (!strcmp(szKey, m_aSettings[i].szKey))
 		{
-			djDEL(m_aSettings[i].szValue);
+			djDELV(m_aSettings[i].szValue);
 			m_aSettings[i].szValue = new char[strlen(szValue)+1];
 			strcpy(m_aSettings[i].szValue, szValue);
 			return;
