@@ -13,7 +13,7 @@ Copyright (C) 1999-2018 David Joffe and Kent Mein
 #include <SDL_mixer.h>
 #endif
 
-#if defined(__APPLE__) || defined(__FreeBSD__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__)
 #include <stdlib.h>//Fixing malloc.h 'not found' error compiling on Mac [dj2016-10]
 #else
 #include <malloc.h>
