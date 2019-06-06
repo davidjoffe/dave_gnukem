@@ -101,6 +101,7 @@ TL;DR Shoot anything that moves
 * A surprisingly bearable 18 frames per second
 * Detects and corrects wrongthink
 * Bugs older than your children
+* Safe for use during pregnancy
 * Floors
 * Walls
 * Doors
