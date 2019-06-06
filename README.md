@@ -116,6 +116,7 @@ TL;DR Shoot anything that moves
 
 Recent:
 
+* [6 Jun 2019] Incorporate OpenBSD build fixes by Dr. Brian Robert Callahan https://twitter.com/__briancallahan
 * [10 Apr 2018] Tentative fix for XP and ReactOS support (relating to SetProcessDPIAware stuff)
 * [4 Apr 2018] Got it running on TrueOS (use make -f Makefile.bsd)
 
