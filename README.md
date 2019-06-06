@@ -24,7 +24,7 @@ Created by: David Joffe http://djoffe.com/ / https://www.liveedu.tv/david_joffe/
 
 The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: [T.O.G](http://www.nuke24.net/ "T.O.G."), [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
-As of 8 Oct 2016, this project is under 'properly' active development again, and on 3 Apr 2018, 'version 1.0' has been released. (Note - this game wasn't 'retro genre' when I started it - it just took so long to complete that it's now 'de facto' "retro"! - David)
+As of 8 Oct 2016, this project is under 'properly' active development again, and **on 3 Apr 2018, 'version 1.0' has been released**. (Note - this game wasn't 'retro genre' when I started it - it just took so long to complete that it's now 'de facto' "retro"! - David)
 
 ### About Duke Nukem 1
 
@@ -121,7 +121,7 @@ Recent:
 * [10 Apr 2018] Tentative fix for XP and ReactOS support (relating to SetProcessDPIAware stuff)
 * [4 Apr 2018] Got it running on TrueOS (use make -f Makefile.bsd)
 
-2018/04/03 - Version 1.0
+2018/04/03 - **Version 1.0**
 
 * [3 Apr 2018] Change it so that you must first turn cheat/debugging stuff (Ctrl+Shift+G) on before using F4 or F5 for sprite/level editor
 * [1 Apr 2018] Add Shift+F10 to start/stop auto-save screenshot-per-frame sequence (warning, eats disk space very fast)
