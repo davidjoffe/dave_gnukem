@@ -277,6 +277,9 @@ void SetSprite ( int new_sprite )
 
 static void SpriteShowExtras ( int c )
 {
+	//dj2019-06 add these two help lines to try make it more self-documenting
+	ED_DrawString(POS_EXTRAS_X,POS_EXTRAS_Y +12*8,"^ Sprite Metadata" );
+	ED_DrawString(POS_EXTRAS_X,POS_EXTRAS_Y +13*8,"Left/right-click edits these values" );
 	for ( int i=0; i<12; i++ )
 	{
 		ED_SpriteShowExtra ( i, c );
