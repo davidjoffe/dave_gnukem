@@ -1315,6 +1315,9 @@ int game_startup(bool bLoadGame)
 						}*/
 						if (Event.key.keysym.sym==SDLK_F6)
 						{
+							//ShowEndGameSequence();
+							//RedrawEverythingHelper();
+
 							g_fFrameRate -= 1.0f;
 							if (g_fFrameRate<1.f)
 								g_fFrameRate = 1.f;
