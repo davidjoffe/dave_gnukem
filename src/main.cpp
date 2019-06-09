@@ -306,7 +306,10 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	// Better to offer the user a little guidance rather than just exiting with no clue at all, e.g. [dj2018-05] cf. https://github.com/davidjoffe/dave_gnukem/issues/114
 	if (!djFolderExists( DATA_DIR ))
 	{
+		// dj2019-06 This whole business should be improved on Linux
 		printf("Unable to find data folder '%s'. Please note this is in a separate repo - see the ReadMe.md for details.\n",DATA_DIR);
+		printf("If you have the data folder, then you can generally fix this message by first changing your current\n");
+		printf("directory to the folder in which the 'data' folder is contained, then running the application.\n");
 		return -1;
 	}
 

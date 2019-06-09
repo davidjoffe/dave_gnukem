@@ -594,6 +594,28 @@ bool djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 	//fixmeLOW should ideally warn or assert or something if pImage already in map here??? [dj2017-06-20]
 
 	//fixme to check are these actually hardware surfaces
+
+	/*
+	dj2019-06: There may still be something else wrong here re SDL_BIG_ENDIAN patch for issue 100 below.
+	macppc OpenBSD users reported having to seemingly (as I interpret it) BeWorld2018 fix for issue 100,
+	to get it working on OpenBSD macppc, or they get blank screen ... see here for more info:
+
+	http://openbsd-archive.7691.n7.nabble.com/NEW-games-gnukem-td365426.html
+
+	NB: (If I'm reading that Raphael Graf patch correctly, I can't incorporate that OpenBSD macppc patch 'blindly'
+	here without breaking it again on MorphOS - so this needs further investigation as to what exactly is going on,
+	and the most 'correct' way to fix it. If macpcc has SDL_BYTEORDER==SDL_BIG_ENDIAN then why the blank screen,
+	why must we pass little-endian bitmasks, could it be something like graphics hardware byte order different from
+	CPU byte order? Not sure. Or could it be an issue with libsdl1.2 on macppc itself (less likely).
+	Unfortunately I cannot test on PPC MorphOS which makes it difficult to just try things out as I have no way to see
+	how they impact that configuration.
+	Or could it be something to do with how we load images into RAM.
+	See also:
+	https://github.com/davidjoffe/dave_gnukem/issues/100
+	https://wiki.libsdl.org/CategoryEndian
+	https://wiki.libsdl.org/SDL_CreateRGBSurface
+	*/
+
 	SDL_Surface* pSurfaceFoo = ::SDL_CreateRGBSurfaceFrom(
 		pImage->Data(),
 		pImage->Width(),
