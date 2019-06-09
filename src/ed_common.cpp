@@ -205,15 +205,23 @@ void ED_SpriteShowType( int c )
 
 void ED_SpriteShowExtra( int i, int c )
 {
-	char buf[64]={0};
+	char buf[128]={0};
 	sprintf( buf, "%2d:[%4d]", i, ED_GetSpriteExtra( g_iSpriteset, g_iSprite, i ) );
+	switch (i)
+	{
+	case 4: strcat(buf, "flags");break;
+	case 10: strcat(buf, "box-contents-spriteset");break;
+	case 11: strcat(buf, "box-contents-sprite");break;//or letter-ID
+	}
 
+	/*
 	if (c==0)
 		ED_DrawStringClear(
 		POS_EXTRAS_X,
 		POS_EXTRAS_Y + i * 8,
 		buf );
 	else
+	*/
 		ED_DrawStringClear(
 		POS_EXTRAS_X,
 		POS_EXTRAS_Y + i * 8,
