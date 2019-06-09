@@ -183,7 +183,7 @@ std::string GetFriendlyTypeName( int a, int b )
 			int d = ED_GetSpriteExtra(a, b, 11);
 			int iTypeContents = ED_GetSpriteType( c,d );
 			sType += " [";
-			if (iTypeContents>=0 && TYPE_LASTONE)
+			if (iTypeContents>=0 && iTypeContents<(int)TYPE_LASTONE)
 				sType += block_type_names[iTypeContents];
 			else
 				sType += "(error: invalid box contents - check in spreditor!)";
