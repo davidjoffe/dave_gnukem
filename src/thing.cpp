@@ -1708,10 +1708,10 @@ CRocket::CRocket() :
 	m_bTakingOff(false),
 	m_fVelocity(0.f),
 	m_fAccel(0.f),
+	m_fDeltaAccel(0.02f),
 	m_fHeight(0.f),
 	m_nYStart(0),
-	m_nFireAnim(0),
-	m_fDeltaAccel(0.02f)
+	m_nFireAnim(0)
 {
 }
 
