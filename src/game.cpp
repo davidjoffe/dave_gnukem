@@ -182,7 +182,7 @@ void DestroyAllBullets()
 //dj2018-03-31
 void DestroyAllThings()
 {
-	for ( unsigned int i=0; i<(int)g_apThings.size(); i++ )
+	for ( unsigned int i=0; i<g_apThings.size(); ++i )
 	{
 		delete g_apThings[i];
 	}
@@ -293,6 +293,18 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 		}
 		if ((x-xo)>=VIEW_WIDTH - 5)
 		{
+			// This stuff relates to trying to get similar 'retro' viewport scrolling behavior to DN1
+			// Not sure it's 100% right but seems sorta 'close enough' at this point (dj2019)
+			// This code's a bit ugly as it's based on my really old/early code.
+			// xo_offset = 'Viewport offset by 8 pixels?'
+			// One must look at DN1's scrolling behavior to see the intention here also.
+			// Baaasically the DN1 blocks were 16 pixels but the horizontal *viewport offset* (as
+			// well as the hero horizontal position) could be offset by either a further 8 pixels,
+			// or no further offset, i.e. aligned to the 16-pixel block positions.)
+			// If we want to use the dave_gnukem code for more generic purposes,
+			// eg totally smooth-animating and/or higher-resolution platforms, this is one of
+			// the parts of the code we'd first want to change/genericize etc.
+
 			//bool bEven = (((x-xo)%2)==0);
 
 			/*if (!bEven & (x_small==0))
@@ -326,18 +338,21 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 		}
 
 		//[was:onmoveleft]
+		// If our x position is left of the viewport X origin (i.e. hero entirely outside viewport and would thus be invisible), 'force'/'snap'/reset viewport origin as a-few-blocks-left of hero
 		if (x<=xo)
 		{
 			xo = x-4;
 			xo_small = 0;
 		}
+		// If our hero is close to left of viewport and we maybe need to adjust the horizontal scrolling
 		else if (((x-xo)<=4))
 		{
 			bool bEven = (((x-xo)%2)==0);
 			if (bEven & (!(x_small))) {
 				xo_small = 0;
 			}
-			if (!bEven & (x_small)) {
+			// dj2019-06 NB: This was "if (!bEven && (x_small))"; changing it based on a compiler warning from Ubuntu. I don't even know anymore (as some of this code is 20+ years old) if the intention was to do this bitwise or int-wise etc. but I don't think it matters, I think end result is the same. Nonetheless, if we suddenly have strange viewport scrolling behavior after this change, change it back or come back to this.
+			if ((!bEven) && (x_small!=0)) {
 				xo--;
 				xo_small = 1;
 			}
@@ -492,7 +507,6 @@ void DropFallableThings()
 void CheckForBulletsOutOfView()
 {
 	CBullet* pBullet=NULL;
-	int x1=0;
 	// Check for bullets that have gone out of the view
 	for ( int i=0; i<(int)g_apBullets.size(); ++i )
 	{
@@ -878,8 +892,6 @@ void PerGameSetup()
 
 void PerLevelSetup()
 {
-	int i;
-
 	Log ( "PerLevelSetup()\n" );
 
 	g_nRecentlyFallingOrJumping=0;
@@ -1655,7 +1667,7 @@ int game_startup(bool bLoadGame)
 
 
 		// Make a simple FPS display for debug purposes
-		fixme_notworking://in largeviewportmode
+		//fixme_notworking://in largeviewportmode
 		float fTimeRun;
 		fTimeRun = fTimeNow - fTimeFirst;
 		iFrameCount++;
@@ -1798,7 +1810,6 @@ int game_startup(bool bLoadGame)
 void GameHeartBeat()
 {
 	//debug//printf("HEARTBEAT[");
-	CThing * pThing = NULL;
 
 	// Update hero basic stuff
 	HeroUpdate();
@@ -2022,7 +2033,7 @@ void DrawHealth()
 	for ( unsigned int i=0; i<MAX_HEALTH; ++i )
 	{
 		// 170 = health; 169 = not health
-		szHealth[MAX_HEALTH-1-i] = (i<g_nHealth?170:169);
+		szHealth[MAX_HEALTH-1-i] = ((int)i<g_nHealth?170:169);
 	}
 	szHealth[MAX_HEALTH] = 0;
 	if (g_bLargeViewport)

@@ -75,7 +75,7 @@ extern int g_nHeroJustFiredWeaponCounter;
 
 //! xo,yo = top-left corner of view for scrolling
 extern int yo;
-//! View offset by 8 pixels?
+//! View offset by 8 pixels? (If I remember correctly this is basically either 0 or 1, but we do use it as an int for some calculations, so maybe still best to leave it as an int.) This stuff has to do with the particular way DN1's viewport scrolling worked; either the horizontal game viewport is aligned to the 16-pixel boundaries (in which case this is 0), or it's further offset by half a block i.e. 8 pixels, depending.)
 extern int xo_small;
 
 extern int nSlowDownHeroWalkAnimationCounter;
