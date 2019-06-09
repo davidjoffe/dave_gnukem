@@ -26,7 +26,9 @@ const float fBACKGROUNDMUSIC_RELATIVE_VOLUME = 0.36f;
 
 bool g_bSoundInit = false;
 bool g_bSoundEnabled = true;
+#ifndef NOSOUND
 Mix_Chunk *sounds[255]={NULL};
+#endif
 int numsounds = 0;
 int g_nVolume = 85;//[0..128] Default volume (don't have default volume at max, I think? dj2016-10) Note LibSDL Mixer MIX_MAX_VOLUME is 128.
 /*--------------------------------------------------------------------------*/

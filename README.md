@@ -1,7 +1,7 @@
 # Dave Gnukem
 Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'. It is kind of a parody of the original. Please note it is not a 'clone', and not a 're-make'.)
 
-**News Apr 2018: Version 1.0 released.**
+**News Apr 2018: Version 1.0 released.** Apr 2019 OpenBSD port.
 
 **Release Downloads:** https://sourceforge.net/projects/gnukem/
 
@@ -114,6 +114,8 @@ TL;DR Shoot anything that moves
 * Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi and https://github.com/ptitseb)
 * MorphOS [Mar 2018, by Bruno Peloille]: http://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_0.91.lha
 * Instructions for ClockworkPi GameShell: https://forum.clockworkpi.com/t/lets-play-dave-gnukem/1917 by: https://forum.clockworkpi.com/u/Oet
+* OpenBSD [Apr 2019 by Dr. Brian Robert Callahan] Callahan https://twitter.com/__briancallahan https://github.com/jasperla/openbsd-wip/commit/e51e3a3b9386365cd0eb8317018463ff4682e0d3 http://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/games/gnukem/
+
 
 # History / Changes
 
@@ -123,7 +125,7 @@ Recent:
 * [10 Apr 2018] Tentative fix for XP and ReactOS support (relating to SetProcessDPIAware stuff)
 * [4 Apr 2018] Got it running on TrueOS (use make -f Makefile.bsd)
 
-2018/04/03 - **Version 1.0**
+**2018/04/03 - Version 1.0**
 
 * [3 Apr 2018] Change it so that you must first turn cheat/debugging stuff (Ctrl+Shift+G) on before using F4 or F5 for sprite/level editor
 * [1 Apr 2018] Add Shift+F10 to start/stop auto-save screenshot-per-frame sequence (warning, eats disk space very fast)
@@ -226,9 +228,14 @@ Recent:
 * Fixed 'tiny game window'
 * Fix some Linux compile issues, make a few other fixes/improvements (streamed on LiveCoding), call it v0.6 ('un-abandoning' project - DJ)
 
+1994 - 2016 - See HISTORY.txt for 1994 - 2016 history
+
+1994/02/22 [david]
+ - Crude origins as a 16-bit x86 assembler implementation
+
 # Developer Info / Build Info
 
-Dependencies: LibSDL1.2, LibSDL-Mixer 1.2
+**Dependencies: LibSDL1.2, LibSDL-Mixer 1.2**
 
 ## Windows Build Instructions
 
@@ -238,16 +245,37 @@ Dependencies: LibSDL1.2, LibSDL-Mixer 1.2
 
 ## Linux Build Instructions
 
+Either download the source code archive, or get the latest source code with git. Make sure the 'data' subfolder is also present.
+
+The latest source code and data archives can be downloaded here (these should generally be stable and the best option to download):
+
+https://github.com/davidjoffe/dave_gnukem/archive/master.zip
+https://github.com/davidjoffe/gnukem_data/archive/master.zip (after extracting, rename this folder to just 'data' as that's what the game looks for)
+
+GETTING THE LATEST SOURCE AND DATA FOLDER USING GIT:
+
+To get the latest source with git, you need two repos, the source code, and the data, which must be exactly cloned into 'data' under the main folder:
+
+$ git clone https://github.com/davidjoffe/dave_gnukem.git gnukem
+$ cd gnukem
+$ git clone https://github.com/davidjoffe/gnukem_data.git data
+$ cd ..
+
+BUILDING:
+
 Type 'make'
+(BSD variants: Try 'make -f Makefile.bsd' rather.)
 
-Run with ./davegnukem if it built correctly
+Run with ./davegnukem if it built correctly (NB, it must find the 'data' folder)
 
-Installing dependencies on Debian etc.:
+NB: FIRST INSTALL DEPENDENCIES:
 
-apt-get install libsdl1.2-dev
+How to install dependencies on Debian, Ubuntu etc.:
 
-apt-get install libsdl-mixer1.2-dev
+$ sudo apt-get install libsdl1.2-dev
+$ sudo apt-get install libsdl-mixer1.2-dev
 
+(NOTE: If you don't have libsdl-mixer1.2 for whatever reason and you just want to get it compiling without sound, you can add -DNOSOUND to the CCFLAGS in the Makefile, and remove -lSDL_mixer from the Makefile LIBS setting.)
 
 ## Mac OS X Build Instructions
 

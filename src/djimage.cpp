@@ -256,12 +256,12 @@ int djImage::LoadTGA( const char * szFilename )
 				// Create a blank image
 				CreateImage( nWidth, nHeight, 16 );
 				unsigned char *pBuf = new unsigned char[nWidth*3];
-				for ( unsigned int i=0; i<nHeight; i++ )
+				for ( unsigned int i=0; i<nHeight; ++i )
 				{
 					// Read a row of pixels and copy it into the image buffer
 					read( fin, pBuf, nWidth*2 );
 					int iOffset = (bFlipY?(nHeight-i-1):i)*Pitch();
-					for ( unsigned int j=0; j<nWidth; j++ )
+					for ( unsigned int j=0; j<nWidth; ++j )
 					{
 						// reverse endianness from file
 						m_pData[iOffset+j*2+0] = pBuf[j*2+1];

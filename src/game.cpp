@@ -917,6 +917,7 @@ void PerLevelSetup()
 	asMusicFiles.push_back("Monsters-in-Bell-Bottoms_Looping.ogg");
 	asMusicFiles.push_back("Retro-Frantic_V001_Looping.ogg");
 	asMusicFiles.push_back("Techno-Gameplay_Looping.ogg");
+#ifndef NOSOUND
 	// This is somewhat gross quick n dirty simplistic for now - should rather have ability to assign music file in the level file format [dj2016-10]
 	int nMusicFile = (g_nLevel % asMusicFiles.size());
 	std::string sBasePath = "data/music/eric_matyas/";
@@ -930,6 +931,7 @@ void PerLevelSetup()
 	{
 		Mix_FadeInMusic(g_pGameMusic, -1, 500);
 	}
+#endif
 
 	// Save current score and firepower - these must be restored if we die.
 	g_nScoreOld = g_nScore;
@@ -1130,11 +1132,13 @@ void PerLevelCleanup()
 	DestroyAllThings();// clear list of "things"
 	DestroyAllBullets();//Make sure no bullets, for good measure [dj2018-03]
 
+#ifndef NOSOUND
 	if (g_pGameMusic!=NULL)
 	{
 		Mix_FreeMusic(g_pGameMusic);
 		g_pGameMusic = NULL;
 	}
+#endif
 
 	if (g_pLevelShadowMap)
 	{
