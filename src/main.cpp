@@ -52,7 +52,9 @@ Copyright (C) 1995-2018 David Joffe
 #endif
 //#endif
 
+#ifndef NOSOUND
 #include <SDL_mixer.h>//For background music stuff
+#endif
 
 #include <map>
 #include <string>
@@ -442,11 +444,13 @@ void DoMainMenu()
 {
 	bool bRunning = true;
 
+#ifndef NOSOUND
 	//dj2016-10 adding background music to main menu, though have not put any real thought into what would
 	// be the best track here so fixme todo maybe dig a bit more and find better choice here etc. [also for levels]
 	Mix_Music* pMusic = Mix_LoadMUS("data/music/eric_matyas/8-Bit-Mayhem.ogg");
 	if (pMusic!=NULL)
 		Mix_FadeInMusic(pMusic, -1, 800);
+#endif
 
 	do
 	{
@@ -474,18 +478,22 @@ void DoMainMenu()
 			//int score = PlayGame ();
 			int score = game_startup();
 			CheckHighScores( score );
+#ifndef NOSOUND
 			// Game levels start their own music, so when come out of game and back to main menu, restart main menu music
 			if (pMusic!=NULL)
 				Mix_FadeInMusic(pMusic, -1, 800);
+#endif
 			break;
 		}
 		case 2: // restore game [dj2016-10 adding implementation for this - it did nothing before]
 			{
 				int score = game_startup(true);
 				CheckHighScores( score );
+#ifndef NOSOUND
 				// Game levels start their own music, so when come out of game and back to main menu, restart main menu music
 				if (pMusic!=NULL)
 					Mix_FadeInMusic(pMusic, -1, 800);
+#endif
 			}
 			break;
 		case 3: // select mission
@@ -513,11 +521,13 @@ void DoMainMenu()
 		}
 	} while (bRunning);
 
+#ifndef NOSOUND
 	if (pMusic)
 	{
 		Mix_FreeMusic(pMusic);
 		pMusic = NULL;
 	}
+#endif
 }
 
 void AppendCharacter(char *szBuffer, char c, int nMaxLen)
