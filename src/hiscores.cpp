@@ -74,7 +74,7 @@ void ShowHighScores()
 
 		for ( int i=0; i<(int)g_aScores.size(); i++ )
 		{
-			char buf[128]={0};
+			char buf[256]={0};
 			sprintf(buf, "%d  %d", i, g_aScores[i].nScore);
 			GraphDrawString(pVisBack, g_pFont8x8, 24, 24+i*12, (unsigned char*)buf);
 			sprintf(buf, "%s", g_aScores[i].szName);
