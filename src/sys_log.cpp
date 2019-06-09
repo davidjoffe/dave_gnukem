@@ -221,7 +221,12 @@ void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 	strcpy ( log_filename_base, file );
 	M_StripFileExtension ( log_filename_base );
 
-	PushBackup ( file, bklevel );
+	// dj2019-06 Commenting this out to effectively disable rotating of logs to fix this issue as reported by keithbowes:
+	// https://github.com/davidjoffe/dave_gnukem/issues/120
+	// ("home directory is littered with files like ~/.old0, ~/.old1, ~/.old2")
+	// I don't really feel it's worth rotating logs; I seldom if ever go look at old logs. We can maybe add it
+	// later (and fix the 'littering' issue) IF it seems in future like it's worth it to have rotating logs.
+	//PushBackup ( file, bklevel );
 
 	*f = fopen ( file, "w" );
 
@@ -270,6 +275,12 @@ void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 
 
 
+// dj2019-06 Commenting out call to this function to effectively disable rotating of logs to fix this issue as reported by keithbowes:
+// https://github.com/davidjoffe/dave_gnukem/issues/120
+// ("home directory is littered with files like ~/.old0, ~/.old1, ~/.old2")
+// I don't really feel it's worth rotating logs; I seldom if ever go look at old logs. We can maybe add it
+// later (and fix the 'littering' issue) IF it seems in future like it's worth it to have rotating logs.
+// Otherwise, later maybe just delete this function (that's my recommendation, to simplify this code)
 void PushBackup ( const char *filename, int bklevel )
 {
 	char		newname[SYS_MAX_FILE]={0};
