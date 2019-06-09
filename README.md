@@ -112,7 +112,7 @@ TL;DR Shoot anything that moves
 # Ports
 
 * Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi and https://github.com/ptitseb)
-* MorphOS [Mar 2018, by Bruno Peloille]: http://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_0.91.lha
+* MorphOS [Mar 2018, by Bruno Peloille]: http://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_1.00.lha
 * Instructions for ClockworkPi GameShell: https://forum.clockworkpi.com/t/lets-play-dave-gnukem/1917 by: https://forum.clockworkpi.com/u/Oet
 * OpenBSD [Apr 2019 by Dr. Brian Robert Callahan] Callahan https://twitter.com/__briancallahan https://github.com/jasperla/openbsd-wip/commit/e51e3a3b9386365cd0eb8317018463ff4682e0d3 http://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/games/gnukem/
 
