@@ -257,8 +257,11 @@ GETTING THE LATEST SOURCE AND DATA FOLDER USING GIT:
 To get the latest source with git, you need two repos, the source code, and the data, which must be exactly cloned into 'data' under the main folder:
 
 $ git clone https://github.com/davidjoffe/dave_gnukem.git gnukem
+
 $ cd gnukem
+
 $ git clone https://github.com/davidjoffe/gnukem_data.git data
+
 $ cd ..
 
 BUILDING:
@@ -273,6 +276,7 @@ NB: FIRST INSTALL DEPENDENCIES:
 How to install dependencies on Debian, Ubuntu etc.:
 
 $ sudo apt-get install libsdl1.2-dev
+
 $ sudo apt-get install libsdl-mixer1.2-dev
 
 (NOTE: If you don't have libsdl-mixer1.2 for whatever reason and you just want to get it compiling without sound, you can add -DNOSOUND to the CCFLAGS in the Makefile, and remove -lSDL_mixer from the Makefile LIBS setting.)
