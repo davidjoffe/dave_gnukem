@@ -3,7 +3,7 @@
 //
 // 1995/07/28
 //
-// Copyright (C) 1995-2018 David Joffe
+// Copyright (C) 1995-2019 David Joffe
 //
 /*--------------------------------------------------------------------------*/
 
@@ -226,6 +226,7 @@ struct SMenuItem gameMenuItems[] =
 	{ true,  "   Save Game       " },
 	{ true,  "   Restore Game    " },
 	{ true,  "   Instructions    " },
+	{ true,  "   Retro Settings  " },//dj2019-06 new
 	{ true,  "   Abort Game      " },
 	{ false, "                   " },
 	{ false, NULL }
@@ -2935,7 +2936,13 @@ void IngameMenu()
 			ShowInstructions();
 		}
 		break;
-	case 5:
+	case 5://dj2019-06 just-for-fun extra-retro simulated faux-EGA/CGA
+	{
+		extern void SettingsMenu();
+		SettingsMenu();
+	}
+	break;
+	case 6:
 		g_bGameRunning = false;
 		break;
 	}

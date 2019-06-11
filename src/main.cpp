@@ -9,7 +9,7 @@
 // 2016/10 : new github + livecoding 'era'
 
 /*
-Copyright (C) 1995-2018 David Joffe
+Copyright (C) 1995-2019 David Joffe
 */
 
 /*--------------------------------------------------------------------------*/
@@ -78,18 +78,6 @@ void KillMainMenu();
 // Main menu [NB, warning, the handling code uses indexes :/ .. so if you add/remove items, must update there too - dj2016-10]
 struct SMenuItem mainMenuItems[] =
 {
-	/*{ false, "{~~~~~~~~~~~~~~~~~}" },//dj2016-10 try without the big borders ..
-	{ true,  "|  Start gnu game |" },
-	{ true,  "|  Select Mission |" },
-	{ true,  "|  Restore game   |" },
-	{ true,  "|  Ordering info  |" },
-	{ true,  "|   (not!)        |" },
-	{ true,  "|  Instructions   |" },
-	{ true,  "|  Redefine keys  |" },
-	{ true,  "|  High scores    |" },
-	{ true,  "|  Credits        |" },
-	{ true,  "|  Quit           |" },
-	{ false, "[~~~~~~~~~~~~~~~~~]" },*/
 	{ false, "                   " },
 	{ true,  "   Start gnu game  " },
 	{ true,  "   Restore game    " },
@@ -101,7 +89,8 @@ struct SMenuItem mainMenuItems[] =
 	{ true,  "   High scores     " },
 	{ true,  "   Credits         " },
 	{ true,  "   About           " },
-	//{ true,  "   Don't quit      " },
+	{ true,  "   Retro Settings  " },
+	{ true,  "   Don't quit      " },
 	{ true,  "   Quit            " },
 	{ false, "                   " },
 	{ false, NULL }
@@ -443,6 +432,49 @@ void DaveCleanup()
 //	KillLog ();
 }
 
+extern int g_nSimulatedGraphics;
+//dj2019-06 just-for-fun extra-retro simulated faux-EGA/CGA
+void SettingsMenu()
+{
+	struct SMenuItem SettingsMenuItems[] =
+	{
+		// this looks very weird; need to fix menu code to handle this better, or wrap setttingsmenu in additional UI stuff
+		//{ false, "                                     " },//(DJ2019-06 low prio, at some stage want to fix up menu code so we can space / layout this thing properly - either that, or change how it draws the background)
+		{ false, " retro user experience settings      " },
+		//{ false, "                                     " },
+		{ true,  "   Mild (Default graphics)           " },
+		{ true,  "   Medium (EGA) (simulated 16-color) " },
+		{ true,  "   High (CGA) (simulated 4-color)    " },
+		//{ false, "                                     " },
+		{ false, "                                     " },
+		{ false, NULL }
+	};
+
+	unsigned char MenuCursor[] = { 128, 129, 130, 131, 0 };
+
+	CMenu Menu("SettingsMenu");
+	Menu.setClrBack( djColor(48,66,128) );
+	Menu.setSize(0);
+	Menu.setItems(SettingsMenuItems);
+	Menu.setMenuCursor(MenuCursor);
+	Menu.setXOffset(-1); // Calculate menu position for us
+	Menu.setYOffset(-1);
+
+	int nMenuOption = do_menu( &Menu );
+	switch (nMenuOption)
+	{
+	case 1:
+		g_nSimulatedGraphics = 0;
+		break;
+	case 2:
+		g_nSimulatedGraphics = 1;
+		break;
+	case 3:
+		g_nSimulatedGraphics = 2;
+		break;
+	}
+}
+
 void DoMainMenu()
 {
 	bool bRunning = true;
@@ -517,8 +549,13 @@ void DoMainMenu()
 		case 10: // about
 			ShowAbout();
 			break;
+		case 11://dj2019-06 just-for-fun extra-retro simulated faux-EGA/CGA
+			SettingsMenu();
+			break;
+		case 12://Don't quit
+			break;
 		case -1: // escape
-		case 11: // quit
+		case 13: // quit
 			bRunning = false;
 			break;
 		}

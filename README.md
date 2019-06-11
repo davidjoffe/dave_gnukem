@@ -87,6 +87,7 @@ TL;DR Shoot anything that moves
 * Integrated level editor
 * Subliminal messages
 * Puns
+* Now with extra-retro simulated EGA/CGA settings, you'll believe you're in the 90s again or your money back
 * Evil SuperTux
 * SystemD integration
 * Big rockets
@@ -101,6 +102,7 @@ TL;DR Shoot anything that moves
 * Arcane command-line parameters nobody will use
 * Overweight hero to represent rise in obesity rates since original 1991 release
 * A surprisingly bearable 18 frames per second
+* A good time killer when baking
 * Detects and corrects wrongthink
 * Bugs older than your children
 * Safe for use during pregnancy
@@ -116,11 +118,15 @@ TL;DR Shoot anything that moves
 * Instructions for ClockworkPi GameShell: https://forum.clockworkpi.com/t/lets-play-dave-gnukem/1917 by: https://forum.clockworkpi.com/u/Oet
 * OpenBSD [Apr 2019 by Dr. Brian Robert Callahan] Callahan https://twitter.com/__briancallahan https://github.com/jasperla/openbsd-wip/commit/e51e3a3b9386365cd0eb8317018463ff4682e0d3 http://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/games/gnukem/
 
+# Awards and Reviews
+
+* "a good time killer when I'm baking" - Alessia_Amelia (Jan 2019)
 
 # History / Changes
 
 Recent:
 
+* [11 Jun 2019] New 'Retro Settings' menu option with 'extra retro' settings/effects for simulated EGA 16-color and CGA 4-color graphics options. You'll feel like you're back in the 90s or your money back. [NB: currently little-endian platforms only]
 * [6 Jun 2019] Incorporate OpenBSD build fixes by Dr. Brian Robert Callahan https://twitter.com/__briancallahan https://github.com/jasperla/openbsd-wip/commit/e51e3a3b9386365cd0eb8317018463ff4682e0d3 http://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/games/gnukem/
 * [10 Apr 2018] Tentative fix for XP and ReactOS support (relating to SetProcessDPIAware stuff)
 * [4 Apr 2018] Got it running on TrueOS (use make -f Makefile.bsd)
