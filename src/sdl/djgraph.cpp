@@ -2,7 +2,7 @@
 /*
 djgraph.cpp
 
-Copyright (C) 1997-2018 David Joffe
+Copyright (C) 1997-2019 David Joffe
 */
 
 
@@ -26,7 +26,39 @@ std::map< djImage*, SDL_Surface *> g_SurfaceMap;
 int	rMask=0, gMask=0, bMask=0, aMask=0;
 int	rShift=0, gShift=0, bShift=0, aShift=0;
 
+// 0=default
+// 1=EGA
+// 2=CGA (simulated retro)
+int g_nSimulatedGraphics = 0;
 
+// CGA palette 1 (4 colors) cyan magenta black white
+const djColor djPALETTE_CGA[4] {
+	djColor(0,0,0),//black
+	djColor(0x55,0xFF,0xFF),//bright cyan
+	djColor(0xFF,0x55,0xFF),//bright magenta
+	djColor(0xFF,0xFF,0xFF)//bright white
+	// DITHERTEST
+	//djColor(0x55,0x55,0x55)//dark grey as white/black dither
+};
+// EGA standard 16-colors
+const djColor djPALETTE_EGA[16] {
+	djColor(0,0,0),//black
+	djColor(0,0,0xAA),//blue
+	djColor(0,0xAA,0),//green
+	djColor(0,0xAA,0xAA),//cyan
+	djColor(0xAA,0,0),//red
+	djColor(0xAA,0,0xAA),//magenta
+	djColor(0xAA,0x55,0),//brown
+	djColor(0xAA,0xAA,0xAA),//light grey
+	djColor(0x55,0x55,0x55),//dark grey
+	djColor(0x55,0x55,0xFF),//bright blue
+	djColor(0x55,0xFF,0x55),//bright green
+	djColor(0x55,0xFF,0xFF),//bright cyan
+	djColor(0xFF,0x55,0x55),//bright red
+	djColor(0xFF,0x55,0xFF),//bright magenta
+	djColor(0xFF,0xFF,0x55),//bright yellow
+	djColor(0xFF,0xFF,0xFF)//bright white
+};
 
 unsigned int djgMapColor( djVisual * pVis, const djColor& color )
 {
@@ -164,17 +196,94 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 			unsigned int uBPP = pVisSrc->pSurface->format->BytesPerPixel;
 			unsigned int *pSurfaceMem = (unsigned int*)pVisSrc->pSurface->pixels;
 			unsigned int uMemOffsetRow = 0;
-			for ( unsigned int y=0; y<200; ++y )
+
+
+			//fixme this won't work bigendian
+			#if SDL_BYTEORDER==SDL_BIG_ENDIAN
+			// Not yet supported for big-endian platforms (dj2019-06)
+			if (false)
+			#else
+			if (g_nSimulatedGraphics>0) //'Simulate' CGA/EGA
+			#endif
 			{
-				uMemOffsetRow = (y * (pVisSrc->pSurface->pitch/uBPP));
-				pSurfaceMem = ((unsigned int*)pVisSrc->pSurface->pixels) + uMemOffsetRow;
-				// Note we must be careful here, pVisSrc->pSurface->pitch is in *bytes*, pSurfaceMem is a pointer to unsigned int* so pointer 'math' in multiples of 4
-				for ( unsigned int x=0; x<320; ++x )
+				// Select target simulated-graphics palette
+				const int NUMCOLORS = (g_nSimulatedGraphics==1?16:4);
+				const djColor* pPalette = (g_nSimulatedGraphics==1 ? djPALETTE_EGA : djPALETTE_CGA);
+				
+				register int nPixel;
+				// For finding closest-matching pixel in target simulated mode palette
+				register int nDistance=0;
+				register int nDistanceMin=-1;
+				register int nClosest = 0;//black
+				
+				rc.y=0;
+				for ( unsigned int y=0; y<200; ++y )
 				{
-					rc.x = x*uScaleMax;
-					rc.y = y*uScaleMax;
-					SDL_FillRect(pVisDest->pSurface, &rc, *pSurfaceMem);
-					++pSurfaceMem;
+					uMemOffsetRow = (y * (pVisSrc->pSurface->pitch/uBPP));
+					pSurfaceMem = ((unsigned int*)pVisSrc->pSurface->pixels) + uMemOffsetRow;
+					// Note we must be careful here, pVisSrc->pSurface->pitch is in *bytes*, pSurfaceMem is a pointer to unsigned int* so pointer 'math' in multiples of 4
+					rc.x = 0;
+					for ( unsigned int x=0; x<320; ++x )
+					{
+						// Getpixel color from source
+						nPixel = *pSurfaceMem;
+						djColor Color(
+							(nPixel & 0xFF0000) >> 16,//red
+							(nPixel & 0xFF00) >> 8,//green
+							(nPixel & 0xFF));//blue
+
+						// Look for closest approximate match in simulated palette
+						nDistance=0;
+						nDistanceMin=-1;
+						nClosest = 0;//black
+						for (unsigned int z=0;z<NUMCOLORS;++z)
+						{
+							nDistance =
+								(int)ABS((int)Color.r - (int)(pPalette[z]).r) + 
+								(int)ABS((int)Color.g - (int)(pPalette[z]).g) +
+								(int)ABS((int)Color.b - (int)(pPalette[z]).b);
+							if (nDistanceMin==-1 || nDistance<nDistanceMin)
+							{
+								nDistanceMin = nDistance;
+								nClosest = z;
+							}
+						}
+						//cga dark gray
+						/*
+						if (g_nSimulatedGraphics==2 && nClosest==4)
+						{
+							if ((x%2) ^ (y%2))
+								nClosest = 0;//dither alternating black
+							else
+								nClosest = 3;//dither alternating white
+						}
+						*/
+
+						nPixel = SDL_MapRGB(pVisDest->pSurface->format,pPalette[nClosest].r,pPalette[nClosest].g,pPalette[nClosest].b);//djgMapColor( pVis, pVis->colorfore );
+						SDL_FillRect(pVisDest->pSurface, &rc, nPixel);
+						++pSurfaceMem;
+						rc.x += uScaleMax;
+					}//x
+					rc.y += uScaleMax;
+				}//y
+			}
+			else//Normal default
+			{
+				//cbsu/sbsu?[low-dj2019-06]
+				rc.y=0;
+				for ( unsigned int y=0; y<200; ++y )
+				{
+					uMemOffsetRow = (y * (pVisSrc->pSurface->pitch/uBPP));
+					pSurfaceMem = ((unsigned int*)pVisSrc->pSurface->pixels) + uMemOffsetRow;
+					// Note we must be careful here, pVisSrc->pSurface->pitch is in *bytes*, pSurfaceMem is a pointer to unsigned int* so pointer 'math' in multiples of 4
+					rc.x = 0;
+					for ( unsigned int x=0; x<320; ++x )
+					{
+						SDL_FillRect(pVisDest->pSurface, &rc, *pSurfaceMem);
+						++pSurfaceMem;
+						rc.x += uScaleMax;
+					}
+					rc.y += uScaleMax;
 				}
 			}
 			djgUnlock(pVisDest);
