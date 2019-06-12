@@ -87,7 +87,7 @@ TL;DR Shoot anything that moves
 * Integrated level editor
 * Subliminal messages
 * Puns
-* Now with extra-retro simulated EGA/CGA settings, you'll believe you're in the 90s again or your money back
+* Now with extra-retro simulated EGA/CGA settings, you'll feel like you're in the 90s again or your money back
 * Evil SuperTux
 * SystemD integration
 * Big rockets
