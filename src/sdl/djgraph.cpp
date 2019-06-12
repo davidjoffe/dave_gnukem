@@ -207,7 +207,7 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 			#endif
 			{
 				// Select target simulated-graphics palette
-				const int NUMCOLORS = (g_nSimulatedGraphics==1?16:4);
+				const unsigned int NUMCOLORS = (g_nSimulatedGraphics==1?16:4);
 				const djColor* pPalette = (g_nSimulatedGraphics==1 ? djPALETTE_EGA : djPALETTE_CGA);
 				
 				register int nPixel;
