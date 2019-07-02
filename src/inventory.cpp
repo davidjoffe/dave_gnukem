@@ -1,9 +1,10 @@
 /*
 inventory.cpp
 
-Copyright (C) 2001-2018 David Joffe
+Copyright (C) 2001-2019 David Joffe
 */
 
+#include "config.h"
 #include "inventory.h"
 #include "mission.h"
 #include "graph.h"
@@ -80,12 +81,13 @@ bool InvAdd(CThing *pThing)
 
 void InvDraw()
 {
-	if (g_bLargeViewport)
+	if (g_bLargeViewport || g_bBigViewportMode)
 	{
 		for ( unsigned int i=0; i<g_apInventory.size(); ++i)
 		{
-			int nX = 320 - (i+1)*16;
-			int nY = 200 - 16;
+			// Bottom right viewport overlay
+			int nX = (g_nViewOffsetX+(VIEW_WIDTH*BLOCKW)) - (i+1)*BLOCKW;
+			int nY = (g_nViewOffsetY+(VIEW_HEIGHT*BLOCKH)) - BLOCKH;
 			// Background block
 			DRAW_SPRITE16(pVisView, 0, 1, nX, nY);
 			CThing *pThing = g_apInventory[i].pThing;
@@ -127,7 +129,7 @@ CThing *InvGetItem(int n)
 
 void InvRemove(CThing *pThing)
 {
-	for ( int i=0; i<(int)g_apInventory.size(); i++ )
+	for ( int i=0; i<(int)g_apInventory.size(); ++i )
 	{
 		if (pThing==g_apInventory[i].pThing)
 		{
