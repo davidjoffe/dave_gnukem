@@ -3,9 +3,10 @@
 \brief   The hero's inventory
 \author  David Joffe
 
-Copyright (C) 2001-2018 David Joffe
+Copyright (C) 2001-2019 David Joffe
 */
 
+#include "config.h"
 #include <stdio.h>
 
 ///\name Inventory functions

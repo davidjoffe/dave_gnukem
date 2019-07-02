@@ -1,8 +1,9 @@
 /*
 instructions.cpp
 
-Copyright (C) 1999-2018 David Joffe
+Copyright (C) 1999-2019 David Joffe
 */
+#include "config.h"//CFG_APPLICATION_RENDER_RES_W
 #include "djtypes.h"
 #include "instructions.h"
 #include "graph.h"
@@ -116,7 +117,7 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 	}
 	//CBSU[could be sped up'- fixFUtureMaybe]: Pre-build "map" of characters to their indexes in the fontsprite: std::map<char,unsigned int> mapFontChars;
 
-	unsigned int uWIDTH_NUMCOLS = (320 - 16) / FW;
+	unsigned int uWIDTH_NUMCOLS = (CFG_APPLICATION_RENDER_RES_W - 16) / FW;
 
 	std::vector<std::string> asLines;
 	WrapString(sLinesOrigText, uWIDTH_NUMCOLS, asLines);
@@ -128,7 +129,7 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 	const int H = (int)asText.size() + 1
 		+ (int)asLines.size()
 		;
-	int W = (320/8)-1;//5;
+	int W = (CFG_APPLICATION_RENDER_RES_W/8)-1;//5;
 
 	// Draw 'blank' underneath text (pseudo-dialogue-background and border)
 	// This is slightly crass .. clear background
@@ -320,7 +321,7 @@ void ShowInstructions()
 	std::vector<std::string> asText;
 	//asText.push_back("");
 	asText.push_back("### INSTRUCTIONS ###");
-	unsigned int uWIDTH = (320 - 16) / 8;
+	unsigned int uWIDTH = (CFG_APPLICATION_RENDER_RES_W - 16) / 8;
 	WrapString("Find the exit in each level, while dodging or shooting monsters.", uWIDTH, asText);
 
 	asText.push_back("");

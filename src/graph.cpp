@@ -3,10 +3,11 @@
 // David Joffe 1998/12
 // replacing the old djgega.cpp graphics interface
 /*
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2019 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 
+#include "config.h"//CFG_APPLICATION_RENDER_RES_W //dj2019-06
 #ifdef WIN32
 #include <Windows.h>
 #endif
@@ -53,7 +54,7 @@ void GraphFlip(bool bScaleView)
 	// leaving text looking messed up [dj2016-10]
 	if (pVisBack!=NULL && g_pFont8x8!=NULL && (!g_sMsg.empty() || bShowFrameRate))
 	{
-		pVisTemp = SDL_CreateRGBSurface(SDL_HWSURFACE, 320, 8, pVisBack->pSurface->format->BitsPerPixel,
+		pVisTemp = SDL_CreateRGBSurface(SDL_HWSURFACE, CFG_APPLICATION_RENDER_RES_W, 8, pVisBack->pSurface->format->BitsPerPixel,
 			pVisBack->pSurface->format->Rmask,
 			pVisBack->pSurface->format->Gmask,
 			pVisBack->pSurface->format->Bmask,
@@ -63,7 +64,7 @@ void GraphFlip(bool bScaleView)
 			SDL_Rect Rect;
 			Rect.x=0;
 			Rect.y=0;
-			Rect.w=320;
+			Rect.w=CFG_APPLICATION_RENDER_RES_W;
 			Rect.h=8;
 			SDL_BlitSurface(pVisBack->pSurface, &Rect, pVisTemp, &Rect);
 		}
@@ -114,7 +115,7 @@ void GraphFlip(bool bScaleView)
 		SDL_Rect Rect;
 		Rect.x=0;
 		Rect.y=0;
-		Rect.w=320;
+		Rect.w=CFG_APPLICATION_RENDER_RES_W;
 		Rect.h=8;
 		SDL_BlitSurface(pVisTemp, &Rect, pVisBack->pSurface, &Rect);
 

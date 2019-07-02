@@ -16,6 +16,7 @@ Copyright (C) 1997-2019 David Joffe
 #include "../djgraph.h"
 #include "../sys_log.h"
 #include "SDL.h"
+#include "../config.h"//[For CFG_APPLICATION_RENDER_RES_W etc. dj2019-06 slightly ugly dependency direction, conceptually, but not the biggest thing in the world to worry about now, maybe later.]
 
 #include <string.h>
 
@@ -176,16 +177,31 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 		// screen ... this is not entirely perfect but is a quick and easy way to get the game relatively playable
 		// as compared to the tiny gameplay window we have now (and also, NB, makes level editing much more
 		// user-friendly).
-		CdjRect rcSrc(0, 0, 320, 200);
+		// Note pVisSrc->width could be eg 1600 while gamerendering is 320
+		CdjRect rcSrc(0, 0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H);//E.g. 320x200 for DG1
 		CdjRect rcDest(0, 0, pVisDest->width, pVisDest->height);
-		unsigned int uScaleX = (pVisDest->width / 320); // Note we deliberately do *integer* division as we *want* to round down etc.
-		unsigned int uScaleY = (pVisDest->height / 200); // Note we deliberately do *integer* division as we *want* to round down etc.
+		unsigned int uScaleX = (pVisDest->width / CFG_APPLICATION_RENDER_RES_W); // Note we deliberately do *integer* division as we *want* to round down etc.
+		unsigned int uScaleY = (pVisDest->height / CFG_APPLICATION_RENDER_RES_H); // Note we deliberately do *integer* division as we *want* to round down etc.
 		unsigned int uScaleMax = djMAX(1,djMIN(uScaleX,uScaleY));//Select smallest of vertical/horizontal scaling factor in order to fit everything in the window
 		SDL_Rect rc;
 		rc.w = uScaleMax;
 		rc.h = uScaleMax;
+
+		//dj2019-07 Hm leaving this change commented out for now (retro settings at very high resolution CFG_APPLICATION_RENDER_RES_W etc.) as it's very slow, and not necessary for anything yet, so still rethink this stuff; want to keep it clean/simple as possible or later this will just seem like spaghetti & I won't know what's what.
+		/*
+		bool bForceOwnScaleBlitHereEvenIf1to1=false;//dj2019-06
+		#if SDL_BYTEORDER==SDL_BIG_ENDIAN
+		#else
+		// If retro settings requested, 'force' use own blit here so we can do the effect, even if it's a 1-1 pixel ratio [dj2019-06]
+		// This is really not that important, it's just 'silly' stuff for the extra-retro settings, but the 'force' option might
+		// come in handy later for other viewport-related stuff for genericizing this stuff, not sure.
+		if (g_nSimulatedGraphics>0) //'Simulate' CGA/EGA
+			bForceOwnScaleBlitHereEvenIf1to1 = true;
+		#endif
+		//*/
+
 		if (bScaleView
-			&& (rcSrc.w!=rcDest.w || rcSrc.h!=rcDest.h)
+			&& (/*bForceOwnScaleBlitHereEvenIf1to1 || */rcSrc.w!=rcDest.w || rcSrc.h!=rcDest.h)
 		//fixme is this righT? waht if bpp == 2 ..
 			&& pVisSrc->pSurface->format->BytesPerPixel == 4//Current scaling blit implementation only supports 4BPP [dj2016-10] [TODO: Handle other format, OR if upgrading to libsdl2, just use libsdl's scale blit function]
 			)
@@ -217,13 +233,13 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 				register int nClosest = 0;//black
 				
 				rc.y=0;
-				for ( unsigned int y=0; y<200; ++y )
+				for ( unsigned int y=0; y<CFG_APPLICATION_RENDER_RES_H; ++y )
 				{
 					uMemOffsetRow = (y * (pVisSrc->pSurface->pitch/uBPP));
 					pSurfaceMem = ((unsigned int*)pVisSrc->pSurface->pixels) + uMemOffsetRow;
 					// Note we must be careful here, pVisSrc->pSurface->pitch is in *bytes*, pSurfaceMem is a pointer to unsigned int* so pointer 'math' in multiples of 4
 					rc.x = 0;
-					for ( unsigned int x=0; x<320; ++x )
+					for ( unsigned int x=0; x<CFG_APPLICATION_RENDER_RES_W; ++x )
 					{
 						// Getpixel color from source
 						nPixel = *pSurfaceMem;
@@ -271,13 +287,13 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 			{
 				//cbsu/sbsu?[low-dj2019-06]
 				rc.y=0;
-				for ( unsigned int y=0; y<200; ++y )
+				for ( unsigned int y=0; y<CFG_APPLICATION_RENDER_RES_H; ++y )
 				{
 					uMemOffsetRow = (y * (pVisSrc->pSurface->pitch/uBPP));
 					pSurfaceMem = ((unsigned int*)pVisSrc->pSurface->pixels) + uMemOffsetRow;
 					// Note we must be careful here, pVisSrc->pSurface->pitch is in *bytes*, pSurfaceMem is a pointer to unsigned int* so pointer 'math' in multiples of 4
 					rc.x = 0;
-					for ( unsigned int x=0; x<320; ++x )
+					for ( unsigned int x=0; x<CFG_APPLICATION_RENDER_RES_W; ++x )
 					{
 						SDL_FillRect(pVisDest->pSurface, &rc, *pSurfaceMem);
 						++pSurfaceMem;

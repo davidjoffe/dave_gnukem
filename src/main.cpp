@@ -7,6 +7,7 @@
 // 1999/12 : re-begin attempted Win32 port
 // 2001/05 : begin SDL port; doxygen comments
 // 2016/10 : new github + livecoding 'era'
+// 2018/04 : 'DG version 1' released
 
 /*
 Copyright (C) 1995-2019 David Joffe
@@ -344,8 +345,9 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	// I think in theory -640 should behave the same as if passing "-scale 2" now
 	// but my memory of this stuff is a little vague so this needs to be checked.
 	Log ("DaveStartup(): Initializing graphics system ...\n");
-	int w=320;
-	int h=200;
+	int w=CFG_APPLICATION_RENDER_RES_W;
+	int h=CFG_APPLICATION_RENDER_RES_H;
+	//dj2019 do we really need the b640 option anymore? not sure. Might be used by some ports for DG1? Think I vaguely recall seeing someone mentioning using it on a forum ... maybe Pandora? Or maybe not used anymore? don't know.
 	if (b640 == true)
 	{
 		w = 640;
@@ -489,15 +491,21 @@ void DoMainMenu()
 
 	do
 	{
+		// Clear back buffer [dj2019-06 .. adding this just to make as if we drop out of bigviewportmode and the menu skin doesn't cover full size, then there may be junk drawn at right or bottom]
+		djgSetColorFore(pVisBack, djColor(0, 0, 0));
+		djgDrawBox(pVisBack, 0, 0, pVisBack->width, pVisBack->height);
+
 		// Load main menu background image
 		if (g_pImgMain)
+		{
+			// Simple 1 to 1 blit .. later it might be worthwhile doing a stretch blit if size doesn't match resolution? [LOW - dj2019]
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
+		}
 		char sz[100]={0};
 		sprintf(sz,"%s","v1.0 - 3 Apr 2018");
-		//GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8*2, (unsigned char*)sz);
-		GraphDrawString(pVisBack, g_pFont8x8, 0, 200 - 8, (unsigned char*)sz);
+		GraphDrawString(pVisBack, g_pFont8x8, 0, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)sz);
 		sprintf(sz,"%s","djoffe.com");
-		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8, (unsigned char*)sz);
+		GraphDrawString(pVisBack, g_pFont8x8, CFG_APPLICATION_RENDER_RES_W - strlen(sz)*8, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)sz);
 
 		GraphFlip(true);
 
@@ -643,11 +651,13 @@ void RedefineKeys()
 	do
 	{
 		int nDX = 152*2;
+		//dj2019-06 Either everything should be centered [future?] or everything 320-based [DG1]
+		//int nXLeft = (CFG_APPLICATION_RENDER_RES_W/2) - (nDX/2);
 		int nXLeft = (320/2) - (nDX/2);
 
 		// Black background
 		djgSetColorFore( pVisBack, djColor(0,0,0) );
-		djgDrawBox( pVisBack, 0, 0, 320, 200 );
+		djgDrawBox( pVisBack, 0, 0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H );
 		// Stupid cheesy boring dialog-border effect
 		DialogBoxEffect(nXLeft, 32, nDX, 128);
 
@@ -759,11 +769,11 @@ bool GetHighScoreUserName(char *szBuffer)
 	do
 	{
 		int nDX = MAX_HIGHSCORE_LEN*8;
-		int nXLeft = (320/2) - (nDX / 2);
+		int nXLeft = (CFG_APPLICATION_RENDER_RES_W/2) - (nDX / 2);
 
 		// Black background
 		djgSetColorFore( pVisBack, djColor(0,0,0) );
-		djgDrawBox( pVisBack, 0, 0, 320, 200 );
+		djgDrawBox( pVisBack, 0, 0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H );
 		// Stupid cheesy boring dialog-border effect
 		DialogBoxEffect(nXLeft-12, 64, nDX+24, 64);
 

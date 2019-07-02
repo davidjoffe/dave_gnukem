@@ -742,12 +742,22 @@ void UpdateBullets()
 void RedrawEverythingHelper()
 {
 	//fixLOW[dj2017-08-13] really not 100% if all this is exactly correct but anyway
+
+	//dj2019 Clear the back buffer when flipping between viewportmodes eg g_bBigViewportMode/g_bLargeViewport stuff so we don't in some cases potentially leave junky stuff from the previous mode, if the new mode only renders to a sub-portion of the backbuffer
+	//if (g_bLargeViewport || g_bBigViewportMode)
+	{
+		// Clear back buffer [dj2019]
+		djgSetColorFore(pVisBack, djColor(0, 0, 0));
+		djgDrawBox(pVisBack, 0, 0, pVisBack->width, pVisBack->height);
+	}
+
 	GameDrawSkin();
-	GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT, g_nViewOffsetX, g_nViewOffsetY, g_nViewOffsetX, g_nViewOffsetY );
+	//dj2019-06 Move DrawHealth(),score,firepower,inventory before GraphFlipView for big/large viewport modes to work correctly, not sure if that's right.
 	DrawHealth();
 	DrawScore();
 	GameDrawFirepower();
 	InvDraw();
+	GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT, g_nViewOffsetX, g_nViewOffsetY, g_nViewOffsetX, g_nViewOffsetY );
 	GraphFlip(!g_bBigViewportMode);
 }
 /*-----------------------------------------------------------*/
@@ -765,13 +775,14 @@ void ReInitGameViewport()
 
 	if (g_bBigViewportMode)
 	{
-		VIEW_WIDTH = (pVisView->width / 16) - 10;
-		VIEW_HEIGHT = (pVisView->height - 5*16) / 16;
+		//dj2019-07 should refine later but for now make it, use all pixels except a ring around the viewport one 'gameblock' size ..
+		VIEW_WIDTH = (pVisView->width / BLOCKW) - 2;// - 10;
+		VIEW_HEIGHT = (pVisView->height / BLOCKH) - 2;// - 5*16) / 16;
 		if (VIEW_HEIGHT>=100)VIEW_HEIGHT=100;
 		if (VIEW_WIDTH>=128)VIEW_WIDTH=128;
 		//Top left of game viewport in pixels:
-		g_nViewOffsetX=16;//?? or should these be 0, probably [dj2017-08 ??]
-		g_nViewOffsetY=16;//??
+		g_nViewOffsetX=BLOCKW;//?? or should these be 0, probably [dj2017-08 ??]
+		g_nViewOffsetY=BLOCKH;//??
 	}
 	else if (g_bLargeViewport)
 	{
@@ -2040,8 +2051,8 @@ void DrawHealth()
 		szHealth[MAX_HEALTH-1-i] = ((int)i<g_nHealth?170:169);
 	}
 	szHealth[MAX_HEALTH] = 0;
-	if (g_bLargeViewport)
-		GraphDrawString( pVisView, g_pFont8x8, 320-MAX_HEALTH*8, 0, (unsigned char*)szHealth );
+	if (g_bLargeViewport || g_bBigViewportMode)
+		GraphDrawString( pVisView, g_pFont8x8, g_nViewOffsetX+(VIEW_WIDTH*BLOCKW)-MAX_HEALTH*8, g_nViewOffsetY, (unsigned char*)szHealth );
 	else
 		GraphDrawString( pVisBack, g_pFont8x8, HEALTH_X, HEALTH_Y, (unsigned char*)szHealth );
 }
@@ -2090,13 +2101,13 @@ void SetScore(int nScore)
 
 void DrawScore()
 {
-	char score_buf[32]={0};
+	char score_buf[64]={0};
 	sprintf( score_buf, "%10d", (int)g_nScore );
 	// Display score
-	if (g_bLargeViewport)
+	if (g_bLargeViewport || g_bBigViewportMode)
 	{
 		// Don't need to clear behind as the game viewport is redrawn every frame underneath us
-		GraphDrawString( pVisView, g_pFont8x8, 320 - 10*8, 8, (unsigned char*)score_buf );
+		GraphDrawString( pVisView, g_pFont8x8, (g_nViewOffsetX+(VIEW_WIDTH*BLOCKW)) - 10*8, g_nViewOffsetY + 8/* +8 is to put it below health */, (unsigned char*)score_buf );
 	}
 	else
 	{
@@ -2318,7 +2329,7 @@ void GameDrawView()
 
 	// In g_bLargeViewport mode, the health etc. are overlays, so must be drawn every frame.
 	// In DN1-gameviewport mode, they don't need to be drawn every frame.
-	if (g_bLargeViewport)
+	if (g_bLargeViewport || g_bBigViewportMode)
 	{
 		DrawHealth();
 		DrawScore();
@@ -2434,7 +2445,7 @@ void GameDrawSkin()
 	if (g_bLargeViewport) return;
 	// Draw the game skin
 	if (pSkinGame)
-		djgDrawImage( pVisBack, pSkinGame, 0, 0, 320, 200 );
+		djgDrawImage( pVisBack, pSkinGame, 0, 0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H );
 }
 
 int GetCurrentLevel()
@@ -2690,7 +2701,7 @@ bool CheckCollision(int x1, int y1, int x2, int y2, CBullet *pBullet)
 	int nX1 = x1 / 16;
 	int nY1 = y1 / 16;
 	int nX2 = x2 / 16;
-#ifdef tBUILD_GNUKEM1
+#ifdef tBUILD_DAVEGNUKEM1
 	//dj2018-03 Hacky - technically "wrong" but emulates DN1 behavior, and I quite like it because it squares the unfairness in some situations eg flyingrobot shoot over barrel cf 25 Mar 2018 issue. Basically in DN1 your monsters fly over solid single block in front of you like barrel(yellow can), but still hit boxes [which are same position/size etc.] ... so technically that aspect of the physics "doesn't make sense" but this setting nY2 to nY1 emulates the not-making-sense for solid-blocks (check_solid() function) but NOT for CThing's (which boxes are) - so boxes remain shootable, but we can 'shoot over' barrels :)
 	// This is um basically 'very Duke-Nukem-1-specific', probably, I think [dj2018-03] - if we ever make this more generic engine for other games, may want nY2 = y2 / 16; rather
 	int nY2 = nY1;
@@ -2774,12 +2785,15 @@ int GameLoadSprites()
 
 void GameDrawFirepower()
 {
-	if (g_bLargeViewport)
+	if (g_bLargeViewport || g_bBigViewportMode)
 	{
 		// Draw firepower
-		for ( int i=0; i<g_nFirepower; i++ )
+		int nX = g_nViewOffsetX;
+		int nY = (g_nViewOffsetY+(VIEW_HEIGHT*BLOCKH)) - BLOCKH;
+
+		for ( int i=0; i<g_nFirepower; ++i )
 		{
-			DRAW_SPRITE16A( pVisView, 5, 0, i*16, 200 - 16 );
+			DRAW_SPRITE16A( pVisView, 5, 0, nX + i*16, nY );
 		}
 	}
 	else
@@ -2787,7 +2801,7 @@ void GameDrawFirepower()
 		// First clear firepower display area with game skin
 		djgDrawImage( pVisBack, pSkinGame, FIREPOWER_X, FIREPOWER_Y, FIREPOWER_X, FIREPOWER_Y, 16*5, 16 );
 		// Draw firepower
-		for ( int i=0; i<g_nFirepower; i++ )
+		for ( int i=0; i<g_nFirepower; ++i )
 		{
 			DRAW_SPRITE16A( pVisBack, 5, 0, FIREPOWER_X + i*16, FIREPOWER_Y );
 		}

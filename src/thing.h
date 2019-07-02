@@ -15,6 +15,9 @@ Copyright (C) 1999-2018 David Joffe
 #include "hero.h"
 #include "config.h"
 
+
+//g_bLargeViewport -> we slow down every calculation for a cheat-only mode we never use :/ .. hrm. surely could do better here://dj2019-07
+
 //! Convert world X coordinate (level block coordinate) to view (world display buffer) coordinates.
 #define CALC_XOFFSET(x) ( 8 * ( -xo_small + (g_bLargeViewport?0:2) + ((( (x) - xo ) << 1))) )
 //! Convert world Y coordinate (level block coordinate) to view (world display buffer) coordinates.
