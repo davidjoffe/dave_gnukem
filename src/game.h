@@ -27,9 +27,9 @@ extern int g_nViewOffsetX;//Top left of game viewport in pixels (X)
 extern int g_nViewOffsetY;//Top left of game viewport in pixels (Y)
 
 //! Tests if rectangle overlaps portion of world visible on screen (pixel coordinates)
-#define OVERLAPS_VIEW(x1,y1,x2,y2) (OVERLAPS(x1,y1,x2,y2,16*xo,16*yo,16*(xo+VIEW_WIDTH)+(8*xo_small),16*(yo+VIEW_HEIGHT)))
+#define OVERLAPS_VIEW(x1,y1,x2,y2) (OVERLAPS(x1,y1,x2,y2,BLOCKW*xo,BLOCKH*yo,BLOCKW*(xo+VIEW_WIDTH)+(HALFBLOCKW*xo_small),BLOCKH*(yo+VIEW_HEIGHT)))
 //! Tests if point is directly inside portion of world visible on screen (pixel coordinates)
-#define IN_VIEW(x,y) (INBOUNDS(x,y,xo*16,yo*16,16*(xo+VIEW_WIDTH)+(8*xo_small),16*(yo+VIEW_HEIGHT)))
+#define IN_VIEW(x,y) (INBOUNDS(x,y,xo*BLOCKW,yo*BLOCKH,BLOCKW*(xo+VIEW_WIDTH)+(HALFBLOCKW*xo_small),BLOCKH*(yo+VIEW_HEIGHT)))
 
 
 class CThing;
