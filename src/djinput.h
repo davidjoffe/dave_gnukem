@@ -2,7 +2,7 @@
 /* David Joffe '95/07/20 test key hook */
 /* 1999/02 converting over from keys.h/cpp , trying to genericize */
 /* 2001/07 converting to SDL */
-/* Copyright (C) 1995-2018 David Joffe */
+/* Copyright (C) 1995-2019 David Joffe */
 /*--------------------------------------------------------------------------*/
 #ifndef _DJINPUT_H_
 #define _DJINPUT_H_
@@ -22,7 +22,8 @@ extern void djiPollBegin();
 extern void djiPollEnd();
 extern bool djiPollEvents(SDL_Event &Event);
 extern void djiWaitForKeyUp(unsigned char cKey);
-extern bool djiAnyKeyDown();
+//dj2019-07 don't think anything uses djiAnyKeyDown anymore, commenting it out for now ..
+//extern bool djiAnyKeyDown();
 extern bool djiKeyDown(int iScanCode);
 extern bool djiKeyPressed(int iScanCode);
 void djiClearBuffer ();				// rtfb

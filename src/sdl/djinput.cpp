@@ -1,7 +1,7 @@
 /*
 djinput.cpp
 
-Copyright (C) 1995-2018 David Joffe
+Copyright (C) 1995-2019 David Joffe
 
 Created: '95/07/20 (originally as a test keyboard interrupt hook)
 */
@@ -501,15 +501,17 @@ void djiWaitForKeyUp(unsigned char cKey)
 	} while (g_iKeys[cKey]);
 }
 
+/*
 bool djiAnyKeyDown()
 {
 	int i,r=0;
-	for (i = 0;i<128;i++)
+	for (i = 0;i<128;++i)
 	{
 		r = r | g_iKeys[i];
 	}
 	return(r!=0);
 }
+*/
 
 bool djiKeyDown(int iScanCode)
 {
