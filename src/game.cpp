@@ -420,7 +420,7 @@ void InteractWithThings()
 	for ( int i=0; i<(int)g_apThings.size(); ++i )
 	{
 		pThing = g_apThings[i];
-		if (pThing->OverlapsBounds(x*16+x_small*8, y*16+y_offset-16))
+		if (pThing->OverlapsBounds(x*BLOCKW+x_small*HALFBLOCKW, y*BLOCKH+y_offset-BLOCKH))
 		{
 			// [dj2016-10-10] Note that if inside HeroOverlaps(), it can cause you to die, e.g. if you've interacted with
 			// spikes .. so be aware you may be dead after calling that .. thats g_bDied, which causes level restart below.
@@ -443,7 +443,7 @@ void InteractWithThings()
 		if (pThing!=NULL)
 		{
 			// Test if entering or leaving action bounds box
-			if (pThing->HeroInsideActionBounds(x*16+x_small*8, y*16+y_offset-16))
+			if (pThing->HeroInsideActionBounds(x*BLOCKW+x_small*HALFBLOCKW, y*BLOCKH+y_offset-BLOCKH))
 			{
 				if (!pThing->IsHeroInside())
 					pThing->HeroEnter();
@@ -477,6 +477,7 @@ void TickAllThings()
 void DropFallableThings()
 {
 	CThing* pThing = NULL;
+	// Note i may decrement during the loop (if thing deleted)
 	for ( int i=0; i<(int)g_apThings.size(); ++i )
 	{
 		pThing = g_apThings[i];
@@ -492,7 +493,7 @@ void DropFallableThings()
 				{
 					pThing->m_y += 1;
 					// if object falls off bottom of level
-					if (pThing->m_y >= 100)
+					if (pThing->m_y >= LEVEL_HEIGHT)
 					{
 						// delete this object!!!
 						delete pThing;
@@ -545,8 +546,8 @@ void CheckIfHeroShooting()
 			#define HERO_BULLET_SPEED (16)
 
 			HeroShoot(
-				x * 16 /*+ (hero_dir==1 ? 16 : -16)*/ + x_small*8,
-				(y-1) * 16+11,
+				x * BLOCKW /*+ (hero_dir==1 ? BLOCKW : -BLOCKW)*/ + x_small*HALFBLOCKW,
+				(y-1)*BLOCKH + 11,
 				(hero_dir==0 ? -HERO_BULLET_SPEED : HERO_BULLET_SPEED)
 			);
 
@@ -2163,8 +2164,11 @@ void GameDrawView()
 		//djgClear(pVisView);
 	}
 
+	//dj2019-07 Re this "10 seconds got to just after coke can, purple lab" comment: I don't know anymore what I meant with that (possibly something timing/benchmark-related),
+	// but that comment was written in the 1990s, as the 'purple lab' was a computer lab at University of Pretoria where I studied .. for some reason I think of this comment often still when I think about this game so I want to leave this here:
 	//(10 seconds got to just after coke can, purple lab)
-	pLevelBlockPointer = (unsigned char *)(g_pLevel) + yo*512+(xo<<2);
+	const unsigned int uLEVEL_BYTESPERROW = (LEVEL_WIDTH * LEVEL_BYTESPERBLOCK);
+	pLevelBlockPointer = (unsigned char *)(g_pLevel) + yo*uLEVEL_BYTESPERROW + (xo*LEVEL_BYTESPERBLOCK);//was:(g_pLevel) + yo*512+(xo<<2);
 	//  c=2;
 	//const unsigned int uLevelPixelW = 128*16;
 	//const unsigned int uLevelPixelH = 100*16;
@@ -2230,12 +2234,12 @@ void GameDrawView()
 				}
 			}
 			xoff += BLOCKW;
-			pLevelBlockPointer += 4;// <- 4 bytes per level 'block' so advance pointer 4 bytes, see comments at definition of LEVEL_SIZE etc.
+			pLevelBlockPointer += LEVEL_BYTESPERBLOCK;// <- 4 bytes per level 'block' so advance pointer 4 bytes, see comments at definition of LEVEL_SIZE etc.
 		}
 		nYOffset += BLOCKH;
 		// The reason xo_small comes into it if advancing level pointer to next row, is that
 		// if xo_small is 1, we literally actually effectively have a 1-block wider game viewport (as two 'halves' on left/right side of viewport) (keep in mind xo_small is either 0 or 1, IIRC) [dj2017-08]
-		pLevelBlockPointer += (512 - ((VIEW_WIDTH+xo_small)<<2));
+		pLevelBlockPointer += (uLEVEL_BYTESPERROW - ((VIEW_WIDTH+xo_small) * LEVEL_BYTESPERBLOCK));//was:pLevelBlockPointer += (512 - ((VIEW_WIDTH+xo_small)<<2));
 	}
 
 	// Draw pre-hero layers, then draw hero, then draw post-hero layers.
@@ -2252,11 +2256,11 @@ void GameDrawView()
 		//yoff = 200+16+(y-yo-1)*16;
 
 		//xoff = ((x_small - xo_small)+1)*8 + (x-xo) * 16;
-		yoff = g_nViewOffsetY + (y-yo-1) * 16;
+		yoff = g_nViewOffsetY + (y-yo-1) * BLOCKH;
 
 		xoff = (x_small - xo_small)+1 + ((x-xo)<<1);
-		xoff *= 8;
-		if (g_bLargeViewport) xoff -= 16;
+		xoff *= HALFBLOCKW;
+		if (g_bLargeViewport) xoff -= BLOCKW;
 		/*
 		if (hero_dir>0)
 		{
@@ -2279,28 +2283,28 @@ void GameDrawView()
 			--g_nHeroJustFiredWeaponCounter;
 			int nOffs = (hero_picoffs+1)%4;
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+nOffs*4,1+xoff   ,1+yoff   +y_offset,16,16);
-			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+nOffs*4,1+xoff   ,1+yoff+16+y_offset,16,15);
-			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+nOffs*4,1+xoff+16,1+yoff   +y_offset,16,16);
-			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+nOffs*4,1+xoff+16,1+yoff+16+y_offset,16,15);
+			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+nOffs*4,1+xoff       ,1+yoff       +y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+nOffs*4,1+xoff       ,1+yoff+BLOCKH+y_offset,BLOCKW,BLOCKH-1);
+			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+nOffs*4,1+xoff+BLOCKW,1+yoff       +y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+nOffs*4,1+xoff+BLOCKW,1+yoff+BLOCKH+y_offset,BLOCKW,BLOCKH-1);
 #endif
-			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+nOffs*4,xoff   ,yoff   +y_offset);
-			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+nOffs*4,xoff   ,yoff+16+y_offset);
-			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+nOffs*4,xoff+16,yoff   +y_offset);
-			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+nOffs*4,xoff+16,yoff+16+y_offset);
+			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+nOffs*4,xoff       ,yoff       +y_offset);
+			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+nOffs*4,xoff       ,yoff+BLOCKH+y_offset);
+			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+nOffs*4,xoff+BLOCKW,yoff       +y_offset);
+			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+nOffs*4,xoff+BLOCKW,yoff+BLOCKH+y_offset);
 		}
 		else
 		{
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+hero_picoffs*4,1+xoff   ,1+yoff   +y_offset,16,16);
-			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+hero_picoffs*4,1+xoff   ,1+yoff+16+y_offset,16,15);
-			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+hero_picoffs*4,1+xoff+16,1+yoff   +y_offset,16,16);
-			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+hero_picoffs*4,1+xoff+16,1+yoff+16+y_offset,16,15);
+			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff       +y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff+BLOCKH+y_offset,BLOCKW,BLOCKH-1);
+			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+hero_picoffs*4,1+xoff+BLOCKW,1+yoff       +y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+hero_picoffs*4,1+xoff+BLOCKW,1+yoff+BLOCKH+y_offset,BLOCKW,BLOCKH-1);
 #endif
-			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+hero_picoffs*4,xoff   ,yoff   +y_offset);
-			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+hero_picoffs*4,xoff   ,yoff+16+y_offset);
-			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+hero_picoffs*4,xoff+16,yoff   +y_offset);
-			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+hero_picoffs*4,xoff+16,yoff+16+y_offset);
+			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+hero_picoffs*4,xoff       ,yoff       +y_offset);
+			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+hero_picoffs*4,xoff       ,yoff+BLOCKH+y_offset);
+			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+hero_picoffs*4,xoff+BLOCKW,yoff       +y_offset);
+			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+hero_picoffs*4,xoff+BLOCKW,yoff+BLOCKH+y_offset);
 		}
 		if (bShowDebugInfo)
 		{
@@ -2652,7 +2656,9 @@ bool check_solid( int ix, int iy, bool bCheckThings )
 	int i;
 
 	// Create an invisible "border" around the level. Handy catch-all for things going out of bounds.
-	if ( ix<1 || iy<1 || ix>126 || iy>98 ) return true;
+	//(dj2019-07 LOWPrio It's debatable here whether we might actually want this to go all the way to the edges perhaps,
+	// e.g. test if ix<0 or ix>LEVEL_WIDTH .. maybe for other games .. must make sure no crashing issues etc. .. behaviour should be game-dependent)
+	if ( ix<1 || iy<1 || ix>(LEVEL_WIDTH-2) || iy>(LEVEL_HEIGHT-2) ) return true;
 
 	// FIXME: This is not speed-optimal (does it really matter?)
 
@@ -2678,7 +2684,7 @@ bool check_solid( int ix, int iy, bool bCheckThings )
 				// for so long?? If we change this now a lot of things
 				// must be carefully re-tested .. [dj2018-01-12]
 				if (OVERLAPS(
-					ix*16, iy*16, ix*16+15, iy*16+15,
+					ix*BLOCKW, iy*BLOCKH, ix*BLOCKW+(BLOCKW-1), iy*BLOCKH+(BLOCKH-1),
 					pThing->m_x*BLOCKW + pThing->m_iSolidX1,
 					pThing->m_y*BLOCKH + pThing->m_iSolidY1,
 					pThing->m_x*BLOCKW + pThing->m_iSolidX2,
@@ -2698,23 +2704,23 @@ bool check_solid( int ix, int iy, bool bCheckThings )
 bool CheckCollision(int x1, int y1, int x2, int y2, CBullet *pBullet)
 {
 	int i, j;
-	int nX1 = x1 / 16;
-	int nY1 = y1 / 16;
-	int nX2 = x2 / 16;
+	int nX1 = x1 / BLOCKW;
+	int nY1 = y1 / BLOCKH;
+	int nX2 = x2 / BLOCKW;
 #ifdef tBUILD_DAVEGNUKEM1
 	//dj2018-03 Hacky - technically "wrong" but emulates DN1 behavior, and I quite like it because it squares the unfairness in some situations eg flyingrobot shoot over barrel cf 25 Mar 2018 issue. Basically in DN1 your monsters fly over solid single block in front of you like barrel(yellow can), but still hit boxes [which are same position/size etc.] ... so technically that aspect of the physics "doesn't make sense" but this setting nY2 to nY1 emulates the not-making-sense for solid-blocks (check_solid() function) but NOT for CThing's (which boxes are) - so boxes remain shootable, but we can 'shoot over' barrels :)
 	// This is um basically 'very Duke-Nukem-1-specific', probably, I think [dj2018-03] - if we ever make this more generic engine for other games, may want nY2 = y2 / 16; rather
 	int nY2 = nY1;
 #else
-	int nY2 = y2 / 16;
+	int nY2 = y2 / BLOCKH;
 #endif
-	for ( i=nX1; i<=nX2; i++ )
+	for ( i=nX1; i<=nX2; ++i )
 	{
-		for ( j=nY1; j<=nY2; j++ )
+		for ( j=nY1; j<=nY2; ++j )
 		{
 			if (check_solid(i, j, false))
 			{
-				if (OVERLAPS(x1, y1, x2, y2, i*16, j*16, i*16+15, j*16+15))
+				if (OVERLAPS(x1, y1, x2, y2, i*BLOCKW, j*BLOCKH, i*BLOCKW+(BLOCKW-1), j*BLOCKH+(BLOCKH-1)))
 					return true;
 			}
 		}
