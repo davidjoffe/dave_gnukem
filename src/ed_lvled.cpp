@@ -406,7 +406,7 @@ void DoAllLevelsOverview()
 			pData = g_pCurMission->GetSpriteData(a);
 			if (pData)
 			{
-				for ( int b=0;b<128;++b )
+				for ( int b=0;b<SPRITES_PER_SPRITESHEET;++b )
 				{
 					int nType = ED_GetSpriteType( a, b );
 					if (ED_GetSpriteType( a, b )==TYPE_BOX)
@@ -804,7 +804,7 @@ switch_e LVLED_MainLoop ()
 			if (g_iKeys[DJKEY_F])
 			{
 				// if mouse in main level view
-				if (INBOUNDS( mouse_x, mouse_y, 0, 0, 128*LEVEL_GRIDSIZE-1, 100*LEVEL_GRIDSIZE-1 ))
+				if (INBOUNDS(mouse_x, mouse_y, 0, 0, LEVEL_WIDTH*LEVEL_GRIDSIZE - 1, LEVEL_HEIGHT*LEVEL_GRIDSIZE - 1))
 				{
 					LevelFill( mouse_x / LEVEL_GRIDSIZE, mouse_y / LEVEL_GRIDSIZE );
 				}
@@ -1013,7 +1013,7 @@ bool HandleMouse ()
 			ED_DrawString( 0, POS_LEVELSPRITES_Y+16*8, sType.c_str() );
 	}
 	// main editting area
-	else if (INBOUNDS( mouse_x, mouse_y, 0, 0, 128 * LEVEL_GRIDSIZE - 1, 100 * LEVEL_GRIDSIZE - 1 ))
+	else if (INBOUNDS(mouse_x, mouse_y, 0, 0, LEVEL_WIDTH * LEVEL_GRIDSIZE - 1, LEVEL_HEIGHT * LEVEL_GRIDSIZE - 1))
 	{
 		ax = mouse_x / LEVEL_GRIDSIZE;
 		ay = mouse_y / LEVEL_GRIDSIZE;
@@ -1082,8 +1082,8 @@ static void MoveMinimap( int ox, int oy )
 		return;
 
 	// Set new level view offset, checking bounds.
-	levelview_x = djCLAMP(ox, 0, 128 - levelview_w);
-	levelview_y = djCLAMP(oy, 0, 100 - levelview_h);
+	levelview_x = djCLAMP(ox, 0, LEVEL_WIDTH - levelview_w);
+	levelview_y = djCLAMP(oy, 0, LEVEL_HEIGHT - levelview_h);
 
 	// Redraw the purple rectangle
 	DrawMinimapRectangle();
@@ -1107,7 +1107,7 @@ void RedrawView ()
 	else
 		ED_DrawStringClear( 48, 308, "[FOREGROUND]" );
 	DrawSprites();
-	DrawGrid( 0, 0, LEVEL_GRIDSIZE, LEVEL_GRIDSIZE, 128, 100, djColor(60,60,60) );
+	DrawGrid( 0, 0, LEVEL_GRIDSIZE, LEVEL_GRIDSIZE, LEVEL_WIDTH, LEVEL_HEIGHT, djColor(60,60,60) );
 	DrawLevelGrid();
 	DrawSpritesel();
 	DrawMinimap();
@@ -1134,10 +1134,11 @@ void DrawSprites ()
 	ox = POS_LEVELSPRITES_X;
 	oy = POS_LEVELSPRITES_Y;
 
-	for ( i=0; i<128; i++ )
+	for ( i=0; i<SPRITES_PER_SPRITESHEET; i++ )
 	{
-		xoffset = (i%16)*16;
-		yoffset = (i/16)*16;
+		//dj2019-07 hm should we have like a separate SPRITEW/SPRITEH here .. or something else .. hm. (thinking out loud)
+		xoffset = (i % SPRITESHEET_NUM_COLS) * BLOCKW;
+		yoffset = (i / SPRITESHEET_NUM_COLS) * BLOCKH;
 		ED_DrawSprite( ox + xoffset, oy + yoffset, ED_GetCurrSpriteSet(), i );
 	}
 
@@ -1391,7 +1392,7 @@ void SetSpriteSelection( int a0, int b0, int a1, int b1 )
 void SetLevel( int x, int y, int a, int b, bool bforeground )
 {
 	if (x<0 || y<0) return;
-	if (x>=128 || y>=100) return;
+	if (x>=LEVEL_WIDTH || y>=LEVEL_HEIGHT) return;
 	if (bforeground)
 	{
 		*(level_pointer(0, x, y) + 0) = a;

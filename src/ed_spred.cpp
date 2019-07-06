@@ -384,10 +384,10 @@ void DrawSprites ()
 	ox = POS_SPRITES_X;
 	oy = POS_SPRITES_Y;
 
-	for ( i=0; i<128; i++ )
+	for ( i=0; i<SPRITES_PER_SPRITESHEET; i++ )
 	{
-		xoffset = (i%16)*16;
-		yoffset = (i/16)*16;
+		xoffset = (i % SPRITESHEET_NUM_COLS) * BLOCKW;
+		yoffset = (i / SPRITESHEET_NUM_COLS) * BLOCKH;
 		ED_DrawSprite( ox + xoffset, oy + yoffset, ED_GetCurrSpriteSet(), i );
 	}
 
