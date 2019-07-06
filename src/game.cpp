@@ -990,7 +990,7 @@ void PerLevelSetup()
 	// just in case level doesn't contain a starting block ..
 	xo = 0;
 	yo = 0;
-	relocate_hero( 20, 20 );
+	relocate_hero( LEVEL_WIDTH/2, LEVEL_HEIGHT/2 );
 	hero_dir = 1;
 
 	DestroyAllThings();// clear list of "things"
@@ -1004,6 +1004,7 @@ void PerLevelSetup()
 	if (NULL == level_load( 0, szfilename ))
 	{
 		djMSG("PerLevelSetup(): error loading level %s.\n", szfilename );
+		//dj2019-07 This should be just a warning but it should let you play, with some default placement position.
 		ShowGameMessage("BAD FILENAME FOR LEVEL", 1000);
 		//return;
 	}
@@ -2659,7 +2660,11 @@ bool check_solid( int ix, int iy, bool bCheckThings )
 	// Create an invisible "border" around the level. Handy catch-all for things going out of bounds.
 	//(dj2019-07 LOWPrio It's debatable here whether we might actually want this to go all the way to the edges perhaps,
 	// e.g. test if ix<0 or ix>LEVEL_WIDTH .. maybe for other games .. must make sure no crashing issues etc. .. behaviour should be game-dependent)
+//#ifdef tBUILD_DAVEGNUKEM1
 	if ( ix<1 || iy<1 || ix>(LEVEL_WIDTH-2) || iy>(LEVEL_HEIGHT-2) ) return true;
+	//if ( ix<0 || iy<-2 || ix>(LEVEL_WIDTH) || iy>(LEVEL_HEIGHT+5) ) return true;
+//#else
+//#endif
 
 	// FIXME: This is not speed-optimal (does it really matter?)
 
