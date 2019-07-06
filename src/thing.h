@@ -19,16 +19,16 @@ Copyright (C) 1999-2018 David Joffe
 //g_bLargeViewport -> we slow down every calculation for a cheat-only mode we never use :/ .. hrm. surely could do better here://dj2019-07
 
 //! Convert world X coordinate (level block coordinate) to view (world display buffer) coordinates.
-#define CALC_XOFFSET(x) ( 8 * ( -xo_small + (g_bLargeViewport?0:2) + ((( (x) - xo ) << 1))) )
+#define CALC_XOFFSET(x) ( HALFBLOCKW * ( -xo_small + (g_bLargeViewport?0:2) + ((( (x) - xo ) << 1))) )
 //! Convert world Y coordinate (level block coordinate) to view (world display buffer) coordinates.
-#define CALC_YOFFSET(y) ( g_nViewOffsetY + ((y) - yo) * 16 )
+#define CALC_YOFFSET(y) ( g_nViewOffsetY + ((y) - yo) * BLOCKH )
 
 //! Convert world X coordinate (pixels) to view (world display buffer) coordinates.
 //! Theoretically this should probably eventually replace CALC_XOFFSET
-#define WORLDX2VIEW(x) ( -(8*xo_small) + ((x) - (16*xo)) + g_nViewOffsetX )
+#define WORLDX2VIEW(x) ( -(HALFBLOCKW*xo_small) + ((x) - (BLOCKW*xo)) + g_nViewOffsetX )
 //! Convert world Y coordinate (pixels) to view (world display buffer) coordinates.
 //! Theoretically this should probably eventually replace CALC_YOFFSET
-#define WORLDY2VIEW(y) (                 ((y) - (16*yo)) + g_nViewOffsetY)
+#define WORLDY2VIEW(y) (                 ((y) - (BLOCKH*yo)) + g_nViewOffsetY)
 
 // CThing helpers [dj2017-08]
 #define PIXELX (m_x*BLOCKW+m_xoffset)
@@ -297,11 +297,12 @@ public:
 	//! Test if hero is completely inside the box (not merely overlapping)
 	inline bool HeroInsideActionBounds(int x, int y)
 	{
+		//dj2019-07 Currently hardcoded to 1 gameblock wide and 2 high for DG1, later make more generic configurable 'hero action width/height' defines or somesuch ..
 		return (
-			(x   >=PIXELX+m_iActionX1) &&
-			(x+15<=PIXELX+m_iActionX2) &&
-			(y   >=PIXELY+m_iActionY1) &&
-			(y+31<=PIXELY+m_iActionY2));
+			(x             >=PIXELX+m_iActionX1) &&
+			(x+(BLOCKW-1)  <=PIXELX+m_iActionX2) &&
+			(y             >=PIXELY+m_iActionY1) &&
+			(y+(BLOCKH*2-1)<=PIXELY+m_iActionY2));
 	}
 	//! Test if hero is at least partially inside the box. By default this
 	//! just uses the action bounds; override this for things that have

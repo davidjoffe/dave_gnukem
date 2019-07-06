@@ -422,7 +422,7 @@ int CFlyingRobot::Tick()
 		m_nMoveEveryNthFrameY = 0;
 
 		// Work in pixel units here, simplifies things slightly. Compare our center-line, to hero center-line, vertically.
-		int nOurYPixels = PIXELY + (BLOCKH/2);//Add half as we use our center-line vs hero center-line
+		int nOurYPixels = PIXELY + HALFBLOCKH;//Add half as we use our center-line vs hero center-line
 		int nHeroYPixels = (y*BLOCKH + y_offset);
 		int nYDiffDir = 0;
 		if (nHeroYPixels < nOurYPixels)
@@ -463,7 +463,7 @@ int CFlyingRobot::Tick()
 				if ((rand()%50)<=2)
 				{
 					//dj2018-03-25 Change initial startpos from m_nXDir*16 to *8, this fixes a bug where it can shoot us through solid walls if we're against the wall
-					MonsterShoot(PIXELX + (m_nXDir*(BLOCKW/2)), PIXELY, m_nXDir<0?-10:10);
+					MonsterShoot(PIXELX + (m_nXDir*HALFBLOCKW), PIXELY, m_nXDir<0?-10:10);
 					m_nNoShootCounter = 24;// fixme, should be time, not frame count
 				}
 			}
@@ -811,8 +811,8 @@ int CCannon::OnKilled()
 	update_score(400, m_x, m_y);
 	//AddThing(CreateExplosion(m_x*16+8+m_xoffset, m_y*BLOCKH,1));
 	// Use two explosions as quick n dirty / cheap way to make explosion seem slightly bigger
-	AddThing(CreateExplosion(PIXELX+(BLOCKW/2)-(rand()%4),PIXELY+((rand()%3)-1),1));
-	AddThing(CreateExplosion(PIXELX+(BLOCKW/2)+(rand()%4),PIXELY+((rand()%3)-1),1,-1));
+	AddThing(CreateExplosion(PIXELX+HALFBLOCKW-(rand()%4),PIXELY+((rand()%3)-1),1));
+	AddThing(CreateExplosion(PIXELX+HALFBLOCKW+(rand()%4),PIXELY+((rand()%3)-1),1,-1));
 	//[TODO?] later could add a 'dying' animation here [dj2017-08]
 	return THING_DIE;
 }

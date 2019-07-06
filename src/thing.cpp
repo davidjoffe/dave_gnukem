@@ -222,8 +222,10 @@ bool CThing::OverlapsBounds(int x, int y)
 	return OVERLAPS(
 		x, y,
 		x+15, y+31,
-		m_x*16+m_iActionX1+m_xoffset, m_y*16+m_iActionY1+m_yoffset,
-		m_x*16+m_iActionX2+m_xoffset, m_y*16+m_iActionY2+m_yoffset);
+		PIXELX+m_iActionX1, PIXELY+m_iActionY1,
+		PIXELX+m_iActionX2, PIXELY+m_iActionY2);
+		//m_x*16+m_iActionX1+m_xoffset, m_y*16+m_iActionY1+m_yoffset,
+		//m_x*16+m_iActionX2+m_xoffset, m_y*16+m_iActionY2+m_yoffset);
 }
 
 /*-----------------------------------------------------------*/
@@ -239,7 +241,7 @@ CSpikeBall::CSpikeBall()
 void CSpikeBall::Draw()
 {
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_nYOffset*2,16,16);
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_nYOffset*2,BLOCKW,BLOCKH);
 #endif
 	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) + m_nYOffset*2);
 }
@@ -658,14 +660,16 @@ int CFloatingScore::Tick()
 
 void CFloatingScore::Draw()
 {
-	for ( int i=0; i<m_bufferlength; i++ )
+	for ( int i=0; i<m_bufferlength; ++i )
 	{
 		// 5x7 font
 		djgDrawImageAlpha( pVisView, g_pFont8x8,
 			((int)m_buffer[i]%32)*8,
 			((int)m_buffer[i]/32)*8,
-			i * 6 + 8 * ( -xo_small + 2 + (((m_x - xo) << 1))),
-			i * -2 + 16 + (m_y - yo) * 16 - 48 + (m_height * 2),
+			i * 6 + HALFBLOCKW * ( -xo_small + 2 + (((m_x - xo) << 1))),
+			i * -2 + BLOCKH + (m_y - yo) * BLOCKH - 48 + (m_height * 2),
+			//orig:i * 6 + 8 * ( -xo_small + 2 + (((m_x - xo) << 1))),
+			//orig:i * -2 + 16 + (m_y - yo) * 16 - 48 + (m_height * 2),
 			5,
 			7 );
 	}
@@ -868,7 +872,7 @@ void CCamera::Draw()
 		nOffset = 1;
 
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + nOffset, CALC_XOFFSET(m_x)+1, CALC_YOFFSET(m_y)+1,16,16);
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + nOffset, CALC_XOFFSET(m_x)+1, CALC_YOFFSET(m_y)+1,BLOCKW,BLOCKH);
 #endif
 	DRAW_SPRITE16A(pVisView, m_a, m_b + nOffset, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
@@ -897,7 +901,7 @@ CBanana::CBanana()
 void CBanana::Draw()
 {
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + m_nState, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y),16,16);
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + m_nState, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y),BLOCKW,BLOCKH);
 	DRAW_SPRITE16A(pVisView, m_a, m_b + m_nState, CALC_XOFFSET(m_x)-1, CALC_YOFFSET(m_y)-1);
 #else
 	DRAW_SPRITE16A(pVisView, m_a, m_b + m_nState, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
@@ -1173,8 +1177,8 @@ void CAcme::CreateOnDestroyedEffects()
 	AddThing(CreateExplosion(((rand()%4)-2) + m_x*BLOCKW           , PIXELY + ((rand()%6)-3),1, 1));
 	AddThing(CreateExplosion(((rand()%4)-2) + m_x*BLOCKW+ BLOCKW   , PIXELY + ((rand()%6)-3),0,-1));
 	AddThing(CreateExplosion(((rand()%4)-2) + m_x*BLOCKW+ BLOCKW   , PIXELY + ((rand()%6)-3),1,-1));
-	AddThing(CreateExplosion(((rand()%4)-2) + m_x*BLOCKW+(BLOCKW/2), PIXELY + ((rand()%6)-3),0,-1));
-	AddThing(CreateExplosion(((rand()%4)-2) + m_x*BLOCKW+(BLOCKW/2), PIXELY + ((rand()%6)-3),1,-1));
+	AddThing(CreateExplosion(((rand()%4)-2) + m_x*BLOCKW+HALFBLOCKW, PIXELY + ((rand()%6)-3),0,-1));
+	AddThing(CreateExplosion(((rand()%4)-2) + m_x*BLOCKW+HALFBLOCKW, PIXELY + ((rand()%6)-3),1,-1));
 }
 
 int CAcme::OnHeroShot()
@@ -1299,7 +1303,7 @@ CCrumblingFloor::CCrumblingFloor() :
 }
 int CCrumblingFloor::Tick()
 {
-	bool bHeroTouching = OverlapsBounds(x*16+x_small*8, y*16+y_offset-16);
+	bool bHeroTouching = OverlapsBounds(x*BLOCKW+x_small*HALFBLOCKW, y*BLOCKH+y_offset-BLOCKH);
 	//Detect 'edge' when just start touching.
 	if (bHeroTouching && !m_bHeroTouchingPrev)
 	{
@@ -1366,7 +1370,7 @@ int CConveyor::Tick()
 void CConveyor::Draw()
 {
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y),16,16);
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y),BLOCKW,BLOCKH);
 #endif
 	DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }

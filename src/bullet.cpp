@@ -47,7 +47,7 @@ void CBullet::Draw()
 				nAnim,
 				1 + WORLDX2VIEW(x),
 				1 + WORLDY2VIEW(y)-4,
-				16,16
+				BLOCKW,BLOCKH
 			);
 #endif
 			djgDrawImageAlpha(pVisView,
