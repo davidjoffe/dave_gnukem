@@ -15,15 +15,20 @@
 
 // These should be dynamic, to allow any size level. I initially made
 // restrictions because of the memory limitations in the DOS world.
-#define LEVEL_WIDTH  128
-#define LEVEL_HEIGHT 100
+#define LEVEL_WIDTH  (128)
+#define LEVEL_HEIGHT (100)
+#define LEVEL_BYTESPERBLOCK (4)
 //! Size in bytes of the in-memory level 'data block'. See comments at \ref SLevelBlock below for where this 4 comes from (in short: foreground block (a,b) + background block(a,b), where a=spritesetindex and b=offsetintospriteset)
-#define LEVEL_SIZE   (4 * LEVEL_WIDTH * LEVEL_HEIGHT)
+#define LEVEL_SIZE   (LEVEL_BYTESPERBLOCK * LEVEL_WIDTH * LEVEL_HEIGHT)
 
+#ifndef BLOCKW
 //! Width of a basic game 'block'/'sprite' in pixels
 #define BLOCKW (16)
+#endif
+#ifndef BLOCKH
 //! Height of a basic game 'block'/'sprite' in pixels
 #define BLOCKH (16)
+#endif
 
 
 
@@ -85,6 +90,9 @@ extern bool g_bBigViewportMode;//dj2019-06. //Can't have both bigviewport and la
 #endif
 //---------------------------------------------------------------------------
 
+//dj2019-07 Convenience helpers, not really too important (in theory could avoid a bitshift for speed here, but optimizing compiler SHOULD do that already as long as BLOCKW is a constant.)
+#define HALFBLOCKW ((BLOCKW)>>1)
+#define HALFBLOCKH ((BLOCKH)>>1)
 
 /*--------------------------------------------------------------------------*/
 #endif
