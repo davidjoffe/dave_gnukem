@@ -411,7 +411,7 @@ int CSpriteData::LoadData( const char *szFilename )
 	// Read "128"
 	fscanf ( fin, "%i", &temp );
 
-	for ( i=0; i<128; i++ )
+	for ( i=0; i<SPRITES_PER_SPRITESHEET; i++ )
 	{
 		// Read type
 		fscanf ( fin, "%i", &temp );
@@ -484,8 +484,8 @@ int CSpriteData::SaveData( const char *szFilename )
 
 	// Print the number of images in the file. Not used yet, but maybe in
 	// the future.
-	fprintf( fout, "%d\n", 128 );
-	for ( i=0; i<128; i++ )
+	fprintf( fout, "%d\n", SPRITES_PER_SPRITESHEET );
+	for ( i=0; i<SPRITES_PER_SPRITESHEET; i++ )
 	{
 		// output block type
 		fprintf( fout, "%d\n", m_type[i] );

@@ -1,4 +1,5 @@
 
+#include "config.h"
 #include "djstring.h"
 #include "ed_macros.h"
 #include "ed_common.h"
@@ -106,7 +107,7 @@ void PlaceMacro(int x, int y, int iMacroIndex)
 	y = y;				// shut up
 	iMacroIndex = iMacroIndex;	// shut up
 
-	if ( (x < 0) || (y < 0) || (x >= 128) || (y >= 100) )
+	if ( (x < 0) || (y < 0) || (x >= LEVEL_WIDTH) || (y >= LEVEL_HEIGHT) )
 		return;
 
 	int iMacro = g_iAssignedMacros[iMacroIndex];

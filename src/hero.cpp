@@ -1,7 +1,7 @@
 /*
 hero.cpp
 
-Copyright (C) 2000-2018 David Joffe
+Copyright (C) 2000-2019 David Joffe
 */
 
 #include "hero.h"
@@ -164,14 +164,16 @@ void HeroReset()
 
 void relocate_hero( int xnew, int ynew )
 {
+	// Move hero (and reset the sub-block pixel offset values):
 	x = xnew;
 	y = ynew;
 	x_small = 0;
 	y_offset = 0;
+	// Snap viewpoint to where hero has moved and do bounds-checking on level dimensions:
 	xo = MAX( x - int(VIEW_WIDTH / 2), 0 );
 	yo = MAX( y - 6, 0 );
-	xo = MIN( xo, 128 - VIEW_WIDTH );
-	yo = MIN( yo, 100 - VIEW_HEIGHT );
+	xo = MIN( xo, LEVEL_WIDTH - VIEW_WIDTH );
+	yo = MIN( yo, LEVEL_HEIGHT - VIEW_HEIGHT );
 }
 
 
@@ -228,9 +230,9 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 					xo++;
 					xo_small = 0;
 				}
-				if ( (xo + xo_small) > 128 - VIEW_WIDTH )
+				if ( (xo + xo_small) > LEVEL_WIDTH - VIEW_WIDTH )
 				{
-					xo = 128 - VIEW_WIDTH;
+					xo = LEVEL_WIDTH - VIEW_WIDTH;
 					xo_small = 0;
 				}
 				*/

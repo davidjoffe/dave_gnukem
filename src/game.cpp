@@ -331,9 +331,10 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 			xo_small = 1;
 			}*/
 
-			if ( (xo + xo_small) > 128 - VIEW_WIDTH )
+			// (//dj2019-07) hm fixmeHIGH i suspect for low LEVEL_WIDTH we may have issues here with xo being negative, or is that OK
+			if ( (xo + xo_small) > LEVEL_WIDTH - VIEW_WIDTH )
 			{
-				xo = 128 - VIEW_WIDTH;
+				xo = LEVEL_WIDTH - VIEW_WIDTH;
 				xo_small = 0;
 			}
 		}
@@ -779,8 +780,6 @@ void ReInitGameViewport()
 		//dj2019-07 should refine later but for now make it, use all pixels except a ring around the viewport one 'gameblock' size ..
 		VIEW_WIDTH = (pVisView->width / BLOCKW) - 2;// - 10;
 		VIEW_HEIGHT = (pVisView->height / BLOCKH) - 2;// - 5*16) / 16;
-		if (VIEW_HEIGHT>=100)VIEW_HEIGHT=100;
-		if (VIEW_WIDTH>=128)VIEW_WIDTH=128;
 		//Top left of game viewport in pixels:
 		g_nViewOffsetX=BLOCKW;//?? or should these be 0, probably [dj2017-08 ??]
 		g_nViewOffsetY=BLOCKH;//??
@@ -809,6 +808,10 @@ void ReInitGameViewport()
 		//if (x>xo+VIEW_WIDTH/2) xo = x-VIEW_WIDTH/2;
 		//if (y>yo+VIEW_HEIGHT/2) yo = y-VIEW_HEIGHT/2;
 	}
+
+	// If very high resolution then in theory VIEW_WIDTH could be wider than the level, we don't want that or bad things will happen, so clamp to level dimensions:
+	if (VIEW_WIDTH > LEVEL_WIDTH) VIEW_WIDTH = LEVEL_WIDTH;
+	if (VIEW_HEIGHT > LEVEL_HEIGHT) VIEW_HEIGHT = LEVEL_HEIGHT;
 }
 /*-----------------------------------------------------------*/
 
@@ -2167,11 +2170,9 @@ void GameDrawView()
 	//dj2019-07 Re this "10 seconds got to just after coke can, purple lab" comment: I don't know anymore what I meant with that (possibly something timing/benchmark-related),
 	// but that comment was written in the 1990s, as the 'purple lab' was a computer lab at University of Pretoria where I studied .. for some reason I think of this comment often still when I think about this game so I want to leave this here:
 	//(10 seconds got to just after coke can, purple lab)
-	const unsigned int uLEVEL_BYTESPERROW = (LEVEL_WIDTH * LEVEL_BYTESPERBLOCK);
-	pLevelBlockPointer = (unsigned char *)(g_pLevel) + yo*uLEVEL_BYTESPERROW + (xo*LEVEL_BYTESPERBLOCK);//was:(g_pLevel) + yo*512+(xo<<2);
-	//  c=2;
-	//const unsigned int uLevelPixelW = 128*16;
-	//const unsigned int uLevelPixelH = 100*16;
+	pLevelBlockPointer = (unsigned char *)(g_pLevel) + yo*LEVEL_BYTESPERROW + (xo*LEVEL_BYTESPERBLOCK);//was:(g_pLevel) + yo*512+(xo<<2);
+	//const unsigned int uLevelPixelW = LEVEL_WIDTH*BLOCKW;
+	//const unsigned int uLevelPixelH = LEVEL_HEIGHT*BLOCKH;
 
 
 	int nYOffset = g_nViewOffsetY;
@@ -2239,7 +2240,7 @@ void GameDrawView()
 		nYOffset += BLOCKH;
 		// The reason xo_small comes into it if advancing level pointer to next row, is that
 		// if xo_small is 1, we literally actually effectively have a 1-block wider game viewport (as two 'halves' on left/right side of viewport) (keep in mind xo_small is either 0 or 1, IIRC) [dj2017-08]
-		pLevelBlockPointer += (uLEVEL_BYTESPERROW - ((VIEW_WIDTH+xo_small) * LEVEL_BYTESPERBLOCK));//was:pLevelBlockPointer += (512 - ((VIEW_WIDTH+xo_small)<<2));
+		pLevelBlockPointer += (LEVEL_BYTESPERROW - ((VIEW_WIDTH+xo_small) * LEVEL_BYTESPERBLOCK));//was:pLevelBlockPointer += (512 - ((VIEW_WIDTH+xo_small)<<2));
 	}
 
 	// Draw pre-hero layers, then draw hero, then draw post-hero layers.
@@ -2353,9 +2354,9 @@ void parse_level(void)
 {
 	int i, j;
 	// parse the level (for doors, keys, hero starting position etc.)
-	for ( i=0; i<100; ++i )
+	for ( i=0; i<LEVEL_HEIGHT; ++i )
 	{
-		for ( j=0; j<128; ++j )
+		for ( j=0; j<LEVEL_WIDTH; ++j )
 		{
 			sprite_factory( 0, 0, j, i, 0, true );
 			sprite_factory( 0, 0, j, i, 1, true );
@@ -2377,7 +2378,7 @@ void sprite_factory( unsigned char a, unsigned char b, int ix, int iy, int ifore
 	unsigned char   b0, b1;
 	bool            bWipeSprite = false;
 
-	plevel = g_pLevel + 4 * (iy * 128 + ix) + (ifore * 2);
+	plevel = g_pLevel + LEVEL_BYTESPERBLOCK * (iy * LEVEL_WIDTH + ix) + (ifore * 2);
 
 	if ( bfromlevel )
 	{
@@ -2603,7 +2604,7 @@ void DrawDebugInfo()
 	}
 
 	GraphDrawString(pVisView, g_pFont8x8, 32, 16, (unsigned char*)"Debug info on (D)" );
-	char buf[128]={0};
+	char buf[256]={0};
 	sprintf(buf, "%d things", (int)g_apThings.size());
 	GraphDrawString(pVisView, g_pFont8x8, 32, 24, (unsigned char*)buf );
 	sprintf(buf, "%d visible", nNumVisible);

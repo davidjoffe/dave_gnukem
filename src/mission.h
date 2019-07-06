@@ -120,6 +120,17 @@ public:
 	char *m_szBackground; // background image filename
 };
 /*--------------------------------------------------------------------------*/
+// This 128 has nothing to do with the levelwidth 128, not to be confused with it (dj2019-07):
+// Note that the file format is currently 128 also exactly of these .. so if you change this it will break existing metadata files .. ew.
+// OH NO IT WONT I see I thought of that, the file format has this valu ein it.
+#define SPRITES_PER_SPRITESHEET (128)
+//dj2019-07 adding these helpers .. in theory SPRITESHEET_NUM_COLS * SPRITESHEET_NUM_ROWS should = SPRITES_PER_SPRITESHEET
+// So for DG1 BLOCKW/BLOCKH=16x16, but each of our spriteset images has 16x8 (128) sprites on it .. 16 across, 8 down. That 16 has nothing do with BLOCK/BLOCK 16, that's coincidence.
+// So the pixel image size/resolution of a single spriteset image should be: width=BLOCKW * SPRITESHEET_NUM_COLS and height=BLOCKH * SPRITESHEET_NUM_ROWS
+// [//dj2019-07] All this is kinda gross, of course, for a proper generic engine we want to be able to throw arbitrary sprite sizes at it, it will simplify things.
+#define SPRITESHEET_NUM_COLS (16)
+#define SPRITESHEET_NUM_ROWS (8)
+/*--------------------------------------------------------------------------*/
 class CSpriteData
 {
 public:
@@ -141,14 +152,15 @@ public:
 #endif
 	char * m_szImgFilename;
 
-	int          GetID() { return m_iID; }
+	// not sure if this is used currently(dj2019-07):
+	//int          GetID() const { return m_iID; }
 
 	char *       m_szFilenameData;
 
-	int          m_extras[128][12];   // extras values (sprite metadata)
-	int          m_type[128];         // block type
-	//int          m_color[128];        // block color (for level editor) (OBSOLETE/DEPRECATED)
-	djColor      m_Color[128];        // block color
+	// These should probably be in a struct with one array of struct members or something.
+	int          m_extras[SPRITES_PER_SPRITESHEET][12];   // extras values (sprite metadata)
+	int          m_type[SPRITES_PER_SPRITESHEET];         // block type
+	djColor      m_Color[SPRITES_PER_SPRITESHEET];        // block color
 };
 /*--------------------------------------------------------------------------*/
 #endif

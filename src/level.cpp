@@ -144,7 +144,7 @@ unsigned char * level_pointer( int i, int x, int y )
 	if (level == NULL)
 		return NULL;
 
-	return level + 4 * (y * 128 + x);
+	return level + LEVEL_BYTESPERBLOCK * (y * LEVEL_WIDTH + x);
 }
 
 SLevelBlock level_get_block( int i, int x, int y )

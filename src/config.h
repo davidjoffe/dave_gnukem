@@ -20,6 +20,8 @@
 #define LEVEL_BYTESPERBLOCK (4)
 //! Size in bytes of the in-memory level 'data block'. See comments at \ref SLevelBlock below for where this 4 comes from (in short: foreground block (a,b) + background block(a,b), where a=spritesetindex and b=offsetintospriteset)
 #define LEVEL_SIZE   (LEVEL_BYTESPERBLOCK * LEVEL_WIDTH * LEVEL_HEIGHT)
+// Convenience helper //dj2019-07
+#define LEVEL_BYTESPERROW (LEVEL_WIDTH * LEVEL_BYTESPERBLOCK)
 
 #ifndef BLOCKW
 //! Width of a basic game 'block'/'sprite' in pixels
