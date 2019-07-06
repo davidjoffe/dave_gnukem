@@ -5,7 +5,7 @@
 /*
 mission.cpp
 
-Copyright (C) 1999-2018 David Joffe
+Copyright (C) 1999-2019 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "config.h"
@@ -372,7 +372,6 @@ CSpriteData::CSpriteData()
 	m_szFilenameData = NULL;
 	memset(m_extras, 0, sizeof(m_extras));
 	memset(m_type, 0, sizeof(m_type));
-	memset(m_color, 0, sizeof(m_color));
 }
 
 CSpriteData::~CSpriteData()
@@ -431,12 +430,11 @@ int CSpriteData::LoadData( const char *szFilename )
 		m_extras[i][11] = temp;
 
 		// FIXME: FOLLOWING OLD COLOR OBSOLETE
-		// Read block color
+		// Read block color (2019-06 THIS IS NOW DEPRECATED/OBSOLETE, this was for the old m_color variable, but we still load/save a dummy value to keep compatibility with existing sprite files.)
 		fscanf ( fin, "%i", &temp );
 		if (feof(fin))
 			goto error;
-
-		m_color[i] = temp;
+		//(deprecated)m_color[i] = temp;
 
 
 		// Calculate color from sprite by averaging the 16x16 array of pixels
@@ -501,8 +499,8 @@ int CSpriteData::SaveData( const char *szFilename )
 				fprintf( fout, "%d\n", m_extras[i][j] );
 		} // j
 
-		// output block color (for level editor)
-		fprintf( fout, "%d\n", m_color[i] );
+		// output block color (for level editor) (DEPRECATED! Changed 2019-07 from m_color[i] to just output a zero.)
+		fprintf( fout, "%d\n", 0);//Deprecated, but still save to file as it's part of the file format! Otherwise file loading won't work.//m_color[i] );
 	} // i
 
 	fclose( fout );
@@ -544,6 +542,44 @@ int CSpriteData::LoadSpriteImage()
 		sprintf( buf, "%s", m_szImgFilename );
 #endif
 		iRet = m_pImage->Load( buf );
+
+		//dj2019-07 shrink/resize sprites .. quick n dirty test .. to 'make as if' DG1 use 8x8 blocks instead of 16x16, for testing unhardcoded BLOCKW etc. ..
+		/*
+		if (BLOCKW==8)
+		{
+			int m = 0;
+			int mBase = 0;
+			for (int y = 0; y < m_pImage->Height(); ++y)
+			{
+				int n = 0;
+				int nBase = 0;
+				for (int x = 0; x < m_pImage->Width(); ++x)
+				{
+					// Do quick 'n dirty nearest neighbor downsampling from 16 to 8..
+					if (n >= 0 && n <= 7 && m >= 0 && m <= 7)
+					{
+						int pixel = m_pImage->GetPixel(nBase + n * 2, mBase + m * 2);
+						m_pImage->PutPixel(nBase + n, mBase + m, pixel);
+					}
+
+					++n;
+					if (n == 16)
+					{
+						n = 0;
+						nBase = x + 1;
+					}
+				}
+
+				++m;
+				if (m == 16)
+				{
+					m = 0;
+					mBase = y + 1;
+				}
+			}
+		}
+		//*/
+
 		djCreateImageHWSurface( m_pImage );
 
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS

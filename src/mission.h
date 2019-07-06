@@ -3,7 +3,7 @@
 \brief   Level sets, campaigns, missions, whatever you want to call 'em
 \author  David Joffe
 
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2019 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 /* David Joffe '99/02 */
@@ -145,9 +145,9 @@ public:
 
 	char *       m_szFilenameData;
 
-	int          m_extras[128][12];   // extras values
+	int          m_extras[128][12];   // extras values (sprite metadata)
 	int          m_type[128];         // block type
-	int          m_color[128];        // block color (for level editor) (OBSOLETE)
+	//int          m_color[128];        // block color (for level editor) (OBSOLETE/DEPRECATED)
 	djColor      m_Color[128];        // block color
 };
 /*--------------------------------------------------------------------------*/
