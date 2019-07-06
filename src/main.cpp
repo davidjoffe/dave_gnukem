@@ -769,7 +769,9 @@ bool GetHighScoreUserName(char *szBuffer)
 	do
 	{
 		int nDX = MAX_HIGHSCORE_LEN*8;
-		int nXLeft = (CFG_APPLICATION_RENDER_RES_W/2) - (nDX / 2);
+		//dj2019-07 for now just stick to 320; genericize better later re CFG_APPLICATION_RENDER_RES_W stuff ..
+		//int nXLeft = (CFG_APPLICATION_RENDER_RES_W/2) - (nDX / 2);
+		int nXLeft = (320/2) - (nDX / 2);
 
 		// Black background
 		djgSetColorFore( pVisBack, djColor(0,0,0) );
@@ -849,6 +851,10 @@ bool GetHighScoreUserName(char *szBuffer)
 
 
 		GraphFlip(true);
+
+		//Prevent CPU hogging or it eats up a full core here [dj2019-07] (A little simplistic but it'll do)
+		SDL_Delay(20);
+
 	} while (bLoop);
 	return bRet;
 }
