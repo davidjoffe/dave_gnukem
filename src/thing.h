@@ -297,12 +297,11 @@ public:
 	//! Test if hero is completely inside the box (not merely overlapping)
 	inline bool HeroInsideActionBounds(int x, int y)
 	{
-		//dj2019-07 Currently hardcoded to 1 gameblock wide and 2 high for DG1, later make more generic configurable 'hero action width/height' defines or somesuch ..
 		return (
-			(x             >=PIXELX+m_iActionX1) &&
-			(x+(BLOCKW-1)  <=PIXELX+m_iActionX2) &&
-			(y             >=PIXELY+m_iActionY1) &&
-			(y+(BLOCKH*2-1)<=PIXELY+m_iActionY2));
+			(x                    >=PIXELX+m_iActionX1) &&
+			(x+(HEROW_COLLISION-1)<=PIXELX+m_iActionX2) &&
+			(y                    >=PIXELY+m_iActionY1) &&
+			(y+(HEROH_COLLISION-1)<=PIXELY+m_iActionY2));
 	}
 	//! Test if hero is at least partially inside the box. By default this
 	//! just uses the action bounds; override this for things that have
