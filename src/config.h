@@ -99,6 +99,13 @@ extern bool g_bBigViewportMode;//dj2019-06. //Can't have both bigviewport and la
 //dj2019-07 Convenience helpers, not really too important (in theory could avoid a bitshift for speed here, but optimizing compiler SHOULD do that already as long as BLOCKW is a constant.)
 #define HALFBLOCKW ((BLOCKW)>>1)
 #define HALFBLOCKH ((BLOCKH)>>1)
+//dj2019-07 Top-left world pixel coordinate of hero - more convenience helpers to help clean up and genericize the code and improve readability a bit but these should probably be temporary, don't like them, should probably change:
+#define HERO_PIXELX (x*BLOCKW + x_small * HALFBLOCKW)
+#define HERO_PIXELY (y*BLOCKH + y_offset - BLOCKH)
+
+//dj2019-07 This stuff should probably change ..
+#define HEROW_COLLISION (BLOCKW)
+#define HEROH_COLLISION (BLOCKH*2)
 
 /*--------------------------------------------------------------------------*/
 #endif

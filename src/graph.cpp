@@ -99,7 +99,7 @@ void GraphFlip(bool bScaleView)
 			std::string sFrameRate;//Note this is 'instantaneous' frame rate i.e. last-frame-only so can look a bit jumpy, no smoothing
 			if (uTimeNow>=0 && uTimeNow>uTimeLast)
 			{
-				sFrameRate = djStrPrintf("%.2f", 1000.f / (float)(uTimeNow - uTimeLast) );
+				sFrameRate = djStrPrintf("%.2f", 1000.f / (float)(uTimeNow - uTimeLast));
 				GraphDrawString( pVisBack, g_pFont8x8, 150, 0, (const unsigned char*)sFrameRate.c_str() );
 			}
 		}
@@ -273,7 +273,7 @@ void GraphDone()
 void GraphFlipView( int iViewWidth, int iViewHeight, int nXS, int nYS, int nXD, int nYD )
 {
 	//djgDrawVisual( pVisBack, pVisView, g_bLargeViewport?0:16, g_bLargeViewport?0:16, g_bLargeViewport?0:16, g_bLargeViewport?0:16, iViewWidth*16, iViewHeight*16 );
-	djgDrawVisual( pVisBack, pVisView, nXD, nYD, nXS, nYS, iViewWidth*16, iViewHeight*16 );
+	djgDrawVisual( pVisBack, pVisView, nXD, nYD, nXS, nYS, iViewWidth*BLOCKW, iViewHeight*BLOCKH );
 }
 
 // FIXME: Currenetly assumes a 256-char 32x8 character 256x128 pixel alpha-mapped image

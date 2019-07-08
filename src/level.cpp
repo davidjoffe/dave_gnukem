@@ -1,7 +1,7 @@
 /*
 level.cpp
 
-Copyright (C) 1995-2018 David Joffe
+Copyright (C) 1995-2019 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "level.h"
@@ -73,17 +73,18 @@ unsigned char * level_load( int i, const char * szfilename )
 	}
 
 	// allocate memory for level
-	if (NULL == (buffer = new unsigned char[LEVEL_SIZE]))
+	unsigned int uMemSize = LEVEL_SIZE;
+	if (NULL == (buffer = new unsigned char[uMemSize]))
 	{
 		printf( "level_load( %s ): failed to allocate level buffer.\n", szfilename );
 		return NULL;
 	}
 	// Initialize level to blank block by default (in case it doesn't load e.g. bad filename passed or whatever, don't want to sit with random memory contents) [dj2017-07]
-	memset(buffer, 0, LEVEL_SIZE);
+	memset(buffer, 0, uMemSize);
 	if (file_handle != -1)
 	{
 		// read level into buffer
-		read( file_handle, buffer, LEVEL_SIZE );
+		read( file_handle, buffer, uMemSize );
 		// close file
 		close( file_handle );
 

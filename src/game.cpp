@@ -421,7 +421,7 @@ void InteractWithThings()
 	for ( int i=0; i<(int)g_apThings.size(); ++i )
 	{
 		pThing = g_apThings[i];
-		if (pThing->OverlapsBounds(x*BLOCKW+x_small*HALFBLOCKW, y*BLOCKH+y_offset-BLOCKH))
+		if (pThing->OverlapsBounds(HERO_PIXELX, HERO_PIXELY))
 		{
 			// [dj2016-10-10] Note that if inside HeroOverlaps(), it can cause you to die, e.g. if you've interacted with
 			// spikes .. so be aware you may be dead after calling that .. thats g_bDied, which causes level restart below.
@@ -444,7 +444,7 @@ void InteractWithThings()
 		if (pThing!=NULL)
 		{
 			// Test if entering or leaving action bounds box
-			if (pThing->HeroInsideActionBounds(x*BLOCKW+x_small*HALFBLOCKW, y*BLOCKH+y_offset-BLOCKH))
+			if (pThing->HeroInsideActionBounds(HERO_PIXELX, HERO_PIXELY))
 			{
 				if (!pThing->IsHeroInside())
 					pThing->HeroEnter();
@@ -546,9 +546,15 @@ void CheckIfHeroShooting()
 		{
 			#define HERO_BULLET_SPEED (16)
 
+
+			//dj2019-07 this is to multiply the (silly(?)) offset if we're using blocksizes larger than 16x16 .. this is a bit crude. The offset itself is a bit DG1/DN1 specific, which was 'supposed to be' 16x16 only, but for fun we're doing 32x32 etc., and to make source more generic.
+			int nMultiple=1;
+			if (BLOCKW>16)
+				nMultiple = (BLOCKW/16);
+
 			HeroShoot(
 				x * BLOCKW /*+ (hero_dir==1 ? BLOCKW : -BLOCKW)*/ + x_small*HALFBLOCKW,
-				(y-1)*BLOCKH + 11,
+				(y-1)*BLOCKH + (11*nMultiple),
 				(hero_dir==0 ? -HERO_BULLET_SPEED : HERO_BULLET_SPEED)
 			);
 
@@ -660,14 +666,20 @@ void UpdateBullets()
 			{
 				// Check if monster bullet overlaps with hero
 				if (OVERLAPS(
-					x*16+x_small*8,
-					y*16-16,
-					(x*16+x_small*8) + 15,
-					(y*16-16) + 31,
+					HERO_PIXELX,
+					// fixmehigh2019-07 this actually looks like a bug! A possibly imporrant but why not add hero y_offset here!??
+					y*BLOCKH-BLOCKH,// FIXMEHIGH2019-07 WHY NOT HERO_PIXELY which includes the y_offset??
+					HERO_PIXELX + (HEROW_COLLISION-1),
+					(y*BLOCKH-BLOCKH) + (HEROH_COLLISION-1),
 					pBullet->x,
 					pBullet->y,
-					pBullet->x+15,
-					pBullet->y+15))
+					pBullet->x+(BLOCKW-1),
+					// fixme is this +15(BLOCKW-1) right? looks too big .. (dj2019-07)
+					// fixme is this +15 right? looks too big .. (dj2019-07)
+					// fixme is this +15 right? looks too big .. (dj2019-07)
+					// fixme is this +15 right? looks too big .. (dj2019-07)
+					// fixme is this +15 right? looks too big .. (dj2019-07)
+					pBullet->y+(BLOCKH-1)))
 				{
 					bBulletDeleted=true;
 					g_apBulletsDeleted.push_back(pBullet);//delete g_apBullets[i];
@@ -708,14 +720,14 @@ void UpdateBullets()
 				// [dj2018-01] This if check is so we create the explosion centred around the 'tip' of where the bullet collided
 				if (pBullet->dx<0)
 				{
-					AddThing(CreateExplosion(nXOld - 8, nY-4,
+					AddThing(CreateExplosion(nXOld - HALFBLOCKW, nY-4,
 						// Make the hero's bullet slightly larger than smallest explosion
 						g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
 					));
 				}
 				else
 				{
-					AddThing(CreateExplosion(nXOld + 16 - 8, nY-4,
+					AddThing(CreateExplosion(nXOld + BLOCKW - HALFBLOCKW, nY-4,
 						// Make the hero's bullet slightly larger than smallest explosion
 						g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
 					));
@@ -808,6 +820,12 @@ void ReInitGameViewport()
 		//if (x>xo+VIEW_WIDTH/2) xo = x-VIEW_WIDTH/2;
 		//if (y>yo+VIEW_HEIGHT/2) yo = y-VIEW_HEIGHT/2;
 	}
+
+	//dj2019-MMtest//VIEW_WIDTH = 32;
+	//dj2019-MMtest//VIEW_HEIGHT = 16;
+	//Top left of game viewport in pixels:
+	//dj2019-MMtest//g_nViewOffsetX=0;
+	//dj2019-MMtest//g_nViewOffsetY=0;
 
 	// If very high resolution then in theory VIEW_WIDTH could be wider than the level, we don't want that or bad things will happen, so clamp to level dimensions:
 	if (VIEW_WIDTH > LEVEL_WIDTH) VIEW_WIDTH = LEVEL_WIDTH;
@@ -1006,6 +1024,7 @@ void PerLevelSetup()
 		djMSG("PerLevelSetup(): error loading level %s.\n", szfilename );
 		//dj2019-07 This should be just a warning but it should let you play, with some default placement position.
 		ShowGameMessage("BAD FILENAME FOR LEVEL", 1000);
+		relocate_hero( LEVEL_WIDTH/2, LEVEL_HEIGHT/2 );
 		//return;
 	}
 	g_pLevel = apLevels[0];
@@ -1693,6 +1712,7 @@ int game_startup(bool bLoadGame)
 		iFrameCount++;
 		static char sbuf[1024]={0};
 		sprintf( sbuf, "%.2f", (float)iFrameCount / fTimeRun );
+		//sprintf( sbuf, "%.2f %d %d", (float)iFrameCount / fTimeRun ,HERO_PIXELX,HERO_PIXELY);
 		if (iFrameCount==60)
 		{
 			iFrameCount /= 2;
@@ -1829,8 +1849,6 @@ int game_startup(bool bLoadGame)
 /*-----------------------------------------------------------*/
 void GameHeartBeat()
 {
-	//debug//printf("HEARTBEAT[");
-
 	// Update hero basic stuff
 	HeroUpdate();
 
@@ -1888,7 +1906,7 @@ void GameHeartBeat()
 			if (bFallingPrev && !bFalling) // <- just stopped falling
 			{
 				// Kick up some dust ..
-				AddThing(CreateDust(x, y, x_small*8,y_offset));
+				AddThing(CreateDust(x, y, x_small*HALFBLOCKW,y_offset));
 				djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
 			}
 			bFallingPrev = bFalling;
@@ -1921,7 +1939,7 @@ void GameHeartBeat()
 			for ( int i=0; i<(int)g_apThings.size(); ++i )
 			{
 				pThing = g_apThings[i];
-				if (!HeroIsFrozen() && pThing->HeroInsideActionBounds(x*16+x_small*8, y*16-16+y_offset))
+				if (!HeroIsFrozen() && pThing->HeroInsideActionBounds(HERO_PIXELX, HERO_PIXELY))
 				{
 //					int iRet = pThing->Action();
 					pThing->Action();
@@ -2168,6 +2186,11 @@ void GameDrawView()
 		//djgClear(pVisView);
 	}
 
+	//dj2019
+	//dj2019-MMtest//xo=0;
+	//dj2019-MMtest//yo=0;
+	//dj2019-MMtest//xo_small=0;
+
 	//dj2019-07 Re this "10 seconds got to just after coke can, purple lab" comment: I don't know anymore what I meant with that (possibly something timing/benchmark-related),
 	// but that comment was written in the 1990s, as the 'purple lab' was a computer lab at University of Pretoria where I studied .. for some reason I think of this comment often still when I think about this game so I want to leave this here:
 	//(10 seconds got to just after coke can, purple lab)
@@ -2175,12 +2198,11 @@ void GameDrawView()
 	//const unsigned int uLevelPixelW = LEVEL_WIDTH*BLOCKW;
 	//const unsigned int uLevelPixelH = LEVEL_HEIGHT*BLOCKH;
 
-
 	int nYOffset = g_nViewOffsetY;
 	for ( i=0; i<VIEW_HEIGHT; ++i )
 	{
 		xoff = -xo_small+(g_bLargeViewport?0:2);
-		xoff *= 8;
+		xoff *= HALFBLOCKW;
 		for ( j=0; j<VIEW_WIDTH+xo_small; ++j )
 		{
 			// Bounds-checks to not 'buffer overflow' etc. by going past bottom (or right) of level [dj2016-10]
@@ -2313,10 +2335,10 @@ void GameDrawView()
 			// Light blue box shows hero collision bounding box
 			djgSetColorFore(pVisView,djColor(5,50,200));
 			djgDrawRectangle(pVisView,
-				xoff+8,
+				xoff+HALFBLOCKW,
 				yoff+y_offset,
-				16,
-				32);
+				HEROW_COLLISION,
+				HEROH_COLLISION);
 		}
 	}
 	DrawThingsAtLayer(LAYER_4);
@@ -2583,7 +2605,7 @@ void DrawDebugInfo()
 		}
 
 		// Draw action bounds (cyan=overlapping, white=inside, yellow=not interacting)
-		if (pThing->OverlapsBounds(x*16+x_small*8, y*16+y_offset-16))
+		if (pThing->OverlapsBounds(HERO_PIXELX, HERO_PIXELY))
 		{
 			if (pThing->IsHeroInside())
 				pThing->DrawActionBounds(djColor(255,255,255));//white
@@ -2805,17 +2827,17 @@ void GameDrawFirepower()
 
 		for ( int i=0; i<g_nFirepower; ++i )
 		{
-			DRAW_SPRITE16A( pVisView, 5, 0, nX + i*16, nY );
+			DRAW_SPRITE16A( pVisView, 5, 0, nX + i*BLOCKW, nY );
 		}
 	}
 	else
 	{
 		// First clear firepower display area with game skin
-		djgDrawImage( pVisBack, pSkinGame, FIREPOWER_X, FIREPOWER_Y, FIREPOWER_X, FIREPOWER_Y, 16*5, 16 );
+		djgDrawImage( pVisBack, pSkinGame, FIREPOWER_X, FIREPOWER_Y, FIREPOWER_X, FIREPOWER_Y, BLOCKW*5, BLOCKH );
 		// Draw firepower
 		for ( int i=0; i<g_nFirepower; ++i )
 		{
-			DRAW_SPRITE16A( pVisBack, 5, 0, FIREPOWER_X + i*16, FIREPOWER_Y );
+			DRAW_SPRITE16A( pVisBack, 5, 0, FIREPOWER_X + i*BLOCKW, FIREPOWER_Y );
 		}
 	}
 }

@@ -99,19 +99,19 @@ void InvDraw()
 		for ( int i=0; i<5; i++)
 		{
 			// Background blocks
-			DRAW_SPRITE16(pVisBack, 0, 1, INVENTORY_X + i*16, INVENTORY_Y);
-			DRAW_SPRITE16(pVisBack, 0, 1, INVENTORY_X + i*16, INVENTORY_Y+16);
+			DRAW_SPRITE16(pVisBack, 0, 1, INVENTORY_X + i*BLOCKW, INVENTORY_Y);
+			DRAW_SPRITE16(pVisBack, 0, 1, INVENTORY_X + i*BLOCKW, INVENTORY_Y+BLOCKH);
 			// Inventory items 0-4
 			if (i<(int)g_apInventory.size())
 			{
 				CThing *pThing = g_apInventory[i].pThing;
-				DRAW_SPRITE16A(pVisBack, pThing->m_a, pThing->m_b, INVENTORY_X + i*16, INVENTORY_Y);
+				DRAW_SPRITE16A(pVisBack, pThing->m_a, pThing->m_b, INVENTORY_X + i*BLOCKW, INVENTORY_Y);
 			}
 			// Inventory items 5-9
 			if (i+5<(int)g_apInventory.size())
 			{
 				CThing *pThing = g_apInventory[i+5].pThing;
-				DRAW_SPRITE16A(pVisBack, pThing->m_a, pThing->m_b, INVENTORY_X + i*16, INVENTORY_Y+16);
+				DRAW_SPRITE16A(pVisBack, pThing->m_a, pThing->m_b, INVENTORY_X + i*BLOCKW, INVENTORY_Y+BLOCKH);
 			}
 		}
 	}
