@@ -12,9 +12,9 @@
 
 
 // Convenience macro to call the sprite draw function for 16x16 sprite b in sprite set a
-#define DRAW_SPRITE16(vis,a,b,x,y) djgDrawImage( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%16)*16,((b)/16)*16, (x),(y), 16,16 )
+#define DRAW_SPRITE16(vis,a,b,x,y) djgDrawImage( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%SPRITESHEET_NUM_COLS)*BLOCKW,((b)/SPRITESHEET_NUM_COLS)*BLOCKH, (x),(y), BLOCKW,BLOCKH )
 // Same as above but uses alpha map
-#define DRAW_SPRITE16A(vis,a,b,x,y) djgDrawImageAlpha( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%16)*16,((b)/16)*16, (x),(y), 16,16 )
+#define DRAW_SPRITE16A(vis,a,b,x,y) djgDrawImageAlpha( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%SPRITESHEET_NUM_COLS)*BLOCKW,((b)/SPRITESHEET_NUM_COLS)*BLOCKH, (x),(y), BLOCKW,BLOCKH )
 
 
 
@@ -124,9 +124,9 @@ void ED_SetSprite( int ispritenew, int ox, int oy )
 	ispritenew = (ispritenew % 128);
 
 	// clear out arrows
-	ED_DrawStringClear( (g_iSprite%16)*16, oy - 8, "VV" );
-	ED_DrawStringClear( ox + 256, oy + (g_iSprite/16)*16  , "<" );
-	ED_DrawStringClear( ox + 256, oy + (g_iSprite/16)*16+8, "<" );
+	ED_DrawStringClear( (g_iSprite%SPRITESHEET_NUM_COLS)*BLOCKW, oy - 8, "VV" );
+	ED_DrawStringClear( ox + (BLOCKW*SPRITESHEET_NUM_COLS), oy + (g_iSprite/SPRITESHEET_NUM_COLS)*BLOCKH  , "<" );
+	ED_DrawStringClear( ox + (BLOCKW*SPRITESHEET_NUM_COLS), oy + (g_iSprite/SPRITESHEET_NUM_COLS)*BLOCKH+8, "<" );
 
 //	if (state == STATE_SPRITEEDITOR)
 //	{
@@ -142,9 +142,9 @@ void ED_SetSprite( int ispritenew, int ox, int oy )
 	ED_DrawString( 0, 472, buf );
 
 	djgSetColor( pVisMain, djColor(255,255,0), djColor(0,0,0) );
-	ED_DrawString( (g_iSprite%16)*16, oy - 8, "VV" );
-	ED_DrawString( ox + 256, oy + (g_iSprite/16)*16  , "<" );
-	ED_DrawString( ox + 256, oy + (g_iSprite/16)*16+8, "<" );
+	ED_DrawString( (g_iSprite%SPRITESHEET_NUM_COLS)*BLOCKW, oy - 8, "VV" );
+	ED_DrawString( ox + (BLOCKW*SPRITESHEET_NUM_COLS), oy + (g_iSprite/SPRITESHEET_NUM_COLS)*BLOCKH  , "<" );
+	ED_DrawString( ox + (BLOCKW*SPRITESHEET_NUM_COLS), oy + (g_iSprite/SPRITESHEET_NUM_COLS)*BLOCKH+8, "<" );
 
 //	if (state == STATE_SPRITEEDITOR)
 //	{
@@ -253,6 +253,7 @@ void ED_DrawSprite( int x, int y, int a, int b )
 {
 	DRAW_SPRITE16(pVisMain,a,b,x,y);
 
+	// If a box, show box contents overlaid on sprite so level editor can see what's inside the box immediately
 	int nType = ED_GetSpriteType(a, b);
 	if (nType==TYPE_BOX)
 	{
@@ -260,8 +261,7 @@ void ED_DrawSprite( int x, int y, int a, int b )
 		int d = ED_GetSpriteExtra(a, b, 11);
 		if ((c|d)!=0)
 		{
-			//draw_spritea(x, y+1, c, d);
-			djgDrawImageAlpha(pVisMain, g_pCurMission->GetSpriteData(c)->m_pImage, ((d)%16)*16,((d)/16)*16, x,y+1, 16, 15 );
+			djgDrawImageAlpha(pVisMain, g_pCurMission->GetSpriteData(c)->m_pImage, ((d)%SPRITESHEET_NUM_COLS)*BLOCKW,((d)/SPRITESHEET_NUM_COLS)*BLOCKH, x,y+1, BLOCKW, BLOCKH-1 );
 		}
 	}
 }

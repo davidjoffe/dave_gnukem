@@ -970,8 +970,6 @@ void SetSprite ( int new_sprite )
 /*
 =================
 HandleMouse
-
-TODO: write the bastard
 =================
 */
 bool HandleMouse ()
@@ -983,14 +981,14 @@ bool HandleMouse ()
 	g_bMouseHighlighted = 0;
 	if (INBOUNDS( mouse_x, mouse_y,
 		POS_LEVELSPRITES_X, POS_LEVELSPRITES_Y,
-		POS_LEVELSPRITES_X + 16 * 16 - 1,
-		POS_LEVELSPRITES_Y + 16 * 8 - 1 ))
+		POS_LEVELSPRITES_X + SPRITESHEET_NUM_COLS * BLOCKW - 1,
+		POS_LEVELSPRITES_Y + SPRITESHEET_NUM_ROWS * BLOCKH - 1 ))
 	{
 		//a,b spriteset,spritenumber that mouse is floating over
-		ax = (mouse_x - POS_LEVELSPRITES_X) / 16;
-		ay = (mouse_y - POS_LEVELSPRITES_Y) / 16;
+		ax = (mouse_x - POS_LEVELSPRITES_X) / BLOCKW;
+		ay = (mouse_y - POS_LEVELSPRITES_Y) / BLOCKH;
 		g_aMouseHighlighted = ED_GetCurrSpriteSet();
-		g_bMouseHighlighted = ay * 16 + ax;
+		g_bMouseHighlighted = ay * SPRITESHEET_NUM_COLS + ax;
 		if (mouse_b & 1)
 			SetSpriteSelection( g_aMouseHighlighted, g_bMouseHighlighted, sprite1a, sprite1b );
 		else if (mouse_b & 2)
@@ -1000,17 +998,17 @@ bool HandleMouse ()
 		//djgSetColorFore( pVisMain, djColor(127,127,127) );
 		djgSetColorFore( pVisMain, djColor(0,255,255,150) );//[dj2018-01]cyan to match mouse-over sprite flicker stuff
 		djgDrawRectangle( pVisMain,
-			POS_LEVELSPRITES_X + ax*16 - 1,
-			POS_LEVELSPRITES_Y + ay*16 - 1,
-			16+2,
-			16+2 );
+			POS_LEVELSPRITES_X + ax*BLOCKW - 1,
+			POS_LEVELSPRITES_Y + ay*BLOCKH - 1,
+			BLOCKW+2,
+			BLOCKH+2 );
 
 		//dj2017-07 Show sprite type info
 		std::string sType = GetFriendlyTypeName( ED_GetCurrSpriteSet(), ay * 16 + ax );
 		if (!sType.empty())
 			sType = std::string("Type:") + sType;
 		if (!sType.empty())
-			ED_DrawString( 0, POS_LEVELSPRITES_Y+16*8, sType.c_str() );
+			ED_DrawString( 0, POS_LEVELSPRITES_Y+BLOCKH*SPRITESHEET_NUM_ROWS, sType.c_str() );
 	}
 	// main editting area
 	else if (INBOUNDS(mouse_x, mouse_y, 0, 0, LEVEL_WIDTH * LEVEL_GRIDSIZE - 1, LEVEL_HEIGHT * LEVEL_GRIDSIZE - 1))
@@ -1038,11 +1036,11 @@ bool HandleMouse ()
 	// zoomed view area
 	else if (INBOUNDS( mouse_x, mouse_y,
 		POS_LEVELVIEW_X, POS_LEVELVIEW_Y,
-		POS_LEVELVIEW_X + levelview_w * 16 - 1,
-		POS_LEVELVIEW_Y + levelview_h * 16 - 1 ))
+		POS_LEVELVIEW_X + levelview_w * BLOCKW - 1,
+		POS_LEVELVIEW_Y + levelview_h * BLOCKH - 1 ))
 	{
-		ax = (mouse_x - POS_LEVELVIEW_X) / 16;
-		ay = (mouse_y - POS_LEVELVIEW_Y) / 16;
+		ax = (mouse_x - POS_LEVELVIEW_X) / BLOCKW;
+		ay = (mouse_y - POS_LEVELVIEW_Y) / BLOCKH;
 		// dj2016-10: Hold in Ctrl+Alt and click with the mouse to automatically start level with hero 'dropped in' to the clicked position as starting position (to help with level editing / testing)
 		if ((mouse_b & 1)!=0 && g_iKeys[DJKEY_CTRL]!=0 && g_iKeys[DJKEY_ALT]!=0)
 		{
@@ -1238,12 +1236,12 @@ void DrawMinimap()
 			if (!bShowBack)
 			{
 				djgSetColorFore( pVisMain, djColor(0,0,0) );
-				djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*16, POS_LEVELVIEW_Y + i*16, 16, 16 );
+				djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*BLOCKW, POS_LEVELVIEW_Y + i*BLOCKH, BLOCKW, BLOCKH );
 			}
 			else
 			{
-				ED_DrawSprite( POS_LEVELVIEW_X + j * 16,
-					POS_LEVELVIEW_Y + i * 16,
+				ED_DrawSprite( POS_LEVELVIEW_X + j * BLOCKW,
+					POS_LEVELVIEW_Y + i * BLOCKH,
 					a, b );
 				if ( ((a) || (b)) )
 				{
@@ -1262,8 +1260,8 @@ void DrawMinimap()
 				b = *(level_pointer( 0, levelview_x + j, levelview_y + i) + 1);
 				if ((a) || (b))
 				{
-					ED_DrawSprite( POS_LEVELVIEW_X + j * 16,
-					POS_LEVELVIEW_Y + i * 16,
+					ED_DrawSprite( POS_LEVELVIEW_X + j * BLOCKW,
+					POS_LEVELVIEW_Y + i * BLOCKH,
 					a, b );
 					if (g_bFlashingIndicatorTimer)
 					{
@@ -1271,11 +1269,11 @@ void DrawMinimap()
 						if (a==sprite0a && b==sprite0b)
 						{
 							djgSetColorFore( pVisMain, djColor(0,0,0,200) );//black
-							djgDrawBox( pVisMain, -1+POS_LEVELVIEW_X + j*16, -2+POS_LEVELVIEW_Y + i*16   ,18,4);
-							djgDrawBox( pVisMain, -1+POS_LEVELVIEW_X + j*16,    POS_LEVELVIEW_Y + i*16+12,18,4);
+							djgDrawBox( pVisMain, -1+POS_LEVELVIEW_X + j*BLOCKW, -2+POS_LEVELVIEW_Y + i*BLOCKH   ,18,4);
+							djgDrawBox( pVisMain, -1+POS_LEVELVIEW_X + j*BLOCKW,    POS_LEVELVIEW_Y + i*BLOCKH+12,18,4);
 							djgSetColorFore( pVisMain, djColor(255,255,0,200) );//yellow
-							djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*16, -2+POS_LEVELVIEW_Y + i*16 +1,16,2);
-							djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*16,    POS_LEVELVIEW_Y + i*16+13,16,2);
+							djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*16, -2+POS_LEVELVIEW_Y + i*BLOCKH +1,16,2);
+							djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*16,    POS_LEVELVIEW_Y + i*BLOCKH+13,16,2);
 						}
 
 						if ( (g_aMouseHighlighted | g_bMouseHighlighted)!=0  &&
@@ -1283,8 +1281,8 @@ void DrawMinimap()
 						{
 							const int nCROSSHAIROFFSET=4;
 							djgSetColorFore( pVisMain, djColor(0,255,255,200) );//cyan
-							djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*16,nCROSSHAIRSIZE,1);
-							djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*16,1,nCROSSHAIRSIZE);
+							djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*BLOCKW, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*BLOCKH,nCROSSHAIRSIZE,1);
+							djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*BLOCKW, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*BLOCKH,1,nCROSSHAIRSIZE);
 						}
 					}
 				}
@@ -1294,15 +1292,15 @@ void DrawMinimap()
 			{
 				const int nCROSSHAIROFFSET=0;
 				djgSetColorFore( pVisMain, djColor(255,255,0,150) );//yellow
-				djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*16,nCROSSHAIRSIZE,1);
-				djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*16,1,nCROSSHAIRSIZE);
+				djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*BLOCKW, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*BLOCKH,nCROSSHAIRSIZE,1);
+				djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*BLOCKW, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*BLOCKH,1,nCROSSHAIRSIZE);
 			}
 			if (g_bFlashingIndicatorTimer && bHighlightBackMouseOver)
 			{
 				const int nCROSSHAIROFFSET=8;
 				djgSetColorFore( pVisMain, djColor(0,255,255,200) );//cyan
-				djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*16,nCROSSHAIRSIZE,1);
-				djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*16,1,nCROSSHAIRSIZE);
+				djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*BLOCKW, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*BLOCKH,nCROSSHAIRSIZE,1);
+				djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*BLOCKW, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*BLOCKH,1,nCROSSHAIRSIZE);
 			}
 		}
 	}
@@ -1310,21 +1308,21 @@ void DrawMinimap()
 	// If hold in Ctrl+Alt, draw hero overlay at mouse cursor position to indicate the new hero 'drop-in-level-here' functionality [dj2016-10]
 	if (INBOUNDS( mouse_x, mouse_y,
 		POS_LEVELVIEW_X, POS_LEVELVIEW_Y,
-		POS_LEVELVIEW_X + levelview_w * 16 - 1,
-		POS_LEVELVIEW_Y + levelview_h * 16 - 1 ))
+		POS_LEVELVIEW_X + levelview_w * BLOCKW - 1,
+		POS_LEVELVIEW_Y + levelview_h * BLOCKH - 1 ))
 	{
-		int ax = (mouse_x - POS_LEVELVIEW_X) / 16;
-		int ay = (mouse_y - POS_LEVELVIEW_Y) / 16;
+		int ax = (mouse_x - POS_LEVELVIEW_X) / BLOCKW;
+		int ay = (mouse_y - POS_LEVELVIEW_Y) / BLOCKH;
 		if (g_iKeys[DJKEY_CTRL]!=0 && g_iKeys[DJKEY_ALT]!=0)
 		{
 			// These sprite offsets etc. are horribly hardcoded [show hero sprite]
 			if (ay>0)
 			{
-				ED_DrawSprite( POS_LEVELVIEW_X + (ax-1) * 16+8, POS_LEVELVIEW_Y + (ay-1) * 16, 4, 16 );
-				ED_DrawSprite( POS_LEVELVIEW_X + (ax  ) * 16+8, POS_LEVELVIEW_Y + (ay-1) * 16, 4, 17 );
+				ED_DrawSprite( POS_LEVELVIEW_X + (ax-1) * BLOCKW+8, POS_LEVELVIEW_Y + (ay-1) * BLOCKH, 4, 16 );
+				ED_DrawSprite( POS_LEVELVIEW_X + (ax  ) * BLOCKW+8, POS_LEVELVIEW_Y + (ay-1) * BLOCKH, 4, 17 );
 			}
-			ED_DrawSprite( POS_LEVELVIEW_X + (ax-1) * 16+8, POS_LEVELVIEW_Y + ay * 16, 4, 18 );
-			ED_DrawSprite( POS_LEVELVIEW_X + (ax  ) * 16+8, POS_LEVELVIEW_Y + ay * 16, 4, 19 );
+			ED_DrawSprite( POS_LEVELVIEW_X + (ax-1) * BLOCKW+8, POS_LEVELVIEW_Y + ay * BLOCKH, 4, 18 );
+			ED_DrawSprite( POS_LEVELVIEW_X + (ax  ) * BLOCKW+8, POS_LEVELVIEW_Y + ay * BLOCKH, 4, 19 );
 		}
 	}
 }
@@ -1361,7 +1359,7 @@ void ShowInstructions()
 void DrawSpritesel ()
 {
 	ED_DrawSprite(  4, 308, sprite0a, sprite0b );
-	ED_DrawSprite( 24, 308, sprite1a, sprite1b );
+	ED_DrawSprite( BLOCKW+8, 308, sprite1a, sprite1b );
 	DBC_DrawBoxContents();
 }
 
@@ -1416,8 +1414,8 @@ void SetLevel( int x, int y, int a, int b, bool bforeground )
 		&& ( y >= levelview_y )
 		&& ( x < levelview_x + levelview_w )
 		&& ( y < levelview_y + levelview_h ) )
-		ED_DrawSprite( POS_LEVELVIEW_X + (x - levelview_x) * 16,
-		POS_LEVELVIEW_Y + (y - levelview_y) * 16,
+		ED_DrawSprite( POS_LEVELVIEW_X + (x - levelview_x) * BLOCKW,
+		POS_LEVELVIEW_Y + (y - levelview_y) * BLOCKH,
 		a, b );
 }
 
