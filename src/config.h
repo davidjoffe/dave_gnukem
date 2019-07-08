@@ -103,7 +103,7 @@ extern bool g_bBigViewportMode;//dj2019-06. //Can't have both bigviewport and la
 #define HERO_PIXELX (x*BLOCKW + x_small * HALFBLOCKW)
 #define HERO_PIXELY (y*BLOCKH + y_offset - BLOCKH)
 
-//dj2019-07 This stuff should probably change ..
+//dj2019-07 This stuff should probably change. Currently for DG1 the hero (for collision detection purposes etc.) is 1x2 'game blocks'
 #define HEROW_COLLISION (BLOCKW)
 #define HEROH_COLLISION (BLOCKH*2)
 
