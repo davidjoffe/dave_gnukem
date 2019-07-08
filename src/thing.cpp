@@ -153,8 +153,8 @@ CThing::CThing()
 	m_bShootable = false;
 	m_iVisibleX1 = 0;
 	m_iVisibleY1 = 0;
-	m_iVisibleX2 = 15;
-	m_iVisibleY2 = 15;
+	m_iVisibleX2 = BLOCKW-1;
+	m_iVisibleY2 = BLOCKH-1;
 }
 
 void CThing::SetLocation( int ix, int iy, int xoffset, int yoffset, int width, int height )
@@ -219,9 +219,13 @@ bool CThing::OverlapsBounds(int x, int y)
 {
 	if (m_iActionX1<0 && m_iActionY1<0 && m_iActionX2<0 && m_iActionY2<0)
 		return false;
+	//dj2019-07 fixme, check, is this function only used for hero bounds checking? if so,
+	// rename it (and its inherited virtual overridden ones) to something else eg HeroOverlapsBounds, or more accurately, HeroOverlapsActionBounds()?? and then also,
+	// change the BLOCKW-1 here to something like HEROW_COLLISION/HEROH_COLLISION .. ??? I think. So that later we can more easily have custom
+	// hero sizes.
 	return OVERLAPS(
 		x, y,
-		x+15, y+31,
+		x+(BLOCKW-1), y+(BLOCKH*2-1),//was:x+15, y+31
 		PIXELX+m_iActionX1, PIXELY+m_iActionY1,
 		PIXELX+m_iActionX2, PIXELY+m_iActionY2);
 		//m_x*16+m_iActionX1+m_xoffset, m_y*16+m_iActionY1+m_yoffset,
@@ -231,7 +235,7 @@ bool CThing::OverlapsBounds(int x, int y)
 /*-----------------------------------------------------------*/
 CSpikeBall::CSpikeBall()
 {
-	SetActionBounds(0,0,15,15);
+	SetActionBounds(0,0,BLOCKW-1,BLOCKH-1);
 	m_nBounceIndex = -1;
 	m_nYOffset = 0;
 	m_nInitialOffset = 0;
@@ -269,7 +273,7 @@ int CSpikeBall::Tick()
 		m_nYOffset += anBounceOffsets[m_nBounceIndex];
 	}
 	m_iVisibleY1 = m_iActionY1 = m_nYOffset * 2;
-	m_iVisibleY2 = m_iActionY2 = m_nYOffset * 2 + 15;
+	m_iVisibleY2 = m_iActionY2 = m_nYOffset * 2 + (BLOCKH-1);
 
 	return 0;
 }
@@ -304,8 +308,8 @@ CBox::CBox()
 	SetSprite( 0, 0 );
 	m_eLayer = LAYER_BOTTOM;
 	m_bFalls = true;
-	SetActionBounds(0, 0, 15, 15);
-	SetShootBounds(4, 0, 12, 15);
+	SetActionBounds(0, 0, BLOCKW-1, BLOCKH-1);
+	SetShootBounds(4, 0, 12, BLOCKH-1);
 	m_bShootable = true;
 }
 
@@ -342,7 +346,7 @@ CLetter::CLetter()
 {
 	m_iNumber = -1;
 	m_eLayer = LAYER_TOP;
-	SetActionBounds(0,0,15,15);
+	SetActionBounds(0,0,BLOCKW-1,BLOCKH-1);
 }
 
 void CLetter::Initialize(int b0, int b1)
@@ -374,8 +378,9 @@ CLift::CLift()
 	m_bBusy = false;
 	m_eLayer = LAYER_MIDDLE; // FIXME: WHERE?
 	m_bSolid = true;
-	SetSolidBounds(0, 0, 15, 15);
-	SetActionBounds(0, -16, 15, -1);
+	//test
+	SetSolidBounds(0, 0, BLOCKW-1,BLOCKH-1);
+	SetActionBounds(0, -BLOCKH, BLOCKW-1, -1);
 }
 
 int CLift::Tick()
@@ -392,9 +397,9 @@ int CLift::Tick()
 			m_height--;
 		}
 	}
-	SetActionBounds(0, -32 - (m_height-1)*16, 15, -1 - (m_height-1)*16);
-	SetSolidBounds(0, 0 - (m_height-1)*16, 15, 15);
-	SetVisibleBounds(0, 0 - (m_height-1)*16, 15, 15);
+	SetActionBounds(0, -(BLOCKH*2) - (m_height-1)*BLOCKH, BLOCKW-1, -1 - (m_height-1)*BLOCKH);
+	SetSolidBounds(0, 0 - (m_height-1)*BLOCKH, BLOCKW-1,BLOCKH-1);
+	SetVisibleBounds(0, 0 - (m_height-1)*BLOCKH, BLOCKW-1,BLOCKH-1);
 	return 0;
 }
 
@@ -407,9 +412,9 @@ int CLift::Action()
 		// We set these immediately, otherwise the hero may be outside the bounds,
 		// causing the lift to drop.
 		//SetActionBounds(0, -32 - (m_height-1)*16, 15, -1 - (m_height-1)*16);
-		SetActionBounds(0, -32 - (m_height-1)*16, 15, -1 - (m_height-1)*16);
-		SetSolidBounds(0, 0 - (m_height-1)*16, 15, 15);
-		SetVisibleBounds(0, 0 - (m_height-1)*16, 15, 15);
+		SetActionBounds(0, -(BLOCKH*2) - (m_height-1)*BLOCKH, BLOCKW-1, -1 - (m_height-1)*BLOCKH);
+		SetSolidBounds(0, 0 - (m_height-1)*BLOCKH, BLOCKW-1,BLOCKH-1);
+		SetVisibleBounds(0, 0 - (m_height-1)*BLOCKH, BLOCKW-1,BLOCKH-1);
 	}
 	return 0;
 };
@@ -486,9 +491,9 @@ CExit::CExit()
 	m_iType   = TYPE_EXIT;
 	// Action key testing box and visible bounds
 	m_iVisibleX1 = m_iActionX1 =   0;
-	m_iVisibleY1 = m_iActionY1 = -16;
-	m_iVisibleX2 = m_iActionX2 =  31;
-	m_iVisibleY2 = m_iActionY2 =  15;
+	m_iVisibleY1 = m_iActionY1 = -BLOCKH;
+	m_iVisibleX2 = m_iActionX2 =  (BLOCKW*2-1);
+	m_iVisibleY2 = m_iActionY2 =  BLOCKH-1;
 	m_nSecondFrameTick = 0;
 }
 
@@ -557,8 +562,8 @@ void CTeleporter::Initialize(int b0, int b1)
 {
 	SetID(GET_EXTRA(b0, b1, 0));
 	// Action key testing box
-	SetActionBounds ( -8, -16, 15+8,  15);
-	SetVisibleBounds(-16, -32, 15+16, 15);
+	SetActionBounds ( -HALFBLOCKW, -BLOCKH, (BLOCKW-1)+HALFBLOCKW,  BLOCKH-1);
+	SetVisibleBounds(-BLOCKW, -(BLOCKH*2), (BLOCKW*2-1), BLOCKH-1);
 }
 
 int CTeleporter::Action()
@@ -690,8 +695,8 @@ CDoor::CDoor()
 	m_nOpenState = 0;
 	m_bSolid = true; // <-- fixme, sucks
 	m_bShootable = true;//Set shootable flag, but don't do anything 'special' other than STOP the bullet.
-	SetSolidBounds(0,0,15,15);
-	SetShootBounds(0,0,15,15);
+	SetSolidBounds(0,0,BLOCKW-1,BLOCKH-1);
+	SetShootBounds(0,0,BLOCKW-1,BLOCKH-1);
 }
 
 int CDoor::Tick()
@@ -725,7 +730,7 @@ void CDoor::Draw()
 CKey::CKey()
 {
 	m_nID = -1;
-	SetActionBounds(0,0,15,15);
+	SetActionBounds(0,0,BLOCKW-1,BLOCKH-1);
 }
 
 int CKey::HeroOverlaps()
@@ -755,7 +760,7 @@ CDoorActivator::CDoorActivator()
 	m_nID = -1;
 	// Fixme, this seems a little hacky - we have to make the action bounds bigger, because
 	// action bounds only support hero-completely-within, not just overlapping
-	SetActionBounds(-8,0,15+8,31);
+	SetActionBounds(-HALFBLOCKW,0,(BLOCKW-1)+HALFBLOCKW,BLOCKH*2-1);
 }
 
 int CDoorActivator::Action()
@@ -812,8 +817,8 @@ void CDoorActivator::Draw()
 /*-----------------------------------------------------------*/
 CMasterComputer::CMasterComputer()
 {
-	SetActionBounds(-8,-16,31+8,15);
-	SetVisibleBounds(0,-16,31,15);
+	SetActionBounds(-HALFBLOCKW,-BLOCKH,(BLOCKW*2-1)+HALFBLOCKW,BLOCKH-1);
+	SetVisibleBounds(0,-BLOCKH,BLOCKW*2-1,BLOCKH-1);
 }
 void CMasterComputer::OnActivated()
 {
@@ -835,9 +840,9 @@ void CMasterComputer::Draw()
 CSoftBlock::CSoftBlock()
 {
 	m_bSolid = true;
-	SetSolidBounds(0, 0, 15, 15);
-	SetActionBounds(0, 0, 15, 15);
-	SetShootBounds(0, 0, 15, 15);
+	SetSolidBounds(0, 0, BLOCKW-1,BLOCKH-1);
+	SetActionBounds(0, 0, BLOCKW-1,BLOCKH-1);
+	SetShootBounds(0, 0, BLOCKW-1,BLOCKH-1);
 	m_bShootable = true;
 }
 void CSoftBlock::Draw()
@@ -857,8 +862,14 @@ int CCamera::c_nNumCameras = 0;
 CCamera::CCamera()
 {
 	m_bShootable = true;
-	SetActionBounds(0, 0, 15, 15);
-	SetShootBounds(7, 0, 8, 15);//dj2018-01-12 (To fix "the banana problem",) make shoot bounds 'thin vertical line' so that the visual effect of rendering bullet 'one last frame' that collided with us, shows us visually with that bullet impacting near the center, looks a bit odd otherwise
+	SetActionBounds(0, 0, BLOCKW-1,BLOCKH-1);
+	//dj2018-01-12 (To fix "the banana problem",) make shoot bounds 'thin vertical line' so that the visual effect of rendering bullet 'one last frame' that collided with us, shows us visually with that bullet impacting near the center, looks a bit odd otherwise
+	if (BLOCKW==16)
+		SetShootBounds(7, 0, 8, 15);
+	else if (BLOCKW==32)
+		SetShootBounds(7*2, 0, 16, 31);
+	else
+		SetShootBounds(HALFBLOCKW-1, 0, HALFBLOCKW, BLOCKH-1);
 	c_nNumCameras++;
 }
 
@@ -894,8 +905,8 @@ CBanana::CBanana()
 	m_nState = 0;
 	m_bFalls = true;
 	m_bShootable = true;
-	SetActionBounds(0, 0, 15, 15);
-	SetShootBounds(7, 0, 8, 15);//dj2018-01-12 (To fix "the banana problem",) make shoot bounds 'thin vertical line' so that the visual effect of rendering bullet 'one last frame' that collided with us, shows us visually with that bullet impacting near the center, looks a bit odd otherwise
+	SetActionBounds(0, 0, BLOCKW-1,BLOCKH-1);
+	SetShootBounds(HALFBLOCKW-1, 0, HALFBLOCKW, BLOCKH-1);//dj2018-01-12 (To fix "the banana problem",) make shoot bounds 'thin vertical line' so that the visual effect of rendering bullet 'one last frame' that collided with us, shows us visually with that bullet impacting near the center, looks a bit odd otherwise
 }
 
 void CBanana::Draw()
@@ -939,7 +950,13 @@ CSoda::CSoda()
 	m_nShotHeight = -1;
 	m_nAnim = 0;
 	m_bShootable = true;
-	SetShootBounds(7, 0, 8, 15);//dj2018-01-12 (To fix "the banana problem",) make shoot bounds 'thin vertical line' so that the visual effect of rendering bullet 'one last frame' that collided with us, shows us visually with that bullet impacting near the center, looks a bit odd otherwise
+
+	//dj2018-01-12 (To fix "the banana problem",) make shoot bounds 'thin vertical line' so that the visual effect of rendering bullet 'one last frame' that collided with us, shows us visually with that bullet impacting near the center, looks a bit odd otherwise
+	//SetShootBounds(7, 0, 8, 15);
+	if (BLOCKW==16)
+		SetShootBounds(7, 0, 8, 15);
+	else
+		SetShootBounds(HALFBLOCKW-1, 0, HALFBLOCKW, BLOCKH-1);
 }
 
 void CSoda::Draw()
@@ -976,12 +993,12 @@ int CSoda::Tick()
 		m_nShotHeight += 12;
 		m_nAnim = ((m_nAnim + 1) % 4);
 
-		SetActionBounds (0, -m_nShotHeight, 15, -m_nShotHeight + 15);
-		SetVisibleBounds(0, -m_nShotHeight, 15, -m_nShotHeight + 15);
-		SetShootBounds  (0, -m_nShotHeight, 15, -m_nShotHeight + 15);
+		SetActionBounds (0, -m_nShotHeight, BLOCKW-1, -m_nShotHeight + (BLOCKH-1));
+		SetVisibleBounds(0, -m_nShotHeight, BLOCKW-1, -m_nShotHeight + (BLOCKH-1));
+		SetShootBounds  (0, -m_nShotHeight, BLOCKW-1, -m_nShotHeight + (BLOCKH-1));
 
 		// Check if hit ceiling or something
-		if (CheckCollision(m_x*16+m_iVisibleX1, m_y*16+m_iVisibleY1, m_x*16+m_iVisibleX2, m_y*16+m_iVisibleY2))
+		if (CheckCollision(m_x*BLOCKW+m_iVisibleX1, m_y*BLOCKH+m_iVisibleY1, m_x*BLOCKW+m_iVisibleX2, m_y*BLOCKH+m_iVisibleY2))
 		{
 			//AddThing(CreateExplosion(m_x*16, 16*(m_y-1)-m_nShotHeight));
 			return THING_DIE;
@@ -993,7 +1010,7 @@ int CSoda::Tick()
 CFullHealth::CFullHealth()
 {
 	m_bShootable = false;
-	SetShootBounds(0,0,15,15);
+	SetShootBounds(0,0,BLOCKW-1,BLOCKH-1);
 }
 
 int CFullHealth::HeroOverlaps()
@@ -1011,33 +1028,34 @@ int CFullHealth::HeroOverlaps()
 CBalloon::CBalloon()
 {
 	m_nHeight = 0;
-	SetActionBounds (0,-16,15,15);
-	SetVisibleBounds(0,-16,15,15);
+	SetActionBounds (0,-BLOCKH,BLOCKW-1,BLOCKH-1);
+	SetVisibleBounds(0,-BLOCKH,BLOCKW-1,BLOCKH-1);
 	m_bShootable = true;
 }
 
 int CBalloon::HeroOverlaps()
 {
-	update_score(10000, m_x, m_y - 1 - (m_nHeight / 16));
+	update_score(10000, m_x, m_y - 1 - (m_nHeight / BLOCKH));
 	return THING_DIE;
 }
 
 void CBalloon::Draw()
 {
-	DRAW_SPRITE16A(pVisView, m_a, m_b,                         CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) - 16 - m_nHeight);
-	DRAW_SPRITE16A(pVisView, m_a, m_b+16+16*((m_nHeight/4)%2), CALC_XOFFSET(m_x), CALC_YOFFSET(m_y)      - m_nHeight);
+	DRAW_SPRITE16A(pVisView, m_a, m_b,                         CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) - BLOCKH - m_nHeight);
+//fixme32x32 dj2019-07 doesn't look right here:
+	DRAW_SPRITE16A(pVisView, m_a, m_b+16+16*((m_nHeight/4)%2), CALC_XOFFSET(m_x), CALC_YOFFSET(m_y)          - m_nHeight);
 }
 
 int CBalloon::Tick()
 {
 	m_nHeight++;
-	SetActionBounds (0, -16 - m_nHeight,15,-16 - m_nHeight + 31);
-	SetVisibleBounds(0, -16 - m_nHeight,15,-16 - m_nHeight + 31);
-	SetShootBounds  (0, -16 - m_nHeight,15,-16 - m_nHeight + 31);
+	SetActionBounds (0, -BLOCKH - m_nHeight,BLOCKW-1,-BLOCKH - m_nHeight + (BLOCKH*2-1));
+	SetVisibleBounds(0, -BLOCKH - m_nHeight,BLOCKW-1,-BLOCKH - m_nHeight + (BLOCKH*2-1));
+	SetShootBounds  (0, -BLOCKH - m_nHeight,BLOCKW-1,-BLOCKH - m_nHeight + (BLOCKH*2-1));
 	// Check if hit ceiling or something
-	if (CheckCollision(m_x*16+m_iVisibleX1, m_y*16+m_iVisibleY1, m_x*16+m_iVisibleX2, m_y*16+m_iVisibleY2))
+	if (CheckCollision(m_x*BLOCKW+m_iVisibleX1, m_y*BLOCKH+m_iVisibleY1, m_x*BLOCKW+m_iVisibleX2, m_y*BLOCKH+m_iVisibleY2))
 	{
-		AddThing(CreateExplosion(PIXELX, 16*(m_y-1)-m_nHeight));
+		AddThing(CreateExplosion(PIXELX, BLOCKH*(m_y-1)-m_nHeight));
 		return THING_DIE;
 	}
 	return 0;
@@ -1045,7 +1063,7 @@ int CBalloon::Tick()
 
 int CBalloon::OnHeroShot()
 {
-	AddThing(CreateExplosion(PIXELX, 16*(m_y-1)));
+	AddThing(CreateExplosion(PIXELX, BLOCKH*(m_y-1)));
 	return THING_DIE;
 }
 /*-----------------------------------------------------------*/
@@ -1084,9 +1102,9 @@ int CAcme::HeroOverlaps()
 void CAcme::Draw()
 {
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b, 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset, 32, 16);
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b, 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset, BLOCKW*2, BLOCKH);
 #endif
-	DRAW_SPRITEA(pVisView, m_a, m_b, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset, 32, 16);
+	DRAW_SPRITEA(pVisView, m_a, m_b, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset, BLOCKW*2, BLOCKH);
 }
 
 int CAcme::Tick()
@@ -1156,7 +1174,7 @@ int CAcme::Tick()
 		}
 
 		// If hit bottom of level or collide with solid, explode
-		if (m_y>=LEVEL_HEIGHT-1 || CheckCollision(m_x*16+m_iVisibleX1, PIXELY+m_iVisibleY1, m_x*16+m_iVisibleX2, PIXELY+m_iVisibleY2))
+		if (m_y>=LEVEL_HEIGHT-1 || CheckCollision(m_x*BLOCKW+m_iVisibleX1, PIXELY+m_iVisibleY1, m_x*BLOCKW+m_iVisibleX2, PIXELY+m_iVisibleY2))
 		{
 			CreateOnDestroyedEffects();
 			return THING_DIE;
@@ -1201,7 +1219,7 @@ CPickup::CPickup()
 	m_nAnimationCount = -1;
 	m_bInventoryItem = false;
 	m_bPersistent = false;
-	SetActionBounds(0,0,15,15);
+	SetActionBounds(0,0,BLOCKW-1,BLOCKH-1);
 }
 
 int CPickup::HeroOverlaps()
@@ -1233,7 +1251,7 @@ void CPickup::Draw()
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
 	// Note the 15 height here, this is debatable, some things look better with 16
 	// some better with 15, e.g. rugby ball looks better with 15
-	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + (m_nAnimationCount==-1?0:m_nAnimationCount), CALC_XOFFSET(m_x)+1, CALC_YOFFSET(m_y)+1,16,15);
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + (m_nAnimationCount==-1?0:m_nAnimationCount), CALC_XOFFSET(m_x)+1, CALC_YOFFSET(m_y)+1,BLOCKW,BLOCKH-1);
 #endif
 	DRAW_SPRITE16A(pVisView, m_a, m_b + (m_nAnimationCount==-1?0:m_nAnimationCount), CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
@@ -1298,12 +1316,12 @@ CCrumblingFloor::CCrumblingFloor() :
 	m_nWidth(1)
 {
 	m_bSolid = true;
-	SetActionBounds(0, -5, 15, 15);
-	SetSolidBounds(0, 0, 15, 15);
+	SetActionBounds(0, -5, BLOCKW-1,BLOCKH-1);
+	SetSolidBounds(0, 0, BLOCKW-1,BLOCKH-1);
 }
 int CCrumblingFloor::Tick()
 {
-	bool bHeroTouching = OverlapsBounds(x*BLOCKW+x_small*HALFBLOCKW, y*BLOCKH+y_offset-BLOCKH);
+	bool bHeroTouching = OverlapsBounds(HERO_PIXELX, HERO_PIXELY);
 	//Detect 'edge' when just start touching.
 	if (bHeroTouching && !m_bHeroTouchingPrev)
 	{
@@ -1318,7 +1336,7 @@ int CCrumblingFloor::Tick()
 			// Every 2nd one to look slightly less silly (fixmeLOW todo later make nicer / fancier explosion visuals) [dj2017-07]
 			if ((i%2)==0)
 			{
-				AddThing(CreateExplosion((m_x+i)*16, m_y*16));
+				AddThing(CreateExplosion((m_x+i)*BLOCKW, m_y*BLOCKH));
 			}
 		}
 		return THING_DIE;
@@ -1344,9 +1362,9 @@ void CCrumblingFloor::Initialize(int b0, int b1)
 		--m_x;
 		++m_nWidth;
 	}
-	SetActionBounds(0, -5, m_nWidth*16-1, 15);
-	SetSolidBounds(0, 0, m_nWidth*16-1, 15);
-	SetVisibleBounds(0, 0, m_nWidth*16-1, 15);
+	SetActionBounds(0, -5, m_nWidth*BLOCKW-1, BLOCKH-1);
+	SetSolidBounds(0, 0, m_nWidth*BLOCKW-1, BLOCKH-1);
+	SetVisibleBounds(0, 0, m_nWidth*BLOCKW-1, BLOCKH-1);
 
 	CThing::Initialize(b0,b1);
 }
@@ -1354,8 +1372,8 @@ void CCrumblingFloor::Initialize(int b0, int b1)
 CConveyor::CConveyor()
 {
 	m_bSolid = true;
-	SetActionBounds(-7, -32, 15+8, -1);
-	SetSolidBounds(0, 0, 15, 15);
+	SetActionBounds(-(HALFBLOCKW-1), -(BLOCKH*2), (BLOCKW-1)+HALFBLOCKW, -1);
+	SetSolidBounds(0, 0, BLOCKW-1,BLOCKH-1);
 }
 
 int CConveyor::Tick()
@@ -1467,7 +1485,7 @@ CDynamite::CDynamite()
 	m_eLayer = LAYER_TOP;
 	m_bFalls = true;
 	//nFoo=-1;
-	SetVisibleBounds(0 - 64, 0, 15 + 64, 15);
+	SetVisibleBounds(0 - BLOCKW*4, 0, (BLOCKW-1) + BLOCKW*4, BLOCKH-1);
 }
 
 int CDynamite::Tick()
@@ -1779,10 +1797,21 @@ void CRocket::Draw()
 void CRocket::Initialize(int a, int b)
 {
 	CThing::Initialize(a, b);
-	SetVisibleBounds(-16,-48,31,15);
-	SetActionBounds (0,-32,15,15);
-	SetShootBounds  (0,-32,15,15);
-	SetSolidBounds  (0,-48,15,15);
+	//fixme
+	if (BLOCKW==16)
+	{
+		SetVisibleBounds(-16,-48,31,15);
+		SetActionBounds (0,-32,15,15);
+		SetShootBounds  (0,-32,15,15);
+		SetSolidBounds  (0,-48,15,15);
+	}
+	else
+	{
+		SetVisibleBounds(-BLOCKW,-(BLOCKH*3),BLOCKW*2-1,BLOCKH-1);
+		SetActionBounds (0,-(BLOCKH*2),BLOCKW-1,BLOCKH-1);
+		SetShootBounds  (0,-(BLOCKH*2),BLOCKW-1,BLOCKH-1);
+		SetSolidBounds  (0,-(BLOCKH*3),BLOCKW-1,BLOCKH-1);
+	}
 	m_nStrength = 1;
 	m_bSolid = true;
 	m_bFalls = false;
@@ -1802,7 +1831,7 @@ int CRocket::OnHeroShot()
 			m_bTakingOff = true;
 			m_nYStart = m_y;
 			// Increase visiblebounds for fire below
-			SetVisibleBounds(-16,-48,31,15 + 32);
+			SetVisibleBounds(-BLOCKW,-(BLOCKH*3),BLOCKW*2-1,BLOCKH*3-1);
 
 			// In the original DN1, rockets standing on solid block which disappears on takeoff. Do same.
 			// Not sure exactly the 'right' way, but let's say, I think, um, if *solid* block underneath
@@ -1828,8 +1857,8 @@ int CRocket::OnHeroShot()
 /*-----------------------------------------------------------*/
 CFirepower::CFirepower()
 {
-	SetActionBounds(0, 0, 15, 15);
-	SetVisibleBounds(0, 0, 15, 15);
+	SetActionBounds(0, 0, BLOCKW-1,BLOCKH-1);
+	SetVisibleBounds(0, 0, BLOCKW-1,BLOCKH-1);
 }
 
 void CFirepower::Draw()
@@ -1846,7 +1875,7 @@ int CFirepower::HeroOverlaps()
 /*-----------------------------------------------------------*/
 CDust::CDust()
 {
-	SetVisibleBounds(0, 0, 15, 15);
+	SetVisibleBounds(0, 0, BLOCKW-1,BLOCKH-1);
 	int i;
 	for ( i=0; i<4; i++ )
 	{

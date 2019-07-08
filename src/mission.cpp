@@ -437,15 +437,15 @@ int CSpriteData::LoadData( const char *szFilename )
 		//(deprecated)m_color[i] = temp;
 
 
-		// Calculate color from sprite by averaging the 16x16 array of pixels
+		// Calculate color from sprite by averaging the 16x16 array of pixels (or whatever the dimensions are - dj2019-07 extend to handle other size sprites)
 		if (m_pImage)
 		{
-			int iIndexX = (i%16)*16; // x offset into image
-			int iIndexY = (i/16)*16; // y offset into image
+			int iIndexX = (i%SPRITESHEET_NUM_COLS)*BLOCKW; // x offset into image
+			int iIndexY = (i/SPRITESHEET_NUM_COLS)*BLOCKH; // y offset into image
 			int r=0,g=0,b=0;
-			for ( j=0; j<16; j++ )
+			for ( j=0; j<BLOCKH; ++j )
 			{
-				for ( int k=0; k<16; k++ )
+				for ( int k=0; k<BLOCKW; ++k )
 				{
 					const djColor& clr = m_pImage->GetPixelColor(k+iIndexX, j+iIndexY);
 					r += (int)clr.r;
@@ -453,9 +453,9 @@ int CSpriteData::LoadData( const char *szFilename )
 					b += (int)clr.b;
 				}
 			}
-			r /= 256;
-			g /= 256;
-			b /= 256;
+			r /= (BLOCKW*BLOCKH);
+			g /= (BLOCKW*BLOCKH);
+			b /= (BLOCKW*BLOCKH);
 			m_Color[i] = djColor((unsigned char)r,(unsigned char)g,(unsigned char)b);
 		}
 	}
@@ -545,36 +545,15 @@ int CSpriteData::LoadSpriteImage()
 
 		//dj2019-07 shrink/resize sprites .. quick n dirty test .. to 'make as if' DG1 use 8x8 blocks instead of 16x16, for testing unhardcoded BLOCKW etc. ..
 		/*
-		if (BLOCKW==8)
+		if (BLOCKW==8 && m_pImage->Width()==256)
 		{
-			int m = 0;
-			int mBase = 0;
-			for (int y = 0; y < m_pImage->Height(); ++y)
+			for (int y = 0; y < m_pImage->Height() / 2; ++y)
 			{
-				int n = 0;
-				int nBase = 0;
-				for (int x = 0; x < m_pImage->Width(); ++x)
+				for (int x = 0; x < m_pImage->Width() / 2; ++x)
 				{
-					// Do quick 'n dirty nearest neighbor downsampling from 16 to 8..
-					if (n >= 0 && n <= 7 && m >= 0 && m <= 7)
-					{
-						int pixel = m_pImage->GetPixel(nBase + n * 2, mBase + m * 2);
-						m_pImage->PutPixel(nBase + n, mBase + m, pixel);
-					}
-
-					++n;
-					if (n == 16)
-					{
-						n = 0;
-						nBase = x + 1;
-					}
-				}
-
-				++m;
-				if (m == 16)
-				{
-					m = 0;
-					mBase = y + 1;
+					// Do quick 'n dirty nearest neighbor downsampling
+					int pixel = m_pImage->GetPixel(x * 2, y * 2);
+					m_pImage->PutPixel(x, y, pixel);
 				}
 			}
 		}

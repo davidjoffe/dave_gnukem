@@ -167,7 +167,7 @@ void CRobot::Draw()
 	}
 	else if (m_nType==1) // Fireball?
 	{
-		DRAW_SPRITEA(pVisView, m_a, (m_nXDir>0 ? 16 : 20) + anim4_count - 16, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y-1)+m_yoffset, 16, 32);
+		DRAW_SPRITEA(pVisView, m_a, (m_nXDir>0 ? 16 : 20) + anim4_count - 16, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y-1)+m_yoffset, BLOCKW, BLOCKH*2);
 	}
 }
 
@@ -276,9 +276,9 @@ void CRobot::Initialize(int a, int b)
 {
 	CMonster::Initialize(a,b);
 
-	SetActionBounds(0,0,15,15);
-	SetVisibleBounds(0,0,15,15);
-	SetShootBounds  (0,0,15,15);
+	SetActionBounds(0,0,BLOCKW-1,BLOCKH-1);
+	SetVisibleBounds(0,0,BLOCKW-1,BLOCKH-1);
+	SetShootBounds  (0,0,BLOCKW-1,BLOCKH-1);
 
 	m_bFalls = false;//The robot does fall, but we do our own falilng code [for now?] [dj2017-08-13]
 
@@ -317,7 +317,7 @@ int CFlyingRobot::HeroOverlaps()
 		
 		// We initiate dying if hero touches us
 		update_score(100, m_x, m_y);
-		AddThing(CreateExplosion(m_x*16+m_xoffset, m_y*16+m_yoffset));
+		AddThing(CreateExplosion(PIXELX, PIXELY));
 		m_nDieAnim = m_nDieAnimLength;
 	}
 	return 0;
@@ -327,7 +327,7 @@ int CFlyingRobot::OnKilled()
 	if (m_nDieAnim<0)//If we've 'just been killed' for the first time (um, as if we can be killed more than once)
 	{
 		update_score(100, m_x, m_y);
-		AddThing(CreateExplosion(m_x*16+m_xoffset, m_y*16+m_yoffset));
+		AddThing(CreateExplosion(PIXELX, PIXELY));
 		// Start the 'dying' animation 'countdown'
 		m_nDieAnim = m_nDieAnimLength;
 	}
@@ -342,7 +342,7 @@ void CFlyingRobot::Draw()
 			m_a, m_b + anim4_count + 4,
 			1+CALC_XOFFSET(m_x) + m_xoffset,
 			1+CALC_YOFFSET(m_y) + m_yoffset,
-			16,16
+			BLOCKW,BLOCKH
 		);
 #endif
 		DRAW_SPRITE16A(pVisView,
@@ -357,14 +357,14 @@ void CFlyingRobot::Draw()
 		if (m_nXDir>0)//Facing right?
 		{
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-			DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count    , 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset,16,16);
+			DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count    , 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset,BLOCKW,BLOCKH);
 #endif
 			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count    , CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 		}
 		else//Facing left
 		{
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-			DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count + 4, 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset,16,16);
+			DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count + 4, 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset,BLOCKW,BLOCKH);
 #endif
 			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count + 4, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 		}
@@ -527,8 +527,8 @@ void CRabbit::Draw()
 	// for this is clear if you look at the sprite - 32x32, but he's +/- 16x32 body is 'centered' in sprite.
 	DRAW_SPRITEA(pVisView,
 		a   ,b+m_nWalkAnimOffset*2,
-		x -8   ,y-16,
-		32  ,  32);
+		x -HALFBLOCKW   ,y-BLOCKH,
+		BLOCKW*2  ,  BLOCKH*2);
 }
 int CRabbit::Tick()
 {
@@ -748,9 +748,9 @@ int CCannon::Tick()
 				{
 					const int nBULLETSPEEDX=10;
 					if (m_nXDir<0)//Facing left?
-						MonsterShoot(PIXELX-BLOCKW  , m_y*16, m_nXDir*nBULLETSPEEDX,0);
+						MonsterShoot(PIXELX-BLOCKW  , m_y*BLOCKH, m_nXDir*nBULLETSPEEDX,0);
 					else
-						MonsterShoot(PIXELX+BLOCKW*2, m_y*16, m_nXDir*nBULLETSPEEDX,0);
+						MonsterShoot(PIXELX+BLOCKW*2, m_y*BLOCKH, m_nXDir*nBULLETSPEEDX,0);
 					// FIXME PLAY SOUND HERE?
 					m_nNoShootCounter = 12;
 				}
@@ -769,10 +769,10 @@ void CCannon::Draw()
 	int y = CALC_YOFFSET(m_y) + m_yoffset;
 
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-	DRAW_SPRITEA_SHADOW(pVisView, a, b, x, y, 32, 16);
-	DRAW_SPRITEA(pVisView, a, b, x-1, y-1, 32, 16);
+	DRAW_SPRITEA_SHADOW(pVisView, a, b, x, y, BLOCKW*2, BLOCKH);
+	DRAW_SPRITEA(pVisView, a, b, x-1, y-1, BLOCKW*2, BLOCKH);
 #else
-	DRAW_SPRITEA(pVisView, a, b, x, y, 32, 16);
+	DRAW_SPRITEA(pVisView, a, b, x, y, BLOCKW*2, BLOCKH);
 #endif
 
 	// Note that after it's been shot once, it 'smokes', to show it's injured [cf. DN1] [dj2017-08]
@@ -802,7 +802,8 @@ int CCannon::OnHeroShot()
 {
 	if (m_nStrength>0)
 	{
-		AddThing(CreateExplosion(m_x*16+8, m_y*16));
+		//PIXELX + HALFBLOCKW??
+		AddThing(CreateExplosion(m_x*BLOCKW+HALFBLOCKW, m_y*BLOCKH));
 	}
 	return CMonster::OnHeroShot();
 }
@@ -834,13 +835,16 @@ int CCrawler::Tick()
 			return 0;
 		}
 	}
+
+	//normalize?
+
 	m_yoffset += m_nDir;
-	if (m_yoffset<=-16)
+	if (m_yoffset<=-BLOCKH)
 	{
 		m_yoffset = 0;
 		m_y--;
 	}
-	else if (m_yoffset>=16)
+	else if (m_yoffset>=BLOCKH)
 	{
 		m_yoffset = 0;
 		m_y++;
@@ -851,7 +855,7 @@ int CCrawler::Tick()
 void CCrawler::Draw()
 {
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-	DRAW_SPRITEA_SHADOW(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_yoffset,16,16);
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_yoffset,BLOCKW,BLOCKH);
 #endif
 	DRAW_SPRITE16A(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) + m_yoffset);
 }
@@ -876,16 +880,16 @@ int CCrawler::HeroOverlaps()
 void CCrawler::Initialize(int b0, int b1)
 {
 	m_nXDir = (GET_EXTRA(b0, b1, 0)==0 ? -1 : 1);
-	SetActionBounds(0,0,15,15);
-	SetVisibleBounds(0,0,15,15);
-	SetShootBounds(0,0,15,15);
+	SetActionBounds(0,0,BLOCKW-1,BLOCKH-1);
+	SetVisibleBounds(0,0,BLOCKW-1,BLOCKH-1);
+	SetShootBounds(0,0,BLOCKW-1,BLOCKH-1);
 }
 /*-----------------------------------------------------------*/
 CSpike::CSpike()
 {
 	m_nType = 0;
 	m_nSpikePopupCount = 0;
-	SetActionBounds(0,0,15,15);
+	SetActionBounds(0,0,BLOCKW-1,BLOCKH-1);
 }
 
 int CSpike::Tick()
