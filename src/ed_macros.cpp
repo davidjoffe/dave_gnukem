@@ -101,13 +101,10 @@ bool DeleteMacros()
 	return true;
 }
 
-void PlaceMacro(int x, int y, int iMacroIndex)
+//dj2019-08 adding underscore prefix to x,y, the only (bad) reason I'm doing that is due to the ugly global x/y for hero position, so as to avoid ambiguity .. can remove later if that ever gets re-done in a better way.
+void PlaceMacro(int _x, int _y, int iMacroIndex)
 {
-	x = x;				// shut up
-	y = y;				// shut up
-	iMacroIndex = iMacroIndex;	// shut up
-
-	if ( (x < 0) || (y < 0) || (x >= LEVEL_WIDTH) || (y >= LEVEL_HEIGHT) )
+	if ( (_x < 0) || (_y < 0) || (_x >= LEVEL_WIDTH) || (_y >= LEVEL_HEIGHT) )
 		return;
 
 	int iMacro = g_iAssignedMacros[iMacroIndex];
@@ -121,8 +118,8 @@ void PlaceMacro(int x, int y, int iMacroIndex)
 	for ( int i=0; i<(int)pMacro->m_aiBlocks[0].size(); i++ )
 	{
 		SetLevel(
-			x+pMacro->m_aiBlocks[0][i],
-			y+pMacro->m_aiBlocks[1][i],
+			_x+pMacro->m_aiBlocks[0][i],
+			_y+pMacro->m_aiBlocks[1][i],
 			pMacro->m_aiBlocks[2][i],
 			pMacro->m_aiBlocks[3][i],
 			LVLED_GetLevelFore () );

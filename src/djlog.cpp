@@ -1,7 +1,7 @@
 /*
 djlog.cpp
 
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2019 David Joffe
 */
 
 #ifdef WIN32
@@ -33,10 +33,5 @@ void log_message( const char * szFormat, ... )
    printf( "%s", buf );
    fflush(NULL);
 #endif
-}
-
-void log_do_nothing( char * szFormat, ... )
-{
-	szFormat = szFormat;		// shut up the "unused patameter" warning
 }
 
