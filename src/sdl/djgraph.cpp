@@ -33,7 +33,7 @@ int	rShift=0, gShift=0, bShift=0, aShift=0;
 int g_nSimulatedGraphics = 0;
 
 // CGA palette 1 (4 colors) cyan magenta black white
-const djColor djPALETTE_CGA[4] {
+const djColor djPALETTE_CGA[4] = {
 	djColor(0,0,0),//black
 	djColor(0x55,0xFF,0xFF),//bright cyan
 	djColor(0xFF,0x55,0xFF),//bright magenta
@@ -42,7 +42,7 @@ const djColor djPALETTE_CGA[4] {
 	//djColor(0x55,0x55,0x55)//dark grey as white/black dither
 };
 // EGA standard 16-colors
-const djColor djPALETTE_EGA[16] {
+const djColor djPALETTE_EGA[16] = {
 	djColor(0,0,0),//black
 	djColor(0,0,0xAA),//blue
 	djColor(0,0xAA,0),//green

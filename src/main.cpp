@@ -502,7 +502,8 @@ void DoMainMenu()
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
 		}
 		char sz[100]={0};
-		sprintf(sz,"%s","v1.0 - 3 Apr 2018");
+		//sprintf(sz,"%s","v1.0 - 3 Apr 2018");
+		sprintf(sz,"%s","v1.0.1 - 25 Apr 2020");
 		GraphDrawString(pVisBack, g_pFont8x8, 0, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)sz);
 		sprintf(sz,"%s","djoffe.com");
 		GraphDrawString(pVisBack, g_pFont8x8, CFG_APPLICATION_RENDER_RES_W - strlen(sz)*8, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)sz);
