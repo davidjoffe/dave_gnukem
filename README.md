@@ -126,6 +126,8 @@ TL;DR Shoot anything that moves
 
 Recent:
 
+2020/04/25 - Version 1.0.1
+
 * [11 Jun 2019] New 'Retro Settings' menu option with 'extra retro' settings/effects for simulated EGA 16-color and CGA 4-color graphics options. You'll feel like you're back in the 90s or your money back. [NB: currently little-endian platforms only]
 * [6 Jun 2019] Incorporate OpenBSD build fixes by Dr. Brian Robert Callahan https://twitter.com/__briancallahan https://github.com/jasperla/openbsd-wip/commit/e51e3a3b9386365cd0eb8317018463ff4682e0d3 http://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/games/gnukem/
 * [10 Apr 2018] Tentative fix for XP and ReactOS support (relating to SetProcessDPIAware stuff)
