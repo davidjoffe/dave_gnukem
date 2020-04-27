@@ -88,7 +88,7 @@ TL;DR Shoot anything that moves
 * Subliminal messages
 * Puns
 * Now with extra-retro simulated EGA/CGA settings, you'll feel like you're in the 90s again or your money back
-* Evil SuperTux
+* Evil SuperTux*
 * SystemD integration
 * Big rockets
 * Software doesn't spy on you
@@ -110,6 +110,8 @@ TL;DR Shoot anything that moves
 * Walls
 * Doors
 * Much much more!
+
+\* "Evil SuperTux": Kindly note that no disrespect is intended here toward SuperTux: In this game the SuperTux's have only turned evil due to being infected by the SystemD virus. Save the world by finding the Devuan Antivirus, and they'll be cured.
 
 # Ports
 
