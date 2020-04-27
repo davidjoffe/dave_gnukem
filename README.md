@@ -355,13 +355,11 @@ Keep in mind that once the hero has the powerboots, he'll be able to jump higher
 To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add a new line containing the name of your .gam file, e.g. "mygame/mygame.gam" (without quotes). (You should try keep all files associated with a particular game/mission in its own subfolder.) To add/remove levels for that game/mission, edit the .gam file (see the included .gam files to see the format).
 
 
-# TODOs (To Sort):
+# TODOs (To Sort - many done now):
 
-* Create 'Roadmap' to "version 1"? E.g. starter list below:
+* It would be really great to have packages for e.g. Debian, Ubuntu etc. (possibly two packages? one for the binary, one for the data)
 * Videos?
-* Check through code for possible buffer over-runs and 
-* v0.7 [stil issue with ctrl jump keypress story]
-* v0.7 linux segfault
+* Check through code for possible buffer over-runs?
 * 'Texture Manager':
 	* Clean up of 'textures'
 	* Actual hardware accel if available [todo: proper blending]
@@ -373,16 +371,10 @@ To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add 
 	* Add a dev readme.txt to help devs get set up
 
 * [med] Level Editor is hogging CPU [check sprite editor, does it also?]
-* Finalize sprites and other graphics to at least reasonable ready state
-* Finalize a basic playable set of levels
 * Check for all possible hardcoded keys that may be interfering with redefined keys (e.g. Ctrl, H, backspace+G etc.)
 * [After redefine keys] Ctrl *both* shoot and jump
-* H to damage health should not be on by default [likewise other things]
-* Better colors for menu
-* Some more / better sounds
 * CREDITS: Add Vytautas Shaltenis, a.k.a. rtfb, EMH, etc. [who else?]
 * Some better graphics
-* Fix up and update credits etc.
 * Signed executables in binary release?
 * [check] Dying seems to reset score to 0 - is that right? Cf. DN1 behavior
 * Is the -640 flag now basically obsolete? Remove? Or change to do something else useful? E.g. to make window maximum size e.g. same as monitor could be useful for level editing.
@@ -391,13 +383,9 @@ To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add 
 
 * Some of the background brick colors should be a bit darker
 * Some smoothing on some of hard pixely 'lines' (e.g. on shadow edges)
-* Finish conveyor belt
 * Un-EGA-ish sprites that still look a bit too EGA-ish (some of the especially ones look a bit too 16-color-ish perhaps, though the original DN1 was 16 colors)
 * Red background pipes look a bit .. I dunno what .. chromatic? Maybe desaturate slightly .. or something
 
-## Level TODOs:
-
-* ? Make a list of 'level TODOs' that are must-have for a 'version 1'?
 
 
 # Notes
