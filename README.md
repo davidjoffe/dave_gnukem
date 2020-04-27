@@ -297,6 +297,24 @@ Same as Linux - type 'make'. Run with ./davegnukem if it built correctly.
 
 Dependencies: You may have to first install LibSDL1.2 and LibSDL-Mixer1.2 (these can be installed by downloading the source code and doing 'make' and 'make install' (as root) for each of these first).
 
+## Windows Installer Build Instructions
+
+To build a Windows installer, use Inno Setup 5.
+
+Note: As of Apr 2020 it is still recommended to use the older 'version 5' of Inno Setup (and not versions 6 or higher) as Inno Setup version 6 appears to have dropped support for Windows XP, which we still support (this also indirectly allows ReactOS support)
+
+The basic process of building a Windows installer is as follows (this process is still a little crude/unrefined and may require a bit of hackery if you're trying to do this):
+
+* Build the source code so you have the game's .exe (updating version number and date in main.cpp if/as desired to change it)
+* Set up a local folder, e.g. c:\src\gnukem\src\installer\ApplicationFolder\ which is basically a mirror of what the installed "\Program Files\Dave Gnukem" is going to look like, containing the data subfolder, .exe, DLLs, license files, README.md etc. Remember to codesign the exe and DLLs if you can.
+* Open c:\src\gnukem\src\installer\gnukem.iss in Inno Setup
+* Make any changes to reflect your own local build differences, e.g. if you're using a different folder location to the default c:\src\gnukem
+* Update the version number
+* Compile it in Inno Setup. It will generate something like Dave_Gnukem_Setup.exe ... rename to add the version number
+* Code-sign the generated Setup .exe
+* Test the generated Setup .exe
+
+
 # Level Editor Instructions
 
 (New 1 Jul 2017) Level Editor how-to video: https://youtu.be/xiznDqg2BHg
