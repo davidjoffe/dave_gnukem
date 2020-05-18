@@ -32,9 +32,15 @@ As of 8 Oct 2016, this project is under 'properly' active development again, and
 
 Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by Apogee Software in 1991 that launched the Duke Nukem series: https://goo.gl/yP4PbS  The original Duke Nukem 1 was created by Todd Replogle (co-creator of the Duke Nukem series), John Carmack (of id Software), Scott Miller (founder of 3D Realms), Allen H. Blum III, George Broussard, and Jim Norwood.
 
-### Help Wanted: Packages for Debian, Linux etc.?
+### Help Wanted: Packages for major Linux distros, e.g. Debian, Ubuntu etc.
 
-It would be really great if someone could create packages for major Linux distros (perhaps two packages, one for data, one for binary? as licenses differ a bit .. or just one?).
+It would be really great if someone could create packages for all major Linux distros (perhaps dual packages, i.e. one for data, one for binary? as licenses differ a bit .. or just one?)
+
+Spotted: openSUSE Leap packages :) (seemingly by Martin Hauke)
+
+* https://opensuse.pkgs.org/15.2/games-x86_64/dave_gnukem-1.0.1-lp152.1.1.x86_64.rpm.html (the description here is perfect to me - dj)
+* https://opensuse.pkgs.org/15.2/games-x86_64/dave_gnukem-data-1.0.1-lp152.1.1.noarch.rpm.html
+
 
 ### Development LiveStreaming Channels
 
