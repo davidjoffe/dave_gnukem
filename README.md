@@ -1,7 +1,7 @@
 # Dave Gnukem
 Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'. It is kind of a parody of the original. Please note it is not a 'clone', and not a 're-make'.)
 
-**News Apr 2018: Version 1.0 released.** Apr 2019 OpenBSD port.
+**News Apr 2018: Version 1.0 released.** Apr 2019 OpenBSD port. (Apr 2020: Version 1.0.1 released.)
 
 **Release Downloads:** https://sourceforge.net/projects/gnukem/
 
@@ -31,6 +31,10 @@ As of 8 Oct 2016, this project is under 'properly' active development again, and
 ### About Duke Nukem 1
 
 Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by Apogee Software in 1991 that launched the Duke Nukem series: https://goo.gl/yP4PbS  The original Duke Nukem 1 was created by Todd Replogle (co-creator of the Duke Nukem series), John Carmack (of id Software), Scott Miller (founder of 3D Realms), Allen H. Blum III, George Broussard, and Jim Norwood.
+
+### Help Wanted: Packages for Debian, Linux etc.?
+
+It would be really great if someone could create packages for major Linux distros (perhaps two packages, one for data, one for binary? as licenses differ a bit .. or just one?).
 
 ### Development LiveStreaming Channels
 
@@ -363,7 +367,7 @@ To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add 
 * 'Texture Manager':
 	* Clean up of 'textures'
 	* Actual hardware accel if available [todo: proper blending]
-	* Restoring hardware surfaces on toggle fullscreen with DirectX
+	* Restoring hardware surfaces on toggle fullscreen with DirectX (is this no longer an issue now we're on SDL? or still something one must do with SDL?) (low)
 * Explosion sound doesn't always play (fixed 2016-10-22 but fix could use more testing, cf. channel -1 story)
 * DEV
 	* Update TargetName to DaveGnukem in VS2010
