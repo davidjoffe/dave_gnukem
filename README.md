@@ -36,6 +36,10 @@ Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by A
 
 It would be really great if someone could create packages for all major Linux distros (perhaps dual packages, i.e. one for data, one for binary? as licenses differ a bit .. or just one?)
 
+Dave Gnukem added to the Arch Linux AUR (Arch User Repository) 🙂 (Added May 2020 by https://github.com/caltlgin)
+
+* https://aur.archlinux.org/packages/dave_gnukem/
+
 Spotted: openSUSE Leap packages :) (seemingly by Martin Hauke)
 
 * https://opensuse.pkgs.org/15.2/games-x86_64/dave_gnukem-1.0.1-lp152.1.1.x86_64.rpm.html (the description here is perfect to me - dj)
