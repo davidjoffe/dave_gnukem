@@ -46,6 +46,12 @@ else
     ifeq ($(UNAME_S),Linux)
         #CCFLAGS += -D LINUX
     endif
+    # dj2020-06 Add basic HaikuOS detection and override some default settings here if detected
+    ifeq ($(UNAME_S),Haiku)
+        INCLUDEDIRS=`sdl-config --cflags`
+        CCFLAGS=-Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
+        LIBS=`sdl-config --libs` -lSDLmain -lSDL_mixer -lpthread
+    endif
     ifeq ($(UNAME_S),Darwin)
         LIBS += -framework Cocoa 
     endif
