@@ -133,6 +133,15 @@ TL;DR Shoot anything that moves
 * MorphOS [Mar 2018, by Bruno Peloille]: http://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_1.00.lha
 * Instructions for ClockworkPi GameShell: https://forum.clockworkpi.com/t/lets-play-dave-gnukem/1917 by: https://forum.clockworkpi.com/u/Oet
 * OpenBSD [Apr 2019 by Dr. Brian Robert Callahan] Callahan https://twitter.com/__briancallahan https://github.com/jasperla/openbsd-wip/commit/e51e3a3b9386365cd0eb8317018463ff4682e0d3 http://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/games/gnukem/
+* HaikuOS (see discussion thread and instructions here https://discuss.haiku-os.org/t/gaming-on-haiku/3928/74) [22 June 2020]
+* HaikuOS Instructions:
+
+~> pkgman install libsdl_devel
+
+~> pkgman install sdl_mixer_devel
+
+Then follow the same instructions as for Linux, e.g. git clone the src, cd into src folder, git clone the gnukem_data into 'data' folder, and 'make'
+
 
 # Awards and Reviews
 
