@@ -141,6 +141,7 @@ TL;DR Shoot anything that moves
 ~> pkgman install sdl_mixer_devel
 
 Then follow the same instructions as for Linux, e.g. git clone the src, cd into src folder, git clone the gnukem_data into 'data' folder, and 'make'
+* Also in HaikuPorts: https://github.com/haikuports/haikuports/tree/master/games-action/dave_gnukem
 
 
 # Awards and Reviews
