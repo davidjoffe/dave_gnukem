@@ -10,6 +10,7 @@ Copyright (C) 2000-2020 David Joffe
 #include "djtypes.h"
 
 int hero_picoffs = 0;    // hero animation image index offset
+int nSlowDownHeroWalkAnimationCounter = 0;
 
 //----------------------------------------------------------------------------
 //fixme(low) odd hardcoded default position
