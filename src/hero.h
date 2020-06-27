@@ -3,13 +3,14 @@
 \brief   Hero-related stuff
 \author  David Joffe
 
-Copyright (C) 2001-2018 David Joffe
+Copyright (C) 2001-2020 David Joffe
 
 I'm not a fan of the various globals here; they're mostly from the very
 oldest parts of the codebase, when I was still an inexperienced coder ...
 but not necessarily at this stage worth investing time in refactoring,
 unless we want to genericize this codebase more/better for other derived
 games. [dj2018]
+[dj2020-06: Fixing some of the most embarassing globals, eg global x,y and create new CPlayer class for the hero]
 */
 #ifndef _HERO_H_
 #define _HERO_H_
@@ -28,8 +29,18 @@ extern int nHurtCounter;
 
 
 // Fixme, these names have GOT to change! [should be in a class too - not globals - dj2016-10]
-extern int x;			//!< Hero's absolute x position, in level block coordinates
-extern int y;			//!< Hero's absolute y position, in level block coordinates
+class CPlayer
+{
+public:
+	CPlayer();
+
+	//! x,y = Hero's absolute x position in level (in level block coordinates, not pixel units, and excluding the half-block 'x_small' offset that is fairly specific to DN1/DaveGnukem) (0,0 = upper left of level)
+	int x;
+	//! x,y = Hero's absolute y position in level (in level block coordinates, not pixel units) (0,0 = upper left of level)
+	int y;
+};
+//! Main hero/player (for now, we only support a single player etc., but in future can make this more generic and support multiple players)
+extern CPlayer g_Player;
 extern int x_small;		//!< x_small == 0 ? hero at x : hero at x + 8 pixels
 
 // This should really just be permanently on I guess, not sure if there's any good reason to turn it off, unless we want to backtrack today's changes. [dj2017-06-24]

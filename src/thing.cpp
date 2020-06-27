@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------------*/
 // thing.cpp
 /*
-Copyright (C) 2000-2018 David Joffe
+Copyright (C) 2000-2020 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "thing.h"
@@ -877,9 +877,9 @@ void CCamera::Draw()
 {
 	// "Turn" to face hero
 	int nOffset = 0;
-	if (x < m_x - 1)
+	if (g_Player.x < m_x - 1)
 		nOffset = -1;
-	else if (x > m_x + 1)
+	else if (g_Player.x > m_x + 1)
 		nOffset = 1;
 
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
@@ -895,7 +895,7 @@ int CCamera::OnHeroShot()
 	c_nNumCameras--;
 	if (c_nNumCameras==0) // Shot all cameras in level, issue a bonus!
 	{
-		update_score(10000, x, y);
+		update_score(10000, g_Player.x, g_Player.y);
 	}
 	return THING_DIE;
 }
@@ -1117,7 +1117,7 @@ int CAcme::Tick()
 		// Test if we are above hero.
 // FIXME I think this doesn't work for half-block under - it should
 // FIXME Also use check_solid for problem of if solid above us but below Acme, then shouldn't fall (I think (??))
-		if ((x>=m_x) && (x<=m_x+1) && (y>m_y))
+		if ((g_Player.x>=m_x) && (g_Player.x<=m_x+1) && (g_Player.y>m_y))
 		{
 			// Sort of 'cast a ray downwards' from us, to hero's Y position, to see if
 			// there are eg solid floors BETWEEN us and the hero .. if there are, don't
@@ -1125,7 +1125,7 @@ int CAcme::Tick()
 
 			int nY = m_y+1;
 			bool bClear = true;
-			while (bClear && nY<y)
+			while (bClear && nY<g_Player.y)
 			{
 				if (check_solid(m_x,nY) || check_solid(m_x+1,nY))
 					bClear = false;
@@ -1896,12 +1896,11 @@ int CDust::Tick()
 	if (m_nPuff<=-1)
 	{
 		m_nPuff++;
-		m_anX[m_nPuff] = x;
-		m_anY[m_nPuff] = y;
+		m_anX[m_nPuff] = g_Player.x;
+		m_anY[m_nPuff] = g_Player.y;
 	}
-	int i;
 	bool bAllDead = true;
-	for ( i=0; i<=m_nPuff; i++ )
+	for ( int i=0; i<=m_nPuff; i++ )
 	{
 		m_anAnim[i]++;
 		if (m_anAnim[i]<=3)

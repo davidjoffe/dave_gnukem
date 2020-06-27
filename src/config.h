@@ -1,4 +1,4 @@
-// Copyright (C) 1998-2019 David Joffe
+// Copyright (C) 1998-2020 David Joffe
 /*--------------------------------------------------------------------------*/
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
@@ -100,8 +100,8 @@ extern bool g_bBigViewportMode;//dj2019-06. //Can't have both bigviewport and la
 #define HALFBLOCKW ((BLOCKW)>>1)
 #define HALFBLOCKH ((BLOCKH)>>1)
 //dj2019-07 Top-left world pixel coordinate of hero - more convenience helpers to help clean up and genericize the code and improve readability a bit but these should probably be temporary, don't like them, should probably change:
-#define HERO_PIXELX (x*BLOCKW + x_small * HALFBLOCKW)
-#define HERO_PIXELY (y*BLOCKH + y_offset - BLOCKH)
+#define HERO_PIXELX (g_Player.x*BLOCKW + x_small * HALFBLOCKW)
+#define HERO_PIXELY (g_Player.y*BLOCKH + y_offset - BLOCKH)
 
 //dj2019-07 This stuff should probably change. Currently for DG1 the hero (for collision detection purposes etc.) is 1x2 'game blocks'
 #define HEROW_COLLISION (BLOCKW)
