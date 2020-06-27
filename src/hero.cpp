@@ -11,14 +11,15 @@ Copyright (C) 2000-2020 David Joffe
 
 
 int hero_mode = MODE_NORMAL;
-int x_small=0, xo_small=0; // x_small == 0 ? hero at x : hero at x + 8 pixels
+int xo_small=0;
 int xo = 60, yo = 45;    // xo,yo = top-left corner of view for scrolling
 int hero_dir = 1;        // hero direction, left==0, right==1
 int hero_picoffs = 0;    // hero animation image index offset
 
 //----------------------------------------------------------------------------
 //fixme(low) odd hardcoded default position
-CPlayer::CPlayer() : x(64), y(50)
+CPlayer::CPlayer() : x(64), y(50),
+	x_small(0)
 {
 }
 CPlayer g_Player;
@@ -107,7 +108,7 @@ void HeroUpdateJump()
 		//else
 		{
 			// Check if gonna hit head on solid as result of fine 'pixel' movement?
-			bool bSolid = check_solid( g_Player.x, g_Player.y - 2 ) | check_solid( g_Player.x + x_small, g_Player.y - 2 );
+			bool bSolid = check_solid( g_Player.x, g_Player.y - 2 ) | check_solid( g_Player.x + g_Player.x_small, g_Player.y - 2 );
 			if (bSolid)
 			{
 				y_offset += nJUMP_VERTICAL_PIXELS;
@@ -175,7 +176,7 @@ void relocate_hero( int xnew, int ynew )
 	// Move hero (and reset the sub-block pixel offset values):
 	g_Player.x = xnew;
 	g_Player.y = ynew;
-	x_small = 0;
+	g_Player.x_small = 0;
 	y_offset = 0;
 	// Snap viewpoint to where hero has moved and do bounds-checking on level dimensions:
 	xo = MAX( g_Player.x - int(VIEW_WIDTH / 2), 0 );
@@ -211,7 +212,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 		if (xdiff>0)
 		{
 			bsolid = false;
-			if ( x_small == 0 )
+			if ( g_Player.x_small == 0 )
 			{
 				bsolid = check_solid( g_Player.x + 1, g_Player.y ) | check_solid( g_Player.x + 1, g_Player.y - 1 );
 				// Prevent being able to walk into floors left/right while falling [dj2017-06]
@@ -224,10 +225,10 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 				}
 			}
 			ret = 2;
-			if (  (!(bsolid)) && ( (x_small) | (!(bsolid)) )  ) {
+			if (  (!(bsolid)) && ( (g_Player.x_small) | (!(bsolid)) )  ) {
 				ret = 0;
-				g_Player.x += (xdiff * x_small);
-				x_small ^= 1;
+				g_Player.x += (xdiff * g_Player.x_small);
+				g_Player.x_small ^= 1;//Toggle whether x_small offset on or off
 
 				/*//dj2017-08/12 moving this auto-viewport scrolling stuff elsewhere
 				if (((x-xo)==(VIEW_WIDTH - 5)) & (x_small)) {
@@ -249,7 +250,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 		else//Try move left
 		{ //facing left, must have pressed left
 			bsolid = false;
-			if (!(x_small))
+			if (!(g_Player.x_small))
 			{
 				bsolid = check_solid( g_Player.x - 1, g_Player.y ) | check_solid( g_Player.x - 1, g_Player.y - 1 );
 				// Prevent being able to walk into floors left/right while falling [dj2017-06]
@@ -262,10 +263,10 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 				}
 			}
 			ret = 2;
-			if ((!(bsolid)) & ((x_small) | (!(bsolid))) ) {
+			if ((!(bsolid)) & ((g_Player.x_small) | (!(bsolid))) ) {
 				ret = 0;
-				x_small ^= 1;
-				g_Player.x += (xdiff * x_small);
+				g_Player.x_small ^= 1;//Toggle whether x_small offset on or off
+				g_Player.x += (xdiff * g_Player.x_small);
 				/*
 				if (((x-xo)==4) & (!(x_small))) {
 					xo_small = 0;
@@ -295,7 +296,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 			n = -2;     // going up, check above hero's head
 		
 		// also stop hero falling if at bottom of screen
-		bsolid = check_solid( g_Player.x, g_Player.y + n ) | check_solid( g_Player.x + x_small, g_Player.y + n );
+		bsolid = check_solid( g_Player.x, g_Player.y + n ) | check_solid( g_Player.x + g_Player.x_small, g_Player.y + n );
 		
 		ret = 1;
 		if (!bsolid) {

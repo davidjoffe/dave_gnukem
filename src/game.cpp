@@ -290,7 +290,7 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 		{
 			// Snap to it
 			xo = g_Player.x - VIEW_WIDTH;
-			xo_small = x_small!=0 ? 1 : 0;
+			xo_small = g_Player.x_small != 0 ? 1 : 0;
 		}
 		if ((g_Player.x - xo) >= VIEW_WIDTH - 5)
 		{
@@ -314,7 +314,7 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 			xo_small = 0;
 			}
 			*/
-			if (((g_Player.x - xo) == VIEW_WIDTH - 5) & (x_small)) {
+			if (((g_Player.x - xo) == VIEW_WIDTH - 5) & (g_Player.x_small)) {
 				xo_small = 1;
 
 				//if ((x-xo)>=VIEW_WIDTH - 3)
@@ -350,11 +350,11 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 		else if (((g_Player.x - xo) <= 4))
 		{
 			bool bEven = (((g_Player.x - xo) % 2) == 0);
-			if (bEven & (!(x_small))) {
+			if (bEven & (!(g_Player.x_small))) {
 				xo_small = 0;
 			}
 			// dj2019-06 NB: This was "if (!bEven && (x_small))"; changing it based on a compiler warning from Ubuntu. I don't even know anymore (as some of this code is 20+ years old) if the intention was to do this bitwise or int-wise etc. but I don't think it matters, I think end result is the same. Nonetheless, if we suddenly have strange viewport scrolling behavior after this change, change it back or come back to this.
-			if ((!bEven) && (x_small!=0)) {
+			if ((!bEven) && (g_Player.x_small!=0)) {
 				xo--;
 				xo_small = 1;
 			}
@@ -552,8 +552,9 @@ void CheckIfHeroShooting()
 			if (BLOCKW>16)
 				nMultiple = (BLOCKW/16);
 
+			// The start X position of the bullet may be a bit imperfect here :/ .. but now that version 1's been released, probably best not to mess with it (at least for DG v1) - dj2020-06
 			HeroShoot(
-				g_Player.x * BLOCKW /*+ (hero_dir==1 ? BLOCKW : -BLOCKW)*/ + x_small*HALFBLOCKW,
+				g_Player.x * BLOCKW /*+ (hero_dir==1 ? BLOCKW : -BLOCKW)*/ + g_Player.x_small*HALFBLOCKW,
 				(g_Player.y-1)*BLOCKH + (11*nMultiple),
 				(hero_dir==0 ? -HERO_BULLET_SPEED : HERO_BULLET_SPEED)
 			);
@@ -1002,7 +1003,6 @@ void PerLevelSetup()
 	anim4_count=0; // animation count 0
 	hero_picoffs=0;
 	g_nHeroJustFiredWeaponCounter = 0;
-	x_small = 0; // hero not half-block offset
 	xo_small = 0; // view not half-block offset
 	y_offset = 0;
 	// just in case level doesn't contain a starting block ..
@@ -1906,7 +1906,7 @@ void GameHeartBeat()
 			if (bFallingPrev && !bFalling) // <- just stopped falling
 			{
 				// Kick up some dust ..
-				AddThing(CreateDust(g_Player.x, g_Player.y, x_small*HALFBLOCKW,y_offset));
+				AddThing(CreateDust(g_Player.x, g_Player.y, g_Player.x_small*HALFBLOCKW,y_offset));
 				djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
 			}
 			bFallingPrev = bFalling;
@@ -2282,7 +2282,7 @@ void GameDrawView()
 		//xoff = ((x_small - xo_small)+1)*8 + (x-xo) * 16;
 		yoff = g_nViewOffsetY + (g_Player.y - yo - 1) * BLOCKH;
 
-		xoff = (x_small - xo_small) + 1 + ((g_Player.x - xo) << 1);
+		xoff = (g_Player.x_small - xo_small) + 1 + ((g_Player.x - xo) << 1);
 		xoff *= HALFBLOCKW;
 		if (g_bLargeViewport) xoff -= BLOCKW;
 		/*
