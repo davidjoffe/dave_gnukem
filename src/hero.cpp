@@ -18,7 +18,8 @@ CPlayer::CPlayer() : x(64), y(50),
 	y_offset(0),
 	hero_dir(1),
 	hero_mode(MODE_NORMAL),
-	nHurtCounter(0)
+	nHurtCounter(0),
+	m_nFalltime(0)
 {
 }
 CPlayer g_Player;
@@ -37,7 +38,7 @@ CViewport g_Viewport;
 int g_nHeroJustFiredWeaponCounter = 0;
 
 bool g_bSmoothVerticalMovementEnabled=true;
-int g_nFalltime=0;
+
 // These at '8' correspond relatively closely to original DN1 behavior. Setting these to e.g. 1 or 2 etc. allow much smoother more refined vertical movement of hero, which might be useful in future. [dj2017-06]
 const int nFALL_VERTICAL_PIXELS=8;
 const int nJUMP_VERTICAL_PIXELS=8;
@@ -313,7 +314,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 				ydiff>0)//Falling?
 			{
 				bDo=false;
-				// This g_nFalltime thing is to make hero fall initially slower
+				// This m_nFalltime thing is to make hero fall initially slower
 				// then faster (full block at a time).
 				// Apart from looking/feeling slightly more natural, it also 'masks'
 				// a current issue where you get a jerky effect that looks like hero
@@ -325,7 +326,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 				// he is falling 16 pixels, and the view scrolls 16 pixels too.
 				// It's a bit fiddly but anyway, we have to do fine tweaks like this.
 				// See also liveedu.tv video 2017-06-24 [dj2017-06-24]
-				g_Player.y_offset += ( g_nFalltime>=6 ? BLOCKH : nFALL_VERTICAL_PIXELS );
+				g_Player.y_offset += ( g_Player.m_nFalltime>=6 ? BLOCKH : nFALL_VERTICAL_PIXELS );
 				ret = 0;//Return 'busy falling'
 				if (g_Player.y_offset >= (BLOCKH - 1))
 				{
@@ -359,7 +360,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 			// insta-drop all 12 to the floor, but correctly still fall over multiple
 			// frames back down to the ground.
 
-			// This g_nFalltime thing is to make hero fall initially slower
+			// This m_nFalltime thing is to make hero fall initially slower
 			// then faster (full block at a time).
 			// Apart from looking/feeling slightly more natural, it also 'masks'
 			// a current issue where you get a jerky effect that looks like hero
@@ -371,7 +372,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 			// he is falling 16 pixels, and the view scrolls 16 pixels too.
 			// It's a bit fiddly but anyway, we have to do fine tweaks like this.
 			// See also liveedu.tv video 2017-06-24 [dj2017-06-24]
-			g_Player.y_offset += ( g_nFalltime>=6 ? BLOCKH : nFALL_VERTICAL_PIXELS );
+			g_Player.y_offset += ( g_Player.m_nFalltime>=6 ? BLOCKH : nFALL_VERTICAL_PIXELS );
 			ret = 0;//Return 'busy falling'
 			if (g_Player.y_offset>0)
 				g_Player.y_offset = 0;//We're not going to change hero block-y, as this case is when we're only y_offset (less than a full BLOCKH) above the ground.
