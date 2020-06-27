@@ -13,14 +13,14 @@ Copyright (C) 2000-2020 David Joffe
 int hero_mode = MODE_NORMAL;
 int xo_small=0;
 int xo = 60, yo = 45;    // xo,yo = top-left corner of view for scrolling
-int hero_dir = 1;        // hero direction, left==0, right==1
 int hero_picoffs = 0;    // hero animation image index offset
 
 //----------------------------------------------------------------------------
 //fixme(low) odd hardcoded default position
 CPlayer::CPlayer() : x(64), y(50),
 	x_small(0),
-	y_offset(0)
+	y_offset(0),
+	hero_dir(1)
 {
 }
 CPlayer g_Player;
@@ -201,10 +201,10 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 	if (xdiff)
 	{
 		//simple direction reverse (unless bChangeLookDirection is false, which means we're probably on a conveyor or something)
-		if (bChangeLookDirection && (((hero_dir == 1) & (xdiff == -1)) | ((hero_dir == 0) & (xdiff == 1))))
+		if (bChangeLookDirection && (((g_Player.hero_dir == 1) & (xdiff == -1)) | ((g_Player.hero_dir == 0) & (xdiff == 1))))
 		{
 			hero_picoffs = 0;
-			hero_dir = (xdiff+1)/2;  //( -1 --> 0 : 1 --> 1 )
+			g_Player.hero_dir = (xdiff+1)/2;  //( -1 --> 0 : 1 --> 1 )
 			return 0;
 		}
 		//facing right, must also have pressed right
