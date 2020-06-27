@@ -1,9 +1,9 @@
 //
 // game.cpp
 //
-// 1995/07/28
+// Created 1995/07/28
 //
-// Copyright (C) 1995-2019 David Joffe
+// Copyright (C) 1995-2020 David Joffe
 //
 /*--------------------------------------------------------------------------*/
 
@@ -286,13 +286,13 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 
 		//[was:onmoveright]
 		//if (
-		if (x>=xo+VIEW_WIDTH)//Totally at/off right side of view?
+		if (g_Player.x>=xo+VIEW_WIDTH)//Totally at/off right side of view?
 		{
 			// Snap to it
-			xo = x - VIEW_WIDTH;
+			xo = g_Player.x - VIEW_WIDTH;
 			xo_small = x_small!=0 ? 1 : 0;
 		}
-		if ((x-xo)>=VIEW_WIDTH - 5)
+		if ((g_Player.x - xo) >= VIEW_WIDTH - 5)
 		{
 			// This stuff relates to trying to get similar 'retro' viewport scrolling behavior to DN1
 			// Not sure it's 100% right but seems sorta 'close enough' at this point (dj2019)
@@ -314,13 +314,13 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 			xo_small = 0;
 			}
 			*/
-			if (((x-xo)==VIEW_WIDTH - 5) & (x_small)) {
+			if (((g_Player.x - xo) == VIEW_WIDTH - 5) & (x_small)) {
 				xo_small = 1;
 
 				//if ((x-xo)>=VIEW_WIDTH - 3)
 				//	++xo;
 			}
-			if ((x-xo)>=VIEW_WIDTH - 4) {
+			if ((g_Player.x - xo) >= VIEW_WIDTH - 4) {
 				//xo++;
 				++xo;
 				xo_small = 0;
@@ -341,15 +341,15 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 
 		//[was:onmoveleft]
 		// If our x position is left of the viewport X origin (i.e. hero entirely outside viewport and would thus be invisible), 'force'/'snap'/reset viewport origin as a-few-blocks-left of hero
-		if (x<=xo)
+		if (g_Player.x <= xo)
 		{
-			xo = x-4;
+			xo = g_Player.x - 4;
 			xo_small = 0;
 		}
 		// If our hero is close to left of viewport and we maybe need to adjust the horizontal scrolling
-		else if (((x-xo)<=4))
+		else if (((g_Player.x - xo) <= 4))
 		{
-			bool bEven = (((x-xo)%2)==0);
+			bool bEven = (((g_Player.x - xo) % 2) == 0);
 			if (bEven & (!(x_small))) {
 				xo_small = 0;
 			}
@@ -377,7 +377,7 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 			// 'Avoid' scroll yo (unless 'necessary' e.g. if right at top) up if busy jumping up ... likewise for downward movement
 			if (hero_mode == MODE_JUMPING)
 			{
-				if (y-yo<2) yo--;
+				if (g_Player.y - yo < 2) yo--;
 				g_nRecentlyFallingOrJumping = 2;
 			}
 			else
@@ -386,7 +386,7 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 				if (bIsFalling)
 				{
 					g_nRecentlyFallingOrJumping = 2;
-					if (y-yo>=9) yo++;
+					if (g_Player.y - yo >= 9) yo++;
 				}
 				else
 				{
@@ -396,12 +396,12 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 					}
 					else
 					{
-						if (y-yo<7)
+						if (g_Player.y - yo < 7)
 						{
 							yo--;
 						}
 					}
-					if (y-yo>=7)
+					if (g_Player.y - yo >= 7)
 					{
 						yo++;
 					}
@@ -553,8 +553,8 @@ void CheckIfHeroShooting()
 				nMultiple = (BLOCKW/16);
 
 			HeroShoot(
-				x * BLOCKW /*+ (hero_dir==1 ? BLOCKW : -BLOCKW)*/ + x_small*HALFBLOCKW,
-				(y-1)*BLOCKH + (11*nMultiple),
+				g_Player.x * BLOCKW /*+ (hero_dir==1 ? BLOCKW : -BLOCKW)*/ + x_small*HALFBLOCKW,
+				(g_Player.y-1)*BLOCKH + (11*nMultiple),
 				(hero_dir==0 ? -HERO_BULLET_SPEED : HERO_BULLET_SPEED)
 			);
 
@@ -668,9 +668,9 @@ void UpdateBullets()
 				if (OVERLAPS(
 					HERO_PIXELX,
 					// fixmehigh2019-07 this actually looks like a bug! A possibly imporrant but why not add hero y_offset here!??
-					y*BLOCKH-BLOCKH,// FIXMEHIGH2019-07 WHY NOT HERO_PIXELY which includes the y_offset??
+					g_Player.y*BLOCKH-BLOCKH,// FIXMEHIGH2019-07 WHY NOT HERO_PIXELY which includes the y_offset??
 					HERO_PIXELX + (HEROW_COLLISION-1),
-					(y*BLOCKH-BLOCKH) + (HEROH_COLLISION-1),
+					(g_Player.y*BLOCKH-BLOCKH) + (HEROH_COLLISION-1),
 					pBullet->x,
 					pBullet->y,
 					pBullet->x+(BLOCKW-1),
@@ -1764,8 +1764,8 @@ int game_startup(bool bLoadGame)
 
 		// ensure we don't leave the borders of the level
 		// fixme; is this still necessary what with the (other functions)
-		x = MAX( MIN(x,126), 1 );
-		y = MAX( MIN(y, 99), 2 );
+		g_Player.x = MAX( MIN(g_Player.x,126), 1 );
+		g_Player.y = MAX( MIN(g_Player.y, 99), 2 );
 		//debug//printf("}");
 
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
@@ -1906,7 +1906,7 @@ void GameHeartBeat()
 			if (bFallingPrev && !bFalling) // <- just stopped falling
 			{
 				// Kick up some dust ..
-				AddThing(CreateDust(x, y, x_small*HALFBLOCKW,y_offset));
+				AddThing(CreateDust(g_Player.x, g_Player.y, x_small*HALFBLOCKW,y_offset));
 				djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
 			}
 			bFallingPrev = bFalling;
@@ -2280,9 +2280,9 @@ void GameDrawView()
 		//yoff = 200+16+(y-yo-1)*16;
 
 		//xoff = ((x_small - xo_small)+1)*8 + (x-xo) * 16;
-		yoff = g_nViewOffsetY + (y-yo-1) * BLOCKH;
+		yoff = g_nViewOffsetY + (g_Player.y - yo - 1) * BLOCKH;
 
-		xoff = (x_small - xo_small)+1 + ((x-xo)<<1);
+		xoff = (x_small - xo_small) + 1 + ((g_Player.x - xo) << 1);
 		xoff *= HALFBLOCKW;
 		if (g_bLargeViewport) xoff -= BLOCKW;
 		/*
@@ -2632,7 +2632,7 @@ void DrawDebugInfo()
 	GraphDrawString(pVisView, g_pFont8x8, 32, 24, (unsigned char*)buf );
 	sprintf(buf, "%d visible", nNumVisible);
 	GraphDrawString(pVisView, g_pFont8x8, 32, 32, (unsigned char*)buf );
-	sprintf(buf, "[%d,%d] [%d firepower]", x, y, g_nFirepower);
+	sprintf(buf, "[%d,%d] [%d firepower]", g_Player.x, g_Player.y, g_nFirepower);
 	GraphDrawString(pVisView, g_pFont8x8, 32, 40, (unsigned char*)buf );
 
 	if (HeroIsFrozen())

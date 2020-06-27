@@ -1,7 +1,7 @@
 /*
 hero.cpp
 
-Copyright (C) 2000-2019 David Joffe
+Copyright (C) 2000-2020 David Joffe
 */
 
 #include "hero.h"
@@ -11,11 +11,19 @@ Copyright (C) 2000-2019 David Joffe
 
 
 int hero_mode = MODE_NORMAL;
-int x = 64, y = 50;      // x,y = hero's absolute positioning in level
 int x_small=0, xo_small=0; // x_small == 0 ? hero at x : hero at x + 8 pixels
 int xo = 60, yo = 45;    // xo,yo = top-left corner of view for scrolling
 int hero_dir = 1;        // hero direction, left==0, right==1
 int hero_picoffs = 0;    // hero animation image index offset
+
+//----------------------------------------------------------------------------
+//fixme(low) odd hardcoded default position
+CPlayer::CPlayer() : x(64), y(50)
+{
+}
+CPlayer g_Player;
+//----------------------------------------------------------------------------
+
 
 int g_nHeroJustFiredWeaponCounter = 0;
 
@@ -99,7 +107,7 @@ void HeroUpdateJump()
 		//else
 		{
 			// Check if gonna hit head on solid as result of fine 'pixel' movement?
-			bool bSolid = check_solid( x, y - 2 ) | check_solid( x + x_small, y - 2 );
+			bool bSolid = check_solid( g_Player.x, g_Player.y - 2 ) | check_solid( g_Player.x + x_small, g_Player.y - 2 );
 			if (bSolid)
 			{
 				y_offset += nJUMP_VERTICAL_PIXELS;
@@ -118,7 +126,7 @@ void HeroUpdateJump()
 			HeroCancelJump();
 			hero_picoffs = 1;
 			// Kick up some dust ..
-			AddThing(CreateDust(x, y));
+			AddThing(CreateDust(g_Player.x, g_Player.y));
 			djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
 		}
 		jump_pos++;
@@ -165,13 +173,13 @@ void HeroReset()
 void relocate_hero( int xnew, int ynew )
 {
 	// Move hero (and reset the sub-block pixel offset values):
-	x = xnew;
-	y = ynew;
+	g_Player.x = xnew;
+	g_Player.y = ynew;
 	x_small = 0;
 	y_offset = 0;
 	// Snap viewpoint to where hero has moved and do bounds-checking on level dimensions:
-	xo = MAX( x - int(VIEW_WIDTH / 2), 0 );
-	yo = MAX( y - 6, 0 );
+	xo = MAX( g_Player.x - int(VIEW_WIDTH / 2), 0 );
+	yo = MAX( g_Player.y - 6, 0 );
 	xo = MIN( xo, LEVEL_WIDTH - VIEW_WIDTH );
 	yo = MIN( yo, LEVEL_HEIGHT - VIEW_HEIGHT );
 }
@@ -182,9 +190,8 @@ void relocate_hero( int xnew, int ynew )
 //returns 2 if coundnt move (x)
 int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 {
-	int n,ret;
-	bool bsolid;
-	ret = 0;
+	bool bsolid=false;
+	int ret = 0;
 	
 	// Don't do any moving if you're about to teleport or something
 	if (HeroIsFrozen())
@@ -206,20 +213,20 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 			bsolid = false;
 			if ( x_small == 0 )
 			{
-				bsolid = check_solid( x + 1, y ) | check_solid( x + 1, y - 1 );
+				bsolid = check_solid( g_Player.x + 1, g_Player.y ) | check_solid( g_Player.x + 1, g_Player.y - 1 );
 				// Prevent being able to walk into floors left/right while falling [dj2017-06]
 				if (g_bSmoothVerticalMovementEnabled)
 				{
 					if (y_offset<0)
-						bsolid |= check_solid( x + 1, y-1 ) | check_solid( x + 1, y - 2 );
+						bsolid |= check_solid( g_Player.x + 1, g_Player.y-1 ) | check_solid( g_Player.x + 1, g_Player.y - 2 );
 					else if (y_offset>0)
-						bsolid |= check_solid( x + 1, y+1 ) | check_solid( x + 1, y );
+						bsolid |= check_solid( g_Player.x + 1, g_Player.y+1 ) | check_solid( g_Player.x + 1, g_Player.y );
 				}
 			}
 			ret = 2;
 			if (  (!(bsolid)) && ( (x_small) | (!(bsolid)) )  ) {
 				ret = 0;
-				x += (xdiff * x_small);
+				g_Player.x += (xdiff * x_small);
 				x_small ^= 1;
 
 				/*//dj2017-08/12 moving this auto-viewport scrolling stuff elsewhere
@@ -244,21 +251,21 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 			bsolid = false;
 			if (!(x_small))
 			{
-				bsolid = check_solid( x - 1, y ) | check_solid( x - 1, y - 1 );
+				bsolid = check_solid( g_Player.x - 1, g_Player.y ) | check_solid( g_Player.x - 1, g_Player.y - 1 );
 				// Prevent being able to walk into floors left/right while falling [dj2017-06]
 				if (g_bSmoothVerticalMovementEnabled)
 				{
 					if (y_offset<0)
-						bsolid |= check_solid( x - 1, y-1 ) | check_solid( x - 1, y - 2 );
+						bsolid |= check_solid( g_Player.x - 1, g_Player.y-1 ) | check_solid( g_Player.x - 1, g_Player.y - 2 );
 					else if (y_offset>0)
-						bsolid |= check_solid( x - 1, y+1 ) | check_solid( x - 1, y );
+						bsolid |= check_solid( g_Player.x - 1, g_Player.y+1 ) | check_solid( g_Player.x - 1, g_Player.y );
 				}
 			}
 			ret = 2;
 			if ((!(bsolid)) & ((x_small) | (!(bsolid))) ) {
 				ret = 0;
 				x_small ^= 1;
-				x += (xdiff * x_small);
+				g_Player.x += (xdiff * x_small);
 				/*
 				if (((x-xo)==4) & (!(x_small))) {
 					xo_small = 0;
@@ -280,6 +287,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 	
 	if (ydiff)
 	{
+		int n=0;
 		// Jumping
 		if (ydiff == 1)
 			n = 1;      // falling, check below us
@@ -287,7 +295,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 			n = -2;     // going up, check above hero's head
 		
 		// also stop hero falling if at bottom of screen
-		bsolid = check_solid( x, y + n ) | check_solid( x + x_small, y + n );
+		bsolid = check_solid( g_Player.x, g_Player.y + n ) | check_solid( g_Player.x + x_small, g_Player.y + n );
 		
 		ret = 1;
 		if (!bsolid) {
@@ -323,7 +331,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 			if (bDo)
 			{
 				ret = 0;
-				y += ydiff;
+				g_Player.y += ydiff;
 			}
 		}
 		// If there is a solid below (in terms of game BLOCK units), but

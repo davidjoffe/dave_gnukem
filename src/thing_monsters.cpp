@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------------*/
 // thing_monsters.cpp
 /*
-Copyright (C) 2000-2018 David Joffe
+Copyright (C) 2000-2020 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "thing_monsters.h"
@@ -240,7 +240,7 @@ int CRobot::Tick()
 			if (IsInView())
 			{
 				// Check we're facing hero, and hero is more or less at same height ..
-				if ((ABS(y-m_y)<3) && ((m_nXDir<0 && x<=m_x) || (m_nXDir>0 && x>=m_x)))
+				if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 				{
 					if ((rand()%100)<=3)
 					{
@@ -391,9 +391,9 @@ int CFlyingRobot::Tick()
 		return CThing::Tick();
 
 	// Turn to face (and move in) direction of hero
-	if (x < m_x - 1)
+	if (g_Player.x < m_x - 1)
 		m_nXDir = -1;
-	else if (x > m_x + 1)
+	else if (g_Player.x > m_x + 1)
 		m_nXDir = 1;
 
 	// Move slowly in direction of hero along both axes (but slower in y axis)
@@ -423,7 +423,7 @@ int CFlyingRobot::Tick()
 
 		// Work in pixel units here, simplifies things slightly. Compare our center-line, to hero center-line, vertically.
 		int nOurYPixels = PIXELY + HALFBLOCKH;//Add half as we use our center-line vs hero center-line
-		int nHeroYPixels = (y*BLOCKH + y_offset);
+		int nHeroYPixels = (g_Player.y*BLOCKH + y_offset);
 		int nYDiffDir = 0;
 		if (nHeroYPixels < nOurYPixels)
 			nYDiffDir = -1;
@@ -458,7 +458,7 @@ int CFlyingRobot::Tick()
 		if (IsInView())
 		{
 			// Check we're facing hero, and hero is more or less at same height ..
-			if ((ABS(y-m_y)<3) && ((m_nXDir<0 && x<=m_x) || (m_nXDir>0 && x>=m_x)))
+			if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 			{
 				if ((rand()%50)<=2)
 				{
@@ -742,7 +742,7 @@ int CCannon::Tick()
 		if (IsInView())
 		{
 			// Check we're facing hero, and hero is more or less at same height ..
-			if ((ABS(y-m_y)<3) && ((m_nXDir<0 && x<=m_x) || (m_nXDir>0 && x>=m_x)))
+			if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 			{
 				if ((rand()%50)<=2)
 				{
@@ -941,9 +941,9 @@ CJumpingMonster::CJumpingMonster() :
 int CJumpingMonster::Tick()
 {
 	// Turn to face (and move in) direction of hero
-	if (x < m_x - 1)
+	if (g_Player.x < m_x - 1)
 		m_nXDir = -1;
-	else if (x > m_x + 1)
+	else if (g_Player.x > m_x + 1)
 		m_nXDir = 1;
 
 	if (IsInView())
@@ -1073,7 +1073,7 @@ int CJumpingMonster::Tick()
 	if (IsInView() && !m_bFalling && !IsJumping())
 	{
 		// Check we're facing hero, and hero is more or less at same height ..
-		if ((ABS(y-m_y)<3) && ((m_nXDir<0 && x<=m_x) || (m_nXDir>0 && x>=m_x)))
+		if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 		{
 			m_bLinedUpToShoot = true;
 			if (m_nNoShootCounter>0)
@@ -1211,7 +1211,7 @@ int CDrProton::Tick()
 		}
 		//if (ABS(m_nOrigX - m_x) < 3)
 		{
-			if (m_x<(x+m_nDesiredXRandomVariation))
+			if (m_x < (g_Player.x + m_nDesiredXRandomVariation))
 			{
 				bool bSolid = false;
 				bSolid |= check_solid(m_x+1,m_y-1);//headblock [top right block is 'basically' empty]
@@ -1222,7 +1222,7 @@ int CDrProton::Tick()
 				if (!bSolid)//! (check_solid(m_x+2,m_y) || check_solid(m_x+2,m_y-1) || check_solid(m_x+1,m_y-2)) )
 					++m_xoffset;
 			}
-			else if (m_x >= (x+m_nDesiredXRandomVariation)+1)
+			else if (m_x >= (g_Player.x + m_nDesiredXRandomVariation) + 1)
 			{
 				bool bSolid = false;
 				bSolid |= check_solid(m_x  ,m_y-1);//headblock [top left block is 'basically' empty]
@@ -1246,12 +1246,12 @@ int CDrProton::Tick()
 		{
 			m_nDesiredYRandomVariation = ((rand()%6)-2);//[-2,-1,0,1,2,3]
 		}
-		if (m_y<(y+m_nDesiredYRandomVariation) - 2)
+		if (m_y < (g_Player.y + m_nDesiredYRandomVariation) - 2)
 		{
 			if (! (check_solid(m_x,m_y+1) || check_solid(m_x+1,m_y+1)) )
 				++m_yoffset;
 		}
-		else if (m_y > (y+m_nDesiredYRandomVariation) + 1)
+		else if (m_y > (g_Player.y + m_nDesiredYRandomVariation) + 1)
 		{
 			if (! (check_solid(m_x,m_y-2) || check_solid(m_x+1,m_y-2)) )
 				--m_yoffset;
@@ -1259,16 +1259,16 @@ int CDrProton::Tick()
 		NORMALIZEY;
 
 		// Turn to face direction of hero
-		if (x < m_x - 1)
+		if (g_Player.x < m_x - 1)
 			m_nXDir = -1;
-		else if (x > m_x + 1)
+		else if (g_Player.x > m_x + 1)
 			m_nXDir = 1;
 
 
 		if (IsInView())// && !m_bFalling && !IsJumping())
 		{
 			// Check we're facing hero, and hero is more or less at same height ..
-			if ((ABS(y-m_y)<3) && ((m_nXDir<0 && x<=m_x) || (m_nXDir>0 && x>=m_x)))
+			if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 			{
 				//m_bLinedUpToShoot = true;
 				if (m_nNoShootCounter>0)
