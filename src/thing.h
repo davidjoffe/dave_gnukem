@@ -19,16 +19,16 @@ Copyright (C) 1999-2018 David Joffe
 //g_bLargeViewport -> we slow down every calculation for a cheat-only mode we never use :/ .. hrm. surely could do better here://dj2019-07
 
 //! Convert world X coordinate (level block coordinate) to view (world display buffer) coordinates.
-#define CALC_XOFFSET(x) ( HALFBLOCKW * ( -xo_small + (g_bLargeViewport?0:2) + ((( (x) - xo ) << 1))) )
+#define CALC_XOFFSET(x) ( HALFBLOCKW * ( -g_Viewport.xo_small + (g_bLargeViewport?0:2) + ((( (x) - g_Viewport.xo ) << 1))) )
 //! Convert world Y coordinate (level block coordinate) to view (world display buffer) coordinates.
-#define CALC_YOFFSET(y) ( g_nViewOffsetY + ((y) - yo) * BLOCKH )
+#define CALC_YOFFSET(y) ( g_nViewOffsetY + ((y) - g_Viewport.yo) * BLOCKH )
 
 //! Convert world X coordinate (pixels) to view (world display buffer) coordinates.
 //! Theoretically this should probably eventually replace CALC_XOFFSET
-#define WORLDX2VIEW(x) ( -(HALFBLOCKW*xo_small) + ((x) - (BLOCKW*xo)) + g_nViewOffsetX )
+#define WORLDX2VIEW(x) ( -(HALFBLOCKW*g_Viewport.xo_small) + ((x) - (BLOCKW*g_Viewport.xo)) + g_nViewOffsetX )
 //! Convert world Y coordinate (pixels) to view (world display buffer) coordinates.
 //! Theoretically this should probably eventually replace CALC_YOFFSET
-#define WORLDY2VIEW(y) (                 ((y) - (BLOCKH*yo)) + g_nViewOffsetY)
+#define WORLDY2VIEW(y) (                 ((y) - (BLOCKH*g_Viewport.yo)) + g_nViewOffsetY)
 
 // CThing helpers [dj2017-08]
 #define PIXELX (m_x*BLOCKW+m_xoffset)

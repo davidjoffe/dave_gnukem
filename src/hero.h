@@ -67,8 +67,20 @@ extern bool g_bSmoothVerticalMovementEnabled;
 // See also liveedu.tv video 2017-06-24 [dj2017-06-24]
 extern int g_nFalltime;
 
-//! xo,yo = top-left corner of view for scrolling
-extern int xo;
+// [dj2020-06 - Wrap old globals xo,yo etc. into new class for viewport - note this doesn't belong in 'hero.h/cpp', should maybe have its own h/cpp - low prio]
+class CViewport
+{
+public:
+	CViewport();
+
+	//! xo,yo = top-left corner of view for scrolling
+	int xo;
+	//! xo,yo = top-left corner of view for scrolling
+	int yo;
+	//! View offset by 8 pixels? (If I remember correctly this is basically either 0 or 1, but we do use it as an int for some calculations, so maybe still best to leave it as an int.) This stuff has to do with the particular way DN1's viewport scrolling worked; either the horizontal game viewport is aligned to the 16-pixel boundaries (in which case this is 0), or it's further offset by half a block i.e. 8 pixels, depending.)
+	int xo_small;
+};
+extern CViewport g_Viewport;
 
 //! hero animation image index offset [dj2020-06 naively one might think this belongs in CPlayer, but really it's more to do with the CPlayer 'visual' - so maybe belongs in a separate class - not important]
 extern int hero_picoffs;
@@ -88,11 +100,6 @@ extern int hero_picoffs;
 //! ... that's extremely low-prio, I'll probably never bother doing that. ~dj2018-01)
 extern int g_nHeroJustFiredWeaponCounter;
 
-
-//! xo,yo = top-left corner of view for scrolling
-extern int yo;
-//! View offset by 8 pixels? (If I remember correctly this is basically either 0 or 1, but we do use it as an int for some calculations, so maybe still best to leave it as an int.) This stuff has to do with the particular way DN1's viewport scrolling worked; either the horizontal game viewport is aligned to the 16-pixel boundaries (in which case this is 0), or it's further offset by half a block i.e. 8 pixels, depending.)
-extern int xo_small;
 
 extern int nSlowDownHeroWalkAnimationCounter;
 

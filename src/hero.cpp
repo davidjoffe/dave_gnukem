@@ -9,9 +9,6 @@ Copyright (C) 2000-2020 David Joffe
 #include "thing.h" // For CreateDust only .. might move
 #include "djtypes.h"
 
-
-int xo_small=0;
-int xo = 60, yo = 45;    // xo,yo = top-left corner of view for scrolling
 int hero_picoffs = 0;    // hero animation image index offset
 
 //----------------------------------------------------------------------------
@@ -25,6 +22,15 @@ CPlayer::CPlayer() : x(64), y(50),
 {
 }
 CPlayer g_Player;
+//----------------------------------------------------------------------------
+//fixme(low) odd hardcoded default position
+CViewport::CViewport() :
+	xo(60),
+	yo(45),
+	xo_small(0)
+{
+}
+CViewport g_Viewport;
 //----------------------------------------------------------------------------
 
 
@@ -178,10 +184,10 @@ void relocate_hero( int xnew, int ynew )
 	g_Player.x_small = 0;
 	g_Player.y_offset = 0;
 	// Snap viewpoint to where hero has moved and do bounds-checking on level dimensions:
-	xo = MAX( g_Player.x - int(VIEW_WIDTH / 2), 0 );
-	yo = MAX( g_Player.y - 6, 0 );
-	xo = MIN( xo, LEVEL_WIDTH - VIEW_WIDTH );
-	yo = MIN( yo, LEVEL_HEIGHT - VIEW_HEIGHT );
+	g_Viewport.xo = MAX( g_Player.x - int(VIEW_WIDTH / 2), 0 );
+	g_Viewport.yo = MAX( g_Player.y - 6, 0 );
+	g_Viewport.xo = MIN( g_Viewport.xo, LEVEL_WIDTH - VIEW_WIDTH );
+	g_Viewport.yo = MIN( g_Viewport.yo, LEVEL_HEIGHT - VIEW_HEIGHT );
 }
 
 
