@@ -84,6 +84,7 @@ extern CViewport g_Viewport;
 
 //! hero animation image index offset [dj2020-06 naively one might think this belongs in CPlayer, but really it's more to do with the CPlayer 'visual' - so maybe belongs in a separate class - not important]
 extern int hero_picoffs;
+extern int nSlowDownHeroWalkAnimationCounter;
 
 //! Immediately after firing weapon, the hero sprite is drawn slightly differently
 //! briefly, which gives almost a slight 'recoil/kickback' visual effect, this ugly
@@ -100,8 +101,6 @@ extern int hero_picoffs;
 //! ... that's extremely low-prio, I'll probably never bother doing that. ~dj2018-01)
 extern int g_nHeroJustFiredWeaponCounter;
 
-
-extern int nSlowDownHeroWalkAnimationCounter;
 
 
 //! Jump modes

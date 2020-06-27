@@ -56,7 +56,7 @@ enum EdjGameSounds
 };
 extern SOUND_HANDLE g_iSounds[SOUND_MAX];
 
-//! Global 4-animation-frame animation count. This name must also change.
+//! Global 4-animation-frame sprite animation count. This name must also change.
 extern int anim4_count;
 
 // rtfb

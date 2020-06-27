@@ -235,9 +235,8 @@ unsigned char gameMenuCursor[] = { 128, 129, 130, 131, 0 };
 CMenu gameMenu ( "game.cpp:gameMenu" );
 /*--------------------------------------------------------------------------*/
 
-//animation
+//global 4-block sprite animation offset counter for various things
 int anim4_count = 0;
-int nSlowDownHeroWalkAnimationCounter = 0;
 
 
 
