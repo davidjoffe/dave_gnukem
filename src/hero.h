@@ -46,26 +46,26 @@ public:
 	//! When hero is hurt, this is set to a positive "framecount" that
 	//! counts down. Can't get hurt again until it reaches 0.
 	int nHurtCounter;
+
+	// This m_nFalltime thing is to make hero fall initially slower
+	// then faster (full block at a time).
+	// Apart from looking/feeling slightly more natural, it also 'masks'
+	// an issue with smooth vertical movement enabled where you get a jerky
+	// effect that looks like hero bouncing jerkily up and down when falling
+	// off bottom of view, as the view code scrolls vertically always in increments of 16 pixels,
+	// whereas if hero falls at 8 pixels off bottom then relative vertical offset
+	// of hero on screen toggles 8 pixels each consecutive frame. With
+	// this falltime thing, by the time he is falling off the bottom,
+	// he is falling 16 pixels, and the view scrolls 16 pixels too.
+	// It's a bit fiddly but anyway, we have to do fine tweaks like this.
+	// See also liveedu.tv video 2017-06-24 [dj2017-06-24]
+	int m_nFalltime;
 };
 //! Main hero/player (for now, we only support a single player etc., but in future can make this more generic and support multiple players)
 extern CPlayer g_Player;
 
 // This should really just be permanently on I guess, not sure if there's any good reason to turn it off, unless we want to backtrack today's changes. [dj2017-06-24]
 extern bool g_bSmoothVerticalMovementEnabled;
-
-// This g_nFalltime thing is to make hero fall initially slower
-// then faster (full block at a time).
-// Apart from looking/feeling slightly more natural, it also 'masks'
-// an issue with smooth vertical movement enabled where you get a jerky
-// effect that looks like hero bouncing jerkily up and down when falling
-// off bottom of view, as the view code scrolls vertically always in increments of 16 pixels,
-// whereas if hero falls at 8 pixels off bottom then relative vertical offset
-// of hero on screen toggles 8 pixels each consecutive frame. With
-// this falltime thing, by the time he is falling off the bottom,
-// he is falling 16 pixels, and the view scrolls 16 pixels too.
-// It's a bit fiddly but anyway, we have to do fine tweaks like this.
-// See also liveedu.tv video 2017-06-24 [dj2017-06-24]
-extern int g_nFalltime;
 
 // [dj2020-06 - Wrap old globals xo,yo etc. into new class for viewport - note this doesn't belong in 'hero.h/cpp', should maybe have its own h/cpp - low prio]
 class CViewport

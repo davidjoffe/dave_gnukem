@@ -1892,12 +1892,12 @@ void GameHeartBeat()
 			{
 				if (!bFallingPrev) // <- just started falling?
 				{
-					g_nFalltime = 0;
+					g_Player.m_nFalltime = 0;
 				}
-				++g_nFalltime;
+				++g_Player.m_nFalltime;
 			}
 			else
-				g_nFalltime = 0;
+				g_Player.m_nFalltime = 0;
 			if (bFallingPrev && !bFalling) // <- just stopped falling
 			{
 				// Kick up some dust ..
