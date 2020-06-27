@@ -10,7 +10,6 @@ Copyright (C) 2000-2020 David Joffe
 #include "djtypes.h"
 
 
-int hero_mode = MODE_NORMAL;
 int xo_small=0;
 int xo = 60, yo = 45;    // xo,yo = top-left corner of view for scrolling
 int hero_picoffs = 0;    // hero animation image index offset
@@ -20,7 +19,9 @@ int hero_picoffs = 0;    // hero animation image index offset
 CPlayer::CPlayer() : x(64), y(50),
 	x_small(0),
 	y_offset(0),
-	hero_dir(1)
+	hero_dir(1),
+	hero_mode(MODE_NORMAL),
+	nHurtCounter(0)
 {
 }
 CPlayer g_Player;
@@ -34,8 +35,6 @@ int g_nFalltime=0;
 // These at '8' correspond relatively closely to original DN1 behavior. Setting these to e.g. 1 or 2 etc. allow much smoother more refined vertical movement of hero, which might be useful in future. [dj2017-06]
 const int nFALL_VERTICAL_PIXELS=8;
 const int nJUMP_VERTICAL_PIXELS=8;
-
-int nHurtCounter = 0;
 
 // jumping
 struct SJumpInfo
@@ -76,7 +75,7 @@ EJump HeroGetJumpMode()
 
 void HeroStartJump()
 {
-	hero_mode = MODE_JUMPING;
+	g_Player.hero_mode = MODE_JUMPING;
 	jump_pos = 0;
 	g_Player.y_offset = 0;
 	
@@ -85,7 +84,7 @@ void HeroStartJump()
 
 void HeroCancelJump()
 {
-	hero_mode = MODE_NORMAL;
+	g_Player.hero_mode = MODE_NORMAL;
 	jump_pos = 0;
 }
 
@@ -133,7 +132,7 @@ void HeroUpdateJump()
 		jump_pos++;
 		if (jump_pos >= pJumpInfo->size)
 		{
-			hero_mode = MODE_NORMAL;
+			g_Player.hero_mode = MODE_NORMAL;
 		}
 	}
 }
@@ -164,9 +163,9 @@ bool HeroIsFrozen()
 void HeroReset()
 {
 	HeroUnfreeze();
-	hero_mode = MODE_NORMAL; // Standing around
+	g_Player.hero_mode = MODE_NORMAL; // Standing around
 	HeroCancelJump(); // Not currently jumping
-	nHurtCounter = 0; // Not currently hurting
+	g_Player.nHurtCounter = 0; // Not currently hurting
 }
 
 
@@ -372,7 +371,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 				g_Player.y_offset = 0;//We're not going to change hero block-y, as this case is when we're only y_offset (less than a full BLOCKH) above the ground.
 		}
 	}
-	if ((hero_mode != MODE_JUMPING) && (ret == 0)) {
+	if ((g_Player.hero_mode != MODE_JUMPING) && (ret == 0)) {
 		if (nSlowDownHeroWalkAnimationCounter == 0)
 			hero_picoffs++;
 		if (hero_picoffs>3) hero_picoffs = 0;

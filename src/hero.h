@@ -21,12 +21,6 @@ enum
 	MODE_NORMAL = 0,
 	MODE_JUMPING
 };
-//! Hero movement mode
-extern int hero_mode;
-//! When hero is hurt, this is set to a positive "framecount" that
-//! counts down. Can't get hurt again until it reaches 0.
-extern int nHurtCounter;
-
 
 // Fixme, these names have GOT to change! [should be in a class too - not globals - dj2016-10]
 class CPlayer
@@ -46,6 +40,12 @@ public:
 
 	//! Left/right direction hero is facing, left==0, right==1
 	int hero_dir;
+
+	//! Hero movement mode
+	int hero_mode;
+	//! When hero is hurt, this is set to a positive "framecount" that
+	//! counts down. Can't get hurt again until it reaches 0.
+	int nHurtCounter;
 };
 //! Main hero/player (for now, we only support a single player etc., but in future can make this more generic and support multiple players)
 extern CPlayer g_Player;
@@ -70,7 +70,7 @@ extern int g_nFalltime;
 //! xo,yo = top-left corner of view for scrolling
 extern int xo;
 
-//! hero animation image index offset
+//! hero animation image index offset [dj2020-06 naively one might think this belongs in CPlayer, but really it's more to do with the CPlayer 'visual' - so maybe belongs in a separate class - not important]
 extern int hero_picoffs;
 
 //! Immediately after firing weapon, the hero sprite is drawn slightly differently

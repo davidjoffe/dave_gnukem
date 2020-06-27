@@ -375,14 +375,14 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 		// as hero's head hits roof, and without this g_nRecentlyFallingOrJumping "buffer" the vertical offset auto-scrolling incorrectly kicks in.
 		{
 			// 'Avoid' scroll yo (unless 'necessary' e.g. if right at top) up if busy jumping up ... likewise for downward movement
-			if (hero_mode == MODE_JUMPING)
+			if (g_Player.hero_mode == MODE_JUMPING)
 			{
 				if (g_Player.y - yo < 2) yo--;
 				g_nRecentlyFallingOrJumping = 2;
 			}
 			else
 			{
-				bool bIsFalling = bFalling || bFallingPrev || hero_mode==MODE_JUMPING;
+				bool bIsFalling = bFalling || bFallingPrev || g_Player.hero_mode==MODE_JUMPING;
 				if (bIsFalling)
 				{
 					g_nRecentlyFallingOrJumping = 2;
@@ -1864,7 +1864,7 @@ void GameHeartBeat()
 		nSlowDownHeroWalkAnimationCounter = 0;
 
 	//not jumping but about to be, then dont left/right move
-	if (!((key_jump) && (hero_mode != MODE_JUMPING))) {
+	if (!((key_jump) && (g_Player.hero_mode != MODE_JUMPING))) {
 		if (key_left)
 		{
 			//debug//printf("L");
@@ -1885,7 +1885,7 @@ void GameHeartBeat()
 
 	//mode-specific handling
 	int n=0;
-	switch (hero_mode)
+	switch (g_Player.hero_mode)
 	{
 	case MODE_NORMAL:
 		//fall:
@@ -2004,8 +2004,8 @@ void GameHeartBeat()
 	// drawing them one last time) [dj2018-01-13] [This is a 'kludge' for effective visual effect of drawing these one last frame after they've hit something]
 	DestroyBullets(g_apBulletsDeleted);
 
-	if ( nHurtCounter > 0 )
-		nHurtCounter--;
+	if ( g_Player.nHurtCounter > 0 )
+		g_Player.nHurtCounter--;
 
 	// Show on-screen message
 	if (g_nGameMessageCount>=0)
@@ -2055,13 +2055,14 @@ void MonsterShoot(int nX, int nY, int nXDiff, int nYDiff)
 
 void HeroSetHurting(bool bReset)
 {
-	if (bReset || nHurtCounter==0)
-		nHurtCounter = 16;
+	// [dj2020-06] This 16 is NOT the 'block width or height' 16, it's not in pixels, it's in num-frames ... so when we genericize away the BLOCKW/BLOCKH stuff, leave this one at 16
+	if (bReset || g_Player.nHurtCounter==0)
+		g_Player.nHurtCounter = 16;
 }
 
 bool HeroIsHurting()
 {
-	return nHurtCounter!=0;
+	return (g_Player.nHurtCounter!=0);
 }
 
 void DrawHealth()
@@ -2109,7 +2110,7 @@ void update_health(int health_diff)
 		return;
 	SetHealth(g_nHealth + health_diff);
 	// If busy jumping up and something hurts hero, stop the jump
-	if (health_diff<0 && hero_mode==MODE_JUMPING)
+	if (health_diff<0 && g_Player.hero_mode==MODE_JUMPING)
 	{
 		HeroCancelJump();
 	}
@@ -2272,7 +2273,7 @@ void GameDrawView()
 	DrawThingsAtLayer(LAYER_MIDDLE);
 	// draw hero, but flash if he is currently hurt
 	int yoff=0;
-	if ((nHurtCounter == 0) || (nHurtCounter%3 != 0))
+	if ((g_Player.nHurtCounter == 0) || (g_Player.nHurtCounter%3 != 0))
 	{
 		// no human being can really understand what this code was meant to be doing, surely [dj2017-12]
 		// commenting out bits of it now to try clean it up a bit
