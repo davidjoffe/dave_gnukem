@@ -41,13 +41,15 @@ public:
 
 	//! If x_small is 0 then hero is at 'x', if 1 then hero is at x+8 pixels (or to be more specific, an extra half-block offset in the x direction, whatever the block width in pixels) ... this is slightly quite specific-ish to DN1/DaveGnukem style of movement, in a generic 2D platformer I might not want it - in that case, we might want to derive e.g. CPlayerGnukem from e.g. CPlayer and put it in the derived class as a possible solution to doing things generically. Note that when this code was created, many compilers didn't have 'bool' type in C++, that's why it was represented as an int.
 	int x_small;
+	//! Pixel offset, e.g. [-15,15] relative to the hero's 'block unit' 'y' position. For smooth vertical movement. [Added dj2017-06]
+	int y_offset;
 };
 //! Main hero/player (for now, we only support a single player etc., but in future can make this more generic and support multiple players)
 extern CPlayer g_Player;
 
 // This should really just be permanently on I guess, not sure if there's any good reason to turn it off, unless we want to backtrack today's changes. [dj2017-06-24]
 extern bool g_bSmoothVerticalMovementEnabled;
-extern int y_offset;	//!< Pixel offset (e.g. [-15,15] relative to the hero's 'block unit' 'y' position. For smooth vertical movement. [Added dj2017-06]
+
 // This g_nFalltime thing is to make hero fall initially slower
 // then faster (full block at a time).
 // Apart from looking/feeling slightly more natural, it also 'masks'

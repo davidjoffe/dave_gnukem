@@ -423,7 +423,7 @@ int CFlyingRobot::Tick()
 
 		// Work in pixel units here, simplifies things slightly. Compare our center-line, to hero center-line, vertically.
 		int nOurYPixels = PIXELY + HALFBLOCKH;//Add half as we use our center-line vs hero center-line
-		int nHeroYPixels = (g_Player.y*BLOCKH + y_offset);
+		int nHeroYPixels = (g_Player.y*BLOCKH + g_Player.y_offset);
 		int nYDiffDir = 0;
 		if (nHeroYPixels < nOurYPixels)
 			nYDiffDir = -1;

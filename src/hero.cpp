@@ -19,7 +19,8 @@ int hero_picoffs = 0;    // hero animation image index offset
 //----------------------------------------------------------------------------
 //fixme(low) odd hardcoded default position
 CPlayer::CPlayer() : x(64), y(50),
-	x_small(0)
+	x_small(0),
+	y_offset(0)
 {
 }
 CPlayer g_Player;
@@ -29,7 +30,6 @@ CPlayer g_Player;
 int g_nHeroJustFiredWeaponCounter = 0;
 
 bool g_bSmoothVerticalMovementEnabled=true;
-int y_offset = 0;//!< Pixel offset (e.g. [-15,15] relative to the hero's 'block unit' 'y' position. For smooth vertical movement. [Added dj2017-06]
 int g_nFalltime=0;
 // These at '8' correspond relatively closely to original DN1 behavior. Setting these to e.g. 1 or 2 etc. allow much smoother more refined vertical movement of hero, which might be useful in future. [dj2017-06]
 const int nFALL_VERTICAL_PIXELS=8;
@@ -78,7 +78,7 @@ void HeroStartJump()
 {
 	hero_mode = MODE_JUMPING;
 	jump_pos = 0;
-	y_offset = 0;
+	g_Player.y_offset = 0;
 	
 	djSoundPlay( g_iSounds[SOUND_JUMP] );
 }
@@ -97,12 +97,12 @@ void HeroUpdateJump()
 	if (g_bSmoothVerticalMovementEnabled &&
 		pJumpInfo->jump_diffs[jump_pos] < 0)
 	{
-		y_offset -= nJUMP_VERTICAL_PIXELS;
+		g_Player.y_offset -= nJUMP_VERTICAL_PIXELS;
 		
 		bDo = false;
-		if (y_offset<-15)
+		if (g_Player.y_offset<-15)
 		{
-			y_offset = 0;
+			g_Player.y_offset = 0;
 			bDo = true;
 		}
 		//else
@@ -111,7 +111,7 @@ void HeroUpdateJump()
 			bool bSolid = check_solid( g_Player.x, g_Player.y - 2 ) | check_solid( g_Player.x + g_Player.x_small, g_Player.y - 2 );
 			if (bSolid)
 			{
-				y_offset += nJUMP_VERTICAL_PIXELS;
+				g_Player.y_offset += nJUMP_VERTICAL_PIXELS;
 				HeroCancelJump();
 				hero_picoffs = 1;
 				return;
@@ -121,7 +121,7 @@ void HeroUpdateJump()
 	
 	if (bDo)
 	{
-		y_offset = 0;
+		g_Player.y_offset = 0;
 		n = move_hero(0,pJumpInfo->jump_diffs[jump_pos]);
 		if (n == 1) { //cancel jump, fell on block (x 1 ret?)
 			HeroCancelJump();
@@ -177,7 +177,7 @@ void relocate_hero( int xnew, int ynew )
 	g_Player.x = xnew;
 	g_Player.y = ynew;
 	g_Player.x_small = 0;
-	y_offset = 0;
+	g_Player.y_offset = 0;
 	// Snap viewpoint to where hero has moved and do bounds-checking on level dimensions:
 	xo = MAX( g_Player.x - int(VIEW_WIDTH / 2), 0 );
 	yo = MAX( g_Player.y - 6, 0 );
@@ -218,9 +218,9 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 				// Prevent being able to walk into floors left/right while falling [dj2017-06]
 				if (g_bSmoothVerticalMovementEnabled)
 				{
-					if (y_offset<0)
+					if (g_Player.y_offset<0)
 						bsolid |= check_solid( g_Player.x + 1, g_Player.y-1 ) | check_solid( g_Player.x + 1, g_Player.y - 2 );
-					else if (y_offset>0)
+					else if (g_Player.y_offset>0)
 						bsolid |= check_solid( g_Player.x + 1, g_Player.y+1 ) | check_solid( g_Player.x + 1, g_Player.y );
 				}
 			}
@@ -256,9 +256,9 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 				// Prevent being able to walk into floors left/right while falling [dj2017-06]
 				if (g_bSmoothVerticalMovementEnabled)
 				{
-					if (y_offset<0)
+					if (g_Player.y_offset<0)
 						bsolid |= check_solid( g_Player.x - 1, g_Player.y-1 ) | check_solid( g_Player.x - 1, g_Player.y - 2 );
-					else if (y_offset>0)
+					else if (g_Player.y_offset>0)
 						bsolid |= check_solid( g_Player.x - 1, g_Player.y+1 ) | check_solid( g_Player.x - 1, g_Player.y );
 				}
 			}
@@ -320,12 +320,12 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 				// he is falling 16 pixels, and the view scrolls 16 pixels too.
 				// It's a bit fiddly but anyway, we have to do fine tweaks like this.
 				// See also liveedu.tv video 2017-06-24 [dj2017-06-24]
-				y_offset += ( g_nFalltime>=6 ? 16 : nFALL_VERTICAL_PIXELS );
+				g_Player.y_offset += ( g_nFalltime>=6 ? BLOCKH : nFALL_VERTICAL_PIXELS );
 				ret = 0;//Return 'busy falling'
-				if (y_offset>=15)
+				if (g_Player.y_offset >= (BLOCKH - 1))
 				{
 					bDo = true;
-					y_offset = 0;
+					g_Player.y_offset = 0;
 				}
 			}
 
@@ -342,7 +342,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 		// so we check for that case here.
 		// If we don't do this, then if something hurts us the moment we jump, we
 		// are left floating several pixels in the air. This should fix that [dj2017-08-13]
-		else if (y_offset<0 && ydiff>0)
+		else if (g_Player.y_offset<0 && ydiff>0)
 		{
 			// Say we had jumped up 4 pixels, but now we try 'fall' 8 pixels. That
 			// could leave us (instead of floating in the air) slightly inside the floor.
@@ -366,10 +366,10 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 			// he is falling 16 pixels, and the view scrolls 16 pixels too.
 			// It's a bit fiddly but anyway, we have to do fine tweaks like this.
 			// See also liveedu.tv video 2017-06-24 [dj2017-06-24]
-			y_offset += ( g_nFalltime>=6 ? 16 : nFALL_VERTICAL_PIXELS );
+			g_Player.y_offset += ( g_nFalltime>=6 ? BLOCKH : nFALL_VERTICAL_PIXELS );
 			ret = 0;//Return 'busy falling'
-			if (y_offset>0)
-				y_offset = 0;//We're not going to change hero block-y, as this case is when we're only y_offset (less than a full BLOCKH) above the ground.
+			if (g_Player.y_offset>0)
+				g_Player.y_offset = 0;//We're not going to change hero block-y, as this case is when we're only y_offset (less than a full BLOCKH) above the ground.
 		}
 	}
 	if ((hero_mode != MODE_JUMPING) && (ret == 0)) {

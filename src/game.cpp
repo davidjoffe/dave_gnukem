@@ -1004,7 +1004,6 @@ void PerLevelSetup()
 	hero_picoffs=0;
 	g_nHeroJustFiredWeaponCounter = 0;
 	xo_small = 0; // view not half-block offset
-	y_offset = 0;
 	// just in case level doesn't contain a starting block ..
 	xo = 0;
 	yo = 0;
@@ -1906,7 +1905,7 @@ void GameHeartBeat()
 			if (bFallingPrev && !bFalling) // <- just stopped falling
 			{
 				// Kick up some dust ..
-				AddThing(CreateDust(g_Player.x, g_Player.y, g_Player.x_small*HALFBLOCKW,y_offset));
+				AddThing(CreateDust(g_Player.x, g_Player.y, g_Player.x_small*HALFBLOCKW,g_Player.y_offset));
 				djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
 			}
 			bFallingPrev = bFalling;
@@ -2307,36 +2306,36 @@ void GameDrawView()
 			--g_nHeroJustFiredWeaponCounter;
 			int nOffs = (hero_picoffs+1)%4;
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+nOffs*4,1+xoff       ,1+yoff       +y_offset,BLOCKW,BLOCKH);
-			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+nOffs*4,1+xoff       ,1+yoff+BLOCKH+y_offset,BLOCKW,BLOCKH-1);
-			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+nOffs*4,1+xoff+BLOCKW,1+yoff       +y_offset,BLOCKW,BLOCKH);
-			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+nOffs*4,1+xoff+BLOCKW,1+yoff+BLOCKH+y_offset,BLOCKW,BLOCKH-1);
+			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+nOffs*4,1+xoff       ,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+nOffs*4,1+xoff       ,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
+			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+nOffs*4,1+xoff+BLOCKW,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+nOffs*4,1+xoff+BLOCKW,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
 #endif
-			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+nOffs*4,xoff       ,yoff       +y_offset);
-			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+nOffs*4,xoff       ,yoff+BLOCKH+y_offset);
-			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+nOffs*4,xoff+BLOCKW,yoff       +y_offset);
-			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+nOffs*4,xoff+BLOCKW,yoff+BLOCKH+y_offset);
+			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+nOffs*4,xoff       ,yoff       +g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+nOffs*4,xoff       ,yoff+BLOCKH+g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+nOffs*4,xoff+BLOCKW,yoff       +g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+nOffs*4,xoff+BLOCKW,yoff+BLOCKH+g_Player.y_offset);
 		}
 		else
 		{
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff       +y_offset,BLOCKW,BLOCKH);
-			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff+BLOCKH+y_offset,BLOCKW,BLOCKH-1);
-			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+hero_picoffs*4,1+xoff+BLOCKW,1+yoff       +y_offset,BLOCKW,BLOCKH);
-			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+hero_picoffs*4,1+xoff+BLOCKW,1+yoff+BLOCKH+y_offset,BLOCKW,BLOCKH-1);
+			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
+			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+hero_picoffs*4,1+xoff+BLOCKW,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+hero_picoffs*4,1+xoff+BLOCKW,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
 #endif
-			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+hero_picoffs*4,xoff       ,yoff       +y_offset);
-			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+hero_picoffs*4,xoff       ,yoff+BLOCKH+y_offset);
-			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+hero_picoffs*4,xoff+BLOCKW,yoff       +y_offset);
-			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+hero_picoffs*4,xoff+BLOCKW,yoff+BLOCKH+y_offset);
+			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+hero_picoffs*4,xoff       ,yoff       +g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+hero_picoffs*4,xoff       ,yoff+BLOCKH+g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+hero_picoffs*4,xoff+BLOCKW,yoff       +g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+hero_picoffs*4,xoff+BLOCKW,yoff+BLOCKH+g_Player.y_offset);
 		}
 		if (bShowDebugInfo)
 		{
 			// Light blue box shows hero collision bounding box
 			djgSetColorFore(pVisView,djColor(5,50,200));
 			djgDrawRectangle(pVisView,
-				xoff+HALFBLOCKW,
-				yoff+y_offset,
+				xoff + HALFBLOCKW,
+				yoff + g_Player.y_offset,
 				HEROW_COLLISION,
 				HEROH_COLLISION);
 		}
