@@ -266,7 +266,6 @@ int g_nHealthOld = 0;
 //! GameHeartBeat() helper. These params seem a bit weird to me, design-wise[low][dj2018-01]
 void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 {
-
 	// If we're right at the end of the game tackling Dr Proton, and he starts
 	// escaping, then we want the viewport to briefly 'center around' / follow
 	// Dr Proton as he flies upwards to escape (as per original DN1). So we
@@ -276,8 +275,8 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 	if (CDrProton::GameEnding())
 	{
 		CDrProton* pDrProton = CDrProton::GetDrProton();
-		if (yo+2>pDrProton->m_y)
-			--yo;
+		if (g_Viewport.yo + 2 > pDrProton->m_y)
+			--g_Viewport.yo;
 	}
 	else
 	{
@@ -286,13 +285,13 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 
 		//[was:onmoveright]
 		//if (
-		if (g_Player.x>=xo+VIEW_WIDTH)//Totally at/off right side of view?
+		if (g_Player.x >= g_Viewport.xo + VIEW_WIDTH)//Totally at/off right side of view?
 		{
 			// Snap to it
-			xo = g_Player.x - VIEW_WIDTH;
-			xo_small = g_Player.x_small != 0 ? 1 : 0;
+			g_Viewport.xo = g_Player.x - VIEW_WIDTH;
+			g_Viewport.xo_small = g_Player.x_small != 0 ? 1 : 0;
 		}
-		if ((g_Player.x - xo) >= VIEW_WIDTH - 5)
+		if ((g_Player.x - g_Viewport.xo) >= VIEW_WIDTH - 5)
 		{
 			// This stuff relates to trying to get similar 'retro' viewport scrolling behavior to DN1
 			// Not sure it's 100% right but seems sorta 'close enough' at this point (dj2019)
@@ -314,54 +313,50 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 			xo_small = 0;
 			}
 			*/
-			if (((g_Player.x - xo) == VIEW_WIDTH - 5) & (g_Player.x_small)) {
-				xo_small = 1;
-
-				//if ((x-xo)>=VIEW_WIDTH - 3)
-				//	++xo;
+			if (((g_Player.x - g_Viewport.xo) == VIEW_WIDTH - 5) & (g_Player.x_small)) {
+				g_Viewport.xo_small = 1;
 			}
-			if ((g_Player.x - xo) >= VIEW_WIDTH - 4) {
-				//xo++;
-				++xo;
-				xo_small = 0;
+			if ((g_Player.x - g_Viewport.xo) >= VIEW_WIDTH - 4) {
+				++g_Viewport.xo;
+				g_Viewport.xo_small = 0;
 			}
 			/*else
 			{
-			++xo;
-			xo_small = 1;
+			++g_Viewport.xo;
+			g_Viewport.xo_small = 1;
 			}*/
 
 			// (//dj2019-07) hm fixmeHIGH i suspect for low LEVEL_WIDTH we may have issues here with xo being negative, or is that OK
-			if ( (xo + xo_small) > LEVEL_WIDTH - VIEW_WIDTH )
+			if ( (g_Viewport.xo + g_Viewport.xo_small) > LEVEL_WIDTH - VIEW_WIDTH )
 			{
-				xo = LEVEL_WIDTH - VIEW_WIDTH;
-				xo_small = 0;
+				g_Viewport.xo = LEVEL_WIDTH - VIEW_WIDTH;
+				g_Viewport.xo_small = 0;
 			}
 		}
 
 		//[was:onmoveleft]
 		// If our x position is left of the viewport X origin (i.e. hero entirely outside viewport and would thus be invisible), 'force'/'snap'/reset viewport origin as a-few-blocks-left of hero
-		if (g_Player.x <= xo)
+		if (g_Player.x <= g_Viewport.xo)
 		{
-			xo = g_Player.x - 4;
-			xo_small = 0;
+			g_Viewport.xo = g_Player.x - 4;
+			g_Viewport.xo_small = 0;
 		}
 		// If our hero is close to left of viewport and we maybe need to adjust the horizontal scrolling
-		else if (((g_Player.x - xo) <= 4))
+		else if (((g_Player.x - g_Viewport.xo) <= 4))
 		{
-			bool bEven = (((g_Player.x - xo) % 2) == 0);
+			bool bEven = (((g_Player.x - g_Viewport.xo) % 2) == 0);
 			if (bEven & (!(g_Player.x_small))) {
-				xo_small = 0;
+				g_Viewport.xo_small = 0;
 			}
 			// dj2019-06 NB: This was "if (!bEven && (x_small))"; changing it based on a compiler warning from Ubuntu. I don't even know anymore (as some of this code is 20+ years old) if the intention was to do this bitwise or int-wise etc. but I don't think it matters, I think end result is the same. Nonetheless, if we suddenly have strange viewport scrolling behavior after this change, change it back or come back to this.
 			if ((!bEven) && (g_Player.x_small!=0)) {
-				xo--;
-				xo_small = 1;
+				g_Viewport.xo--;
+				g_Viewport.xo_small = 1;
 			}
-			if (xo < 0)
+			if (g_Viewport.xo < 0)
 			{
-				xo = 0;
-				xo_small = 0;
+				g_Viewport.xo = 0;
+				g_Viewport.xo_small = 0;
 			}
 		}
 
@@ -377,7 +372,7 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 			// 'Avoid' scroll yo (unless 'necessary' e.g. if right at top) up if busy jumping up ... likewise for downward movement
 			if (g_Player.hero_mode == MODE_JUMPING)
 			{
-				if (g_Player.y - yo < 2) yo--;
+				if (g_Player.y - g_Viewport.yo < 2) g_Viewport.yo--;
 				g_nRecentlyFallingOrJumping = 2;
 			}
 			else
@@ -386,7 +381,7 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 				if (bIsFalling)
 				{
 					g_nRecentlyFallingOrJumping = 2;
-					if (g_Player.y - yo >= 9) yo++;
+					if (g_Player.y - g_Viewport.yo >= 9) g_Viewport.yo++;
 				}
 				else
 				{
@@ -396,21 +391,21 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 					}
 					else
 					{
-						if (g_Player.y - yo < 7)
+						if (g_Player.y - g_Viewport.yo < 7)
 						{
-							yo--;
+							g_Viewport.yo--;
 						}
 					}
-					if (g_Player.y - yo >= 7)
+					if (g_Player.y - g_Viewport.yo >= 7)
 					{
-						yo++;
+						g_Viewport.yo++;
 					}
 				}
 			}
-			if ( yo < 0 )
-				yo = 0;
-			if ( yo > LEVEL_HEIGHT - 10 )
-				yo = LEVEL_HEIGHT - 10;
+			if ( g_Viewport.yo < 0 )
+				g_Viewport.yo = 0;
+			if ( g_Viewport.yo > LEVEL_HEIGHT - 10 )
+				g_Viewport.yo = LEVEL_HEIGHT - 10;
 		}
 	}
 }
@@ -1004,10 +999,10 @@ void PerLevelSetup()
 	anim4_count=0; // animation count 0
 	hero_picoffs=0;
 	g_nHeroJustFiredWeaponCounter = 0;
-	xo_small = 0; // view not half-block offset
 	// just in case level doesn't contain a starting block ..
-	xo = 0;
-	yo = 0;
+	g_Viewport.xo = 0;
+	g_Viewport.yo = 0;
+	g_Viewport.xo_small = 0; // view not half-block offset
 	relocate_hero( LEVEL_WIDTH/2, LEVEL_HEIGHT/2 );
 	g_Player.hero_dir = 1;
 
@@ -2195,19 +2190,19 @@ void GameDrawView()
 	//dj2019-07 Re this "10 seconds got to just after coke can, purple lab" comment: I don't know anymore what I meant with that (possibly something timing/benchmark-related),
 	// but that comment was written in the 1990s, as the 'purple lab' was a computer lab at University of Pretoria where I studied .. for some reason I think of this comment often still when I think about this game so I want to leave this here:
 	//(10 seconds got to just after coke can, purple lab)
-	pLevelBlockPointer = (unsigned char *)(g_pLevel) + yo*LEVEL_BYTESPERROW + (xo*LEVEL_BYTESPERBLOCK);//was:(g_pLevel) + yo*512+(xo<<2);
+	pLevelBlockPointer = (unsigned char *)(g_pLevel) + g_Viewport.yo*LEVEL_BYTESPERROW + (g_Viewport.xo*LEVEL_BYTESPERBLOCK);//was:(g_pLevel) + yo*512+(xo<<2);
 	//const unsigned int uLevelPixelW = LEVEL_WIDTH*BLOCKW;
 	//const unsigned int uLevelPixelH = LEVEL_HEIGHT*BLOCKH;
 
 	int nYOffset = g_nViewOffsetY;
 	for ( i=0; i<VIEW_HEIGHT; ++i )
 	{
-		xoff = -xo_small+(g_bLargeViewport?0:2);
+		xoff = -g_Viewport.xo_small + (g_bLargeViewport ? 0 : 2);
 		xoff *= HALFBLOCKW;
-		for ( j=0; j<VIEW_WIDTH+xo_small; ++j )
+		for ( j=0; j<VIEW_WIDTH+g_Viewport.xo_small; ++j )
 		{
 			// Bounds-checks to not 'buffer overflow' etc. by going past bottom (or right) of level [dj2016-10]
-			if (yo+i>=LEVEL_HEIGHT || xo+j>=LEVEL_WIDTH)
+			if (g_Viewport.yo+i>=LEVEL_HEIGHT || g_Viewport.xo+j>=LEVEL_WIDTH)
 			{
 				// do nothing .. leave black
 			}
@@ -2233,7 +2228,7 @@ void GameDrawView()
 					if (g_bAutoShadows && g_pLevelShadowMap!=NULL)
 					{
 						// Note several things could be slightly sped up here should this ever be a performance bottleneck
-						unsigned char uShadowVal = *(g_pLevelShadowMap + ((yo+i)*LEVEL_WIDTH) + (xo+j));
+						unsigned char uShadowVal = *(g_pLevelShadowMap + ((g_Viewport.yo+i)*LEVEL_WIDTH) + (g_Viewport.xo+j));
 						if (uShadowVal)
 						{
 							djgDrawImageAlpha( pVisView,
@@ -2264,7 +2259,7 @@ void GameDrawView()
 		nYOffset += BLOCKH;
 		// The reason xo_small comes into it if advancing level pointer to next row, is that
 		// if xo_small is 1, we literally actually effectively have a 1-block wider game viewport (as two 'halves' on left/right side of viewport) (keep in mind xo_small is either 0 or 1, IIRC) [dj2017-08]
-		pLevelBlockPointer += (LEVEL_BYTESPERROW - ((VIEW_WIDTH+xo_small) * LEVEL_BYTESPERBLOCK));//was:pLevelBlockPointer += (512 - ((VIEW_WIDTH+xo_small)<<2));
+		pLevelBlockPointer += (LEVEL_BYTESPERROW - ((VIEW_WIDTH+g_Viewport.xo_small) * LEVEL_BYTESPERBLOCK));//was:pLevelBlockPointer += (512 - ((VIEW_WIDTH+g_Viewport.xo_small)<<2));
 	}
 
 	// Draw pre-hero layers, then draw hero, then draw post-hero layers.
@@ -2281,9 +2276,9 @@ void GameDrawView()
 		//yoff = 200+16+(y-yo-1)*16;
 
 		//xoff = ((x_small - xo_small)+1)*8 + (x-xo) * 16;
-		yoff = g_nViewOffsetY + (g_Player.y - yo - 1) * BLOCKH;
+		yoff = g_nViewOffsetY + (g_Player.y - g_Viewport.yo - 1) * BLOCKH;
 
-		xoff = (g_Player.x_small - xo_small) + 1 + ((g_Player.x - xo) << 1);
+		xoff = (g_Player.x_small - g_Viewport.xo_small) + 1 + ((g_Player.x - g_Viewport.xo) << 1);
 		xoff *= HALFBLOCKW;
 		if (g_bLargeViewport) xoff -= BLOCKW;
 		/*

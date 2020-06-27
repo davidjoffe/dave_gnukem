@@ -426,7 +426,9 @@ void CLift::Draw()
 		int nLiftBlockY = m_y-m_height+i+1;
 		// if section of lift is on-screen
 		if ( INBOUNDS( m_x, nLiftBlockY,
-			xo, yo, xo + VIEW_WIDTH + xo_small, yo + VIEW_HEIGHT ) )
+			g_Viewport.xo, g_Viewport.yo,
+			g_Viewport.xo + VIEW_WIDTH + g_Viewport.xo_small,
+			g_Viewport.yo + VIEW_HEIGHT ) )
 		{
 			if (i == 0)
 			{
@@ -671,8 +673,8 @@ void CFloatingScore::Draw()
 		djgDrawImageAlpha( pVisView, g_pFont8x8,
 			((int)m_buffer[i]%32)*8,
 			((int)m_buffer[i]/32)*8,
-			i * 6 + HALFBLOCKW * ( -xo_small + 2 + (((m_x - xo) << 1))),
-			i * -2 + BLOCKH + (m_y - yo) * BLOCKH - 48 + (m_height * 2),
+			i * 6 + HALFBLOCKW * ( -g_Viewport.xo_small + 2 + (((m_x - g_Viewport.xo) << 1))),
+			i * -2 + BLOCKH + (m_y - g_Viewport.yo) * BLOCKH - 48 + (m_height * 2),
 			//orig:i * 6 + 8 * ( -xo_small + 2 + (((m_x - xo) << 1))),
 			//orig:i * -2 + 16 + (m_y - yo) * 16 - 48 + (m_height * 2),
 			5,
