@@ -43,6 +43,9 @@ public:
 	int x_small;
 	//! Pixel offset, e.g. [-15,15] relative to the hero's 'block unit' 'y' position. For smooth vertical movement. [Added dj2017-06]
 	int y_offset;
+
+	//! Left/right direction hero is facing, left==0, right==1
+	int hero_dir;
 };
 //! Main hero/player (for now, we only support a single player etc., but in future can make this more generic and support multiple players)
 extern CPlayer g_Player;
@@ -69,8 +72,6 @@ extern int xo;
 
 //! hero animation image index offset
 extern int hero_picoffs;
-//! hero direction, left==0, right==1
-extern int hero_dir;
 
 //! Immediately after firing weapon, the hero sprite is drawn slightly differently
 //! briefly, which gives almost a slight 'recoil/kickback' visual effect, this ugly
@@ -125,7 +126,7 @@ extern bool HeroIsFrozen();
 extern void HeroReset();
 
 
-//! Set the hero's position in level block coordinates
+//! Set the hero's position in level block coordinates (this resets the x_small and yoffset to 0 but does not alter the left/right direction the hero is currently facing)
 extern void relocate_hero( int xnew, int ynew );
 //! Attempt to move the hero
 extern int  move_hero(int xdiff, int ydiff, bool bChangeLookDirection=true);

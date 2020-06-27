@@ -554,9 +554,10 @@ void CheckIfHeroShooting()
 
 			// The start X position of the bullet may be a bit imperfect here :/ .. but now that version 1's been released, probably best not to mess with it (at least for DG v1) - dj2020-06
 			HeroShoot(
-				g_Player.x * BLOCKW /*+ (hero_dir==1 ? BLOCKW : -BLOCKW)*/ + g_Player.x_small*HALFBLOCKW,
+				g_Player.x * BLOCKW /*+ (g_Player.hero_dir==1 ? BLOCKW : -BLOCKW)*/ + g_Player.x_small*HALFBLOCKW,
 				(g_Player.y-1)*BLOCKH + (11*nMultiple),
-				(hero_dir==0 ? -HERO_BULLET_SPEED : HERO_BULLET_SPEED)
+				// If hero facing left, start bullet speed in negative X axis direction (shooting left), else positive (shooting right)
+				(g_Player.hero_dir==0 ? -HERO_BULLET_SPEED : HERO_BULLET_SPEED)
 			);
 
 			// RESET COUNTER [fixme this must reset between games also]
@@ -1008,7 +1009,7 @@ void PerLevelSetup()
 	xo = 0;
 	yo = 0;
 	relocate_hero( LEVEL_WIDTH/2, LEVEL_HEIGHT/2 );
-	hero_dir = 1;
+	g_Player.hero_dir = 1;
 
 	DestroyAllThings();// clear list of "things"
 	DestroyAllBullets();//Make sure no bullets, for good measure [dj2018-03]
@@ -2285,7 +2286,7 @@ void GameDrawView()
 		xoff *= HALFBLOCKW;
 		if (g_bLargeViewport) xoff -= BLOCKW;
 		/*
-		if (hero_dir>0)
+		if (g_Player.hero_dir>0)
 		{
 			//tuxtest [dj2017-07 want to make hero sprite simpler to work on ultimately]
 			DRAW_SPRITE16A(pVisView,4,   96+hero_picoffs*2  ,xoff   ,yoff   +y_offset);
@@ -2306,28 +2307,28 @@ void GameDrawView()
 			--g_nHeroJustFiredWeaponCounter;
 			int nOffs = (hero_picoffs+1)%4;
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+nOffs*4,1+xoff       ,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
-			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+nOffs*4,1+xoff       ,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
-			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+nOffs*4,1+xoff+BLOCKW,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
-			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+nOffs*4,1+xoff+BLOCKW,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
+			DRAW_SPRITEA_SHADOW(pVisView,4,  g_Player.hero_dir*16+nOffs*4,1+xoff       ,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,2+g_Player.hero_dir*16+nOffs*4,1+xoff       ,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
+			DRAW_SPRITEA_SHADOW(pVisView,4,1+g_Player.hero_dir*16+nOffs*4,1+xoff+BLOCKW,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,3+g_Player.hero_dir*16+nOffs*4,1+xoff+BLOCKW,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
 #endif
-			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+nOffs*4,xoff       ,yoff       +g_Player.y_offset);
-			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+nOffs*4,xoff       ,yoff+BLOCKH+g_Player.y_offset);
-			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+nOffs*4,xoff+BLOCKW,yoff       +g_Player.y_offset);
-			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+nOffs*4,xoff+BLOCKW,yoff+BLOCKH+g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,  g_Player.hero_dir*16+nOffs*4,xoff       ,yoff       +g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,2+g_Player.hero_dir*16+nOffs*4,xoff       ,yoff+BLOCKH+g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,1+g_Player.hero_dir*16+nOffs*4,xoff+BLOCKW,yoff       +g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,3+g_Player.hero_dir*16+nOffs*4,xoff+BLOCKW,yoff+BLOCKH+g_Player.y_offset);
 		}
 		else
 		{
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
-			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
-			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+hero_picoffs*4,1+xoff+BLOCKW,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
-			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+hero_picoffs*4,1+xoff+BLOCKW,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
+			DRAW_SPRITEA_SHADOW(pVisView,4,  g_Player.hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,2+g_Player.hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
+			DRAW_SPRITEA_SHADOW(pVisView,4,1+g_Player.hero_dir*16+hero_picoffs*4,1+xoff+BLOCKW,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,3+g_Player.hero_dir*16+hero_picoffs*4,1+xoff+BLOCKW,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
 #endif
-			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+hero_picoffs*4,xoff       ,yoff       +g_Player.y_offset);
-			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+hero_picoffs*4,xoff       ,yoff+BLOCKH+g_Player.y_offset);
-			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+hero_picoffs*4,xoff+BLOCKW,yoff       +g_Player.y_offset);
-			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+hero_picoffs*4,xoff+BLOCKW,yoff+BLOCKH+g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,  g_Player.hero_dir*16+hero_picoffs*4,xoff       ,yoff       +g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,2+g_Player.hero_dir*16+hero_picoffs*4,xoff       ,yoff+BLOCKH+g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,1+g_Player.hero_dir*16+hero_picoffs*4,xoff+BLOCKW,yoff       +g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,3+g_Player.hero_dir*16+hero_picoffs*4,xoff+BLOCKW,yoff+BLOCKH+g_Player.y_offset);
 		}
 		if (bShowDebugInfo)
 		{
@@ -2446,10 +2447,10 @@ void sprite_factory( unsigned char a, unsigned char b, int ix, int iy, int ifore
 			relocate_hero( ix, iy );
 
 			// By default start looking right, unless the start-looking-left is used [dj2017-08]
-			hero_dir = 1;//Right
+			g_Player.hero_dir = 1;//Right
 			// Check the sprite metadata, the first
 			if (GET_EXTRA(b0, b1, 0) == 0)
-				hero_dir = 0;//Left
+				g_Player.hero_dir = 0;//Left
 
 
 			bWipeSprite = true;
