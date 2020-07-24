@@ -2,7 +2,7 @@
 /*
 djgraph.cpp
 
-Copyright (C) 1997-2019 David Joffe
+Copyright (C) 1997-2020 David Joffe
 */
 
 
@@ -22,6 +22,12 @@ Copyright (C) 1997-2019 David Joffe
 
 // [dj2016-10] For 'texture' manager'
 #include <map>
+//fixme[dj2020] low priority, should ideally be sped up:
+// 1. A map is not really the most efficient way to do this as it must do a lookup for every blit
+// 2. std::map is probably not the fastest map for this either .. unordered_map may be (we don't need correct sorting and we're happy with slower inserts for faster lookups)
+// The more correct way requires some re-coding all over the codebase - return some kind of 'handle' here which could be a void* to either a struct with a pointer to the SDL_surface or the SDL_surface pointer as a void* or something ... then each 'user' must keep this 'texture handle' for when it does blits. Then, no map lookup.
+// I started adding that so it can be used already if desired [dj2020-07]
+// On modern hardware for a small 320x200 game this is probably not the worst bottleneck in the code ... if we wanted a more generic engine with much more intense graphics it may become worth it to optimize here.
 std::map< djImage*, SDL_Surface *> g_SurfaceMap;
 
 int	rMask=0, gMask=0, bMask=0, aMask=0;
@@ -710,11 +716,14 @@ void djDestroyImageHWSurface( djImage* pImage )
 	// Remove from 'map'
 	g_SurfaceMap.erase( pImage );
 }
-bool djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
+// dj2020 Adding that this returns a void* as a sort of 'handle', which is in fact the SDL_Surface*, so it can be used as such which is faster than the map, see comments at top of file .. later this might return SDL_Surface* or some sort of 'handle' or struct that includes the SDL_Surface*.
+void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 {
 	//extern djVisual* pVisView;
 	//djVisual* pVisDisplayBuffer = pVisView;
-	if (pImage==NULL) return false;
+	if (pImage==NULL) return nullptr;//false;
+
+	SDL_Surface* pSurfaceHardware = nullptr;
 
 	//fixmeLOW should ideally warn or assert or something if pImage already in map here??? [dj2017-06-20]
 
@@ -741,7 +750,7 @@ bool djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 	https://wiki.libsdl.org/SDL_CreateRGBSurface
 	*/
 
-	SDL_Surface* pSurfaceFoo = ::SDL_CreateRGBSurfaceFrom(
+	pSurfaceHardware = ::SDL_CreateRGBSurfaceFrom(
 		pImage->Data(),
 		pImage->Width(),
 		pImage->Height(),
@@ -757,9 +766,13 @@ bool djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 		0xFF000000
 		#endif
 	);
-	g_SurfaceMap[ pImage ] = pSurfaceFoo;
+	//fixme should be sped up:
+	// 1. A map is not really the most efficient way to do this as it must do a lookup for every blit
+	// 2. std::map is probably not the fastest map for this either .. unordered_map may be (we don't need correct sorting and we're happy with slower inserts for faster lookups)
+	// The more correct way requires some re-coding all over the codebase - return some kind of 'handle' here which could be a void* to either a struct with a pointer to the SDL_surface or the SDL_surface pointer as a void* or something ... then each 'user' must keep this 'texture handle' for when it does blits. Then, no map lookup.
+	g_SurfaceMap[ pImage ] = pSurfaceHardware;
 
-	return true;
+	return (void*)pSurfaceHardware;
 
 
 
@@ -843,7 +856,7 @@ SDL_SWSURFACE,
 		0xFF,//pVisDisplayBuffer->pSurface->format->Bmask,
 		0xFF000000);//pVisDisplayBuffer->pSurface->format->Amask);
 	if (!pSurface)
-		return false;
+		return nullptr;
 	g_SurfaceMap[ pImage ] = pSurface;
 	SDL_Surface* pSurfaceImg = ::SDL_CreateRGBSurfaceFrom(
 		pImage->Data(),
@@ -903,6 +916,6 @@ SDL_SetAlpha(pSurface, SDL_SRCALPHA, 0);
 		//SDL_FreeSurface(pSurfaceImg);
 		//delete pSurface;//?
 	}
-	return true;
+	return (void*)pSurface;
 }
 
