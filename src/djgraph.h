@@ -150,7 +150,7 @@ public:
 
 /*--------------------------------------------------------------------------*/
 //[dj2016-10] experimenting here with attempted HW surface cache, needs work [started as fixing wrong colors on Linux VNC]
-extern bool djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ );
+extern void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ );
 extern void djDestroyImageHWSurface( djImage* pImage );//dj2017-06-20 Added the 'destroy'
 /*--------------------------------------------------------------------------*/
 
