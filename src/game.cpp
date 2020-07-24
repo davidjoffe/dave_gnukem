@@ -214,6 +214,18 @@ djImage *pBackground      = NULL; // Level background image
 // 'Map auto-shadows' [dj2018-01]
 const char* FILE_SHADOWS = "data/shadows.tga";
 djImage* g_pImgShadows = NULL;
+
+#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+// dj2020-07 Playing around with a new visual effect to try improve the graphics slightly ...
+// subtle 'shadowing' that is focused around hero as he moves around viewport .. so walls behind
+// hero aren't perfectly uniform, and get slightly darker toward corners, given a crude 'pretend effect'
+// of lighting in the room. Not sure if this sucks? Will maybe add it as an option and let users decide.
+// I think I overall prefer it on, to off. But it needs more testing before I add it to the real game.
+djImage* g_pImgShadows2 = nullptr;
+SDL_Surface* g_pShadows2 = nullptr;
+const unsigned int SHADSIZE=4;
+#endif
+
 // Use config options to turn on/off specific effects if need be or desired (ideally these shouldn't be ugly globals, should have some sort of generic properties type thing - LOW prio - dj2018)
 bool g_bAutoShadows = true;
 bool g_bSpriteDropShadows = true;
@@ -876,6 +888,32 @@ void GameInitialSetup()
 		djCreateImageHWSurface( g_pImgShadows );
 	}
 
+#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+	if (!g_pImgShadows2)
+	{
+		g_pImgShadows2 = new djImage(SHADSIZE*16, SHADSIZE*16, 32);
+		int nAlpha = 255;//start with darkness at top left
+		for ( int y=0; y<16; ++y )
+		{
+			for ( int x=0; x<16; ++x )
+			{
+				// Black pixel, with different alpha
+				int nPixel = ((unsigned int)(nAlpha & 0xFF) << 24); //fixme which bits should be alpha?
+				for (unsigned int i=0; i<SHADSIZE; ++i)
+				{
+					for ( unsigned int j=0; j<SHADSIZE; ++j )
+					{
+						g_pImgShadows2->PutPixel(x*SHADSIZE+i, y*SHADSIZE+j, nPixel);
+					}
+				}
+				--nAlpha;
+			}
+		}
+		g_pShadows2 = (SDL_Surface*)djCreateImageHWSurface( g_pImgShadows2 );
+	}
+#endif//djBETA_SHADOWFOLLOWEFFECT2020
+
+
 	// Register the "thing"'s that need to be registered dynamically at runtime [dj2017-07-29]
 	RegisterThings_Monsters();
 }
@@ -884,6 +922,15 @@ void GameInitialSetup()
 void GameFinalCleanup()
 {
 	SYS_Debug( "GameFinalCleanup()\n" );
+
+#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+	if (g_pImgShadows2)
+	{
+		djDestroyImageHWSurface(g_pImgShadows2);
+		djDEL(g_pImgShadows2);
+		g_pShadows2 = nullptr;
+	}
+#endif
 
 	djDestroyImageHWSurface(g_pImgShadows);
 	djDEL(g_pImgShadows);
@@ -2159,7 +2206,7 @@ void DrawThingsAtLayer(EdjLayer eLayer)
 
 void GameDrawView()
 {
-	int i=0,j=0,a=0,b=0,xoff=0;
+	int i=0,j=0,a=0,b=0,nXOffset=0;
 	int anim_offset = 0;
 	unsigned char *pLevelBlockPointer=NULL;
 
@@ -2196,8 +2243,8 @@ void GameDrawView()
 	int nYOffset = g_nViewOffsetY;
 	for ( i=0; i<VIEW_HEIGHT; ++i )
 	{
-		xoff = -g_Viewport.xo_small + (g_bLargeViewport ? 0 : 2);
-		xoff *= HALFBLOCKW;
+		nXOffset = -g_Viewport.xo_small + (g_bLargeViewport ? 0 : 2);
+		nXOffset *= HALFBLOCKW;
 		for ( j=0; j<VIEW_WIDTH+g_Viewport.xo_small; ++j )
 		{
 			// Bounds-checks to not 'buffer overflow' etc. by going past bottom (or right) of level [dj2016-10]
@@ -2214,10 +2261,10 @@ void GameDrawView()
 				anim_offset = (GET_EXTRA( a, b, 4 ) & FLAG_ANIMATED) ? anim4_count : 0;
 
 				// draw background block
-				//djgDrawImage( pVisView, g_pCurMission->GetSpriteData(a)->m_pImage, ((b+anim_offset)%16)*16, ((b+anim_offset)/16)*16, xoff*8,16+i*16,16,16 );
+				//djgDrawImage( pVisView, g_pCurMission->GetSpriteData(a)->m_pImage, ((b+anim_offset)%16)*16, ((b+anim_offset)/16)*16, nXOffset*8,16+i*16,16,16 );
 				if ((a | b) != 0)//<- This if prevents background clearing of 'bg' background block .. etiher we need to clear entire viewport before start drawing map, or must draw a black square here 'manually' .. not sure which is more efficient ultimately
 				{
-					DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff, nYOffset);
+					DRAW_SPRITE16A(pVisView, a, b+anim_offset, nXOffset, nYOffset);
 
 					// We include this in the above 'if' because it's not
 					// strictly correct to have drop-shadows falling onto
@@ -2232,11 +2279,101 @@ void GameDrawView()
 						{
 							djgDrawImageAlpha( pVisView,
 								g_pImgShadows,
-								(uShadowVal % 16) * 16,
-								(uShadowVal / 16) * 16,
-								xoff, nYOffset,
-								16,16 );
+								(uShadowVal % 16) * BLOCKW,
+								(uShadowVal / 16) * BLOCKH,
+								nXOffset, nYOffset,
+								BLOCKW,BLOCKH );
 						}
+
+#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+						// These shadowings look crap in simulator EGA/CGA retro so don't do if g_nSimulatedGraphics!=0
+						bool bBackgroundSolid = CHECK_SOLID( a, b );
+						extern int g_nSimulatedGraphics;
+						if (g_nSimulatedGraphics==0 && g_pShadows2!=nullptr/*g_pImgShadows2*/ && !bBackgroundSolid)
+						{
+							const int nHIGH = 262;
+							const float fFADEOVERNUMBLOCKS = 7.2f;
+							const float fLOWRANGEEXTENT = 110.0f; // Higher numbers toward 250 make for very dark 'corners' .. lower numbers around 100 etc. make for more subtle effect
+
+							float fBlockWorldXStart = (float)(j + g_Viewport.xo) * (float)BLOCKW;
+							float fBlockWorldY = (float)(i + g_Viewport.yo) * (float)BLOCKH;
+							const float fHeroWorldX = (float)(HERO_PIXELX) + ((float)BLOCKW/2.0f);
+							const float fHeroWorldY = (float)(HERO_PIXELY) + (float)BLOCKH;
+							int nIntensity = 0;//0-255, 0 is darkness, 255 is fully lit (or rather, no darkness)
+							float fDistance = 0.0f;
+
+							SDL_Rect rectSrc;
+							//rectSrc.x = (nIntensity % 16) * SHADSIZE;
+							//rectSrc.y = (nIntensity / 16) * SHADSIZE;
+							rectSrc.w = SHADSIZE;
+							rectSrc.h = SHADSIZE;
+							SDL_Rect rectDest;
+							//rectDest.x = nXOffset;
+							rectDest.y = nYOffset;
+							rectDest.w = SHADSIZE;
+							rectDest.h = SHADSIZE;
+							for (int nY = 0; nY < BLOCKH; nY += SHADSIZE)
+							{
+								rectDest.x = nXOffset;
+								float fBlockWorldX = fBlockWorldXStart;
+
+								//for (int nX = 0; nX < BLOCKW; nX += SHADSIZE)
+								{
+									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + (fBlockWorldX-fHeroWorldX)*(fBlockWorldX-fHeroWorldX) );
+									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
+									if (nIntensity<0)nIntensity=0;
+									if (nIntensity<255)
+									{
+										rectSrc.x = (nIntensity % 16) * SHADSIZE;
+										rectSrc.y = (nIntensity / 16) * SHADSIZE;
+										SDL_BlitSurface(g_pShadows2, &rectSrc, pVisView->pSurface, &rectDest);
+									}
+
+									rectDest.x += SHADSIZE;
+									fBlockWorldX += (float)SHADSIZE;
+
+									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + (fBlockWorldX-fHeroWorldX)*(fBlockWorldX-fHeroWorldX) );
+									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
+									if (nIntensity<0)nIntensity=0;
+									if (nIntensity<255)
+									{
+										rectSrc.x = (nIntensity % 16) * SHADSIZE;
+										rectSrc.y = (nIntensity / 16) * SHADSIZE;
+										SDL_BlitSurface(g_pShadows2, &rectSrc, pVisView->pSurface, &rectDest);
+									}
+
+									rectDest.x += SHADSIZE;
+									fBlockWorldX += (float)SHADSIZE;
+
+									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + (fBlockWorldX-fHeroWorldX)*(fBlockWorldX-fHeroWorldX) );
+									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
+									if (nIntensity<0)nIntensity=0;
+									if (nIntensity<255)
+									{
+										rectSrc.x = (nIntensity % 16) * SHADSIZE;
+										rectSrc.y = (nIntensity / 16) * SHADSIZE;
+										SDL_BlitSurface(g_pShadows2, &rectSrc, pVisView->pSurface, &rectDest);
+									}
+
+									rectDest.x += SHADSIZE;
+									fBlockWorldX += (float)SHADSIZE;
+
+									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + (fBlockWorldX-fHeroWorldX)*(fBlockWorldX-fHeroWorldX) );
+									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
+									if (nIntensity<0)nIntensity=0;
+									if (nIntensity<255)
+									{
+										rectSrc.x = (nIntensity % 16) * SHADSIZE;
+										rectSrc.y = (nIntensity / 16) * SHADSIZE;
+										SDL_BlitSurface(g_pShadows2, &rectSrc, pVisView->pSurface, &rectDest);
+									}
+								}
+								
+								rectDest.y += SHADSIZE;
+								fBlockWorldY += (float)SHADSIZE;
+							}
+						}
+#endif//#ifdef djBETA_SHADOWFOLLOWEFFECT2020
 					}
 				}
 
@@ -2249,10 +2386,10 @@ void GameDrawView()
 				// draw foreground block, unless its (0,0)
 				if ((a | b) != 0)
 				{
-					DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff, nYOffset);
+					DRAW_SPRITE16A(pVisView, a, b+anim_offset, nXOffset, nYOffset);
 				}
 			}
-			xoff += BLOCKW;
+			nXOffset += BLOCKW;
 			pLevelBlockPointer += LEVEL_BYTESPERBLOCK;// <- 4 bytes per level 'block' so advance pointer 4 bytes, see comments at definition of LEVEL_SIZE etc.
 		}
 		nYOffset += BLOCKH;
@@ -2277,7 +2414,7 @@ void GameDrawView()
 		//xoff = ((x_small - xo_small)+1)*8 + (x-xo) * 16;
 		yoff = g_nViewOffsetY + (g_Player.y - g_Viewport.yo - 1) * BLOCKH;
 
-		xoff = (g_Player.x_small - g_Viewport.xo_small) + 1 + ((g_Player.x - g_Viewport.xo) << 1);
+		int xoff = (g_Player.x_small - g_Viewport.xo_small) + 1 + ((g_Player.x - g_Viewport.xo) << 1);
 		xoff *= HALFBLOCKW;
 		if (g_bLargeViewport) xoff -= BLOCKW;
 		/*
