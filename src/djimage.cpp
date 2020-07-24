@@ -88,6 +88,7 @@ djImage::djImage( int iWidth, int iHeight, int ibpp )
 	m_iHeight   = iHeight;
 	m_ibpp      = ibpp;
 	m_ipixwidth = CalculatePixelWidth( ibpp );
+	m_ipitch = m_ipixwidth * iWidth;
 
 	//fixmemediumorfuture 2018 something might be wrong with this constructor??????? see attempts to use 12/13 jan 2018 for sprite drop shadow stuff
 
