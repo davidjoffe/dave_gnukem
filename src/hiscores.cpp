@@ -1,7 +1,7 @@
 /*
 hiscores.cpp
 
-Copyright (C) 2001-2018 David Joffe
+Copyright (C) 2001-2020 David Joffe
 */
 
 #include <stdio.h>
@@ -97,15 +97,18 @@ bool LoadHighScores(const char *szFilename)
 	if (pIn==NULL)
 	{
 		djMSG("LoadHighScores: Failed to open file (%s): Creating default list\n", szFilename);
-		AddHighScore("Todd", 40000);
-		AddHighScore("Scott", 30000);
-		AddHighScore("George", 20000);
-		AddHighScore("Al", 10000);
-		AddHighScore("David", 5000);
+		// The default high scores in DN1 had firstnames of the DN1 developers, so we add that exactly the same here as a sort of 'hat tip' to them (with the same original default scores). And add myself. [dj2020-07]
+		// If we turn this into a generic little game engine this part should not be directly in the core but separated as Gnukem-specific stuff (maybe via derived class or lambda or something)
+		AddHighScore("Todd", 40000);//Todd Replogle
+		AddHighScore("Scott", 30000);//Scott Miller
+		AddHighScore("George", 20000);//George Broussard
+		AddHighScore("Al", 10000);//Allen H. Blum III
+		AddHighScore("David", 5000);//Me [dj2020-07]
+		AddHighScore("John", 500);// Is "John"==Jim Norwood? Not sure. The original DN1 highscores say "John" here but credits say "Jim Norwood" and no John is listed in credits. [dj2020-07]
 		return false;
 	}
 
-	char buf[512]={0};
+	char buf[1024]={0};
 
 	fgets(buf, sizeof(buf), pIn);
 	djStripCRLF(buf); // strip CR/LF characters
