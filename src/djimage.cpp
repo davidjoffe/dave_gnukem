@@ -1,7 +1,7 @@
 /*
 djimage.cpp
 
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2020 David Joffe
 */
 
 #include "djimage.h"
@@ -89,8 +89,6 @@ djImage::djImage( int iWidth, int iHeight, int ibpp )
 	m_ibpp      = ibpp;
 	m_ipixwidth = CalculatePixelWidth( ibpp );
 	m_ipitch = m_ipixwidth * iWidth;
-
-	//fixmemediumorfuture 2018 something might be wrong with this constructor??????? see attempts to use 12/13 jan 2018 for sprite drop shadow stuff
 
 	m_pData = new unsigned char[iWidth*iHeight*m_ipixwidth];
 
