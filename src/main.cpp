@@ -15,6 +15,7 @@ Copyright (C) 1995-2019 David Joffe
 
 /*--------------------------------------------------------------------------*/
 
+
 #include "mmgr/mmgr.h"
 
 #include <time.h>   // for srand()
@@ -52,6 +53,10 @@ Copyright (C) 1995-2019 David Joffe
 #include <Windows.h>//SetProcessDPIAware();
 #endif
 //#endif
+#ifdef __OS2__
+#define INCL_DOS
+#include <os2.h>
+#endif
 
 #ifndef NOSOUND
 #include <SDL_mixer.h>//For background music stuff
@@ -74,6 +79,19 @@ void CheckHighScores( int score );	// check if high score table is beaten,
 						// and show the table after all
 void InitMainMenu();
 void KillMainMenu();
+
+#ifdef __OS2__
+void MorphToPM()
+{
+   PPIB pib;
+   PTIB tib;
+
+   DosGetInfoBlocks(&tib, &pib);
+
+   // Change flag from VIO to PM:
+   if (pib->pib_ultype==2) pib->pib_ultype = 3;
+}
+#endif
 
 /*--------------------------------------------------------------------------*/
 // Main menu [NB, warning, the handling code uses indexes :/ .. so if you add/remove items, must update there too - dj2016-10]
@@ -107,6 +125,12 @@ CMenu mainMenu ( "main.cpp:mainMenu" );
 // This is the 'main' function. The big cheese.
 int main ( int argc, char** argv )
 {
+
+
+#ifdef __OS2__
+	MorphToPM();
+#endif
+	
 	// Check commandline args
 	bool bfullscreen = false;
 	bool b640 = false;
