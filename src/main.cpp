@@ -59,7 +59,11 @@ Copyright (C) 1995-2019 David Joffe
 #endif
 
 #ifndef NOSOUND
+#ifdef __OS2__
+#include <SDL/SDL_mixer.h>
+#else
 #include <SDL_mixer.h>//For background music stuff
+#endif
 #endif
 
 #include <map>

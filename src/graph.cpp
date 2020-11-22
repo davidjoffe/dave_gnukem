@@ -15,7 +15,11 @@ Copyright (C) 1998-2019 David Joffe
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#ifdef __OS2__
+#include <SDL/SDL.h>
+#else
 #include "SDL.h"
+#endif
 #include "sys_log.h"//Log
 #include "djstring.h"//djStrPrintf
 
