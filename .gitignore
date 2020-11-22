@@ -11,3 +11,5 @@
 
 # Temporary local Visual Studio settings and cached stuff eg precompiled headers that should not be committed
 /src/vcDave/.vs/
+/**/*.o
+/*.exe

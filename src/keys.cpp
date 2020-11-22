@@ -8,7 +8,11 @@ Created: 09/2001
 
 #include "keys.h"
 #include "settings.h"
+#ifdef __OS2__
+#include <SDL/SDL.h>
+#else
 #include "SDL.h"
+#endif
 #include <vector>
 using namespace std;
 

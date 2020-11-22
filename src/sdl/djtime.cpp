@@ -5,7 +5,11 @@ Copyright (C) 1999-2018 David Joffe
 */
 
 #include "../djtime.h"
+#ifdef __OS2__
+#include <SDL/SDL.h>
+#else
 #include "SDL.h"
+#endif
 #ifdef WIN32
 #include <windows.h>
 #include <mmsystem.h>

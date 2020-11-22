@@ -7,10 +7,19 @@ Copyright (C) 1999-2018 David Joffe and Kent Mein
 #include "../djsound.h"
 #include "../djstring.h"
 #include "../djlog.h"
+#ifdef __OS2__
+#include <SDL/SDL_audio.h>
+#include <SDL/SDL_error.h>
+#else
 #include <SDL_audio.h>
 #include <SDL_error.h>
+#endif
 #ifndef NOSOUND
+#ifdef __OS2__
+#include <SDL/SDL_mixer.h>
+#else
 #include <SDL_mixer.h>
+#endif
 #endif
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__)
