@@ -10,7 +10,7 @@
 // 2018/04 : 'DG version 1' released
 
 /*
-Copyright (C) 1995-2019 David Joffe
+Copyright (C) 1995-2022 David Joffe
 */
 
 /*--------------------------------------------------------------------------*/
@@ -40,6 +40,9 @@ Copyright (C) 1995-2019 David Joffe
 #include "sys_error.h"
 #include "datadir.h"//DATA_DIR [might move later - dj2018-05]
 
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__linux__)
+#include <unistd.h>//getcwd, chdir
+#endif
 #ifdef __APPLE__
 #include <mach-o/dyld.h>//_NSGetExecutablePath
 #include <sys/stat.h>//For djFolderExists stuff
