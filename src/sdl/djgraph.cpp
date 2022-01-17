@@ -2,7 +2,7 @@
 /*
 djgraph.cpp
 
-Copyright (C) 1997-2020 David Joffe
+Copyright (C) 1997-2022 David Joffe
 */
 
 
@@ -232,11 +232,13 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 				const unsigned int NUMCOLORS = (g_nSimulatedGraphics==1?16:4);
 				const djColor* pPalette = (g_nSimulatedGraphics==1 ? djPALETTE_EGA : djPALETTE_CGA);
 				
-				register int nPixel;
+				// [dj2022-01] Removing "register" hint here on these four variables as appears to cause issues with c++17 on arch e.g. see https://github.com/davidjoffe/dave_gnukem/issues/132
+				// "register" is not important anyway here - it's just a hint for compiler optimization and the compiler usually does a decent job, this codepath's for an unimportant feature (pseudo fake retro display modes which will be hardly used and our resolution usually low, I doubt its removal will make a material difference to anyone's lives, if it does cause bottlenecks someday we can revisit this)
+				int nPixel;
 				// For finding closest-matching pixel in target simulated mode palette
-				register int nDistance=0;
-				register int nDistanceMin=-1;
-				register int nClosest = 0;//black
+				int nDistance=0;
+				int nDistanceMin=-1;
+				int nClosest = 0;//black
 				
 				rc.y=0;
 				for ( unsigned int y=0; y<CFG_APPLICATION_RENDER_RES_H; ++y )
