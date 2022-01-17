@@ -40,7 +40,7 @@ Copyright (C) 1995-2022 David Joffe
 #include "sys_error.h"
 #include "datadir.h"//DATA_DIR [might move later - dj2018-05]
 
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__linux__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__linux__) || defined(__unix__)
 #include <unistd.h>//getcwd, chdir
 #endif
 #ifdef __APPLE__
