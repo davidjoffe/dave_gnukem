@@ -784,7 +784,7 @@ bool GetHighScoreUserName(char *szBuffer)
 		DialogBoxEffect(nXLeft-12, 64, nDX+24, 64);
 
 		djiPollBegin();
-		SDLMod ModState = SDL_GetModState();
+		SDL_Keymod ModState = SDL_GetModState();
 		SDL_Event Event;
 		while (djiPollEvents(Event))
 		{

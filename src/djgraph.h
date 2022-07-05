@@ -55,6 +55,8 @@ public:
 		m_bFullscreen = false;
 	}
 	SDL_Surface *pSurface;
+	SDL_Renderer *pRenderer;
+	SDL_Texture *pTexture;
 	djColor                  colorfore;
 	djColor                  colorback;
 	int                      width;
