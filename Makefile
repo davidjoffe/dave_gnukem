@@ -13,7 +13,7 @@ CC = gcc
 
 
 # dj2016-10 Add L -I/usr/local/include/SDL in process of getting this working on Mac OS X - not sure if this is 'bad' to just have both /usr/include and /usr/local/include??
-INCLUDEDIRS= -I/usr/include/SDL -I/usr/local/include/SDL 
+INCLUDEDIRS= -I/usr/include/SDL2 -I/usr/local/include/SDL2
 
 #CCFLAGS = -O -Wall $(INCLUDEDIRS)
 
@@ -25,7 +25,7 @@ CCFLAGS = -Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
 #Release version:
 #CCFLAGS = -O -Wall -I/usr/local/include -DHAVE_SOUND $(INCLUDEDIRS)
 
-LIBS = -lSDL -lSDLmain -lSDL_mixer -lpthread 
+LIBS = -lSDL2 -lSDL2_mixer -lpthread
 BIN = davegnukem
 
 
@@ -50,7 +50,7 @@ else
     ifeq ($(UNAME_S),Haiku)
         INCLUDEDIRS=`sdl-config --cflags`
         CCFLAGS=-Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
-        LIBS=`sdl-config --libs` -lSDLmain -lSDL_mixer -lpthread
+        LIBS=`sdl-config --libs` -lSDL2 -lSDL2_mixer -lpthread
     endif
     ifeq ($(UNAME_S),Darwin)
         LIBS += -framework Cocoa 

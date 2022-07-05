@@ -42,6 +42,13 @@ static djImage		*pFont = NULL;
 
 void ED_CommonInit ()
 {
+	SDL_FreeSurface(pVisMain->pSurface);
+	SDL_DestroyTexture(pVisMain->pTexture);
+	SDL_RenderSetLogicalSize(pVisMain->pRenderer, pVisMain->width, pVisMain->height);
+	pVisMain->pSurface = SDL_CreateRGBSurface(0, pVisMain->width, pVisMain->height, pVisMain->bpp,
+		0, 0, 0, 0);
+	pVisMain->pTexture = SDL_CreateTextureFromSurface(pVisMain->pRenderer, pVisMain->pSurface);
+
 	// rtfb:
 	// i don't know how and why it worked before i set this,
 	// but when i first tried to put my hands on Editor,
@@ -77,6 +84,13 @@ void ED_CommonKill ()
 	pFont = NULL;
 	DeleteMacros ();
 	djiClearBuffer ();
+
+	SDL_FreeSurface(pVisMain->pSurface);
+	SDL_DestroyTexture(pVisMain->pTexture);
+	SDL_RenderSetLogicalSize(pVisMain->pRenderer, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H);
+	pVisMain->pSurface = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, pVisMain->bpp,
+		0, 0, 0, 0);
+	pVisMain->pTexture = SDL_CreateTextureFromSurface(pVisMain->pRenderer, pVisMain->pSurface);
 }
 
 
