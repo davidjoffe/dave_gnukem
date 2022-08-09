@@ -683,7 +683,7 @@ void DoCreateNewLevel()
 	djAppendPathS(sLevelRelativePath, sFilenameWithoutPath.c_str());
 	pLevel->SetFilename(sLevelRelativePath.c_str());
 	pLevel->m_szName		= djStrDeepCopy("");
-	pLevel->m_szBackground	= djStrDeepCopy("data/levels/bg1.tga");//fixme for now hardcoded
+	pLevel->m_szBackground	= djStrDeepCopy(DATA_DIR "levels/bg1.tga");//fixme for now hardcoded
 	pLevel->m_szAuthor		= djStrDeepCopy("");
 	g_pCurMission->AddLevel(pLevel);
 

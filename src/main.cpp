@@ -256,7 +256,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		// Check if data folder is present relative to cwd
 		char szDataFile[8192]={0};
 		strcpy(szDataFile,cwd);
-		djAppendPath(szDataFile,"data/missions.txt");//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever
+		djAppendPath(szDataFile, DATA_DIR "missions.txt");//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever
 		//debug//printf("Checking for:%s\n",szDataFile);fflush(NULL);
 		if (!djFileExists(szDataFile))
 		{
@@ -276,7 +276,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 					*(szLast+1) = 0; // NULL-terminate
 
 				strcpy(szDataFile,path);
-				djAppendPath(szDataFile,"data/missions.txt");
+				djAppendPath(szDataFile, DATA_DIR "missions.txt");
 				if (djFileExists(szDataFile))
 				{
 					printf("Successfully found the data path :)\n");fflush(NULL);
@@ -373,13 +373,13 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	djSoundInit();				// Initialize sound
 
 	g_pImgMain = new djImage;			// Load main skin (title screen)
-	g_pImgMain->Load("data/main.tga");
+	g_pImgMain->Load(DATA_DIR "main.tga");
 	djCreateImageHWSurface( g_pImgMain );
 
 	InitMissionSystem();
 
 	// Load missions
-	if (0 != LoadMissions("data/missions.txt"))
+	if (0 != LoadMissions(DATA_DIR "missions.txt"))
 		return -1;
 	Log ( "DaveStartup(): %d missions(s) found.\n", g_apMissions.size() );
 
@@ -487,7 +487,7 @@ void DoMainMenu()
 #ifndef NOSOUND
 	//dj2016-10 adding background music to main menu, though have not put any real thought into what would
 	// be the best track here so fixme todo maybe dig a bit more and find better choice here etc. [also for levels]
-	Mix_Music* pMusic = Mix_LoadMUS("data/music/eric_matyas/8-Bit-Mayhem.ogg");
+	Mix_Music* pMusic = Mix_LoadMUS(DATA_DIR "music/eric_matyas/8-Bit-Mayhem.ogg");
 	if (pMusic!=NULL)
 		Mix_FadeInMusic(pMusic, -1, 800);
 #endif
@@ -943,7 +943,7 @@ void InitMainMenu()
 	//dj2018-04-01 make the Y position sightly higher by 4 pixel than the default, looks slightly better with new city background
 	mainMenu.setYOffset( 8 * (12 - (13 / 2)) - 4 );//13 = num items
 
-	mainMenu.setSoundMove ( djSoundLoad( "data/sounds/cardflip.wav" ) );
+	mainMenu.setSoundMove ( djSoundLoad( DATA_DIR "sounds/cardflip.wav" ) );
 }
 
 void KillMainMenu()
