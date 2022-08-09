@@ -26,7 +26,7 @@ bool LoadMacros()
 {
 	FILE *fin=NULL;
 	char buf[1024]={0};
-	if (NULL == (fin = fopen( "data/editor/macros.txt", "r" )))
+	if (NULL == (fin = fopen( DATA_DIR "editor/macros.txt", "r" )))
 		return false;
 
 	SMacro* pMacro=NULL;

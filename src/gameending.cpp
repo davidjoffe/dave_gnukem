@@ -25,7 +25,7 @@ void ShowEndGameSequence()
 	if (pImgFont==NULL)
 	{
 		pImgFont = new djImage;
-		if (pImgFont->Load( "data/fonts/simple_6x8.tga" )>=0)
+		if (pImgFont->Load( DATA_DIR "fonts/simple_6x8.tga" )>=0)
 		{
 			djCreateImageHWSurface( pImgFont );
 			FW=6;

@@ -175,7 +175,7 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 
 	// Window dressing crap
 	SDL_WM_SetCaption("Dave Gnukem", NULL);
-	SDL_WM_SetIcon(SDL_LoadBMP("data/icon.bmp"), NULL);
+	SDL_WM_SetIcon(SDL_LoadBMP(DATA_DIR "icon.bmp"), NULL);
 	// Hide mouse cursor
 	SDL_ShowCursor(0);
 
