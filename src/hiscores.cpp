@@ -8,10 +8,8 @@ Copyright (C) 2001-2020 David Joffe
 #include <string.h>
 #include "djstring.h"
 
-#include "mmgr/nommgr.h"
 #include <vector>
 using namespace std;
-#include "mmgr/mmgr.h"
 
 
 #include "hiscores.h"
