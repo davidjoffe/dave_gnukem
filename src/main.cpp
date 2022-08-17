@@ -15,8 +15,6 @@ Copyright (C) 1995-2022 David Joffe
 
 /*--------------------------------------------------------------------------*/
 
-#include "mmgr/mmgr.h"
-
 #include <time.h>   // for srand()
 
 #include "graph.h"
