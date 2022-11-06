@@ -17,10 +17,8 @@ Copyright (C) 1998-2019 David Joffe
 #include "djtypes.h"
 #include "djimage.h"
 
-#include "mmgr/nommgr.h"
 #include <vector>
 using namespace std;
-#include "mmgr/mmgr.h"
 #include <string>
 /*--------------------------------------------------------------------------*/
 class CMission;
