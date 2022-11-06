@@ -12,10 +12,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-#include "mmgr/nommgr.h"
 #include <string>
 using namespace std;
-#include "mmgr/mmgr.h"
 
 #ifdef WIN32
 #else

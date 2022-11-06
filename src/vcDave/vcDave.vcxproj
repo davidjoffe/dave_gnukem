@@ -160,7 +160,6 @@
     <ClCompile Include="..\menu.cpp" />
     <ClCompile Include="..\mission.cpp" />
     <ClCompile Include="..\mixins.cpp" />
-    <ClCompile Include="..\mmgr\mmgr.cpp" />
     <ClCompile Include="..\settings.cpp" />
     <ClCompile Include="..\sys_error.cpp" />
     <ClCompile Include="..\sys_log.cpp" />
@@ -200,8 +199,6 @@
     <ClInclude Include="..\menu.h" />
     <ClInclude Include="..\mission.h" />
     <ClInclude Include="..\mixins.h" />
-    <ClInclude Include="..\mmgr\mmgr.h" />
-    <ClInclude Include="..\mmgr\nommgr.h" />
     <ClInclude Include="..\settings.h" />
     <ClInclude Include="..\sys_defs.h" />
     <ClInclude Include="..\sys_error.h" />

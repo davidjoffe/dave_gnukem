@@ -18,11 +18,9 @@ Copyright (C) 1999-2019 David Joffe
 #include <string.h>
 #include <stdlib.h>
 
-#include "mmgr/nommgr.h"
 #include <string>
 #include <fstream>
 using namespace std;
-#include "mmgr/mmgr.h"
 
 vector<CMission * > g_apMissions;
 // FIXME: Does this stuff really belong here? Probably not.
