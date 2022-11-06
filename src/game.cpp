@@ -111,16 +111,16 @@ void IngameMenu();
 
 const char *g_szSoundFiles[SOUND_MAX] =
 {
-	"data/sounds/pickup.wav",
-	"data/sounds/shoot_cg1_modified.wav",//<- Hero shoot sound
-	"data/sounds/exit.ogg",//<-dj2016-10-28 New proper exit sound (is "PowerUp13.mp3" by Eric Matyas http://soundimage.org/)
-	"data/sounds/wooeep.wav",
-	"data/sounds/explode.wav",
-	"data/sounds/sfx_weapon_singleshot7.wav"//<- Monster shoot sound
-	,"data/sounds/jump.wav"//dj2016-10-30
-	,"data/sounds/jump_landing.wav"//dj2016-10-30
-	,"data/sounds/soft_explode.wav"//dj2016-10-30
-	,"data/sounds/key_pickup.wav"//dj2016-10-30
+	DATA_DIR "sounds/pickup.wav",
+	DATA_DIR "sounds/shoot_cg1_modified.wav",//<- Hero shoot sound
+	DATA_DIR "sounds/exit.ogg",//<-dj2016-10-28 New proper exit sound (is "PowerUp13.mp3" by Eric Matyas http://soundimage.org/)
+	DATA_DIR "sounds/wooeep.wav",
+	DATA_DIR "sounds/explode.wav",
+	DATA_DIR "sounds/sfx_weapon_singleshot7.wav"//<- Monster shoot sound
+	,DATA_DIR "sounds/jump.wav"//dj2016-10-30
+	,DATA_DIR "sounds/jump_landing.wav"//dj2016-10-30
+	,DATA_DIR "sounds/soft_explode.wav"//dj2016-10-30
+	,DATA_DIR "sounds/key_pickup.wav"//dj2016-10-30
 };
 SOUND_HANDLE g_iSounds[SOUND_MAX]={0};
 
@@ -204,13 +204,13 @@ int CountHeroBullets()
 vector<float> afTimeTaken;
 #define MAX_DEBUGGRAPH 128
 
-const char *FILE_GAMESKIN = "data/gameskin.tga";
+const char *FILE_GAMESKIN = DATA_DIR "gameskin.tga";
 djImage *pSkinGame        = NULL; // Main game view skin (while playing)
 djImage *pBackground      = NULL; // Level background image
 
 // Game effects [dj2018-01]
 // 'Map auto-shadows' [dj2018-01]
-const char* FILE_SHADOWS = "data/shadows.tga";
+const char* FILE_SHADOWS = DATA_DIR "shadows.tga";
 djImage* g_pImgShadows = NULL;
 
 #ifdef djBETA_SHADOWFOLLOWEFFECT2020
@@ -1007,7 +1007,7 @@ void PerLevelSetup()
 #ifndef NOSOUND
 	// This is somewhat gross quick n dirty simplistic for now - should rather have ability to assign music file in the level file format [dj2016-10]
 	int nMusicFile = (g_nLevel % asMusicFiles.size());
-	std::string sBasePath = "data/music/eric_matyas/";
+	std::string sBasePath = DATA_DIR "music/eric_matyas/";
 	if (g_pGameMusic!=NULL)
 	{
 		Mix_FreeMusic(g_pGameMusic);
