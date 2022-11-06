@@ -1,0 +1,21 @@
+Source: gnukem
+Section: games
+Priority: optional
+Maintainer: Craig Langman <craig@bodhilinux.com>
+Build-Depends: libsdl1.2-dev, libsdl-mixer1.2-dev, debhelper
+Standards-Version: 4.5.0
+Homepage: https://djoffe.com/gnukem/
+#Vcs-Browser: https://salsa.debian.org/debian/gnukem
+#Vcs-Git: https://salsa.debian.org/debian/gnukem.git
+Rules-Requires-Root: no
+
+Package: gnukem
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libsdl1.2debian, libsdl-mixer1.2
+Description: Retro platform shooter inspired by Duke Nukem.
+ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to,
+ and inspired by, Duke Nukem 1 (~1991).  The original Duke Nukem 1 had
+ 16-color EGA 320x200 graphics; the aim here is 'similar but different'
+ gameplay and 'look and feel'. It is kind of a parody of the original.
+ Please note it is not a 'clone', and not a 're-make'.
+
