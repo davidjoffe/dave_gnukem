@@ -440,3 +440,11 @@ With respect to particular data items, the following license conditions apply:
 
 Apart from the abovementioned, all other data included with 'version 1' is dual-licensed under MIT license or GPL.
 
+# Additional Development Credits
+
+* 2021/2022- [Ongoing] Some valuable contributions for and contributions for Debian support (work in progress, see https://github.com/davidjoffe/dave_gnukem/pull/131 discussion) and SDL2 version (in progress, see https://github.com/davidjoffe/dave_gnukem/pull/135) by, amongst others:
+
+	https://github.com/enigma9o7
+	https://github.com/bgermann
+	https://github.com/matteobin
+	Craig Langman (New ~2022 Debian package files work in progress e.g. )
