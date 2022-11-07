@@ -129,6 +129,7 @@ TL;DR Shoot anything that moves
 
 # Ports
 
+* Debian (work in progress ~2022 - https://github.com/enigma9o7, https://github.com/bgermann, https://github.com/matteobin Craig Langman)
 * Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi and https://github.com/ptitseb)
 * MorphOS [Mar 2018, by Bruno Peloille]: http://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_1.00.lha
 * Instructions for ClockworkPi GameShell: https://forum.clockworkpi.com/t/lets-play-dave-gnukem/1917 by: https://forum.clockworkpi.com/u/Oet
@@ -151,6 +152,8 @@ Then follow the same instructions as for Linux, e.g. git clone the src, cd into 
 # History / Changes
 
 Recent:
+
+~2022 - Work in progress for Debian support (and possible SDL2 support) - user contributions by https://github.com/enigma9o7, https://github.com/bgermann, https://github.com/matteobin Craig Langman
 
 2020/04/25 - Version 1.0.1
 
@@ -442,8 +445,7 @@ Apart from the abovementioned, all other data included with 'version 1' is dual-
 
 # Additional Development Credits
 
-* 2021/2022- [Ongoing] Some valuable contributions for and contributions for Debian support (work in progress, see https://github.com/davidjoffe/dave_gnukem/pull/131 discussion) and SDL2 version (in progress, see https://github.com/davidjoffe/dave_gnukem/pull/135) by, amongst others:
-
+* 2021/2022- [Ongoing] Some valuable contributions for Debian support (work in progress, see https://github.com/davidjoffe/dave_gnukem/pull/131 discussion) and SDL2 version (in progress, see https://github.com/davidjoffe/dave_gnukem/pull/135) by, amongst others: 
 	https://github.com/enigma9o7
 	https://github.com/bgermann
 	https://github.com/matteobin
