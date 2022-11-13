@@ -22,7 +22,7 @@ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspi
 
 ### Who is to blame for this?
 
-Created by: David Joffe http://djoffe.com/ / https://www.liveedu.tv/david_joffe/ / https://minds.com/David_Joffe
+Created by: David Joffe https://djoffe.com/ / https://www.liveedu.tv/david_joffe/ / https://minds.com/David_Joffe
 
 The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: [T.O.G](http://www.nuke24.net/ "T.O.G."), [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
@@ -38,10 +38,11 @@ It would be really great if someone could create packages for all major Linux di
 
 Dave Gnukem added to the Arch Linux AUR (Arch User Repository) 🙂 (Added May 2020 by https://github.com/caltlgin)
 
-* https://aur.archlinux.org/packages/dave_gnukem/
+* https://aur.archlinux.org/packages/dave_gnukem/ [~2022 now defunct?]
 
 Spotted: openSUSE Leap packages :) (seemingly by Martin Hauke)
 
+* https://software.opensuse.org/package/dave_gnukem
 * https://opensuse.pkgs.org/15.2/games-x86_64/dave_gnukem-1.0.1-lp152.1.1.x86_64.rpm.html (the description here is perfect to me - dj)
 * https://opensuse.pkgs.org/15.2/games-x86_64/dave_gnukem-data-1.0.1-lp152.1.1.noarch.rpm.html
 
@@ -130,6 +131,7 @@ TL;DR Shoot anything that moves
 # Ports
 
 * Debian (work in progress ~2022 - https://github.com/enigma9o7, https://github.com/bgermann, https://github.com/matteobin Craig Langman)
+* Bodhi Linux Dec 2021 efforts: https://bodhilinux.boards.net/thread/892/packaged-dave-gnukem-silly-retro
 * Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi and https://github.com/ptitseb)
 * MorphOS [Mar 2018, by Bruno Peloille]: http://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_1.00.lha
 * Instructions for ClockworkPi GameShell: https://forum.clockworkpi.com/t/lets-play-dave-gnukem/1917 by: https://forum.clockworkpi.com/u/Oet
@@ -149,11 +151,18 @@ Then follow the same instructions as for Linux, e.g. git clone the src, cd into 
 
 * "a good time killer when I'm baking" - Alessia_Amelia (Jan 2019)
 
+# FAQ
+
+* Q: 'The scrolling is choppy' or 'framerate low'?
+* A: The code can handle smoother scrolling and faster frame rates by tweaking settings and gameplay code, but is deliberately soft-limited to 18 frames per second (and the scrolling behaviour intended to mimic the original) because the original DN1 behaved close to this, and the point is to offer a nostalgic similar retro 'look and feel' (and thus also frame rate and scrolling behaviour) of the original Duke Nukem 1, which was designed to run on the much slower computers of that era (I used to play DN1 on an 80286 with 16-color EGA graphics in the '90s, and if you've ever had to code for EGA you'd also understand - dj) - so that anyone who also played the original should experience some nostalgic familiarity.
+
 # History / Changes
 
 Recent:
 
 ~2022 - Work in progress for Debian support (and possible SDL2 support) - user contributions by https://github.com/enigma9o7, https://github.com/bgermann, https://github.com/matteobin Craig Langman
+
+~2021 - User work for Bodhi Linux port: https://bodhilinux.boards.net/thread/892/packaged-dave-gnukem-silly-retro
 
 2020/04/25 - Version 1.0.1
 
@@ -427,7 +436,7 @@ The underlying 'engine' supports high frame rates and smooth scrolling etc.; the
 
 The source code itself (and most of the data/sprites) for Dave Gnukem are dual-licensed under MIT license or GPL.
 
-With respect to particular data items, the following license conditions apply:
+With respect to particular **data items**, the following license conditions apply:
 
 * 2018-03-22 Add boots sprite made by freepik.com, from flaticon.com, license Creative Commons BY 3.0
 * 2017-08-04 Add font data/fonts/simple_6x8.tga by http://www.zingot.com/ from https://opengameart.org/content/bitmap-font-pack License https://creativecommons.org/licenses/by/3.0/ (small changes made to color, and convert from PNG to TGA)
