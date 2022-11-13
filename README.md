@@ -452,6 +452,8 @@ With respect to particular **data items**, the following license conditions appl
 
 Apart from the abovementioned, all other data included with 'version 1' is dual-licensed under MIT license or GPL.
 
+Additional game data credits: Apart from the abovementioned, most the sprites were done by David Joffe (with some major contributions by Evil Mr Henry http://www.emhsoft.com/ including the main character sprites). Steve Merrifield made major level editing contributions. Apologies if anyone left out.
+
 # Additional Development Credits
 
 * 2021/2022- [Ongoing] Some valuable contributions for Debian support (work in progress, see https://github.com/davidjoffe/dave_gnukem/pull/131 discussion) and SDL2 version (in progress, see https://github.com/davidjoffe/dave_gnukem/pull/135) by, amongst others: 
