@@ -38,7 +38,7 @@ It would be really great if someone could create packages for all major Linux di
 
 Dave Gnukem added to the Arch Linux AUR (Arch User Repository) 🙂 (Added May 2020 by https://github.com/caltlgin)
 
-* https://aur.archlinux.org/packages/dave_gnukem/ [~2022 now defunct?]
+* https://aur.archlinux.org/packages/dave-gnukem
 
 Spotted: openSUSE Leap packages :) (seemingly by Martin Hauke)
 
