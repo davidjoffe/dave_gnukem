@@ -130,7 +130,7 @@ TL;DR Shoot anything that moves
 
 # Ports
 
-* Debian (work in progress ~2022 - https://github.com/enigma9o7, https://github.com/bgermann, https://github.com/matteobin Craig Langman)
+* Debian (work in progress ~2022 - Matteo Bini; https://github.com/enigma9o7, https://github.com/bgermann; Craig Langman)
 * Bodhi Linux Dec 2021 efforts: https://bodhilinux.boards.net/thread/892/packaged-dave-gnukem-silly-retro
 * Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi and https://github.com/ptitseb)
 * MorphOS [Mar 2018, by Bruno Peloille]: http://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_1.00.lha
@@ -160,9 +160,11 @@ Then follow the same instructions as for Linux, e.g. git clone the src, cd into 
 
 Recent:
 
-~2022 - Work in progress for Debian support (and possible SDL2 support) - user contributions by https://github.com/enigma9o7, https://github.com/bgermann, https://github.com/matteobin Craig Langman
+2022 - Work on Debian support and Debian packaging - user contributions by Matteo Bini, https://github.com/enigma9o7, https://github.com/bgermann, Craig Langman
 
-~2021 - User work for Bodhi Linux port: https://bodhilinux.boards.net/thread/892/packaged-dave-gnukem-silly-retro
+2022 - Matteo Bini implemented SDL2 support (including also contributions for Debian support) (merging of these changes in progress) https://github.com/davidjoffe/dave_gnukem/pull/135/commits/0f0022b9921982062eb7a93d2aef9a90459f3d33
+
+2021 - User work for Bodhi Linux port: https://bodhilinux.boards.net/thread/892/packaged-dave-gnukem-silly-retro
 
 2020/04/25 - Version 1.0.1
 
@@ -456,8 +458,10 @@ Additional game data credits: Apart from the abovementioned, most the sprites we
 
 # Additional Development Credits
 
-* 2021/2022- [Ongoing] Some valuable contributions for Debian support (work in progress, see https://github.com/davidjoffe/dave_gnukem/pull/131 discussion) and SDL2 version (in progress, see https://github.com/davidjoffe/dave_gnukem/pull/135) by, amongst others: 
+* ~2022 Matteo Bini entirely developed and contributed updates of the code from SDL1 to SDL2 (~2022 merging in progress) https://github.com/davidjoffe/dave_gnukem/pull/135
+
+* ~2021/2022- [Ongoing] Some valuable contributions for Debian support (work in progress, see https://github.com/davidjoffe/dave_gnukem/pull/131 discussion) - amongst others:
+	Matteo Bini
 	https://github.com/enigma9o7
 	https://github.com/bgermann
-	https://github.com/matteobin
 	Craig Langman (New ~2022 Debian package files work in progress e.g. )
