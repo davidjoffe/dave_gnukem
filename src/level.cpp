@@ -1,7 +1,7 @@
 /*
 level.cpp
 
-Copyright (C) 1995-2018 David Joffe
+Copyright (C) 1995-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "level.h"
@@ -53,7 +53,7 @@ void KillLevelSystem()
 unsigned char * level_load( int i, const char * szfilename )
 {
 	unsigned char* pRet = NULL;
-	unsigned char * buffer;
+	unsigned char * buffer=nullptr;
 
 	printf( "level_load( %s ): loading at slot %d.\n", szfilename, i );
 
@@ -62,7 +62,7 @@ unsigned char * level_load( int i, const char * szfilename )
 
 	char filename[4096]={0};
 
-	sprintf( filename, "%s%s", DATA_DIR, szfilename );
+	snprintf( filename, sizeof(filename), "%s%s", DATA_DIR, szfilename );
 
 	// open level file
 	int file_handle = -1;
@@ -73,17 +73,18 @@ unsigned char * level_load( int i, const char * szfilename )
 	}
 
 	// allocate memory for level
-	if (NULL == (buffer = new unsigned char[LEVEL_SIZE]))
+	unsigned int uMemSize = LEVEL_SIZE;
+	if (NULL == (buffer = new unsigned char[uMemSize]))
 	{
 		printf( "level_load( %s ): failed to allocate level buffer.\n", szfilename );
 		return NULL;
 	}
 	// Initialize level to blank block by default (in case it doesn't load e.g. bad filename passed or whatever, don't want to sit with random memory contents) [dj2017-07]
-	memset(buffer, 0, LEVEL_SIZE);
+	memset(buffer, 0, uMemSize);
 	if (file_handle != -1)
 	{
 		// read level into buffer
-		read( file_handle, buffer, LEVEL_SIZE );
+		read( file_handle, buffer, uMemSize );
 		// close file
 		close( file_handle );
 
@@ -101,7 +102,7 @@ int level_save( int i, const char * szfilename )
 	unsigned char * level=NULL;
 	char filename[4096]={0};
 
-	sprintf( filename, "%s%s", DATA_DIR, szfilename );
+	snprintf( filename, sizeof(filename), "%s%s", DATA_DIR, szfilename );
 
 	level = apLevels[i];
 	if ( level == NULL )
@@ -144,7 +145,7 @@ unsigned char * level_pointer( int i, int x, int y )
 	if (level == NULL)
 		return NULL;
 
-	return level + 4 * (y * 128 + x);
+	return level + LEVEL_BYTESPERBLOCK * (y * LEVEL_WIDTH + x);
 }
 
 SLevelBlock level_get_block( int i, int x, int y )

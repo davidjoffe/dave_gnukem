@@ -3,14 +3,13 @@
 \brief   Graphics functionality
 \author  David Joffe
 
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _DJGRAPH_H_
 #define _DJGRAPH_H_
 
 #include "SDL.h"
-#include "mmgr/mmgr.h"
 
 #include "djimage.h"
 #include "djtypes.h"
@@ -39,12 +38,12 @@ inline unsigned short PIXEL32TO16 ( unsigned long p )
 
 
 
+//! Roughly, in this source code there are three main of these 'visuals' - one for the main window, a main backbuffer ('pVisBack' - probably not used for editor), and a main 'gameview render' buffer ('pVisView') ... this is perhaps slightly confusing sometimes but has reasons, though not to say it's the best or ideal for any and every game, it's just how this evolved over the years as we changed backends etc. - dj2022
 class djVisual
 {
 public:
 	djVisual()
 	{
-		pSurface = NULL;
 		colorfore = djColor(255,255,255);
 		colorback = djColor(0,0,0);
 		width    = 0;
@@ -54,7 +53,9 @@ public:
 		pixwidth = 0;
 		m_bFullscreen = false;
 	}
-	SDL_Surface *pSurface;
+	SDL_Surface *pSurface = nullptr;
+	SDL_Renderer *pRenderer = nullptr;
+	SDL_Texture *pTexture = nullptr;
 	djColor                  colorfore;
 	djColor                  colorback;
 	int                      width;
@@ -150,7 +151,7 @@ public:
 
 /*--------------------------------------------------------------------------*/
 //[dj2016-10] experimenting here with attempted HW surface cache, needs work [started as fixing wrong colors on Linux VNC]
-extern bool djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ );
+extern void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ );
 extern void djDestroyImageHWSurface( djImage* pImage );//dj2017-06-20 Added the 'destroy'
 /*--------------------------------------------------------------------------*/
 

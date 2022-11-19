@@ -1,9 +1,9 @@
 //
 // game.cpp
 //
-// 1995/07/28
+// Created 1995/07/28
 //
-// Copyright (C) 1995-2018 David Joffe
+// Copyright (C) 1995-2022 David Joffe
 //
 /*--------------------------------------------------------------------------*/
 
@@ -12,10 +12,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-#include "mmgr/nommgr.h"
 #include <string>
 using namespace std;
-#include "mmgr/mmgr.h"
 
 #ifdef WIN32
 #else
@@ -113,16 +111,16 @@ void IngameMenu();
 
 const char *g_szSoundFiles[SOUND_MAX] =
 {
-	"data/sounds/pickup.wav",
-	"data/sounds/shoot_cg1_modified.wav",//<- Hero shoot sound
-	"data/sounds/exit.ogg",//<-dj2016-10-28 New proper exit sound (is "PowerUp13.mp3" by Eric Matyas http://soundimage.org/)
-	"data/sounds/wooeep.wav",
-	"data/sounds/explode.wav",
-	"data/sounds/sfx_weapon_singleshot7.wav"//<- Monster shoot sound
-	,"data/sounds/jump.wav"//dj2016-10-30
-	,"data/sounds/jump_landing.wav"//dj2016-10-30
-	,"data/sounds/soft_explode.wav"//dj2016-10-30
-	,"data/sounds/key_pickup.wav"//dj2016-10-30
+	DATA_DIR "sounds/pickup.wav",
+	DATA_DIR "sounds/shoot_cg1_modified.wav",//<- Hero shoot sound
+	DATA_DIR "sounds/exit.ogg",//<-dj2016-10-28 New proper exit sound (is "PowerUp13.mp3" by Eric Matyas http://soundimage.org/)
+	DATA_DIR "sounds/wooeep.wav",
+	DATA_DIR "sounds/explode.wav",
+	DATA_DIR "sounds/sfx_weapon_singleshot7.wav"//<- Monster shoot sound
+	,DATA_DIR "sounds/jump.wav"//dj2016-10-30
+	,DATA_DIR "sounds/jump_landing.wav"//dj2016-10-30
+	,DATA_DIR "sounds/soft_explode.wav"//dj2016-10-30
+	,DATA_DIR "sounds/key_pickup.wav"//dj2016-10-30
 };
 SOUND_HANDLE g_iSounds[SOUND_MAX]={0};
 
@@ -182,7 +180,7 @@ void DestroyAllBullets()
 //dj2018-03-31
 void DestroyAllThings()
 {
-	for ( unsigned int i=0; i<(int)g_apThings.size(); i++ )
+	for ( unsigned int i=0; i<g_apThings.size(); ++i )
 	{
 		delete g_apThings[i];
 	}
@@ -206,14 +204,26 @@ int CountHeroBullets()
 vector<float> afTimeTaken;
 #define MAX_DEBUGGRAPH 128
 
-const char *FILE_GAMESKIN = "data/gameskin.tga";
+const char *FILE_GAMESKIN = DATA_DIR "gameskin.tga";
 djImage *pSkinGame        = NULL; // Main game view skin (while playing)
 djImage *pBackground      = NULL; // Level background image
 
 // Game effects [dj2018-01]
 // 'Map auto-shadows' [dj2018-01]
-const char* FILE_SHADOWS = "data/shadows.tga";
+const char* FILE_SHADOWS = DATA_DIR "shadows.tga";
 djImage* g_pImgShadows = NULL;
+
+#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+// dj2020-07 Playing around with a new visual effect to try improve the graphics slightly ...
+// subtle 'shadowing' that is focused around hero as he moves around viewport .. so walls behind
+// hero aren't perfectly uniform, and get slightly darker toward corners, given a crude 'pretend effect'
+// of lighting in the room. Not sure if this sucks? Will maybe add it as an option and let users decide.
+// I think I overall prefer it on, to off. But it needs more testing before I add it to the real game.
+djImage* g_pImgShadows2 = nullptr;
+SDL_Surface* g_pShadows2 = nullptr;
+const unsigned int SHADSIZE=4;
+#endif
+
 // Use config options to turn on/off specific effects if need be or desired (ideally these shouldn't be ugly globals, should have some sort of generic properties type thing - LOW prio - dj2018)
 bool g_bAutoShadows = true;
 bool g_bSpriteDropShadows = true;
@@ -226,6 +236,7 @@ struct SMenuItem gameMenuItems[] =
 	{ true,  "   Save Game       " },
 	{ true,  "   Restore Game    " },
 	{ true,  "   Instructions    " },
+	{ true,  "   Retro Settings  " },//dj2019-06 new
 	{ true,  "   Abort Game      " },
 	{ false, "                   " },
 	{ false, NULL }
@@ -234,9 +245,8 @@ unsigned char gameMenuCursor[] = { 128, 129, 130, 131, 0 };
 CMenu gameMenu ( "game.cpp:gameMenu" );
 /*--------------------------------------------------------------------------*/
 
-//animation
+//global 4-block sprite animation offset counter for various things
 int anim4_count = 0;
-int nSlowDownHeroWalkAnimationCounter = 0;
 
 
 
@@ -265,7 +275,6 @@ int g_nHealthOld = 0;
 //! GameHeartBeat() helper. These params seem a bit weird to me, design-wise[low][dj2018-01]
 void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 {
-
 	// If we're right at the end of the game tackling Dr Proton, and he starts
 	// escaping, then we want the viewport to briefly 'center around' / follow
 	// Dr Proton as he flies upwards to escape (as per original DN1). So we
@@ -275,8 +284,8 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 	if (CDrProton::GameEnding())
 	{
 		CDrProton* pDrProton = CDrProton::GetDrProton();
-		if (yo+2>pDrProton->m_y)
-			--yo;
+		if (g_Viewport.yo + 2 > pDrProton->m_y)
+			--g_Viewport.yo;
 	}
 	else
 	{
@@ -285,14 +294,26 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 
 		//[was:onmoveright]
 		//if (
-		if (x>=xo+VIEW_WIDTH)//Totally at/off right side of view?
+		if (g_Player.x >= g_Viewport.xo + VIEW_WIDTH)//Totally at/off right side of view?
 		{
 			// Snap to it
-			xo = x - VIEW_WIDTH;
-			xo_small = x_small!=0 ? 1 : 0;
+			g_Viewport.xo = g_Player.x - VIEW_WIDTH;
+			g_Viewport.xo_small = g_Player.x_small != 0 ? 1 : 0;
 		}
-		if ((x-xo)>=VIEW_WIDTH - 5)
+		if ((g_Player.x - g_Viewport.xo) >= VIEW_WIDTH - 5)
 		{
+			// This stuff relates to trying to get similar 'retro' viewport scrolling behavior to DN1
+			// Not sure it's 100% right but seems sorta 'close enough' at this point (dj2019)
+			// This code's a bit ugly as it's based on my really old/early code.
+			// xo_offset = 'Viewport offset by 8 pixels?'
+			// One must look at DN1's scrolling behavior to see the intention here also.
+			// Baaasically the DN1 blocks were 16 pixels but the horizontal *viewport offset* (as
+			// well as the hero horizontal position) could be offset by either a further 8 pixels,
+			// or no further offset, i.e. aligned to the 16-pixel block positions.)
+			// If we want to use the dave_gnukem code for more generic purposes,
+			// eg totally smooth-animating and/or higher-resolution platforms, this is one of
+			// the parts of the code we'd first want to change/genericize etc.
+
 			//bool bEven = (((x-xo)%2)==0);
 
 			/*if (!bEven & (x_small==0))
@@ -301,50 +322,50 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 			xo_small = 0;
 			}
 			*/
-			if (((x-xo)==VIEW_WIDTH - 5) & (x_small)) {
-				xo_small = 1;
-
-				//if ((x-xo)>=VIEW_WIDTH - 3)
-				//	++xo;
+			if (((g_Player.x - g_Viewport.xo) == VIEW_WIDTH - 5) & (g_Player.x_small)) {
+				g_Viewport.xo_small = 1;
 			}
-			if ((x-xo)>=VIEW_WIDTH - 4) {
-				//xo++;
-				++xo;
-				xo_small = 0;
+			if ((g_Player.x - g_Viewport.xo) >= VIEW_WIDTH - 4) {
+				++g_Viewport.xo;
+				g_Viewport.xo_small = 0;
 			}
 			/*else
 			{
-			++xo;
-			xo_small = 1;
+			++g_Viewport.xo;
+			g_Viewport.xo_small = 1;
 			}*/
 
-			if ( (xo + xo_small) > 128 - VIEW_WIDTH )
+			// (//dj2019-07) hm fixmeHIGH i suspect for low LEVEL_WIDTH we may have issues here with xo being negative, or is that OK
+			if ( (g_Viewport.xo + g_Viewport.xo_small) > LEVEL_WIDTH - VIEW_WIDTH )
 			{
-				xo = 128 - VIEW_WIDTH;
-				xo_small = 0;
+				g_Viewport.xo = LEVEL_WIDTH - VIEW_WIDTH;
+				g_Viewport.xo_small = 0;
 			}
 		}
 
 		//[was:onmoveleft]
-		if (x<=xo)
+		// If our x position is left of the viewport X origin (i.e. hero entirely outside viewport and would thus be invisible), 'force'/'snap'/reset viewport origin as a-few-blocks-left of hero
+		if (g_Player.x <= g_Viewport.xo)
 		{
-			xo = x-4;
-			xo_small = 0;
+			g_Viewport.xo = g_Player.x - 4;
+			g_Viewport.xo_small = 0;
 		}
-		else if (((x-xo)<=4))
+		// If our hero is close to left of viewport and we maybe need to adjust the horizontal scrolling
+		else if (((g_Player.x - g_Viewport.xo) <= 4))
 		{
-			bool bEven = (((x-xo)%2)==0);
-			if (bEven & (!(x_small))) {
-				xo_small = 0;
+			bool bEven = (((g_Player.x - g_Viewport.xo) % 2) == 0);
+			if (bEven & (!(g_Player.x_small))) {
+				g_Viewport.xo_small = 0;
 			}
-			if (!bEven & (x_small)) {
-				xo--;
-				xo_small = 1;
+			// dj2019-06 NB: This was "if (!bEven && (x_small))"; changing it based on a compiler warning from Ubuntu. I don't even know anymore (as some of this code is 20+ years old) if the intention was to do this bitwise or int-wise etc. but I don't think it matters, I think end result is the same. Nonetheless, if we suddenly have strange viewport scrolling behavior after this change, change it back or come back to this.
+			if ((!bEven) && (g_Player.x_small!=0)) {
+				g_Viewport.xo--;
+				g_Viewport.xo_small = 1;
 			}
-			if (xo < 0)
+			if (g_Viewport.xo < 0)
 			{
-				xo = 0;
-				xo_small = 0;
+				g_Viewport.xo = 0;
+				g_Viewport.xo_small = 0;
 			}
 		}
 
@@ -358,18 +379,18 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 		// as hero's head hits roof, and without this g_nRecentlyFallingOrJumping "buffer" the vertical offset auto-scrolling incorrectly kicks in.
 		{
 			// 'Avoid' scroll yo (unless 'necessary' e.g. if right at top) up if busy jumping up ... likewise for downward movement
-			if (hero_mode == MODE_JUMPING)
+			if (g_Player.hero_mode == MODE_JUMPING)
 			{
-				if (y-yo<2) yo--;
+				if (g_Player.y - g_Viewport.yo < 2) g_Viewport.yo--;
 				g_nRecentlyFallingOrJumping = 2;
 			}
 			else
 			{
-				bool bIsFalling = bFalling || bFallingPrev || hero_mode==MODE_JUMPING;
+				bool bIsFalling = bFalling || bFallingPrev || g_Player.hero_mode==MODE_JUMPING;
 				if (bIsFalling)
 				{
 					g_nRecentlyFallingOrJumping = 2;
-					if (y-yo>=9) yo++;
+					if (g_Player.y - g_Viewport.yo >= 9) g_Viewport.yo++;
 				}
 				else
 				{
@@ -379,21 +400,21 @@ void GameViewportAutoscroll(bool bFalling, bool bFallingPrev)
 					}
 					else
 					{
-						if (y-yo<7)
+						if (g_Player.y - g_Viewport.yo < 7)
 						{
-							yo--;
+							g_Viewport.yo--;
 						}
 					}
-					if (y-yo>=7)
+					if (g_Player.y - g_Viewport.yo >= 7)
 					{
-						yo++;
+						g_Viewport.yo++;
 					}
 				}
 			}
-			if ( yo < 0 )
-				yo = 0;
-			if ( yo > LEVEL_HEIGHT - 10 )
-				yo = LEVEL_HEIGHT - 10;
+			if ( g_Viewport.yo < 0 )
+				g_Viewport.yo = 0;
+			if ( g_Viewport.yo > LEVEL_HEIGHT - 10 )
+				g_Viewport.yo = LEVEL_HEIGHT - 10;
 		}
 	}
 }
@@ -404,7 +425,7 @@ void InteractWithThings()
 	for ( int i=0; i<(int)g_apThings.size(); ++i )
 	{
 		pThing = g_apThings[i];
-		if (pThing->OverlapsBounds(x*16+x_small*8, y*16+y_offset-16))
+		if (pThing->OverlapsBounds(HERO_PIXELX, HERO_PIXELY))
 		{
 			// [dj2016-10-10] Note that if inside HeroOverlaps(), it can cause you to die, e.g. if you've interacted with
 			// spikes .. so be aware you may be dead after calling that .. thats g_bDied, which causes level restart below.
@@ -427,7 +448,7 @@ void InteractWithThings()
 		if (pThing!=NULL)
 		{
 			// Test if entering or leaving action bounds box
-			if (pThing->HeroInsideActionBounds(x*16+x_small*8, y*16+y_offset-16))
+			if (pThing->HeroInsideActionBounds(HERO_PIXELX, HERO_PIXELY))
 			{
 				if (!pThing->IsHeroInside())
 					pThing->HeroEnter();
@@ -461,6 +482,7 @@ void TickAllThings()
 void DropFallableThings()
 {
 	CThing* pThing = NULL;
+	// Note i may decrement during the loop (if thing deleted)
 	for ( int i=0; i<(int)g_apThings.size(); ++i )
 	{
 		pThing = g_apThings[i];
@@ -476,7 +498,7 @@ void DropFallableThings()
 				{
 					pThing->m_y += 1;
 					// if object falls off bottom of level
-					if (pThing->m_y >= 100)
+					if (pThing->m_y >= LEVEL_HEIGHT)
 					{
 						// delete this object!!!
 						delete pThing;
@@ -492,7 +514,6 @@ void DropFallableThings()
 void CheckForBulletsOutOfView()
 {
 	CBullet* pBullet=NULL;
-	int x1=0;
 	// Check for bullets that have gone out of the view
 	for ( int i=0; i<(int)g_apBullets.size(); ++i )
 	{
@@ -529,10 +550,18 @@ void CheckIfHeroShooting()
 		{
 			#define HERO_BULLET_SPEED (16)
 
+
+			//dj2019-07 this is to multiply the (silly(?)) offset if we're using blocksizes larger than 16x16 .. this is a bit crude. The offset itself is a bit DG1/DN1 specific, which was 'supposed to be' 16x16 only, but for fun we're doing 32x32 etc., and to make source more generic.
+			int nMultiple=1;
+			if (BLOCKW>16)
+				nMultiple = (BLOCKW/16);
+
+			// The start X position of the bullet may be a bit imperfect here :/ .. but now that version 1's been released, probably best not to mess with it (at least for DG v1) - dj2020-06
 			HeroShoot(
-				x * 16 /*+ (hero_dir==1 ? 16 : -16)*/ + x_small*8,
-				(y-1) * 16+11,
-				(hero_dir==0 ? -HERO_BULLET_SPEED : HERO_BULLET_SPEED)
+				g_Player.x * BLOCKW /*+ (g_Player.hero_dir==1 ? BLOCKW : -BLOCKW)*/ + g_Player.x_small*HALFBLOCKW,
+				(g_Player.y-1)*BLOCKH + (11*nMultiple),
+				// If hero facing left, start bullet speed in negative X axis direction (shooting left), else positive (shooting right)
+				(g_Player.hero_dir==0 ? -HERO_BULLET_SPEED : HERO_BULLET_SPEED)
 			);
 
 			// RESET COUNTER [fixme this must reset between games also]
@@ -643,14 +672,20 @@ void UpdateBullets()
 			{
 				// Check if monster bullet overlaps with hero
 				if (OVERLAPS(
-					x*16+x_small*8,
-					y*16-16,
-					(x*16+x_small*8) + 15,
-					(y*16-16) + 31,
+					HERO_PIXELX,
+					// fixmehigh2019-07 this actually looks like a bug! A possibly imporrant but why not add hero y_offset here!??
+					g_Player.y*BLOCKH-BLOCKH,// FIXMEHIGH2019-07 WHY NOT HERO_PIXELY which includes the y_offset??
+					HERO_PIXELX + (HEROW_COLLISION-1),
+					(g_Player.y*BLOCKH-BLOCKH) + (HEROH_COLLISION-1),
 					pBullet->x,
 					pBullet->y,
-					pBullet->x+15,
-					pBullet->y+15))
+					pBullet->x+(BLOCKW-1),
+					// fixme is this +15(BLOCKW-1) right? looks too big .. (dj2019-07)
+					// fixme is this +15 right? looks too big .. (dj2019-07)
+					// fixme is this +15 right? looks too big .. (dj2019-07)
+					// fixme is this +15 right? looks too big .. (dj2019-07)
+					// fixme is this +15 right? looks too big .. (dj2019-07)
+					pBullet->y+(BLOCKH-1)))
 				{
 					bBulletDeleted=true;
 					g_apBulletsDeleted.push_back(pBullet);//delete g_apBullets[i];
@@ -691,14 +726,14 @@ void UpdateBullets()
 				// [dj2018-01] This if check is so we create the explosion centred around the 'tip' of where the bullet collided
 				if (pBullet->dx<0)
 				{
-					AddThing(CreateExplosion(nXOld - 8, nY-4,
+					AddThing(CreateExplosion(nXOld - HALFBLOCKW, nY-4,
 						// Make the hero's bullet slightly larger than smallest explosion
 						g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
 					));
 				}
 				else
 				{
-					AddThing(CreateExplosion(nXOld + 16 - 8, nY-4,
+					AddThing(CreateExplosion(nXOld + BLOCKW - HALFBLOCKW, nY-4,
 						// Make the hero's bullet slightly larger than smallest explosion
 						g_apBullets[i]->eType==CBullet::BULLET_HERO ? 1 : 0
 					));
@@ -727,12 +762,22 @@ void UpdateBullets()
 void RedrawEverythingHelper()
 {
 	//fixLOW[dj2017-08-13] really not 100% if all this is exactly correct but anyway
+
+	//dj2019 Clear the back buffer when flipping between viewportmodes eg g_bBigViewportMode/g_bLargeViewport stuff so we don't in some cases potentially leave junky stuff from the previous mode, if the new mode only renders to a sub-portion of the backbuffer
+	//if (g_bLargeViewport || g_bBigViewportMode)
+	{
+		// Clear back buffer [dj2019]
+		djgSetColorFore(pVisBack, djColor(0, 0, 0));
+		djgDrawBox(pVisBack, 0, 0, pVisBack->width, pVisBack->height);
+	}
+
 	GameDrawSkin();
-	GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT, g_nViewOffsetX, g_nViewOffsetY, g_nViewOffsetX, g_nViewOffsetY );
+	//dj2019-06 Move DrawHealth(),score,firepower,inventory before GraphFlipView for big/large viewport modes to work correctly, not sure if that's right.
 	DrawHealth();
 	DrawScore();
 	GameDrawFirepower();
 	InvDraw();
+	GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT, g_nViewOffsetX, g_nViewOffsetY, g_nViewOffsetX, g_nViewOffsetY );
 	GraphFlip(!g_bBigViewportMode);
 }
 /*-----------------------------------------------------------*/
@@ -750,13 +795,12 @@ void ReInitGameViewport()
 
 	if (g_bBigViewportMode)
 	{
-		VIEW_WIDTH = (pVisView->width / 16) - 10;
-		VIEW_HEIGHT = (pVisView->height - 5*16) / 16;
-		if (VIEW_HEIGHT>=100)VIEW_HEIGHT=100;
-		if (VIEW_WIDTH>=128)VIEW_WIDTH=128;
+		//dj2019-07 should refine later but for now make it, use all pixels except a ring around the viewport one 'gameblock' size ..
+		VIEW_WIDTH = (pVisView->width / BLOCKW) - 2;// - 10;
+		VIEW_HEIGHT = (pVisView->height / BLOCKH) - 2;// - 5*16) / 16;
 		//Top left of game viewport in pixels:
-		g_nViewOffsetX=16;//?? or should these be 0, probably [dj2017-08 ??]
-		g_nViewOffsetY=16;//??
+		g_nViewOffsetX=BLOCKW;//?? or should these be 0, probably [dj2017-08 ??]
+		g_nViewOffsetY=BLOCKH;//??
 	}
 	else if (g_bLargeViewport)
 	{
@@ -782,6 +826,16 @@ void ReInitGameViewport()
 		//if (x>xo+VIEW_WIDTH/2) xo = x-VIEW_WIDTH/2;
 		//if (y>yo+VIEW_HEIGHT/2) yo = y-VIEW_HEIGHT/2;
 	}
+
+	//dj2019-MMtest//VIEW_WIDTH = 32;
+	//dj2019-MMtest//VIEW_HEIGHT = 16;
+	//Top left of game viewport in pixels:
+	//dj2019-MMtest//g_nViewOffsetX=0;
+	//dj2019-MMtest//g_nViewOffsetY=0;
+
+	// If very high resolution then in theory VIEW_WIDTH could be wider than the level, we don't want that or bad things will happen, so clamp to level dimensions:
+	if (VIEW_WIDTH > LEVEL_WIDTH) VIEW_WIDTH = LEVEL_WIDTH;
+	if (VIEW_HEIGHT > LEVEL_HEIGHT) VIEW_HEIGHT = LEVEL_HEIGHT;
 }
 /*-----------------------------------------------------------*/
 
@@ -832,6 +886,32 @@ void GameInitialSetup()
 		djCreateImageHWSurface( g_pImgShadows );
 	}
 
+#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+	if (!g_pImgShadows2)
+	{
+		g_pImgShadows2 = new djImage(SHADSIZE*16, SHADSIZE*16, 32);
+		int nAlpha = 255;//start with darkness at top left
+		for ( int y=0; y<16; ++y )
+		{
+			for ( int x=0; x<16; ++x )
+			{
+				// Black pixel, with different alpha
+				int nPixel = ((unsigned int)(nAlpha & 0xFF) << 24); //fixme which bits should be alpha?
+				for (unsigned int i=0; i<SHADSIZE; ++i)
+				{
+					for ( unsigned int j=0; j<SHADSIZE; ++j )
+					{
+						g_pImgShadows2->PutPixel(x*SHADSIZE+i, y*SHADSIZE+j, nPixel);
+					}
+				}
+				--nAlpha;
+			}
+		}
+		g_pShadows2 = (SDL_Surface*)djCreateImageHWSurface( g_pImgShadows2 );
+	}
+#endif//djBETA_SHADOWFOLLOWEFFECT2020
+
+
 	// Register the "thing"'s that need to be registered dynamically at runtime [dj2017-07-29]
 	RegisterThings_Monsters();
 }
@@ -840,6 +920,15 @@ void GameInitialSetup()
 void GameFinalCleanup()
 {
 	SYS_Debug( "GameFinalCleanup()\n" );
+
+#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+	if (g_pImgShadows2)
+	{
+		djDestroyImageHWSurface(g_pImgShadows2);
+		djDEL(g_pImgShadows2);
+		g_pShadows2 = nullptr;
+	}
+#endif
 
 	djDestroyImageHWSurface(g_pImgShadows);
 	djDEL(g_pImgShadows);
@@ -856,7 +945,7 @@ void GameFinalCleanup()
 // Per-game initialization
 void PerGameSetup()
 {
-	Log("PerGameSetup(): InitLevelSystem()\n");
+	djLOGSTR("PerGameSetup(): InitLevelSystem()\n");
 	InitLevelSystem();
 
 	g_nHealth = HEALTH_INITIAL; // Initial health
@@ -878,9 +967,7 @@ void PerGameSetup()
 
 void PerLevelSetup()
 {
-	int i;
-
-	Log ( "PerLevelSetup()\n" );
+	djLOGSTR( "PerLevelSetup()\n" );
 
 	g_nRecentlyFallingOrJumping=0;
 	g_nNoShootCounter = 0;
@@ -917,9 +1004,10 @@ void PerLevelSetup()
 	asMusicFiles.push_back("Monsters-in-Bell-Bottoms_Looping.ogg");
 	asMusicFiles.push_back("Retro-Frantic_V001_Looping.ogg");
 	asMusicFiles.push_back("Techno-Gameplay_Looping.ogg");
+#ifndef NOSOUND
 	// This is somewhat gross quick n dirty simplistic for now - should rather have ability to assign music file in the level file format [dj2016-10]
 	int nMusicFile = (g_nLevel % asMusicFiles.size());
-	std::string sBasePath = "data/music/eric_matyas/";
+	std::string sBasePath = DATA_DIR "music/eric_matyas/";
 	if (g_pGameMusic!=NULL)
 	{
 		Mix_FreeMusic(g_pGameMusic);
@@ -930,6 +1018,7 @@ void PerLevelSetup()
 	{
 		Mix_FadeInMusic(g_pGameMusic, -1, 500);
 	}
+#endif
 
 	// Save current score and firepower - these must be restored if we die.
 	g_nScoreOld = g_nScore;
@@ -954,14 +1043,12 @@ void PerLevelSetup()
 	anim4_count=0; // animation count 0
 	hero_picoffs=0;
 	g_nHeroJustFiredWeaponCounter = 0;
-	x_small = 0; // hero not half-block offset
-	xo_small = 0; // view not half-block offset
-	y_offset = 0;
 	// just in case level doesn't contain a starting block ..
-	xo = 0;
-	yo = 0;
-	relocate_hero( 20, 20 );
-	hero_dir = 1;
+	g_Viewport.xo = 0;
+	g_Viewport.yo = 0;
+	g_Viewport.xo_small = 0; // view not half-block offset
+	relocate_hero( LEVEL_WIDTH/2, LEVEL_HEIGHT/2 );
+	g_Player.hero_dir = 1;
 
 	DestroyAllThings();// clear list of "things"
 	DestroyAllBullets();//Make sure no bullets, for good measure [dj2018-03]
@@ -974,7 +1061,9 @@ void PerLevelSetup()
 	if (NULL == level_load( 0, szfilename ))
 	{
 		djMSG("PerLevelSetup(): error loading level %s.\n", szfilename );
+		//dj2019-07 This should be just a warning but it should let you play, with some default placement position.
 		ShowGameMessage("BAD FILENAME FOR LEVEL", 1000);
+		relocate_hero( LEVEL_WIDTH/2, LEVEL_HEIGHT/2 );
 		//return;
 	}
 	g_pLevel = apLevels[0];
@@ -1121,7 +1210,7 @@ void PerGameCleanup()
 	djDEL(pBackground);
 	// Delete all levels
 	KillLevelSystem();
-	Log ( "KillLevelSystem() ok\n" );
+	djLOGSTR( "KillLevelSystem() ok\n" );
 }
 
 void PerLevelCleanup()
@@ -1130,11 +1219,13 @@ void PerLevelCleanup()
 	DestroyAllThings();// clear list of "things"
 	DestroyAllBullets();//Make sure no bullets, for good measure [dj2018-03]
 
+#ifndef NOSOUND
 	if (g_pGameMusic!=NULL)
 	{
 		Mix_FreeMusic(g_pGameMusic);
 		g_pGameMusic = NULL;
 	}
+#endif
 
 	if (g_pLevelShadowMap)
 	{
@@ -1294,17 +1385,20 @@ int game_startup(bool bLoadGame)
 						{
 						/*{
 						char buf[1024]={0};
-						sprintf(buf,"%08x,%08x,%08x",(int)Event.key.keysym.sym, (int)Event.key.keysym.mod, (int)Event.key.keysym.scancode);
+						snprintf(buf,sizeof(buf),"%08x,%08x,%08x",(int)Event.key.keysym.sym, (int)Event.key.keysym.mod, (int)Event.key.keysym.scancode);
 						ShowGameMessage(buf, 32);
 						}*/
 						if (Event.key.keysym.sym==SDLK_F6)
 						{
+							//ShowEndGameSequence();
+							//RedrawEverythingHelper();
+
 							g_fFrameRate -= 1.0f;
 							if (g_fFrameRate<1.f)
 								g_fFrameRate = 1.f;
 							fTIMEFRAME = (1.0f / g_fFrameRate);
 							char buf[1024]={0};
-							sprintf(buf,"Dec framerate %.2f",g_fFrameRate);
+							snprintf(buf,sizeof(buf),"Dec framerate %.2f",g_fFrameRate);
 							ShowGameMessage(buf, 32);
 						}
 						else if (Event.key.keysym.sym==SDLK_F7)
@@ -1312,7 +1406,7 @@ int game_startup(bool bLoadGame)
 							g_fFrameRate += 1.0f;
 							fTIMEFRAME = (1.0f / g_fFrameRate);
 							char buf[1024]={0};
-							sprintf(buf,"Inc framerate %.2f",g_fFrameRate);
+							snprintf(buf,sizeof(buf),"Inc framerate %.2f",g_fFrameRate);
 							ShowGameMessage(buf, 32);
 						}
 						else if (Event.key.keysym.sym==SDLK_F8)
@@ -1355,7 +1449,7 @@ int game_startup(bool bLoadGame)
 							{
 								++n;
 								char szBuf[8192]={0};//fixLOW MAX_PATH? Some issue with MAX_PATH I can't remember what right now [dj2017-08]
-								sprintf(szBuf,"gnukem_recording_%03d", n);
+								snprintf(szBuf, sizeof(szBuf), "gnukem_recording_%03d", n);
 								sFilenameWithPath = djAppendPathStr(sBasePath.c_str(),szBuf);
 							} while (djFolderExists(sFilenameWithPath.c_str()));
 							djEnsureFolderTreeExists(sFilenameWithPath.c_str());
@@ -1380,7 +1474,7 @@ int game_startup(bool bLoadGame)
 						{
 							++n;
 							char szBuf[8192]={0};//fixLOW MAX_PATH? Some issue with MAX_PATH I can't remember what right now [dj2017-08]
-							sprintf(szBuf,"gnukem_screenshot_%03d.bmp", n);
+							snprintf(szBuf, sizeof(szBuf), "gnukem_screenshot_%03d.bmp", n);
 
 							sFilenameWithPath = djAppendPathStr(sPath.c_str(),szBuf);
 						} while (djFileExists(sFilenameWithPath.c_str()));
@@ -1651,12 +1745,13 @@ int game_startup(bool bLoadGame)
 
 
 		// Make a simple FPS display for debug purposes
-		fixme_notworking://in largeviewportmode
+		//fixme_notworking://in largeviewportmode
 		float fTimeRun;
 		fTimeRun = fTimeNow - fTimeFirst;
 		iFrameCount++;
 		static char sbuf[1024]={0};
-		sprintf( sbuf, "%.2f", (float)iFrameCount / fTimeRun );
+		snprintf( sbuf, sizeof(sbuf), "%.2f", (float)iFrameCount / fTimeRun );
+		//snprintf( sbuf, sizeof(sbuf), "%.2f %d %d", (float)iFrameCount / fTimeRun ,HERO_PIXELX,HERO_PIXELY);
 		if (iFrameCount==60)
 		{
 			iFrameCount /= 2;
@@ -1673,7 +1768,7 @@ int game_startup(bool bLoadGame)
 		if (!g_sAutoScreenshotFolder.empty())
 		{
 			char szFilename[4096]={0};
-			sprintf(szFilename,"gnukem_%08d.bmp",g_nScreenshotNumber);
+			snprintf(szFilename,sizeof(szFilename),"gnukem_%08d.bmp",g_nScreenshotNumber);
 			std::string sPath = djAppendPathStr(g_sAutoScreenshotFolder.c_str(),szFilename);
 			SDL_SaveBMP(pVisMain->pSurface, sPath.c_str());//"c:\\dj\\DelmeTestMain.bmp");
 			++g_nScreenshotNumber;
@@ -1681,7 +1776,7 @@ int game_startup(bool bLoadGame)
 
 			//static int nFrameCounter=0;
 			//char szFilename[4096]={0};
-			//sprintf(szFilename,"c:\\dj\\rectest\\dave_gnukem_%08d.bmp",nFrameCounter);
+			//snprintf(szFilename,sizeof(szFilename),"c:\\dj\\rectest\\dave_gnukem_%08d.bmp",nFrameCounter);
 			//SDL_SaveBMP(pVisMain->pSurface, szFilename);//"c:\\dj\\DelmeTestMain.bmp");
 			//nFrameCounter++;
 		}
@@ -1708,8 +1803,8 @@ int game_startup(bool bLoadGame)
 
 		// ensure we don't leave the borders of the level
 		// fixme; is this still necessary what with the (other functions)
-		x = MAX( MIN(x,126), 1 );
-		y = MAX( MIN(y, 99), 2 );
+		g_Player.x = MAX( MIN(g_Player.x,126), 1 );
+		g_Player.y = MAX( MIN(g_Player.y, 99), 2 );
 		//debug//printf("}");
 
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
@@ -1793,9 +1888,6 @@ int game_startup(bool bLoadGame)
 /*-----------------------------------------------------------*/
 void GameHeartBeat()
 {
-	//debug//printf("HEARTBEAT[");
-	CThing * pThing = NULL;
-
 	// Update hero basic stuff
 	HeroUpdate();
 
@@ -1811,7 +1903,7 @@ void GameHeartBeat()
 		nSlowDownHeroWalkAnimationCounter = 0;
 
 	//not jumping but about to be, then dont left/right move
-	if (!((key_jump) && (hero_mode != MODE_JUMPING))) {
+	if (!((key_jump) && (g_Player.hero_mode != MODE_JUMPING))) {
 		if (key_left)
 		{
 			//debug//printf("L");
@@ -1832,7 +1924,7 @@ void GameHeartBeat()
 
 	//mode-specific handling
 	int n=0;
-	switch (hero_mode)
+	switch (g_Player.hero_mode)
 	{
 	case MODE_NORMAL:
 		//fall:
@@ -1844,16 +1936,16 @@ void GameHeartBeat()
 			{
 				if (!bFallingPrev) // <- just started falling?
 				{
-					g_nFalltime = 0;
+					g_Player.m_nFalltime = 0;
 				}
-				++g_nFalltime;
+				++g_Player.m_nFalltime;
 			}
 			else
-				g_nFalltime = 0;
+				g_Player.m_nFalltime = 0;
 			if (bFallingPrev && !bFalling) // <- just stopped falling
 			{
 				// Kick up some dust ..
-				AddThing(CreateDust(x, y, x_small*8,y_offset));
+				AddThing(CreateDust(g_Player.x, g_Player.y, g_Player.x_small*HALFBLOCKW,g_Player.y_offset));
 				djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
 			}
 			bFallingPrev = bFalling;
@@ -1886,7 +1978,7 @@ void GameHeartBeat()
 			for ( int i=0; i<(int)g_apThings.size(); ++i )
 			{
 				pThing = g_apThings[i];
-				if (!HeroIsFrozen() && pThing->HeroInsideActionBounds(x*16+x_small*8, y*16-16+y_offset))
+				if (!HeroIsFrozen() && pThing->HeroInsideActionBounds(HERO_PIXELX, HERO_PIXELY))
 				{
 //					int iRet = pThing->Action();
 					pThing->Action();
@@ -1951,8 +2043,8 @@ void GameHeartBeat()
 	// drawing them one last time) [dj2018-01-13] [This is a 'kludge' for effective visual effect of drawing these one last frame after they've hit something]
 	DestroyBullets(g_apBulletsDeleted);
 
-	if ( nHurtCounter > 0 )
-		nHurtCounter--;
+	if ( g_Player.nHurtCounter > 0 )
+		g_Player.nHurtCounter--;
 
 	// Show on-screen message
 	if (g_nGameMessageCount>=0)
@@ -2002,27 +2094,28 @@ void MonsterShoot(int nX, int nY, int nXDiff, int nYDiff)
 
 void HeroSetHurting(bool bReset)
 {
-	if (bReset || nHurtCounter==0)
-		nHurtCounter = 16;
+	// [dj2020-06] This 16 is NOT the 'block width or height' 16, it's not in pixels, it's in num-frames ... so when we genericize away the BLOCKW/BLOCKH stuff, leave this one at 16
+	if (bReset || g_Player.nHurtCounter==0)
+		g_Player.nHurtCounter = 16;
 }
 
 bool HeroIsHurting()
 {
-	return nHurtCounter!=0;
+	return (g_Player.nHurtCounter!=0);
 }
 
 void DrawHealth()
 {
 	// Build a string representing health bars (which are in the 8x8 font)
-	char szHealth[MAX_HEALTH+1]={0};
+	unsigned char szHealth[MAX_HEALTH+1]={0};
 	for ( unsigned int i=0; i<MAX_HEALTH; ++i )
 	{
 		// 170 = health; 169 = not health
-		szHealth[MAX_HEALTH-1-i] = (i<g_nHealth?170:169);
+		szHealth[MAX_HEALTH-1-i] = ((int)i<g_nHealth?170:169);
 	}
 	szHealth[MAX_HEALTH] = 0;
-	if (g_bLargeViewport)
-		GraphDrawString( pVisView, g_pFont8x8, 320-MAX_HEALTH*8, 0, (unsigned char*)szHealth );
+	if (g_bLargeViewport || g_bBigViewportMode)
+		GraphDrawString( pVisView, g_pFont8x8, g_nViewOffsetX+(VIEW_WIDTH*BLOCKW)-MAX_HEALTH*8, g_nViewOffsetY, (unsigned char*)szHealth );
 	else
 		GraphDrawString( pVisBack, g_pFont8x8, HEALTH_X, HEALTH_Y, (unsigned char*)szHealth );
 }
@@ -2056,7 +2149,7 @@ void update_health(int health_diff)
 		return;
 	SetHealth(g_nHealth + health_diff);
 	// If busy jumping up and something hurts hero, stop the jump
-	if (health_diff<0 && hero_mode==MODE_JUMPING)
+	if (health_diff<0 && g_Player.hero_mode==MODE_JUMPING)
 	{
 		HeroCancelJump();
 	}
@@ -2071,13 +2164,13 @@ void SetScore(int nScore)
 
 void DrawScore()
 {
-	char score_buf[32]={0};
-	sprintf( score_buf, "%10d", (int)g_nScore );
+	char score_buf[128]={0};
+	snprintf( score_buf, sizeof(score_buf), "%10d", (int)g_nScore );
 	// Display score
-	if (g_bLargeViewport)
+	if (g_bLargeViewport || g_bBigViewportMode)
 	{
 		// Don't need to clear behind as the game viewport is redrawn every frame underneath us
-		GraphDrawString( pVisView, g_pFont8x8, 320 - 10*8, 8, (unsigned char*)score_buf );
+		GraphDrawString( pVisView, g_pFont8x8, (g_nViewOffsetX+(VIEW_WIDTH*BLOCKW)) - 10*8, g_nViewOffsetY + 8/* +8 is to put it below health */, (unsigned char*)score_buf );
 	}
 	else
 	{
@@ -2111,7 +2204,7 @@ void DrawThingsAtLayer(EdjLayer eLayer)
 
 void GameDrawView()
 {
-	int i=0,j=0,a=0,b=0,xoff=0;
+	int i=0,j=0,a=0,b=0,nXOffset=0;
 	int anim_offset = 0;
 	unsigned char *pLevelBlockPointer=NULL;
 
@@ -2133,22 +2226,27 @@ void GameDrawView()
 		//djgClear(pVisView);
 	}
 
-	//(10 seconds got to just after coke can, purple lab)
-	pLevelBlockPointer = (unsigned char *)(g_pLevel) + yo*512+(xo<<2);
-	//  c=2;
-	//const unsigned int uLevelPixelW = 128*16;
-	//const unsigned int uLevelPixelH = 100*16;
+	//dj2019
+	//dj2019-MMtest//xo=0;
+	//dj2019-MMtest//yo=0;
+	//dj2019-MMtest//xo_small=0;
 
+	//dj2019-07 Re this "10 seconds got to just after coke can, purple lab" comment: I don't know anymore what I meant with that (possibly something timing/benchmark-related),
+	// but that comment was written in the 1990s, as the 'purple lab' was a computer lab at University of Pretoria where I studied .. for some reason I think of this comment often still when I think about this game so I want to leave this here:
+	//(10 seconds got to just after coke can, purple lab)
+	pLevelBlockPointer = (unsigned char *)(g_pLevel) + g_Viewport.yo*LEVEL_BYTESPERROW + (g_Viewport.xo*LEVEL_BYTESPERBLOCK);//was:(g_pLevel) + yo*512+(xo<<2);
+	//const unsigned int uLevelPixelW = LEVEL_WIDTH*BLOCKW;
+	//const unsigned int uLevelPixelH = LEVEL_HEIGHT*BLOCKH;
 
 	int nYOffset = g_nViewOffsetY;
 	for ( i=0; i<VIEW_HEIGHT; ++i )
 	{
-		xoff = -xo_small+(g_bLargeViewport?0:2);
-		xoff *= 8;
-		for ( j=0; j<VIEW_WIDTH+xo_small; ++j )
+		nXOffset = -g_Viewport.xo_small + (g_bLargeViewport ? 0 : 2);
+		nXOffset *= HALFBLOCKW;
+		for ( j=0; j<VIEW_WIDTH+g_Viewport.xo_small; ++j )
 		{
 			// Bounds-checks to not 'buffer overflow' etc. by going past bottom (or right) of level [dj2016-10]
-			if (yo+i>=LEVEL_HEIGHT || xo+j>=LEVEL_WIDTH)
+			if (g_Viewport.yo+i>=LEVEL_HEIGHT || g_Viewport.xo+j>=LEVEL_WIDTH)
 			{
 				// do nothing .. leave black
 			}
@@ -2161,10 +2259,10 @@ void GameDrawView()
 				anim_offset = (GET_EXTRA( a, b, 4 ) & FLAG_ANIMATED) ? anim4_count : 0;
 
 				// draw background block
-				//djgDrawImage( pVisView, g_pCurMission->GetSpriteData(a)->m_pImage, ((b+anim_offset)%16)*16, ((b+anim_offset)/16)*16, xoff*8,16+i*16,16,16 );
+				//djgDrawImage( pVisView, g_pCurMission->GetSpriteData(a)->m_pImage, ((b+anim_offset)%16)*16, ((b+anim_offset)/16)*16, nXOffset*8,16+i*16,16,16 );
 				if ((a | b) != 0)//<- This if prevents background clearing of 'bg' background block .. etiher we need to clear entire viewport before start drawing map, or must draw a black square here 'manually' .. not sure which is more efficient ultimately
 				{
-					DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff, nYOffset);
+					DRAW_SPRITE16A(pVisView, a, b+anim_offset, nXOffset, nYOffset);
 
 					// We include this in the above 'if' because it's not
 					// strictly correct to have drop-shadows falling onto
@@ -2174,16 +2272,106 @@ void GameDrawView()
 					if (g_bAutoShadows && g_pLevelShadowMap!=NULL)
 					{
 						// Note several things could be slightly sped up here should this ever be a performance bottleneck
-						unsigned char uShadowVal = *(g_pLevelShadowMap + ((yo+i)*LEVEL_WIDTH) + (xo+j));
+						unsigned char uShadowVal = *(g_pLevelShadowMap + ((g_Viewport.yo+i)*LEVEL_WIDTH) + (g_Viewport.xo+j));
 						if (uShadowVal)
 						{
 							djgDrawImageAlpha( pVisView,
 								g_pImgShadows,
-								(uShadowVal % 16) * 16,
-								(uShadowVal / 16) * 16,
-								xoff, nYOffset,
-								16,16 );
+								(uShadowVal % 16) * BLOCKW,
+								(uShadowVal / 16) * BLOCKH,
+								nXOffset, nYOffset,
+								BLOCKW,BLOCKH );
 						}
+
+#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+						// These shadowings look crap in simulator EGA/CGA retro so don't do if g_nSimulatedGraphics!=0
+						bool bBackgroundSolid = CHECK_SOLID( a, b );
+						extern int g_nSimulatedGraphics;
+						if (g_nSimulatedGraphics==0 && g_pShadows2!=nullptr/*g_pImgShadows2*/ && !bBackgroundSolid)
+						{
+							const int nHIGH = 262;
+							const float fFADEOVERNUMBLOCKS = 7.2f;
+							const float fLOWRANGEEXTENT = 110.0f; // Higher numbers toward 250 make for very dark 'corners' .. lower numbers around 100 etc. make for more subtle effect
+
+							float fBlockWorldXStart = (float)(j + g_Viewport.xo) * (float)BLOCKW;
+							float fBlockWorldY = (float)(i + g_Viewport.yo) * (float)BLOCKH;
+							const float fHeroWorldX = (float)(HERO_PIXELX) + ((float)BLOCKW/2.0f);
+							const float fHeroWorldY = (float)(HERO_PIXELY) + (float)BLOCKH;
+							int nIntensity = 0;//0-255, 0 is darkness, 255 is fully lit (or rather, no darkness)
+							float fDistance = 0.0f;
+
+							SDL_Rect rectSrc;
+							//rectSrc.x = (nIntensity % 16) * SHADSIZE;
+							//rectSrc.y = (nIntensity / 16) * SHADSIZE;
+							rectSrc.w = SHADSIZE;
+							rectSrc.h = SHADSIZE;
+							SDL_Rect rectDest;
+							//rectDest.x = nXOffset;
+							rectDest.y = nYOffset;
+							rectDest.w = SHADSIZE;
+							rectDest.h = SHADSIZE;
+							for (int nY = 0; nY < BLOCKH; nY += SHADSIZE)
+							{
+								rectDest.x = nXOffset;
+								float fBlockWorldX = fBlockWorldXStart;
+
+								//for (int nX = 0; nX < BLOCKW; nX += SHADSIZE)
+								{
+									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + (fBlockWorldX-fHeroWorldX)*(fBlockWorldX-fHeroWorldX) );
+									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
+									if (nIntensity<0)nIntensity=0;
+									if (nIntensity<255)
+									{
+										rectSrc.x = (nIntensity % 16) * SHADSIZE;
+										rectSrc.y = (nIntensity / 16) * SHADSIZE;
+										SDL_BlitSurface(g_pShadows2, &rectSrc, pVisView->pSurface, &rectDest);
+									}
+
+									rectDest.x += SHADSIZE;
+									fBlockWorldX += (float)SHADSIZE;
+
+									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + (fBlockWorldX-fHeroWorldX)*(fBlockWorldX-fHeroWorldX) );
+									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
+									if (nIntensity<0)nIntensity=0;
+									if (nIntensity<255)
+									{
+										rectSrc.x = (nIntensity % 16) * SHADSIZE;
+										rectSrc.y = (nIntensity / 16) * SHADSIZE;
+										SDL_BlitSurface(g_pShadows2, &rectSrc, pVisView->pSurface, &rectDest);
+									}
+
+									rectDest.x += SHADSIZE;
+									fBlockWorldX += (float)SHADSIZE;
+
+									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + (fBlockWorldX-fHeroWorldX)*(fBlockWorldX-fHeroWorldX) );
+									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
+									if (nIntensity<0)nIntensity=0;
+									if (nIntensity<255)
+									{
+										rectSrc.x = (nIntensity % 16) * SHADSIZE;
+										rectSrc.y = (nIntensity / 16) * SHADSIZE;
+										SDL_BlitSurface(g_pShadows2, &rectSrc, pVisView->pSurface, &rectDest);
+									}
+
+									rectDest.x += SHADSIZE;
+									fBlockWorldX += (float)SHADSIZE;
+
+									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + (fBlockWorldX-fHeroWorldX)*(fBlockWorldX-fHeroWorldX) );
+									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
+									if (nIntensity<0)nIntensity=0;
+									if (nIntensity<255)
+									{
+										rectSrc.x = (nIntensity % 16) * SHADSIZE;
+										rectSrc.y = (nIntensity / 16) * SHADSIZE;
+										SDL_BlitSurface(g_pShadows2, &rectSrc, pVisView->pSurface, &rectDest);
+									}
+								}
+								
+								rectDest.y += SHADSIZE;
+								fBlockWorldY += (float)SHADSIZE;
+							}
+						}
+#endif//#ifdef djBETA_SHADOWFOLLOWEFFECT2020
 					}
 				}
 
@@ -2196,16 +2384,16 @@ void GameDrawView()
 				// draw foreground block, unless its (0,0)
 				if ((a | b) != 0)
 				{
-					DRAW_SPRITE16A(pVisView, a, b+anim_offset, xoff, nYOffset);
+					DRAW_SPRITE16A(pVisView, a, b+anim_offset, nXOffset, nYOffset);
 				}
 			}
-			xoff += BLOCKW;
-			pLevelBlockPointer += 4;// <- 4 bytes per level 'block' so advance pointer 4 bytes, see comments at definition of LEVEL_SIZE etc.
+			nXOffset += BLOCKW;
+			pLevelBlockPointer += LEVEL_BYTESPERBLOCK;// <- 4 bytes per level 'block' so advance pointer 4 bytes, see comments at definition of LEVEL_SIZE etc.
 		}
 		nYOffset += BLOCKH;
 		// The reason xo_small comes into it if advancing level pointer to next row, is that
 		// if xo_small is 1, we literally actually effectively have a 1-block wider game viewport (as two 'halves' on left/right side of viewport) (keep in mind xo_small is either 0 or 1, IIRC) [dj2017-08]
-		pLevelBlockPointer += (512 - ((VIEW_WIDTH+xo_small)<<2));
+		pLevelBlockPointer += (LEVEL_BYTESPERROW - ((VIEW_WIDTH+g_Viewport.xo_small) * LEVEL_BYTESPERBLOCK));//was:pLevelBlockPointer += (512 - ((VIEW_WIDTH+g_Viewport.xo_small)<<2));
 	}
 
 	// Draw pre-hero layers, then draw hero, then draw post-hero layers.
@@ -2214,7 +2402,7 @@ void GameDrawView()
 	DrawThingsAtLayer(LAYER_MIDDLE);
 	// draw hero, but flash if he is currently hurt
 	int yoff=0;
-	if ((nHurtCounter == 0) || (nHurtCounter%3 != 0))
+	if ((g_Player.nHurtCounter == 0) || (g_Player.nHurtCounter%3 != 0))
 	{
 		// no human being can really understand what this code was meant to be doing, surely [dj2017-12]
 		// commenting out bits of it now to try clean it up a bit
@@ -2222,13 +2410,13 @@ void GameDrawView()
 		//yoff = 200+16+(y-yo-1)*16;
 
 		//xoff = ((x_small - xo_small)+1)*8 + (x-xo) * 16;
-		yoff = g_nViewOffsetY + (y-yo-1) * 16;
+		yoff = g_nViewOffsetY + (g_Player.y - g_Viewport.yo - 1) * BLOCKH;
 
-		xoff = (x_small - xo_small)+1 + ((x-xo)<<1);
-		xoff *= 8;
-		if (g_bLargeViewport) xoff -= 16;
+		int xoff = (g_Player.x_small - g_Viewport.xo_small) + 1 + ((g_Player.x - g_Viewport.xo) << 1);
+		xoff *= HALFBLOCKW;
+		if (g_bLargeViewport) xoff -= BLOCKW;
 		/*
-		if (hero_dir>0)
+		if (g_Player.hero_dir>0)
 		{
 			//tuxtest [dj2017-07 want to make hero sprite simpler to work on ultimately]
 			DRAW_SPRITE16A(pVisView,4,   96+hero_picoffs*2  ,xoff   ,yoff   +y_offset);
@@ -2249,38 +2437,38 @@ void GameDrawView()
 			--g_nHeroJustFiredWeaponCounter;
 			int nOffs = (hero_picoffs+1)%4;
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+nOffs*4,1+xoff   ,1+yoff   +y_offset,16,16);
-			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+nOffs*4,1+xoff   ,1+yoff+16+y_offset,16,15);
-			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+nOffs*4,1+xoff+16,1+yoff   +y_offset,16,16);
-			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+nOffs*4,1+xoff+16,1+yoff+16+y_offset,16,15);
+			DRAW_SPRITEA_SHADOW(pVisView,4,  g_Player.hero_dir*16+nOffs*4,1+xoff       ,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,2+g_Player.hero_dir*16+nOffs*4,1+xoff       ,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
+			DRAW_SPRITEA_SHADOW(pVisView,4,1+g_Player.hero_dir*16+nOffs*4,1+xoff+BLOCKW,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,3+g_Player.hero_dir*16+nOffs*4,1+xoff+BLOCKW,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
 #endif
-			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+nOffs*4,xoff   ,yoff   +y_offset);
-			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+nOffs*4,xoff   ,yoff+16+y_offset);
-			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+nOffs*4,xoff+16,yoff   +y_offset);
-			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+nOffs*4,xoff+16,yoff+16+y_offset);
+			DRAW_SPRITE16A(pVisView,4,  g_Player.hero_dir*16+nOffs*4,xoff       ,yoff       +g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,2+g_Player.hero_dir*16+nOffs*4,xoff       ,yoff+BLOCKH+g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,1+g_Player.hero_dir*16+nOffs*4,xoff+BLOCKW,yoff       +g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,3+g_Player.hero_dir*16+nOffs*4,xoff+BLOCKW,yoff+BLOCKH+g_Player.y_offset);
 		}
 		else
 		{
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-			DRAW_SPRITEA_SHADOW(pVisView,4,  hero_dir*16+hero_picoffs*4,1+xoff   ,1+yoff   +y_offset,16,16);
-			DRAW_SPRITEA_SHADOW(pVisView,4,2+hero_dir*16+hero_picoffs*4,1+xoff   ,1+yoff+16+y_offset,16,15);
-			DRAW_SPRITEA_SHADOW(pVisView,4,1+hero_dir*16+hero_picoffs*4,1+xoff+16,1+yoff   +y_offset,16,16);
-			DRAW_SPRITEA_SHADOW(pVisView,4,3+hero_dir*16+hero_picoffs*4,1+xoff+16,1+yoff+16+y_offset,16,15);
+			DRAW_SPRITEA_SHADOW(pVisView,4,  g_Player.hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,2+g_Player.hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
+			DRAW_SPRITEA_SHADOW(pVisView,4,1+g_Player.hero_dir*16+hero_picoffs*4,1+xoff+BLOCKW,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
+			DRAW_SPRITEA_SHADOW(pVisView,4,3+g_Player.hero_dir*16+hero_picoffs*4,1+xoff+BLOCKW,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
 #endif
-			DRAW_SPRITE16A(pVisView,4,  hero_dir*16+hero_picoffs*4,xoff   ,yoff   +y_offset);
-			DRAW_SPRITE16A(pVisView,4,2+hero_dir*16+hero_picoffs*4,xoff   ,yoff+16+y_offset);
-			DRAW_SPRITE16A(pVisView,4,1+hero_dir*16+hero_picoffs*4,xoff+16,yoff   +y_offset);
-			DRAW_SPRITE16A(pVisView,4,3+hero_dir*16+hero_picoffs*4,xoff+16,yoff+16+y_offset);
+			DRAW_SPRITE16A(pVisView,4,  g_Player.hero_dir*16+hero_picoffs*4,xoff       ,yoff       +g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,2+g_Player.hero_dir*16+hero_picoffs*4,xoff       ,yoff+BLOCKH+g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,1+g_Player.hero_dir*16+hero_picoffs*4,xoff+BLOCKW,yoff       +g_Player.y_offset);
+			DRAW_SPRITE16A(pVisView,4,3+g_Player.hero_dir*16+hero_picoffs*4,xoff+BLOCKW,yoff+BLOCKH+g_Player.y_offset);
 		}
 		if (bShowDebugInfo)
 		{
 			// Light blue box shows hero collision bounding box
 			djgSetColorFore(pVisView,djColor(5,50,200));
 			djgDrawRectangle(pVisView,
-				xoff+8,
-				yoff+y_offset,
-				16,
-				32);
+				xoff + HALFBLOCKW,
+				yoff + g_Player.y_offset,
+				HEROW_COLLISION,
+				HEROH_COLLISION);
 		}
 	}
 	DrawThingsAtLayer(LAYER_4);
@@ -2299,7 +2487,7 @@ void GameDrawView()
 
 	// In g_bLargeViewport mode, the health etc. are overlays, so must be drawn every frame.
 	// In DN1-gameviewport mode, they don't need to be drawn every frame.
-	if (g_bLargeViewport)
+	if (g_bLargeViewport || g_bBigViewportMode)
 	{
 		DrawHealth();
 		DrawScore();
@@ -2319,9 +2507,9 @@ void parse_level(void)
 {
 	int i, j;
 	// parse the level (for doors, keys, hero starting position etc.)
-	for ( i=0; i<100; ++i )
+	for ( i=0; i<LEVEL_HEIGHT; ++i )
 	{
-		for ( j=0; j<128; ++j )
+		for ( j=0; j<LEVEL_WIDTH; ++j )
 		{
 			sprite_factory( 0, 0, j, i, 0, true );
 			sprite_factory( 0, 0, j, i, 1, true );
@@ -2343,7 +2531,7 @@ void sprite_factory( unsigned char a, unsigned char b, int ix, int iy, int ifore
 	unsigned char   b0, b1;
 	bool            bWipeSprite = false;
 
-	plevel = g_pLevel + 4 * (iy * 128 + ix) + (ifore * 2);
+	plevel = g_pLevel + LEVEL_BYTESPERBLOCK * (iy * LEVEL_WIDTH + ix) + (ifore * 2);
 
 	if ( bfromlevel )
 	{
@@ -2389,10 +2577,10 @@ void sprite_factory( unsigned char a, unsigned char b, int ix, int iy, int ifore
 			relocate_hero( ix, iy );
 
 			// By default start looking right, unless the start-looking-left is used [dj2017-08]
-			hero_dir = 1;//Right
+			g_Player.hero_dir = 1;//Right
 			// Check the sprite metadata, the first
 			if (GET_EXTRA(b0, b1, 0) == 0)
-				hero_dir = 0;//Left
+				g_Player.hero_dir = 0;//Left
 
 
 			bWipeSprite = true;
@@ -2415,7 +2603,7 @@ void GameDrawSkin()
 	if (g_bLargeViewport) return;
 	// Draw the game skin
 	if (pSkinGame)
-		djgDrawImage( pVisBack, pSkinGame, 0, 0, 320, 200 );
+		djgDrawImage( pVisBack, pSkinGame, 0, 0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H );
 }
 
 int GetCurrentLevel()
@@ -2547,7 +2735,7 @@ void DrawDebugInfo()
 		}
 
 		// Draw action bounds (cyan=overlapping, white=inside, yellow=not interacting)
-		if (pThing->OverlapsBounds(x*16+x_small*8, y*16+y_offset-16))
+		if (pThing->OverlapsBounds(HERO_PIXELX, HERO_PIXELY))
 		{
 			if (pThing->IsHeroInside())
 				pThing->DrawActionBounds(djColor(255,255,255));//white
@@ -2569,29 +2757,29 @@ void DrawDebugInfo()
 	}
 
 	GraphDrawString(pVisView, g_pFont8x8, 32, 16, (unsigned char*)"Debug info on (D)" );
-	char buf[128]={0};
-	sprintf(buf, "%d things", (int)g_apThings.size());
+	char buf[256]={0};
+	snprintf(buf,sizeof(buf), "%d things", (int)g_apThings.size());// VERY NB that we convert .size() to 'int' because on some platforms size() is 64-bit but int 32-bit so can crash otherwise if not careful!
 	GraphDrawString(pVisView, g_pFont8x8, 32, 24, (unsigned char*)buf );
-	sprintf(buf, "%d visible", nNumVisible);
+	snprintf(buf,sizeof(buf), "%d visible", nNumVisible);
 	GraphDrawString(pVisView, g_pFont8x8, 32, 32, (unsigned char*)buf );
-	sprintf(buf, "[%d,%d] [%d firepower]", x, y, g_nFirepower);
+	snprintf(buf,sizeof(buf), "[%d,%d] [%d firepower]", g_Player.x, g_Player.y, g_nFirepower);
 	GraphDrawString(pVisView, g_pFont8x8, 32, 40, (unsigned char*)buf );
 
 	if (HeroIsFrozen())
 	{
-		sprintf(buf, "[FROZEN]");
+		snprintf(buf,sizeof(buf), "[FROZEN]");
 		GraphDrawString(pVisView, g_pFont8x8, 32, 48, (unsigned char*)buf );
 	}
 
 	extern int nFrozenCount;
-	sprintf(buf, "frozecount=%d", nFrozenCount);
+	snprintf(buf,sizeof(buf), "frozecount=%d", nFrozenCount);
 	GraphDrawString(pVisView, g_pFont8x8, 32, 56, (unsigned char*)buf );
-	//sprintf(buf, "[%d,%d,%d,%d]", x,y,x_small,y_offset);
+	//snprintf(buf,sizeof(buf), "[%d,%d,%d,%d]", x,y,x_small,y_offset);
 	//GraphDrawString(pVisView, g_pFont8x8, 32, 56+8, (unsigned char*)buf );
-	//sprintf(buf, "hero_mode=%d", hero_mode);
+	//snprintf(buf,sizeof(buf), "hero_mode=%d", hero_mode);
 	//GraphDrawString(pVisView, g_pFont8x8, 32, 62, (unsigned char*)buf );
 
-	//sprintf(buf, "xo,yo=%d,%d", xo, yo);
+	//snprintf(buf,sizeof(buf), "xo,yo=%d,%d", xo, yo);
 	//GraphDrawString(pVisView, g_pFont8x8, 32, 70, (unsigned char*)buf );
 }
 
@@ -2622,7 +2810,13 @@ bool check_solid( int ix, int iy, bool bCheckThings )
 	int i;
 
 	// Create an invisible "border" around the level. Handy catch-all for things going out of bounds.
-	if ( ix<1 || iy<1 || ix>126 || iy>98 ) return true;
+	//(dj2019-07 LOWPrio It's debatable here whether we might actually want this to go all the way to the edges perhaps,
+	// e.g. test if ix<0 or ix>LEVEL_WIDTH .. maybe for other games .. must make sure no crashing issues etc. .. behaviour should be game-dependent)
+//#ifdef tBUILD_DAVEGNUKEM1
+	if ( ix<1 || iy<1 || ix>(LEVEL_WIDTH-2) || iy>(LEVEL_HEIGHT-2) ) return true;
+	//if ( ix<0 || iy<-2 || ix>(LEVEL_WIDTH) || iy>(LEVEL_HEIGHT+5) ) return true;
+//#else
+//#endif
 
 	// FIXME: This is not speed-optimal (does it really matter?)
 
@@ -2648,7 +2842,7 @@ bool check_solid( int ix, int iy, bool bCheckThings )
 				// for so long?? If we change this now a lot of things
 				// must be carefully re-tested .. [dj2018-01-12]
 				if (OVERLAPS(
-					ix*16, iy*16, ix*16+15, iy*16+15,
+					ix*BLOCKW, iy*BLOCKH, ix*BLOCKW+(BLOCKW-1), iy*BLOCKH+(BLOCKH-1),
 					pThing->m_x*BLOCKW + pThing->m_iSolidX1,
 					pThing->m_y*BLOCKH + pThing->m_iSolidY1,
 					pThing->m_x*BLOCKW + pThing->m_iSolidX2,
@@ -2668,23 +2862,23 @@ bool check_solid( int ix, int iy, bool bCheckThings )
 bool CheckCollision(int x1, int y1, int x2, int y2, CBullet *pBullet)
 {
 	int i, j;
-	int nX1 = x1 / 16;
-	int nY1 = y1 / 16;
-	int nX2 = x2 / 16;
-#ifdef tBUILD_GNUKEM1
+	int nX1 = x1 / BLOCKW;
+	int nY1 = y1 / BLOCKH;
+	int nX2 = x2 / BLOCKW;
+#ifdef tBUILD_DAVEGNUKEM1
 	//dj2018-03 Hacky - technically "wrong" but emulates DN1 behavior, and I quite like it because it squares the unfairness in some situations eg flyingrobot shoot over barrel cf 25 Mar 2018 issue. Basically in DN1 your monsters fly over solid single block in front of you like barrel(yellow can), but still hit boxes [which are same position/size etc.] ... so technically that aspect of the physics "doesn't make sense" but this setting nY2 to nY1 emulates the not-making-sense for solid-blocks (check_solid() function) but NOT for CThing's (which boxes are) - so boxes remain shootable, but we can 'shoot over' barrels :)
 	// This is um basically 'very Duke-Nukem-1-specific', probably, I think [dj2018-03] - if we ever make this more generic engine for other games, may want nY2 = y2 / 16; rather
 	int nY2 = nY1;
 #else
-	int nY2 = y2 / 16;
+	int nY2 = y2 / BLOCKH;
 #endif
-	for ( i=nX1; i<=nX2; i++ )
+	for ( i=nX1; i<=nX2; ++i )
 	{
-		for ( j=nY1; j<=nY2; j++ )
+		for ( j=nY1; j<=nY2; ++j )
 		{
 			if (check_solid(i, j, false))
 			{
-				if (OVERLAPS(x1, y1, x2, y2, i*16, j*16, i*16+15, j*16+15))
+				if (OVERLAPS(x1, y1, x2, y2, i*BLOCKW, j*BLOCKH, i*BLOCKW+(BLOCKW-1), j*BLOCKH+(BLOCKH-1)))
 					return true;
 			}
 		}
@@ -2755,22 +2949,25 @@ int GameLoadSprites()
 
 void GameDrawFirepower()
 {
-	if (g_bLargeViewport)
+	if (g_bLargeViewport || g_bBigViewportMode)
 	{
 		// Draw firepower
-		for ( int i=0; i<g_nFirepower; i++ )
+		int nX = g_nViewOffsetX;
+		int nY = (g_nViewOffsetY+(VIEW_HEIGHT*BLOCKH)) - BLOCKH;
+
+		for ( int i=0; i<g_nFirepower; ++i )
 		{
-			DRAW_SPRITE16A( pVisView, 5, 0, i*16, 200 - 16 );
+			DRAW_SPRITE16A( pVisView, 5, 0, nX + i*BLOCKW, nY );
 		}
 	}
 	else
 	{
 		// First clear firepower display area with game skin
-		djgDrawImage( pVisBack, pSkinGame, FIREPOWER_X, FIREPOWER_Y, FIREPOWER_X, FIREPOWER_Y, 16*5, 16 );
+		djgDrawImage( pVisBack, pSkinGame, FIREPOWER_X, FIREPOWER_Y, FIREPOWER_X, FIREPOWER_Y, BLOCKW*5, BLOCKH );
 		// Draw firepower
-		for ( int i=0; i<g_nFirepower; i++ )
+		for ( int i=0; i<g_nFirepower; ++i )
 		{
-			DRAW_SPRITE16A( pVisBack, 5, 0, FIREPOWER_X + i*16, FIREPOWER_Y );
+			DRAW_SPRITE16A( pVisBack, 5, 0, FIREPOWER_X + i*BLOCKW, FIREPOWER_Y );
 		}
 	}
 }
@@ -2917,7 +3114,13 @@ void IngameMenu()
 			ShowInstructions();
 		}
 		break;
-	case 5:
+	case 5://dj2019-06 just-for-fun extra-retro simulated faux-EGA/CGA
+	{
+		extern void SettingsMenu();
+		SettingsMenu();
+	}
+	break;
+	case 6:
 		g_bGameRunning = false;
 		break;
 	}

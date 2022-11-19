@@ -1,4 +1,5 @@
 
+#include "config.h"
 #include "djstring.h"
 #include "ed_macros.h"
 #include "ed_common.h"
@@ -25,7 +26,7 @@ bool LoadMacros()
 {
 	FILE *fin=NULL;
 	char buf[1024]={0};
-	if (NULL == (fin = fopen( "data/editor/macros.txt", "r" )))
+	if (NULL == (fin = fopen( DATA_DIR "editor/macros.txt", "r" )))
 		return false;
 
 	SMacro* pMacro=NULL;
@@ -100,13 +101,10 @@ bool DeleteMacros()
 	return true;
 }
 
-void PlaceMacro(int x, int y, int iMacroIndex)
+//dj2019-08 adding underscore prefix to x,y, the only (bad) reason I'm doing that is due to the ugly global x/y for hero position, so as to avoid ambiguity .. can remove later if that ever gets re-done in a better way.
+void PlaceMacro(int _x, int _y, int iMacroIndex)
 {
-	x = x;				// shut up
-	y = y;				// shut up
-	iMacroIndex = iMacroIndex;	// shut up
-
-	if ( (x < 0) || (y < 0) || (x >= 128) || (y >= 100) )
+	if ( (_x < 0) || (_y < 0) || (_x >= LEVEL_WIDTH) || (_y >= LEVEL_HEIGHT) )
 		return;
 
 	int iMacro = g_iAssignedMacros[iMacroIndex];
@@ -120,8 +118,8 @@ void PlaceMacro(int x, int y, int iMacroIndex)
 	for ( int i=0; i<(int)pMacro->m_aiBlocks[0].size(); i++ )
 	{
 		SetLevel(
-			x+pMacro->m_aiBlocks[0][i],
-			y+pMacro->m_aiBlocks[1][i],
+			_x+pMacro->m_aiBlocks[0][i],
+			_y+pMacro->m_aiBlocks[1][i],
 			pMacro->m_aiBlocks[2][i],
 			pMacro->m_aiBlocks[3][i],
 			LVLED_GetLevelFore () );
@@ -137,7 +135,7 @@ void ShowMacros()
 	{
 		int iMacro = g_iAssignedMacros[i];
 		char buf[1024]={0};
-		sprintf( buf, "%d.", i+1 );
+		snprintf( buf, sizeof(buf), "%d.", i+1 );
 		ED_DrawStringClear( MACROS_X, y, "Macros:" );
 		ED_DrawString( MACROS_X, y, "Macros:" );
 

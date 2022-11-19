@@ -1,7 +1,7 @@
 /*
 djinput.cpp
 
-Copyright (C) 1995-2018 David Joffe
+Copyright (C) 1995-2022 David Joffe
 
 Created: '95/07/20 (originally as a test keyboard interrupt hook)
 */
@@ -187,112 +187,16 @@ const char *GetKeyString(int nSDLKeyCode)
 	case SDLK_y:			return "Y";
 	case SDLK_z:			return "Z";
 	case SDLK_DELETE:		return "DEL";
-	case SDLK_WORLD_0:		return "WORLD0";
-	case SDLK_WORLD_1:		return "WORLD1";
-	case SDLK_WORLD_2:		return "WORLD2";
-	case SDLK_WORLD_3:		return "WORLD3";
-	case SDLK_WORLD_4:		return "WORLD4";
-	case SDLK_WORLD_5:		return "WORLD5";
-	case SDLK_WORLD_6:		return "WORLD6";
-	case SDLK_WORLD_7:		return "WORLD7";
-	case SDLK_WORLD_8:		return "WORLD8";
-	case SDLK_WORLD_9:		return "WORLD9";
-	case SDLK_WORLD_10:		return "WORLD10";
-	case SDLK_WORLD_11:		return "WORLD11";
-	case SDLK_WORLD_12:		return "WORLD12";
-	case SDLK_WORLD_13:		return "WORLD13";
-	case SDLK_WORLD_14:		return "WORLD14";
-	case SDLK_WORLD_15:		return "WORLD15";
-	case SDLK_WORLD_16:		return "WORLD16";
-	case SDLK_WORLD_17:		return "WORLD17";
-	case SDLK_WORLD_18:		return "WORLD18";
-	case SDLK_WORLD_19:		return "WORLD19";
-	case SDLK_WORLD_20:		return "WORLD20";
-	case SDLK_WORLD_21:		return "WORLD21";
-	case SDLK_WORLD_22:		return "WORLD22";
-	case SDLK_WORLD_23:		return "WORLD23";
-	case SDLK_WORLD_24:		return "WORLD24";
-	case SDLK_WORLD_25:		return "WORLD25";
-	case SDLK_WORLD_26:		return "WORLD26";
-	case SDLK_WORLD_27:		return "WORLD27";
-	case SDLK_WORLD_28:		return "WORLD28";
-	case SDLK_WORLD_29:		return "WORLD29";
-	case SDLK_WORLD_30:		return "WORLD30";
-	case SDLK_WORLD_31:		return "WORLD31";
-	case SDLK_WORLD_32:		return "WORLD32";
-	case SDLK_WORLD_33:		return "WORLD33";
-	case SDLK_WORLD_34:		return "WORLD34";
-	case SDLK_WORLD_35:		return "WORLD35";
-	case SDLK_WORLD_36:		return "WORLD36";
-	case SDLK_WORLD_37:		return "WORLD37";
-	case SDLK_WORLD_38:		return "WORLD38";
-	case SDLK_WORLD_39:		return "WORLD39";
-	case SDLK_WORLD_40:		return "WORLD40";
-	case SDLK_WORLD_41:		return "WORLD41";
-	case SDLK_WORLD_42:		return "WORLD42";
-	case SDLK_WORLD_43:		return "WORLD43";
-	case SDLK_WORLD_44:		return "WORLD44";
-	case SDLK_WORLD_45:		return "WORLD45";
-	case SDLK_WORLD_46:		return "WORLD46";
-	case SDLK_WORLD_47:		return "WORLD47";
-	case SDLK_WORLD_48:		return "WORLD48";
-	case SDLK_WORLD_49:		return "WORLD49";
-	case SDLK_WORLD_50:		return "WORLD50";
-	case SDLK_WORLD_51:		return "WORLD51";
-	case SDLK_WORLD_52:		return "WORLD52";
-	case SDLK_WORLD_53:		return "WORLD53";
-	case SDLK_WORLD_54:		return "WORLD54";
-	case SDLK_WORLD_55:		return "WORLD55";
-	case SDLK_WORLD_56:		return "WORLD56";
-	case SDLK_WORLD_57:		return "WORLD57";
-	case SDLK_WORLD_58:		return "WORLD58";
-	case SDLK_WORLD_59:		return "WORLD59";
-	case SDLK_WORLD_60:		return "WORLD60";
-	case SDLK_WORLD_61:		return "WORLD61";
-	case SDLK_WORLD_62:		return "WORLD62";
-	case SDLK_WORLD_63:		return "WORLD63";
-	case SDLK_WORLD_64:		return "WORLD64";
-	case SDLK_WORLD_65:		return "WORLD65";
-	case SDLK_WORLD_66:		return "WORLD66";
-	case SDLK_WORLD_67:		return "WORLD67";
-	case SDLK_WORLD_68:		return "WORLD68";
-	case SDLK_WORLD_69:		return "WORLD69";
-	case SDLK_WORLD_70:		return "WORLD70";
-	case SDLK_WORLD_71:		return "WORLD71";
-	case SDLK_WORLD_72:		return "WORLD72";
-	case SDLK_WORLD_73:		return "WORLD73";
-	case SDLK_WORLD_74:		return "WORLD74";
-	case SDLK_WORLD_75:		return "WORLD75";
-	case SDLK_WORLD_76:		return "WORLD76";
-	case SDLK_WORLD_77:		return "WORLD77";
-	case SDLK_WORLD_78:		return "WORLD78";
-	case SDLK_WORLD_79:		return "WORLD79";
-	case SDLK_WORLD_80:		return "WORLD80";
-	case SDLK_WORLD_81:		return "WORLD81";
-	case SDLK_WORLD_82:		return "WORLD82";
-	case SDLK_WORLD_83:		return "WORLD83";
-	case SDLK_WORLD_84:		return "WORLD84";
-	case SDLK_WORLD_85:		return "WORLD85";
-	case SDLK_WORLD_86:		return "WORLD86";
-	case SDLK_WORLD_87:		return "WORLD87";
-	case SDLK_WORLD_88:		return "WORLD88";
-	case SDLK_WORLD_89:		return "WORLD89";
-	case SDLK_WORLD_90:		return "WORLD90";
-	case SDLK_WORLD_91:		return "WORLD91";
-	case SDLK_WORLD_92:		return "WORLD92";
-	case SDLK_WORLD_93:		return "WORLD93";
-	case SDLK_WORLD_94:		return "WORLD94";
-	case SDLK_WORLD_95:		return "WORLD95";
-	case SDLK_KP0:			return "KEYPAD0";
-	case SDLK_KP1:			return "KEYPAD1";
-	case SDLK_KP2:			return "KEYPAD2";
-	case SDLK_KP3:			return "KEYPAD3";
-	case SDLK_KP4:			return "KEYPAD4";
-	case SDLK_KP5:			return "KEYPAD5";
-	case SDLK_KP6:			return "KEYPAD6";
-	case SDLK_KP7:			return "KEYPAD7";
-	case SDLK_KP8:			return "KEYPAD8";
-	case SDLK_KP9:			return "KEYPAD9";
+	case SDLK_KP_0:			return "KEYPAD0";
+	case SDLK_KP_1:			return "KEYPAD1";
+	case SDLK_KP_2:			return "KEYPAD2";
+	case SDLK_KP_3:			return "KEYPAD3";
+	case SDLK_KP_4:			return "KEYPAD4";
+	case SDLK_KP_5:			return "KEYPAD5";
+	case SDLK_KP_6:			return "KEYPAD6";
+	case SDLK_KP_7:			return "KEYPAD7";
+	case SDLK_KP_8:			return "KEYPAD8";
+	case SDLK_KP_9:			return "KEYPAD9";
 	case SDLK_KP_PERIOD:	return "KPPERIOD";
 	case SDLK_KP_DIVIDE:	return "KPDIVIDE";
 	case SDLK_KP_MULTIPLY:	return "KPMULTIPLY";
@@ -324,28 +228,25 @@ const char *GetKeyString(int nSDLKeyCode)
 	case SDLK_F13:			return "F13";
 	case SDLK_F14:			return "F14";
 	case SDLK_F15:			return "F15";
-	case SDLK_NUMLOCK:		return "NUMLOCK";
+	case SDLK_NUMLOCKCLEAR:		return "NUMLOCKCLEAR";
 	case SDLK_CAPSLOCK:		return "CAPSLOCK";
-	case SDLK_SCROLLOCK:	return "SCROLLOCK";
+	case SDLK_SCROLLLOCK:	return "SCROLLLOCK";
 	case SDLK_RSHIFT:		return "RSHIFT";
 	case SDLK_LSHIFT:		return "LSHIFT";
 	case SDLK_RCTRL:		return "CTRL";
 	case SDLK_LCTRL:		return "CTRL";
 	case SDLK_RALT:			return "ALT";
 	case SDLK_LALT:			return "ALT";
-	case SDLK_RMETA:		return "RMETA";
-	case SDLK_LMETA:		return "LMETA";
-	case SDLK_LSUPER:		return "LSUPER";
-	case SDLK_RSUPER:		return "RSUPER";
+	case SDLK_RGUI:			return "RGUI";
+	case SDLK_LGUI:			return "LGUI";
 	case SDLK_MODE:			return "MODE";
-	case SDLK_COMPOSE:		return "COMPOSE";
+	case SDLK_APPLICATION:		return "APPLICATION";
 	case SDLK_HELP:			return "HELP";
-	case SDLK_PRINT:		return "PRINT";
+	case SDLK_PRINTSCREEN:		return "PRINTSCREEN";
 	case SDLK_SYSREQ:		return "SYSREQ";
-	case SDLK_BREAK:		return "BREAK";
 	case SDLK_MENU:			return "MENU";
 	case SDLK_POWER:		return "POWER";
-	case SDLK_EURO:			return "EURO";
+	case SDLK_CURRENCYSUBUNIT:	return "CURRENCYSUBUNIT";
 	default:
 		return "UNKNOWN";
 	}
@@ -353,7 +254,6 @@ const char *GetKeyString(int nSDLKeyCode)
 
 /*--------------------------------------------------------------------------*/
 djVisual *g_pVisInput = NULL;
-int           g_iFlags = 0;
 int           mouse_x = 0;
 int           mouse_y = 0;
 int           mouse_b = 0;
@@ -474,10 +374,8 @@ void djiPoll()
 }
 /*--------------------------------------------------------------------------*/
 
-bool djiInit( djVisual *pVis, int iFlags )
+bool djiInit( djVisual *pVis )
 {
-	g_iFlags = iFlags;
-
 	g_pVisInput = pVis;
 
 	// Initialize mouse variables
@@ -501,15 +399,17 @@ void djiWaitForKeyUp(unsigned char cKey)
 	} while (g_iKeys[cKey]);
 }
 
+/*
 bool djiAnyKeyDown()
 {
 	int i,r=0;
-	for (i = 0;i<128;i++)
+	for (i = 0;i<128;++i)
 	{
 		r = r | g_iKeys[i];
 	}
 	return(r!=0);
 }
+*/
 
 bool djiKeyDown(int iScanCode)
 {

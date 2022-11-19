@@ -13,7 +13,7 @@ Copyright (C) 1999-2018 David Joffe and Kent Mein
 #include <SDL_mixer.h>
 #endif
 
-#if defined(__APPLE__) || defined(__FreeBSD__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__)
 #include <stdlib.h>//Fixing malloc.h 'not found' error compiling on Mac [dj2016-10]
 #else
 #include <malloc.h>
@@ -26,7 +26,9 @@ const float fBACKGROUNDMUSIC_RELATIVE_VOLUME = 0.36f;
 
 bool g_bSoundInit = false;
 bool g_bSoundEnabled = true;
+#ifndef NOSOUND
 Mix_Chunk *sounds[255]={NULL};
+#endif
 int numsounds = 0;
 int g_nVolume = 85;//[0..128] Default volume (don't have default volume at max, I think? dj2016-10) Note LibSDL Mixer MIX_MAX_VOLUME is 128.
 /*--------------------------------------------------------------------------*/

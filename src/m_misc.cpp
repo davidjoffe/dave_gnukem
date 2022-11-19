@@ -183,10 +183,11 @@ M_GetFilePath
 Get filename path directory
 ==================
 */
+/*
 char* M_GetFilePath ( const char* filename )
 {
-	static char	path[SYS_MAX_PATH]={0};
-	char		*ptr;
+	static thread_local char	path[SYS_MAX_PATH]={0};
+	char		*ptr=nullptr;
 
 	strcpy ( path, filename );
 	ptr = strrchr ( path, '\\' );
@@ -215,7 +216,7 @@ char* M_GetFilePath ( const char* filename )
 	path[0] = 0;
 	return path;
 }
-
+*/
 
 /*
 ======================
@@ -224,10 +225,11 @@ M_GetFileRoot
 Get filename without path or extension
 ======================
 */
+/*
 char* M_GetFileRoot ( const char* filename )
 {
-	static char	root[SYS_MAX_PATH]={0};
-	const char		*ptr;
+	static thread_local char	root[SYS_MAX_PATH]={0};
+	const char		*ptr=nullptr;
 
 	ptr = strrchr ( filename, '\\' );
 	if ( !ptr )
@@ -242,7 +244,7 @@ char* M_GetFileRoot ( const char* filename )
 
 	return root;
 }
-
+*/
 
 /*
 =====================
@@ -276,7 +278,7 @@ Get filename extension (without the '.')
 */
 
 
-
+/*
 void M_GetFilePath ( char* filename )
 {
 	char	*ptr;
@@ -309,7 +311,6 @@ void M_GetFilePath ( char* filename )
 
 
 
-
 void M_GetFileRoot ( char* filename )
 {
 	char	*ptr;
@@ -326,6 +327,7 @@ void M_GetFileRoot ( char* filename )
 		*ptr = 0;
 }
 
+*/
 
 
 
@@ -380,6 +382,7 @@ char* M_GetFilePathAlloc ( const char* filename )
 	char	*ptr;
 
 	path = new char[SYS_MAX_PATH];
+	memset(path, 0, SYS_MAX_PATH);
 
 	strcpy ( path, filename );
 	ptr = strrchr ( path, '\\' );
@@ -418,6 +421,7 @@ char* M_GetFileRootAlloc ( const char* filename )
 	const char	*ptr;
 
 	root = new char [SYS_MAX_PATH];
+	memset(root, 0, SYS_MAX_PATH);
 
 	ptr = strrchr ( filename, '\\' );
 	if ( !ptr )
@@ -441,6 +445,7 @@ char* M_GetFileRootAlloc ( const char* filename )
 	const char	*ptr = strrchr ( filename, '.' );
 
 	ext = new char [SYS_MAX_EXT];
+	memset(ext, 0, SYS_MAX_EXT);
 
 	if ( ptr )
 	{

@@ -3,7 +3,7 @@
 \brief   The control of the game itself
 \author  David Joffe
 
-Copyright (C) 1995-2018 David Joffe
+Copyright (C) 1995-2020 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 /* [File created] David Joffe '95/07/28 */
@@ -27,9 +27,9 @@ extern int g_nViewOffsetX;//Top left of game viewport in pixels (X)
 extern int g_nViewOffsetY;//Top left of game viewport in pixels (Y)
 
 //! Tests if rectangle overlaps portion of world visible on screen (pixel coordinates)
-#define OVERLAPS_VIEW(x1,y1,x2,y2) (OVERLAPS(x1,y1,x2,y2,16*xo,16*yo,16*(xo+VIEW_WIDTH)+(8*xo_small),16*(yo+VIEW_HEIGHT)))
+#define OVERLAPS_VIEW(x1,y1,x2,y2) (OVERLAPS(x1,y1,x2,y2,BLOCKW*g_Viewport.xo,BLOCKH*g_Viewport.yo,BLOCKW*(g_Viewport.xo+VIEW_WIDTH)+(HALFBLOCKW*g_Viewport.xo_small),BLOCKH*(g_Viewport.yo+VIEW_HEIGHT)))
 //! Tests if point is directly inside portion of world visible on screen (pixel coordinates)
-#define IN_VIEW(x,y) (INBOUNDS(x,y,xo*16,yo*16,16*(xo+VIEW_WIDTH)+(8*xo_small),16*(yo+VIEW_HEIGHT)))
+#define IN_VIEW(x,y) (INBOUNDS(x,y,g_Viewport.xo*BLOCKW,g_Viewport.yo*BLOCKH,BLOCKW*(g_Viewport.xo+VIEW_WIDTH)+(HALFBLOCKW*g_Viewport.xo_small),BLOCKH*(g_Viewport.yo+VIEW_HEIGHT)))
 
 
 class CThing;
@@ -56,7 +56,7 @@ enum EdjGameSounds
 };
 extern SOUND_HANDLE g_iSounds[SOUND_MAX];
 
-//! Global 4-animation-frame animation count. This name must also change.
+//! Global 4-animation-frame sprite animation count. This name must also change.
 extern int anim4_count;
 
 // rtfb

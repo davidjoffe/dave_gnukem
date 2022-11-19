@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------------*/
 // thing_monsters.cpp
 /*
-Copyright (C) 2000-2018 David Joffe
+Copyright (C) 2000-2020 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "thing_monsters.h"
@@ -167,7 +167,7 @@ void CRobot::Draw()
 	}
 	else if (m_nType==1) // Fireball?
 	{
-		DRAW_SPRITEA(pVisView, m_a, (m_nXDir>0 ? 16 : 20) + anim4_count - 16, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y-1)+m_yoffset, 16, 32);
+		DRAW_SPRITEA(pVisView, m_a, (m_nXDir>0 ? 16 : 20) + anim4_count - 16, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y-1)+m_yoffset, BLOCKW, BLOCKH*2);
 	}
 }
 
@@ -240,7 +240,7 @@ int CRobot::Tick()
 			if (IsInView())
 			{
 				// Check we're facing hero, and hero is more or less at same height ..
-				if ((ABS(y-m_y)<3) && ((m_nXDir<0 && x<=m_x) || (m_nXDir>0 && x>=m_x)))
+				if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 				{
 					if ((rand()%100)<=3)
 					{
@@ -276,9 +276,9 @@ void CRobot::Initialize(int a, int b)
 {
 	CMonster::Initialize(a,b);
 
-	SetActionBounds(0,0,15,15);
-	SetVisibleBounds(0,0,15,15);
-	SetShootBounds  (0,0,15,15);
+	SetActionBounds(0,0,BLOCKW-1,BLOCKH-1);
+	SetVisibleBounds(0,0,BLOCKW-1,BLOCKH-1);
+	SetShootBounds  (0,0,BLOCKW-1,BLOCKH-1);
 
 	m_bFalls = false;//The robot does fall, but we do our own falilng code [for now?] [dj2017-08-13]
 
@@ -317,7 +317,7 @@ int CFlyingRobot::HeroOverlaps()
 		
 		// We initiate dying if hero touches us
 		update_score(100, m_x, m_y);
-		AddThing(CreateExplosion(m_x*16+m_xoffset, m_y*16+m_yoffset));
+		AddThing(CreateExplosion(PIXELX, PIXELY));
 		m_nDieAnim = m_nDieAnimLength;
 	}
 	return 0;
@@ -327,7 +327,7 @@ int CFlyingRobot::OnKilled()
 	if (m_nDieAnim<0)//If we've 'just been killed' for the first time (um, as if we can be killed more than once)
 	{
 		update_score(100, m_x, m_y);
-		AddThing(CreateExplosion(m_x*16+m_xoffset, m_y*16+m_yoffset));
+		AddThing(CreateExplosion(PIXELX, PIXELY));
 		// Start the 'dying' animation 'countdown'
 		m_nDieAnim = m_nDieAnimLength;
 	}
@@ -342,7 +342,7 @@ void CFlyingRobot::Draw()
 			m_a, m_b + anim4_count + 4,
 			1+CALC_XOFFSET(m_x) + m_xoffset,
 			1+CALC_YOFFSET(m_y) + m_yoffset,
-			16,16
+			BLOCKW,BLOCKH
 		);
 #endif
 		DRAW_SPRITE16A(pVisView,
@@ -357,14 +357,14 @@ void CFlyingRobot::Draw()
 		if (m_nXDir>0)//Facing right?
 		{
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-			DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count    , 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset,16,16);
+			DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count    , 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset,BLOCKW,BLOCKH);
 #endif
 			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count    , CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 		}
 		else//Facing left
 		{
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-			DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count + 4, 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset,16,16);
+			DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count + 4, 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset,BLOCKW,BLOCKH);
 #endif
 			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count + 4, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 		}
@@ -391,9 +391,9 @@ int CFlyingRobot::Tick()
 		return CThing::Tick();
 
 	// Turn to face (and move in) direction of hero
-	if (x < m_x - 1)
+	if (g_Player.x < m_x - 1)
 		m_nXDir = -1;
-	else if (x > m_x + 1)
+	else if (g_Player.x > m_x + 1)
 		m_nXDir = 1;
 
 	// Move slowly in direction of hero along both axes (but slower in y axis)
@@ -422,8 +422,8 @@ int CFlyingRobot::Tick()
 		m_nMoveEveryNthFrameY = 0;
 
 		// Work in pixel units here, simplifies things slightly. Compare our center-line, to hero center-line, vertically.
-		int nOurYPixels = PIXELY + (BLOCKH/2);//Add half as we use our center-line vs hero center-line
-		int nHeroYPixels = (y*BLOCKH + y_offset);
+		int nOurYPixels = PIXELY + HALFBLOCKH;//Add half as we use our center-line vs hero center-line
+		int nHeroYPixels = (g_Player.y*BLOCKH + g_Player.y_offset);
 		int nYDiffDir = 0;
 		if (nHeroYPixels < nOurYPixels)
 			nYDiffDir = -1;
@@ -458,12 +458,12 @@ int CFlyingRobot::Tick()
 		if (IsInView())
 		{
 			// Check we're facing hero, and hero is more or less at same height ..
-			if ((ABS(y-m_y)<3) && ((m_nXDir<0 && x<=m_x) || (m_nXDir>0 && x>=m_x)))
+			if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 			{
 				if ((rand()%50)<=2)
 				{
 					//dj2018-03-25 Change initial startpos from m_nXDir*16 to *8, this fixes a bug where it can shoot us through solid walls if we're against the wall
-					MonsterShoot(PIXELX + (m_nXDir*(BLOCKW/2)), PIXELY, m_nXDir<0?-10:10);
+					MonsterShoot(PIXELX + (m_nXDir*HALFBLOCKW), PIXELY, m_nXDir<0?-10:10);
 					m_nNoShootCounter = 24;// fixme, should be time, not frame count
 				}
 			}
@@ -527,8 +527,8 @@ void CRabbit::Draw()
 	// for this is clear if you look at the sprite - 32x32, but he's +/- 16x32 body is 'centered' in sprite.
 	DRAW_SPRITEA(pVisView,
 		a   ,b+m_nWalkAnimOffset*2,
-		x -8   ,y-16,
-		32  ,  32);
+		x -HALFBLOCKW   ,y-BLOCKH,
+		BLOCKW*2  ,  BLOCKH*2);
 }
 int CRabbit::Tick()
 {
@@ -742,15 +742,15 @@ int CCannon::Tick()
 		if (IsInView())
 		{
 			// Check we're facing hero, and hero is more or less at same height ..
-			if ((ABS(y-m_y)<3) && ((m_nXDir<0 && x<=m_x) || (m_nXDir>0 && x>=m_x)))
+			if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 			{
 				if ((rand()%50)<=2)
 				{
 					const int nBULLETSPEEDX=10;
 					if (m_nXDir<0)//Facing left?
-						MonsterShoot(PIXELX-BLOCKW  , m_y*16, m_nXDir*nBULLETSPEEDX,0);
+						MonsterShoot(PIXELX-BLOCKW  , m_y*BLOCKH, m_nXDir*nBULLETSPEEDX,0);
 					else
-						MonsterShoot(PIXELX+BLOCKW*2, m_y*16, m_nXDir*nBULLETSPEEDX,0);
+						MonsterShoot(PIXELX+BLOCKW*2, m_y*BLOCKH, m_nXDir*nBULLETSPEEDX,0);
 					// FIXME PLAY SOUND HERE?
 					m_nNoShootCounter = 12;
 				}
@@ -769,10 +769,10 @@ void CCannon::Draw()
 	int y = CALC_YOFFSET(m_y) + m_yoffset;
 
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-	DRAW_SPRITEA_SHADOW(pVisView, a, b, x, y, 32, 16);
-	DRAW_SPRITEA(pVisView, a, b, x-1, y-1, 32, 16);
+	DRAW_SPRITEA_SHADOW(pVisView, a, b, x, y, BLOCKW*2, BLOCKH);
+	DRAW_SPRITEA(pVisView, a, b, x-1, y-1, BLOCKW*2, BLOCKH);
 #else
-	DRAW_SPRITEA(pVisView, a, b, x, y, 32, 16);
+	DRAW_SPRITEA(pVisView, a, b, x, y, BLOCKW*2, BLOCKH);
 #endif
 
 	// Note that after it's been shot once, it 'smokes', to show it's injured [cf. DN1] [dj2017-08]
@@ -802,7 +802,8 @@ int CCannon::OnHeroShot()
 {
 	if (m_nStrength>0)
 	{
-		AddThing(CreateExplosion(m_x*16+8, m_y*16));
+		//PIXELX + HALFBLOCKW??
+		AddThing(CreateExplosion(m_x*BLOCKW+HALFBLOCKW, m_y*BLOCKH));
 	}
 	return CMonster::OnHeroShot();
 }
@@ -811,8 +812,8 @@ int CCannon::OnKilled()
 	update_score(400, m_x, m_y);
 	//AddThing(CreateExplosion(m_x*16+8+m_xoffset, m_y*BLOCKH,1));
 	// Use two explosions as quick n dirty / cheap way to make explosion seem slightly bigger
-	AddThing(CreateExplosion(PIXELX+(BLOCKW/2)-(rand()%4),PIXELY+((rand()%3)-1),1));
-	AddThing(CreateExplosion(PIXELX+(BLOCKW/2)+(rand()%4),PIXELY+((rand()%3)-1),1,-1));
+	AddThing(CreateExplosion(PIXELX+HALFBLOCKW-(rand()%4),PIXELY+((rand()%3)-1),1));
+	AddThing(CreateExplosion(PIXELX+HALFBLOCKW+(rand()%4),PIXELY+((rand()%3)-1),1,-1));
 	//[TODO?] later could add a 'dying' animation here [dj2017-08]
 	return THING_DIE;
 }
@@ -834,13 +835,16 @@ int CCrawler::Tick()
 			return 0;
 		}
 	}
+
+	//normalize?
+
 	m_yoffset += m_nDir;
-	if (m_yoffset<=-16)
+	if (m_yoffset<=-BLOCKH)
 	{
 		m_yoffset = 0;
 		m_y--;
 	}
-	else if (m_yoffset>=16)
+	else if (m_yoffset>=BLOCKH)
 	{
 		m_yoffset = 0;
 		m_y++;
@@ -851,7 +855,7 @@ int CCrawler::Tick()
 void CCrawler::Draw()
 {
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-	DRAW_SPRITEA_SHADOW(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_yoffset,16,16);
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_yoffset,BLOCKW,BLOCKH);
 #endif
 	DRAW_SPRITE16A(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) + m_yoffset);
 }
@@ -876,16 +880,16 @@ int CCrawler::HeroOverlaps()
 void CCrawler::Initialize(int b0, int b1)
 {
 	m_nXDir = (GET_EXTRA(b0, b1, 0)==0 ? -1 : 1);
-	SetActionBounds(0,0,15,15);
-	SetVisibleBounds(0,0,15,15);
-	SetShootBounds(0,0,15,15);
+	SetActionBounds(0,0,BLOCKW-1,BLOCKH-1);
+	SetVisibleBounds(0,0,BLOCKW-1,BLOCKH-1);
+	SetShootBounds(0,0,BLOCKW-1,BLOCKH-1);
 }
 /*-----------------------------------------------------------*/
 CSpike::CSpike()
 {
 	m_nType = 0;
 	m_nSpikePopupCount = 0;
-	SetActionBounds(0,0,15,15);
+	SetActionBounds(0,0,BLOCKW-1,BLOCKH-1);
 }
 
 int CSpike::Tick()
@@ -937,9 +941,9 @@ CJumpingMonster::CJumpingMonster() :
 int CJumpingMonster::Tick()
 {
 	// Turn to face (and move in) direction of hero
-	if (x < m_x - 1)
+	if (g_Player.x < m_x - 1)
 		m_nXDir = -1;
-	else if (x > m_x + 1)
+	else if (g_Player.x > m_x + 1)
 		m_nXDir = 1;
 
 	if (IsInView())
@@ -1069,7 +1073,7 @@ int CJumpingMonster::Tick()
 	if (IsInView() && !m_bFalling && !IsJumping())
 	{
 		// Check we're facing hero, and hero is more or less at same height ..
-		if ((ABS(y-m_y)<3) && ((m_nXDir<0 && x<=m_x) || (m_nXDir>0 && x>=m_x)))
+		if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 		{
 			m_bLinedUpToShoot = true;
 			if (m_nNoShootCounter>0)
@@ -1207,7 +1211,7 @@ int CDrProton::Tick()
 		}
 		//if (ABS(m_nOrigX - m_x) < 3)
 		{
-			if (m_x<(x+m_nDesiredXRandomVariation))
+			if (m_x < (g_Player.x + m_nDesiredXRandomVariation))
 			{
 				bool bSolid = false;
 				bSolid |= check_solid(m_x+1,m_y-1);//headblock [top right block is 'basically' empty]
@@ -1218,7 +1222,7 @@ int CDrProton::Tick()
 				if (!bSolid)//! (check_solid(m_x+2,m_y) || check_solid(m_x+2,m_y-1) || check_solid(m_x+1,m_y-2)) )
 					++m_xoffset;
 			}
-			else if (m_x >= (x+m_nDesiredXRandomVariation)+1)
+			else if (m_x >= (g_Player.x + m_nDesiredXRandomVariation) + 1)
 			{
 				bool bSolid = false;
 				bSolid |= check_solid(m_x  ,m_y-1);//headblock [top left block is 'basically' empty]
@@ -1242,12 +1246,12 @@ int CDrProton::Tick()
 		{
 			m_nDesiredYRandomVariation = ((rand()%6)-2);//[-2,-1,0,1,2,3]
 		}
-		if (m_y<(y+m_nDesiredYRandomVariation) - 2)
+		if (m_y < (g_Player.y + m_nDesiredYRandomVariation) - 2)
 		{
 			if (! (check_solid(m_x,m_y+1) || check_solid(m_x+1,m_y+1)) )
 				++m_yoffset;
 		}
-		else if (m_y > (y+m_nDesiredYRandomVariation) + 1)
+		else if (m_y > (g_Player.y + m_nDesiredYRandomVariation) + 1)
 		{
 			if (! (check_solid(m_x,m_y-2) || check_solid(m_x+1,m_y-2)) )
 				--m_yoffset;
@@ -1255,16 +1259,16 @@ int CDrProton::Tick()
 		NORMALIZEY;
 
 		// Turn to face direction of hero
-		if (x < m_x - 1)
+		if (g_Player.x < m_x - 1)
 			m_nXDir = -1;
-		else if (x > m_x + 1)
+		else if (g_Player.x > m_x + 1)
 			m_nXDir = 1;
 
 
 		if (IsInView())// && !m_bFalling && !IsJumping())
 		{
 			// Check we're facing hero, and hero is more or less at same height ..
-			if ((ABS(y-m_y)<3) && ((m_nXDir<0 && x<=m_x) || (m_nXDir>0 && x>=m_x)))
+			if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 			{
 				//m_bLinedUpToShoot = true;
 				if (m_nNoShootCounter>0)

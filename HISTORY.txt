@@ -1,5 +1,13 @@
 NB: See README.md for most up-to-date history as of October 2016, this file is not always updated.
 
+2022/11/19 - Version 1.0.3
+
+* [19 Nov 2022] Integrating Matteo Bini's implementation of updating the source from SDL1 to SDL2
+
+2022/11/19 - Version 1.0.2
+
+* [19 Nov 2022] Final offical SDL1-based release: https://github.com/davidjoffe/dave_gnukem/releases/tag/1.0.2
+
 2018/04/03 - Version 1.0
 
 * [3 Apr 2018] Change it so that you must first turn cheat/debugging stuff (Ctrl+Shift+G) on before using F4 or F5 for sprite/level editor

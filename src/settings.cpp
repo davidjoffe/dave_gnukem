@@ -1,7 +1,7 @@
 /*
 settings.cpp
 
-Copyright (C) 2001-2018 David Joffe
+Copyright (C) 2001-2022 David Joffe
 
 09/2001
 */
@@ -131,8 +131,9 @@ void CSettings::SetSetting(const char *szKey, const char *szValue)
 
 void CSettings::SetSettingInt(const char *szKey, int nValue)
 {
-	char szBuf[64]={0};
-	sprintf(szBuf, "%d", nValue);
+	// Hmm, we must be careful to make sure this is large enough for e.g. 64-bit or maybe even 128-bit integer values
+	char szBuf[128]={0};
+	snprintf(szBuf, sizeof(szBuf), "%d", nValue);
 	SetSetting(szKey, szBuf);
 }
 

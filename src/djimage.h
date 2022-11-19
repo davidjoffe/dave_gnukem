@@ -3,13 +3,15 @@
 \brief   Image manipulation class
 \author  David Joffe
 
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _DJIMAGE_H_
 #define _DJIMAGE_H_
 
 #include "djtypes.h"
+#include <cstdint>//for uint32_t (because on 64-bit-int platforms we don't want e.g. putpixel to do weird things like overwrite 2 pixels)
+
 /*!
 \class djImage
 \nosubgrouping
@@ -30,9 +32,9 @@ public:
 	//! Create a blank image of give size, bit depth and ipitch
 	void CreateImage( int x, int y, int ibpp, int ipitch=-1 );
 
-	djColor GetPixelColor( int x, int y );
-	int     GetPixel( int x, int y );
-	void    PutPixel( int x, int y, unsigned int pixel );
+	djColor GetPixelColor( int x, int y ) const;
+	uint32_t     GetPixel( int x, int y ) const;
+	void    PutPixel( int x, int y, uint32_t pixel );
 	//! Return a pointer to the image data
 	unsigned char *Data() const { return m_pData; }
 	

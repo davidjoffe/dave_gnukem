@@ -1,9 +1,10 @@
 /*
 inventory.cpp
 
-Copyright (C) 2001-2018 David Joffe
+Copyright (C) 2001-2019 David Joffe
 */
 
+#include "config.h"
 #include "inventory.h"
 #include "mission.h"
 #include "graph.h"
@@ -80,12 +81,13 @@ bool InvAdd(CThing *pThing)
 
 void InvDraw()
 {
-	if (g_bLargeViewport)
+	if (g_bLargeViewport || g_bBigViewportMode)
 	{
 		for ( unsigned int i=0; i<g_apInventory.size(); ++i)
 		{
-			int nX = 320 - (i+1)*16;
-			int nY = 200 - 16;
+			// Bottom right viewport overlay
+			int nX = (g_nViewOffsetX+(VIEW_WIDTH*BLOCKW)) - (i+1)*BLOCKW;
+			int nY = (g_nViewOffsetY+(VIEW_HEIGHT*BLOCKH)) - BLOCKH;
 			// Background block
 			DRAW_SPRITE16(pVisView, 0, 1, nX, nY);
 			CThing *pThing = g_apInventory[i].pThing;
@@ -97,19 +99,19 @@ void InvDraw()
 		for ( int i=0; i<5; i++)
 		{
 			// Background blocks
-			DRAW_SPRITE16(pVisBack, 0, 1, INVENTORY_X + i*16, INVENTORY_Y);
-			DRAW_SPRITE16(pVisBack, 0, 1, INVENTORY_X + i*16, INVENTORY_Y+16);
+			DRAW_SPRITE16(pVisBack, 0, 1, INVENTORY_X + i*BLOCKW, INVENTORY_Y);
+			DRAW_SPRITE16(pVisBack, 0, 1, INVENTORY_X + i*BLOCKW, INVENTORY_Y+BLOCKH);
 			// Inventory items 0-4
 			if (i<(int)g_apInventory.size())
 			{
 				CThing *pThing = g_apInventory[i].pThing;
-				DRAW_SPRITE16A(pVisBack, pThing->m_a, pThing->m_b, INVENTORY_X + i*16, INVENTORY_Y);
+				DRAW_SPRITE16A(pVisBack, pThing->m_a, pThing->m_b, INVENTORY_X + i*BLOCKW, INVENTORY_Y);
 			}
 			// Inventory items 5-9
 			if (i+5<(int)g_apInventory.size())
 			{
 				CThing *pThing = g_apInventory[i+5].pThing;
-				DRAW_SPRITE16A(pVisBack, pThing->m_a, pThing->m_b, INVENTORY_X + i*16, INVENTORY_Y+16);
+				DRAW_SPRITE16A(pVisBack, pThing->m_a, pThing->m_b, INVENTORY_X + i*BLOCKW, INVENTORY_Y+BLOCKH);
 			}
 		}
 	}
@@ -127,7 +129,7 @@ CThing *InvGetItem(int n)
 
 void InvRemove(CThing *pThing)
 {
-	for ( int i=0; i<(int)g_apInventory.size(); i++ )
+	for ( int i=0; i<(int)g_apInventory.size(); ++i )
 	{
 		if (pThing==g_apInventory[i].pThing)
 		{
