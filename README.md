@@ -363,9 +363,20 @@ SDL2 brings various potential advantages.
 
 ## Mac OS X Build Instructions
 
-Same as Linux - type 'make'. Run with ./davegnukem if it built correctly.
+Same as Linux - type 'make'. Run with ./davegnukem if it built correctly (and data subfolder present)
 
-Dependencies: You may have to first install LibSDL1.2 and LibSDL-Mixer1.2 (these can be installed by downloading the source code and doing 'make' and 'make install' (as root) for each of these first).
+Installing Dependencies:
+
+If using macports, you should be able to just do:
+
+% sudo port install libsdl2
+
+% sudo port install libsdl2_mixer
+
+Then as with Linux, type 'make' and run with "./davegnukem" if it built correctly (and data subfolder present)
+
+(Alternatively, you could install LibSDL2 and LibSDL-Mixer2 by downloading the source code and doing 'make' and 'make install' (as root) for each of these first).
+
 
 ## Windows Installer Build Instructions
 
