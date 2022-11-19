@@ -1,5 +1,5 @@
 /*
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2022 David Joffe
 New level editor started: 1998/12/31
 */
 
@@ -15,10 +15,11 @@ New level editor started: 1998/12/31
 #include "game.h"
 //#include "level.h"
 
-static switch_e		switch_to;
+//dj2022-11 removing the 'static' here somehow seems to have fixed Visual Studio internal compiler error kept getting :/ probably a compiler bug
+switch_e		switch_to = SWITCH_NONE;
 
 
-static void EditorMainLoop ();
+void EditorMainLoop ();
 
 
 
@@ -47,7 +48,7 @@ EditorMainLoop
 Handles switches among different edit modes.
 ===============================
 */
-void EditorMainLoop ()
+void EditorMainLoop()
 {
 	while ( 1 )
 	{
@@ -60,17 +61,20 @@ void EditorMainLoop ()
 			}
 			case SWITCH_SPRED:
 			{
-				SPRED_Init ();
-				SwitchMode ( SPRED_MainLoop () );
-				SPRED_Kill ();
+				SPRED_Init();
+				switch_e eNewMode = SPRED_MainLoop();
+				SwitchMode( eNewMode );
+				//SPRED_Kill();
 				break;
 			}
 			case SWITCH_LVLED:
 			{
-				LVLED_Init (GetCurrentLevel());
+				LVLED_Init(GetCurrentLevel());
 
-				SwitchMode ( LVLED_MainLoop () );
-				LVLED_Kill ();
+				switch_e eNewMode = LVLED_MainLoop();
+				SwitchMode(eNewMode);
+
+				LVLED_Kill();
 
 				//DJ2017-06-19 THERE'S SOME SORT OF SERIOUS BUG HERE .. this isn't right .. when we exit the level editor we immediately continue with that 'heartbeat'
 				// processing, however, we've destroyed everything during PerLevelSetup(), so we're basically playing one frame out with corrupted/deleted

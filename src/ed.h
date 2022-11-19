@@ -6,7 +6,9 @@
 enum switch_e
 {
 	SWITCH_NONE = 0,		// error
+	//! Sprite editor:
 	SWITCH_SPRED,
+	//! Level editor:
 	SWITCH_LVLED,
 	SWITCH_EXIT,			// exit edit mode
 

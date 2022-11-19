@@ -6,12 +6,12 @@
 
 
 
-void LVLED_Init (int curr_level);
-void LVLED_Kill ();
+extern void LVLED_Init(int curr_level);
+extern void LVLED_Kill();
 
 
-switch_e LVLED_MainLoop ();
-bool LVLED_GetLevelFore ();
+extern switch_e LVLED_MainLoop();
+extern bool LVLED_GetLevelFore();
 
 
 #endif		// #ifndef __EDITOR_LEVEL_ED_H__

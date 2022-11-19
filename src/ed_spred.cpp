@@ -90,9 +90,10 @@ void SPRED_Init ()
 
 
 
-void SPRED_Kill ()
+/*void SPRED_Kill ()
 {
 }
+*/
 
 
 

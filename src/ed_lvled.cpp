@@ -624,7 +624,7 @@ void SetDocumentDirty(bool bDirty)
 }
 //---------------------------------------------------------------------------
 
-void LVLED_Init (int curr_level)
+void LVLED_Init(int curr_level)
 {
 	g_bDocumentDirty=false;
 
@@ -646,7 +646,7 @@ void LVLED_Init (int curr_level)
 
 
 
-void LVLED_Kill ()
+void LVLED_Kill()
 {
 	g_bDocumentDirty=false;
 }
