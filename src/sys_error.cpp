@@ -16,8 +16,9 @@
 #include "sys_defs.h"
 #include <string>
 
-std::string g_sFile;
-static int	g_nLine = 0;
+//dj2022-11 add thread_local (C++11) for thread-safety here as this looks like the sort of thing that might cause problems if we start adding threads in future:
+thread_local std::string g_sFile;
+thread_local int	g_nLine = 0;
 
 void _SetFileAndLine ( const char *filename, const int linenum )
 {
