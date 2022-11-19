@@ -1,6 +1,6 @@
 #
 # David Joffe
-# Copyright 1998-2017 David Joffe
+# Copyright 1998-2022 David Joffe
 # Created 1998/12
 # Makefile for Dave Gnukem
 #
@@ -48,12 +48,14 @@ else
     endif
     # dj2020-06 Add basic HaikuOS detection and override some default settings here if detected
     ifeq ($(UNAME_S),Haiku)
-        INCLUDEDIRS=`sdl-config --cflags`
+        INCLUDEDIRS=`sdl2-config --cflags`
         CCFLAGS=-Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
-        LIBS=`sdl-config --libs` -lSDL2 -lSDL2_mixer -lpthread
+        LIBS=`sdl2-config --libs` -lSDL2 -lSDL2_mixer -lpthread
     endif
     ifeq ($(UNAME_S),Darwin)
-        LIBS += -framework Cocoa 
+        LIBS += -framework Cocoa `sdl2-config --libs` 
+	# dj2022-11 add c++17 min here for Mac (might change this later to c++17)
+	CCFLAGS += -std=c++17 `sdl2-config --cflags`
     endif
     UNAME_P := $(shell uname -p)
     ifeq ($(UNAME_P),x86_64)
