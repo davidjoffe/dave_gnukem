@@ -1,7 +1,7 @@
 # Dave Gnukem
 Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'. It is kind of a parody of the original. Please note it is not a 'clone', and not a 're-make'.)
 
-**News Apr 2018: Version 1.0 released.** Apr 2019 OpenBSD port. (Apr 2020: Version 1.0.1 released.) (19 Nov 2022: 1.0.2 and 1.0.3 update to SDL2!)
+**News Apr 2018: Version 1.0 released.** Apr 2019 OpenBSD port. (Apr 2020: Version 1.0.1 released.) (19 Nov 2022: 1.0.2 and 1.0.3 update to SDL2! Also adding OS/2 port)
 
 **Release Downloads:** https://sourceforge.net/projects/gnukem/
 
@@ -131,6 +131,7 @@ TL;DR Shoot anything that moves
 
 # Ports
 
+* OS/2 port by Andreas Peters (~2022/11 merge of ~2020 https://github.com/davidjoffe/dave_gnukem/pull/128)
 * Debian (work in progress ~2022 - Matteo Bini; https://github.com/enigma9o7, https://github.com/bgermann; Craig Langman)
 * Bodhi Linux Dec 2021 efforts: https://bodhilinux.boards.net/thread/892/packaged-dave-gnukem-silly-retro
 * Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi and https://github.com/ptitseb)
@@ -138,9 +139,9 @@ TL;DR Shoot anything that moves
 * Instructions for ClockworkPi GameShell: https://forum.clockworkpi.com/t/lets-play-dave-gnukem/1917 by: https://forum.clockworkpi.com/u/Oet
 * OpenBSD [Apr 2019 by Dr. Brian Robert Callahan] Callahan https://twitter.com/__briancallahan https://github.com/jasperla/openbsd-wip/commit/e51e3a3b9386365cd0eb8317018463ff4682e0d3 http://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/games/gnukem/
 * HaikuOS (see discussion thread and instructions here https://discuss.haiku-os.org/t/gaming-on-haiku/3928/74) [22 June 2020]
-* HaikuOS Instructions:
+* HaikuOS Instructions: (to check - confirm these instructions are right for SDL2?)
 
-~> pkgman install libsdl_devel
+~> pkgman install libsdl2_devel
 
 ~> pkgman install sdl_mixer_devel
 
@@ -175,6 +176,7 @@ Recent:
 2022/11/19 - Version 1.0.3
 
 * [19 Nov 2022] Integrating Matteo Bini's implementation of updating the source from SDL1 to SDL2
+* [19 Nov 2022] Integrating Andreas Peters OS/2 port!
 
 Matteo Bini implemented SDL2 support (including also contributions for Debian support) https://github.com/davidjoffe/dave_gnukem/pull/135/commits/0f0022b9921982062eb7a93d2aef9a90459f3d33
 
