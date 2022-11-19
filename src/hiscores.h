@@ -3,7 +3,7 @@
 \brief   High score list
 \author  David Joffe
 
-Copyright (C) 2000-2018 David Joffe
+Copyright (C) 2000-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _HISCORES_H_
@@ -25,10 +25,13 @@ public:
 	{
 		SScore();
 
-		//! Name
-		char szName[256];
-		//! Score
-		int nScore;
+		//! Adding 'set' helper function that's safer [dj2022-11]
+		void SetName(const char* szNameNew);
+
+		//! Person's name for high score list entry (dj2022-11 note: if we assume later we try globalized Unicode support then perhaps this would become utf8, so 'effective length' may be shorter than this length of a person's name in that case as it's multibyte so just keep that in mind, but as of 2022/11 we don't support Unicode)
+		char szName[512] = { 0 };
+		//! Score achieved
+		int nScore = 0;
 	};
 /*
 protected:
