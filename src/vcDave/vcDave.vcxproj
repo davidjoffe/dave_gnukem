@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="..\gameending.cpp" />
     <ClCompile Include="..\thing_monsters.cpp" />
+    <ClCompile Include="..\win32\dpiscaling.cpp" />
     <ClCompile Include="..\win32\winmain.cpp" />
     <ClCompile Include="..\sdl\djgraph.cpp" />
     <ClCompile Include="..\sdl\djinput.cpp" />

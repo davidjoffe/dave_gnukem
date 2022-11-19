@@ -51,6 +51,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\win32\dpiscaling.cpp">
+      <Filter>Source Files\djGameLib\win32</Filter>
+    </ClCompile>
     <ClCompile Include="..\win32\winmain.cpp">
       <Filter>Source Files\djGameLib\win32</Filter>
     </ClCompile>
