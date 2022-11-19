@@ -3,7 +3,7 @@
 \brief   "Thing"
 \author  David Joffe
 
-Copyright (C) 1999-2018 David Joffe
+Copyright (C) 1999-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 /* David Joffe 1999/03/25 */
@@ -15,17 +15,20 @@ Copyright (C) 1999-2018 David Joffe
 #include "hero.h"
 #include "config.h"
 
+
+//g_bLargeViewport -> we slow down every calculation for a cheat-only mode we never use :/ .. hrm. surely could do better here://dj2019-07
+
 //! Convert world X coordinate (level block coordinate) to view (world display buffer) coordinates.
-#define CALC_XOFFSET(x) ( 8 * ( -xo_small + (g_bLargeViewport?0:2) + ((( (x) - xo ) << 1))) )
+#define CALC_XOFFSET(x) ( HALFBLOCKW * ( -g_Viewport.xo_small + (g_bLargeViewport?0:2) + ((( (x) - g_Viewport.xo ) << 1))) )
 //! Convert world Y coordinate (level block coordinate) to view (world display buffer) coordinates.
-#define CALC_YOFFSET(y) ( g_nViewOffsetY + ((y) - yo) * 16 )
+#define CALC_YOFFSET(y) ( g_nViewOffsetY + ((y) - g_Viewport.yo) * BLOCKH )
 
 //! Convert world X coordinate (pixels) to view (world display buffer) coordinates.
 //! Theoretically this should probably eventually replace CALC_XOFFSET
-#define WORLDX2VIEW(x) ( -(8*xo_small) + ((x) - (16*xo)) + g_nViewOffsetX )
+#define WORLDX2VIEW(x) ( -(HALFBLOCKW*g_Viewport.xo_small) + ((x) - (BLOCKW*g_Viewport.xo)) + g_nViewOffsetX )
 //! Convert world Y coordinate (pixels) to view (world display buffer) coordinates.
 //! Theoretically this should probably eventually replace CALC_YOFFSET
-#define WORLDY2VIEW(y) (                 ((y) - (16*yo)) + g_nViewOffsetY)
+#define WORLDY2VIEW(y) (                 ((y) - (BLOCKH*g_Viewport.yo)) + g_nViewOffsetY)
 
 // CThing helpers [dj2017-08]
 #define PIXELX (m_x*BLOCKW+m_xoffset)
@@ -295,10 +298,10 @@ public:
 	inline bool HeroInsideActionBounds(int x, int y)
 	{
 		return (
-			(x   >=PIXELX+m_iActionX1) &&
-			(x+15<=PIXELX+m_iActionX2) &&
-			(y   >=PIXELY+m_iActionY1) &&
-			(y+31<=PIXELY+m_iActionY2));
+			(x                    >=PIXELX+m_iActionX1) &&
+			(x+(HEROW_COLLISION-1)<=PIXELX+m_iActionX2) &&
+			(y                    >=PIXELY+m_iActionY1) &&
+			(y+(HEROH_COLLISION-1)<=PIXELY+m_iActionY2));
 	}
 	//! Test if hero is at least partially inside the box. By default this
 	//! just uses the action bounds; override this for things that have
@@ -549,7 +552,7 @@ public:
 	void SetScore( int score );
 
 	int m_height;
-	unsigned char m_buffer[16];
+	unsigned char m_buffer[64] = { 0 };//dj2022 make this a bit larger in case someone sets max values on e.g. 64-bit (or hypothetical 128-bit) platforms
 	int m_bufferlength;
 };
 /*-----------------------------------------------------------*/

@@ -3,13 +3,14 @@
 \brief   Bullet class
 \author  David Joffe
 
-Copyright (C) 2002-2018 David Joffe
+Copyright (C) 2002-2019 David Joffe
 */
 #ifndef _BULLET_H_
 #define _BULLET_H_
 
-#define BULLET_WIDTH 16
-#define BULLET_HEIGHT 8
+// In DG1 bullet is 16x8, but we let this scale up/down if using different custom blocksize.
+#define BULLET_WIDTH BLOCKW
+#define BULLET_HEIGHT HALFBLOCKH
 
 class CBullet
 {

@@ -1,8 +1,9 @@
 /*
 instructions.cpp
 
-Copyright (C) 1999-2018 David Joffe
+Copyright (C) 1999-2022 David Joffe
 */
+#include "config.h"//CFG_APPLICATION_RENDER_RES_W
 #include "djtypes.h"
 #include "instructions.h"
 #include "graph.h"
@@ -94,7 +95,7 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 	djImage* pImgFont = NULL;
 	djImage* pImgFontS = NULL;//shadow
 	pImgFont = new djImage;
-	if (pImgFont->Load( "data/fonts/simple_6x8.tga" )>=0)
+	if (pImgFont->Load( DATA_DIR "fonts/simple_6x8.tga" )>=0)
 	{
 		djCreateImageHWSurface( pImgFont );
 		FW=6;
@@ -106,7 +107,7 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 	}
 	if (!pImgFont)return;
 	pImgFontS = new djImage;
-	if (pImgFontS->Load( "data/fonts/simple_6x8_shadow.tga" )>=0)
+	if (pImgFontS->Load( DATA_DIR "fonts/simple_6x8_shadow.tga" )>=0)
 	{
 		djCreateImageHWSurface( pImgFontS );
 	}
@@ -116,7 +117,7 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 	}
 	//CBSU[could be sped up'- fixFUtureMaybe]: Pre-build "map" of characters to their indexes in the fontsprite: std::map<char,unsigned int> mapFontChars;
 
-	unsigned int uWIDTH_NUMCOLS = (320 - 16) / FW;
+	unsigned int uWIDTH_NUMCOLS = (CFG_APPLICATION_RENDER_RES_W - 16) / FW;
 
 	std::vector<std::string> asLines;
 	WrapString(sLinesOrigText, uWIDTH_NUMCOLS, asLines);
@@ -128,7 +129,7 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 	const int H = (int)asText.size() + 1
 		+ (int)asLines.size()
 		;
-	int W = (320/8)-1;//5;
+	int W = (CFG_APPLICATION_RENDER_RES_W/8)-1;//5;
 
 	// Draw 'blank' underneath text (pseudo-dialogue-background and border)
 	// This is slightly crass .. clear background
@@ -320,20 +321,20 @@ void ShowInstructions()
 	std::vector<std::string> asText;
 	//asText.push_back("");
 	asText.push_back("### INSTRUCTIONS ###");
-	unsigned int uWIDTH = (320 - 16) / 8;
+	unsigned int uWIDTH = (CFG_APPLICATION_RENDER_RES_W - 16) / 8;
 	WrapString("Find the exit in each level, while dodging or shooting monsters.", uWIDTH, asText);
 
 	asText.push_back("");
 	asText.push_back("### KEYS ###");
 
-	char szBuf[1024] = {0};
-	sprintf(szBuf, "%s", GetKeyString(g_anKeys[KEY_LEFT]));
+	char szBuf[2048] = {0};
+	snprintf(szBuf, sizeof(szBuf), "%s", GetKeyString(g_anKeys[KEY_LEFT]));
 	asText.push_back(std::string("LEFT:  ") + szBuf
 		+ PadSpaces(szBuf,18-7) + std::string("SHOOT: ") + GetKeyStringS(g_anKeys[KEY_SHOOT]) );
-	sprintf(szBuf, "%s", GetKeyString(g_anKeys[KEY_RIGHT]));
+	snprintf(szBuf, sizeof(szBuf), "%s", GetKeyString(g_anKeys[KEY_RIGHT]));
 	asText.push_back(std::string("RIGHT: ") + szBuf
 		+ PadSpaces(szBuf,18-7) + std::string("JUMP:  ") + GetKeyStringS(g_anKeys[KEY_JUMP]) );
-	sprintf(szBuf, "%s", GetKeyString(g_anKeys[KEY_ACTION]));
+	snprintf(szBuf, sizeof(szBuf), "%s", GetKeyString(g_anKeys[KEY_ACTION]));
 	//asText.push_back(std::string(" Action: ") + szBuf + std::string(" (Activate doors,"));
 	//asText.push_back("  exits, lifts, teleporters etc.)");
 	asText.push_back(std::string("ACTION:") + szBuf + std::string(" Activate doors, lifts, etc."));

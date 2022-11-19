@@ -3,10 +3,11 @@
 // David Joffe 1998/12
 // replacing the old djgega.cpp graphics interface
 /*
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2019 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 
+#include "config.h"//CFG_APPLICATION_RENDER_RES_W //dj2019-06
 #ifdef WIN32
 #include <Windows.h>
 #endif
@@ -15,7 +16,7 @@ Copyright (C) 1998-2018 David Joffe
 #include <string.h>
 #include <stdlib.h>
 #include "SDL.h"
-#include "sys_log.h"//Log
+#include "sys_log.h"//djLog helpers
 #include "djstring.h"//djStrPrintf
 
 #include "graph.h"
@@ -53,7 +54,7 @@ void GraphFlip(bool bScaleView)
 	// leaving text looking messed up [dj2016-10]
 	if (pVisBack!=NULL && g_pFont8x8!=NULL && (!g_sMsg.empty() || bShowFrameRate))
 	{
-		pVisTemp = SDL_CreateRGBSurface(SDL_HWSURFACE, 320, 8, pVisBack->pSurface->format->BitsPerPixel,
+		pVisTemp = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, 8, pVisBack->pSurface->format->BitsPerPixel,
 			pVisBack->pSurface->format->Rmask,
 			pVisBack->pSurface->format->Gmask,
 			pVisBack->pSurface->format->Bmask,
@@ -63,7 +64,7 @@ void GraphFlip(bool bScaleView)
 			SDL_Rect Rect;
 			Rect.x=0;
 			Rect.y=0;
-			Rect.w=320;
+			Rect.w=CFG_APPLICATION_RENDER_RES_W;
 			Rect.h=8;
 			SDL_BlitSurface(pVisBack->pSurface, &Rect, pVisTemp, &Rect);
 		}
@@ -98,7 +99,7 @@ void GraphFlip(bool bScaleView)
 			std::string sFrameRate;//Note this is 'instantaneous' frame rate i.e. last-frame-only so can look a bit jumpy, no smoothing
 			if (uTimeNow>=0 && uTimeNow>uTimeLast)
 			{
-				sFrameRate = djStrPrintf("%.2f", 1000.f / (float)(uTimeNow - uTimeLast) );
+				sFrameRate = djStrPrintf("%.2f", 1000.f / (float)(uTimeNow - uTimeLast));
 				GraphDrawString( pVisBack, g_pFont8x8, 150, 0, (const unsigned char*)sFrameRate.c_str() );
 			}
 		}
@@ -114,7 +115,7 @@ void GraphFlip(bool bScaleView)
 		SDL_Rect Rect;
 		Rect.x=0;
 		Rect.y=0;
-		Rect.w=320;
+		Rect.w=CFG_APPLICATION_RENDER_RES_W;
 		Rect.h=8;
 		SDL_BlitSurface(pVisTemp, &Rect, pVisBack->pSurface, &Rect);
 
@@ -143,14 +144,15 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 	// tries to set a 'true' 320x200 fullscreen display mode, IIRC - dj2017-08.)
 	// No that doesn't seem to be what happens, press F5 when running with "-f" and see.
 	// [low/future] - if 2 monitors, will this behave 'correct'
-	const SDL_VideoInfo* vidinfo = SDL_GetVideoInfo();
+	SDL_DisplayMode dm;
+	int err = SDL_GetCurrentDisplayMode(0, &dm);
 	int max_w = -1;
 	int max_h = -1;
-	if (vidinfo)
+	if (!err)
 	{
 		// THIS MUST BE TESTED ON LINUX [dj2016-10]
-		max_w = vidinfo->current_w;
-		max_h = vidinfo->current_h;
+		max_w = dm.w;
+		max_h = dm.h;
 		if (max_w>iWidth && max_h>iHeight)
 		{
 			int nMultiple = djMAX(1, djMIN( max_w / iWidth, max_h / iHeight ) );
@@ -165,27 +167,22 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 			iWidth *= nMultiple;
 			iHeight *= nMultiple;
 		}
-
-		Log( "GraphInit(): DisplayResolution(%d,%d).\n", max_w, max_h );
+		djLog::LogFormatStr( "GraphInit(): DisplayResolution(%d,%d).\n", max_w, max_h );
 	}
 #endif
 
-	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
-	// Window dressing crap
-	SDL_WM_SetCaption("Dave Gnukem", NULL);
-	SDL_WM_SetIcon(SDL_LoadBMP("data/icon.bmp"), NULL);
 	// Hide mouse cursor
 	SDL_ShowCursor(0);
 
 	//--- (1) - Front buffer
-	Log( "GraphInit(): djgOpenVisual(w,h=%d,%d).\n", iWidth, iHeight );
-	if (NULL == (pVisMain = djgOpenVisual( bFullScreen?"fullscreen":NULL, iWidth, iHeight )))
+	djLog::LogFormatStr( "GraphInit(): djgOpenVisual(w,h=%d,%d).\n", iWidth, iHeight );
+	if (NULL == (pVisMain = djgOpenVisual( bFullScreen?"fullscreen":NULL, iWidth, iHeight, 32 )))
 	{
 		printf( "GraphInit(): COULDN'T OPEN GMAIN\n" );
 		return false;
 	}
-	Log( "GraphInit(): Display bytes per pixel %d\n", pVisMain->bpp) ;
+	djLog::LogFormatStr( "GraphInit(): Display bytes per pixel %d\n", (int)pVisMain->bpp) ;
 	int imode = pVisMain->bpp;
 
 	// Set the 32<->16 pixel conversion atributes, so the
@@ -272,7 +269,7 @@ void GraphDone()
 void GraphFlipView( int iViewWidth, int iViewHeight, int nXS, int nYS, int nXD, int nYD )
 {
 	//djgDrawVisual( pVisBack, pVisView, g_bLargeViewport?0:16, g_bLargeViewport?0:16, g_bLargeViewport?0:16, g_bLargeViewport?0:16, iViewWidth*16, iViewHeight*16 );
-	djgDrawVisual( pVisBack, pVisView, nXD, nYD, nXS, nYS, iViewWidth*16, iViewHeight*16 );
+	djgDrawVisual( pVisBack, pVisView, nXD, nYD, nXS, nYS, iViewWidth*BLOCKW, iViewHeight*BLOCKH );
 }
 
 // FIXME: Currenetly assumes a 256-char 32x8 character 256x128 pixel alpha-mapped image

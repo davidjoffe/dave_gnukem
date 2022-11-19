@@ -1,7 +1,9 @@
 /*
 djimage.cpp
 
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2022 David Joffe
+
+dj2022-11 Note that since we're now on SDL2 we could potentially use e.g. SDLimage lib to more easily load 'better' file formats like png etc. (though would just require a new dependency)
 */
 
 #include "djimage.h"
@@ -88,8 +90,7 @@ djImage::djImage( int iWidth, int iHeight, int ibpp )
 	m_iHeight   = iHeight;
 	m_ibpp      = ibpp;
 	m_ipixwidth = CalculatePixelWidth( ibpp );
-
-	//fixmemediumorfuture 2018 something might be wrong with this constructor??????? see attempts to use 12/13 jan 2018 for sprite drop shadow stuff
+	m_ipitch = m_ipixwidth * iWidth;
 
 	m_pData = new unsigned char[iWidth*iHeight*m_ipixwidth];
 
@@ -131,9 +132,9 @@ int djImage::CalculatePixelWidth( int ibpp )
 	return 0;
 }
 
-djColor djImage::GetPixelColor( int x, int y )
+djColor djImage::GetPixelColor( int x, int y ) const
 {
-	int iPixel = GetPixel( x, y );
+	const uint32_t iPixel = GetPixel( x, y );
 	switch (m_ibpp)
 	{
 	case 24: return djColor( (iPixel&0xFF0000)>>16, (iPixel&0xFF00)>>8, (iPixel&0xFF) );
@@ -145,27 +146,26 @@ djColor djImage::GetPixelColor( int x, int y )
 	return djColor(0,0,0);
 }
 
-int djImage::GetPixel( int x, int y )
+uint32_t djImage::GetPixel( int x, int y ) const
 {
-	int iOffset;
-	int iPixel = 0;
 
 	if ( !m_pData || x>=m_iWidth || y>=m_iHeight )
 		return -1;
 
-	iOffset = m_ipixwidth * (y*m_iWidth + x);
+	const int iOffset = m_ipixwidth * (y*m_iWidth + x);
 
+	uint32_t iPixel = 0;
 	memcpy( &iPixel, m_pData+iOffset, m_ipixwidth );
 
 	return iPixel;
 }
 
-void djImage::PutPixel( int x, int y, unsigned int pixel )
+void djImage::PutPixel( int x, int y, uint32_t pixel )
 {
 	if ( !m_pData || x>=m_iWidth || y>=m_iHeight )
 		return;
 
-	int iOffset = m_ipixwidth * (y*m_iWidth + x);
+	const int iOffset = m_ipixwidth * (y*m_iWidth + x);
 
 	memcpy( m_pData+iOffset, &pixel, m_ipixwidth );
 }
@@ -256,12 +256,12 @@ int djImage::LoadTGA( const char * szFilename )
 				// Create a blank image
 				CreateImage( nWidth, nHeight, 16 );
 				unsigned char *pBuf = new unsigned char[nWidth*3];
-				for ( unsigned int i=0; i<nHeight; i++ )
+				for ( unsigned int i=0; i<nHeight; ++i )
 				{
 					// Read a row of pixels and copy it into the image buffer
 					read( fin, pBuf, nWidth*2 );
 					int iOffset = (bFlipY?(nHeight-i-1):i)*Pitch();
-					for ( unsigned int j=0; j<nWidth; j++ )
+					for ( unsigned int j=0; j<nWidth; ++j )
 					{
 						// reverse endianness from file
 						m_pData[iOffset+j*2+0] = pBuf[j*2+1];

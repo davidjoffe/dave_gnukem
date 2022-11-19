@@ -183,7 +183,7 @@ std::string GetFriendlyTypeName( int a, int b )
 			int d = ED_GetSpriteExtra(a, b, 11);
 			int iTypeContents = ED_GetSpriteType( c,d );
 			sType += " [";
-			if (iTypeContents>=0 && TYPE_LASTONE)
+			if (iTypeContents>=0 && iTypeContents<(int)TYPE_LASTONE)
 				sType += block_type_names[iTypeContents];
 			else
 				sType += "(error: invalid box contents - check in spreditor!)";
@@ -315,26 +315,26 @@ void DisplayLevelStats( CLevelStats& Stats)
 				//a,b pair
 				const std::pair< unsigned char, unsigned char >& pair = iter->first;
 
-				sprintf(buf, "%3d,%3d", (unsigned int)pair.first, (unsigned int)pair.second );
+				snprintf(buf,sizeof(buf), "%3d,%3d", (unsigned int)pair.first, (unsigned int)pair.second );
 				ED_DrawString( xleft+16+8, y*16+4, buf );
 
 				// Count
 				if (iter->second!=0)
 				{
-					sprintf(buf, "%8d", (int)iter->second );
+					snprintf(buf,sizeof(buf), "%8d", (int)iter->second );
 					ED_DrawString( xleft+16+8+10*8, y*16+4, buf );
 				}
 
 				// Count (background instances)
 				if (Stats.SpriteCountsB[ pair ]!=0)
 				{
-					sprintf(buf, "%8d", Stats.SpriteCountsB[ pair ] );
+					snprintf(buf,sizeof(buf), "%8d", Stats.SpriteCountsB[ pair ] );
 					ED_DrawString( xleft+16+8 + 136, y*16+4, buf );
 				}
 				// Count (foreground instances)
 				if (Stats.SpriteCountsF[ pair ]!=0)
 				{
-					sprintf(buf, "%8d", Stats.SpriteCountsF[ pair ] );
+					snprintf(buf,sizeof(buf), "%8d", Stats.SpriteCountsF[ pair ] );
 					ED_DrawString( xleft+16+8 + 136+9*8, y*16+4, buf );
 				}
 
@@ -362,11 +362,11 @@ void DisplayLevelStats( CLevelStats& Stats)
 				++y;
 			}
 
-			sprintf(buf,"Level Statistics. Page %d/%d", nPage+1, nPages);
+			snprintf(buf,sizeof(buf),"Level Statistics. Page %d/%d", nPage+1, nPages);
 			ED_DrawString( 0, pVisMain->height-24, buf );
 
 			const char * szfilename = g_pCurMission->GetLevel(g_nLevel)->GetFilename();
-			sprintf(buf,"Level:%s",szfilename==NULL?"":szfilename);
+			snprintf(buf,sizeof(buf),"Level:%s",szfilename==NULL?"":szfilename);
 			ED_DrawString( 0, pVisMain->height-16, buf );
 
 			ED_DrawString( 0, pVisMain->height-8, "Help: Esc exit stats. PgUp/PgDn to scroll. Home/End 1st/last page. Counts are total,background,foreground" );
@@ -406,7 +406,7 @@ void DoAllLevelsOverview()
 			pData = g_pCurMission->GetSpriteData(a);
 			if (pData)
 			{
-				for ( int b=0;b<128;++b )
+				for ( int b=0;b<SPRITES_PER_SPRITESHEET;++b )
 				{
 					int nType = ED_GetSpriteType( a, b );
 					if (ED_GetSpriteType( a, b )==TYPE_BOX)
@@ -500,10 +500,10 @@ void DoAllLevelsOverview()
 				// Show stats on 'important' pickups/objects etc., e.g. powerboots, firepower
 				const int nTEXTHEIGHT = 8;
 				int nTextY = 0;
-				sprintf(buf,"LEVEL[%d/%d] %s", iLev+1,g_pCurMission->NumLevels(), g_pCurMission->GetLevel(iLev)->GetFilename() );
+				snprintf(buf,sizeof(buf),"LEVEL[%d/%d] %s", iLev+1,g_pCurMission->NumLevels(), g_pCurMission->GetLevel(iLev)->GetFilename() );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
-				sprintf(buf,"Keys    : [1]%03d [2]%03d [3]%03d [4]%03d",
+				snprintf(buf,sizeof(buf),"Keys    : [1]%03d [2]%03d [3]%03d [4]%03d",
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,117) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,118) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,119) ],
@@ -511,7 +511,7 @@ void DoAllLevelsOverview()
 				);
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
-				sprintf(buf,"KeyLocks: [1]%03d [2]%03d [3]%03d [4]%03d",
+				snprintf(buf,sizeof(buf),"KeyLocks: [1]%03d [2]%03d [3]%03d [4]%03d",
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,121) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,122) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,123) ],
@@ -519,7 +519,7 @@ void DoAllLevelsOverview()
 				);
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
-				sprintf(buf,"Doors   : [1]%03d [2]%03d [3]%03d [4]%03d",
+				snprintf(buf,sizeof(buf),"Doors   : [1]%03d [2]%03d [3]%03d [4]%03d",
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 0) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1,16) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1,32) ],
@@ -527,7 +527,7 @@ void DoAllLevelsOverview()
 				);
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
-				sprintf(buf,"Box[GNUKEM]: %-3d %-3d %-3d %-3d %-3d %-3d",
+				snprintf(buf,sizeof(buf),"Box[GNUKEM]: %-3d %-3d %-3d %-3d %-3d %-3d",
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 117) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 118) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 119) ],
@@ -536,7 +536,7 @@ void DoAllLevelsOverview()
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 122) ]
 				);
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
-				sprintf(buf,"    GNUKEM : %-3d %-3d %-3d %-3d %-3d %-3d",
+				snprintf(buf,sizeof(buf),"    GNUKEM : %-3d %-3d %-3d %-3d %-3d %-3d",
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 58) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 59) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 60) ],
@@ -551,33 +551,33 @@ void DoAllLevelsOverview()
 				int nType = TYPE_ACCESSCARD;
 				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
 				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
-				sprintf(buf,"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
 				nType = TYPE_FIREPOWER;
 				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
 				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
-				sprintf(buf,"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
 				nType = TYPE_MASTERCOMPUTER;
 				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
 				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
-				sprintf(buf,"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
 				nType = TYPE_POWERBOOTS;
 				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
 				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
-				sprintf(buf,"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
-				sprintf(buf,"HIGHVOLTAGE: %-3d", aLevelStats[iLev].SpriteCounts[ std::make_pair(5, 31) ] );
+				snprintf(buf,sizeof(buf),"HIGHVOLTAGE: %-3d", aLevelStats[iLev].SpriteCounts[ std::make_pair(5, 31) ] );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 			}
 
 
-			sprintf(buf,"Level overview. Page %d/%d", nPage+1, nPages);
+			snprintf(buf,sizeof(buf),"Level overview. Page %d/%d", nPage+1, nPages);
 			ED_DrawString( 0, pVisMain->height-24, buf );
 
 			ED_DrawString( 0, pVisMain->height-8, "Help: Esc exit stats. PgUp/PgDn to scroll. Home/End 1st/last page." );
@@ -667,7 +667,7 @@ void DoCreateNewLevel()
 	{
 		++n;
 		char szBuf[8192]={0};//fixLOW MAX_PATH? Some issue with MAX_PATH I can't remember what right now [dj2017-08]
-		sprintf(szBuf,"newlevel%03d.lev", n);
+		snprintf(szBuf,sizeof(szBuf),"newlevel%03d.lev", n);
 		sFilenameWithoutPath = szBuf;
 
 		sFilenameWithPath = sPath;
@@ -683,7 +683,7 @@ void DoCreateNewLevel()
 	djAppendPathS(sLevelRelativePath, sFilenameWithoutPath.c_str());
 	pLevel->SetFilename(sLevelRelativePath.c_str());
 	pLevel->m_szName		= djStrDeepCopy("");
-	pLevel->m_szBackground	= djStrDeepCopy("data/levels/bg1.tga");//fixme for now hardcoded
+	pLevel->m_szBackground	= djStrDeepCopy(DATA_DIR "levels/bg1.tga");//fixme for now hardcoded
 	pLevel->m_szAuthor		= djStrDeepCopy("");
 	g_pCurMission->AddLevel(pLevel);
 
@@ -804,7 +804,7 @@ switch_e LVLED_MainLoop ()
 			if (g_iKeys[DJKEY_F])
 			{
 				// if mouse in main level view
-				if (INBOUNDS( mouse_x, mouse_y, 0, 0, 128*LEVEL_GRIDSIZE-1, 100*LEVEL_GRIDSIZE-1 ))
+				if (INBOUNDS(mouse_x, mouse_y, 0, 0, LEVEL_WIDTH*LEVEL_GRIDSIZE - 1, LEVEL_HEIGHT*LEVEL_GRIDSIZE - 1))
 				{
 					LevelFill( mouse_x / LEVEL_GRIDSIZE, mouse_y / LEVEL_GRIDSIZE );
 				}
@@ -970,8 +970,6 @@ void SetSprite ( int new_sprite )
 /*
 =================
 HandleMouse
-
-TODO: write the bastard
 =================
 */
 bool HandleMouse ()
@@ -983,14 +981,14 @@ bool HandleMouse ()
 	g_bMouseHighlighted = 0;
 	if (INBOUNDS( mouse_x, mouse_y,
 		POS_LEVELSPRITES_X, POS_LEVELSPRITES_Y,
-		POS_LEVELSPRITES_X + 16 * 16 - 1,
-		POS_LEVELSPRITES_Y + 16 * 8 - 1 ))
+		POS_LEVELSPRITES_X + SPRITESHEET_NUM_COLS * BLOCKW - 1,
+		POS_LEVELSPRITES_Y + SPRITESHEET_NUM_ROWS * BLOCKH - 1 ))
 	{
 		//a,b spriteset,spritenumber that mouse is floating over
-		ax = (mouse_x - POS_LEVELSPRITES_X) / 16;
-		ay = (mouse_y - POS_LEVELSPRITES_Y) / 16;
+		ax = (mouse_x - POS_LEVELSPRITES_X) / BLOCKW;
+		ay = (mouse_y - POS_LEVELSPRITES_Y) / BLOCKH;
 		g_aMouseHighlighted = ED_GetCurrSpriteSet();
-		g_bMouseHighlighted = ay * 16 + ax;
+		g_bMouseHighlighted = ay * SPRITESHEET_NUM_COLS + ax;
 		if (mouse_b & 1)
 			SetSpriteSelection( g_aMouseHighlighted, g_bMouseHighlighted, sprite1a, sprite1b );
 		else if (mouse_b & 2)
@@ -1000,20 +998,20 @@ bool HandleMouse ()
 		//djgSetColorFore( pVisMain, djColor(127,127,127) );
 		djgSetColorFore( pVisMain, djColor(0,255,255,150) );//[dj2018-01]cyan to match mouse-over sprite flicker stuff
 		djgDrawRectangle( pVisMain,
-			POS_LEVELSPRITES_X + ax*16 - 1,
-			POS_LEVELSPRITES_Y + ay*16 - 1,
-			16+2,
-			16+2 );
+			POS_LEVELSPRITES_X + ax*BLOCKW - 1,
+			POS_LEVELSPRITES_Y + ay*BLOCKH - 1,
+			BLOCKW+2,
+			BLOCKH+2 );
 
 		//dj2017-07 Show sprite type info
 		std::string sType = GetFriendlyTypeName( ED_GetCurrSpriteSet(), ay * 16 + ax );
 		if (!sType.empty())
 			sType = std::string("Type:") + sType;
 		if (!sType.empty())
-			ED_DrawString( 0, POS_LEVELSPRITES_Y+16*8, sType.c_str() );
+			ED_DrawString( 0, POS_LEVELSPRITES_Y+BLOCKH*SPRITESHEET_NUM_ROWS, sType.c_str() );
 	}
 	// main editting area
-	else if (INBOUNDS( mouse_x, mouse_y, 0, 0, 128 * LEVEL_GRIDSIZE - 1, 100 * LEVEL_GRIDSIZE - 1 ))
+	else if (INBOUNDS(mouse_x, mouse_y, 0, 0, LEVEL_WIDTH * LEVEL_GRIDSIZE - 1, LEVEL_HEIGHT * LEVEL_GRIDSIZE - 1))
 	{
 		ax = mouse_x / LEVEL_GRIDSIZE;
 		ay = mouse_y / LEVEL_GRIDSIZE;
@@ -1038,11 +1036,11 @@ bool HandleMouse ()
 	// zoomed view area
 	else if (INBOUNDS( mouse_x, mouse_y,
 		POS_LEVELVIEW_X, POS_LEVELVIEW_Y,
-		POS_LEVELVIEW_X + levelview_w * 16 - 1,
-		POS_LEVELVIEW_Y + levelview_h * 16 - 1 ))
+		POS_LEVELVIEW_X + levelview_w * BLOCKW - 1,
+		POS_LEVELVIEW_Y + levelview_h * BLOCKH - 1 ))
 	{
-		ax = (mouse_x - POS_LEVELVIEW_X) / 16;
-		ay = (mouse_y - POS_LEVELVIEW_Y) / 16;
+		ax = (mouse_x - POS_LEVELVIEW_X) / BLOCKW;
+		ay = (mouse_y - POS_LEVELVIEW_Y) / BLOCKH;
 		// dj2016-10: Hold in Ctrl+Alt and click with the mouse to automatically start level with hero 'dropped in' to the clicked position as starting position (to help with level editing / testing)
 		if ((mouse_b & 1)!=0 && g_iKeys[DJKEY_CTRL]!=0 && g_iKeys[DJKEY_ALT]!=0)
 		{
@@ -1082,8 +1080,8 @@ static void MoveMinimap( int ox, int oy )
 		return;
 
 	// Set new level view offset, checking bounds.
-	levelview_x = djCLAMP(ox, 0, 128 - levelview_w);
-	levelview_y = djCLAMP(oy, 0, 100 - levelview_h);
+	levelview_x = djCLAMP(ox, 0, LEVEL_WIDTH - levelview_w);
+	levelview_y = djCLAMP(oy, 0, LEVEL_HEIGHT - levelview_h);
 
 	// Redraw the purple rectangle
 	DrawMinimapRectangle();
@@ -1107,7 +1105,7 @@ void RedrawView ()
 	else
 		ED_DrawStringClear( 48, 308, "[FOREGROUND]" );
 	DrawSprites();
-	DrawGrid( 0, 0, LEVEL_GRIDSIZE, LEVEL_GRIDSIZE, 128, 100, djColor(60,60,60) );
+	DrawGrid( 0, 0, LEVEL_GRIDSIZE, LEVEL_GRIDSIZE, LEVEL_WIDTH, LEVEL_HEIGHT, djColor(60,60,60) );
 	DrawLevelGrid();
 	DrawSpritesel();
 	DrawMinimap();
@@ -1128,16 +1126,17 @@ void DrawSprites ()
 
 //	djgSetColorFore( pVisMain, djColor(255,255,255) );
 
-	sprintf( buf, "%d,%-15.15s", ED_GetCurrSpriteSet(), g_pCurMission->GetSpriteData(ED_GetCurrSpriteSet())->m_szImgFilename );
+	snprintf(buf,sizeof(buf), "%d,%-15.15s", ED_GetCurrSpriteSet(), g_pCurMission->GetSpriteData(ED_GetCurrSpriteSet())->m_szImgFilename );
 
 	ED_DrawString( 120, POS_LEVELSPRITES_Y - 8, buf );
 	ox = POS_LEVELSPRITES_X;
 	oy = POS_LEVELSPRITES_Y;
 
-	for ( i=0; i<128; i++ )
+	for ( i=0; i<SPRITES_PER_SPRITESHEET; i++ )
 	{
-		xoffset = (i%16)*16;
-		yoffset = (i/16)*16;
+		//dj2019-07 hm should we have like a separate SPRITEW/SPRITEH here .. or something else .. hm. (thinking out loud)
+		xoffset = (i % SPRITESHEET_NUM_COLS) * BLOCKW;
+		yoffset = (i / SPRITESHEET_NUM_COLS) * BLOCKH;
 		ED_DrawSprite( ox + xoffset, oy + yoffset, ED_GetCurrSpriteSet(), i );
 	}
 
@@ -1198,7 +1197,7 @@ void DrawLevelname()
 void ShowSettings()
 {
 	char szBuf[4096]={0};
-	sprintf(szBuf, "Selected Sprite Indicators: %s", g_bFlashingIndicatorEnabled ? "ON" : "OFF");
+	snprintf(szBuf,sizeof(szBuf), "Selected Sprite Indicators: %s", g_bFlashingIndicatorEnabled ? "ON" : "OFF");
 	// Clear background
 	djgSetColorFore(pVisMain, djColor(0,0,80));//blue
 	djgDrawBox(pVisMain, 0, POS_LEVELVIEW_Y + 16 * levelview_h + 8 + 8, pVisMain->width/2, 8);
@@ -1217,8 +1216,8 @@ void DrawMinimapRectangle()
 
 void DrawMinimap()
 {
-	int i, j;
-	int a, b;
+	int i = 0, j = 0;
+	int a = 0, b = 0;
 
 	// Draw the purple rectangle indicating where your zoomed view is
 	DrawMinimapRectangle();
@@ -1237,12 +1236,12 @@ void DrawMinimap()
 			if (!bShowBack)
 			{
 				djgSetColorFore( pVisMain, djColor(0,0,0) );
-				djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*16, POS_LEVELVIEW_Y + i*16, 16, 16 );
+				djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*BLOCKW, POS_LEVELVIEW_Y + i*BLOCKH, BLOCKW, BLOCKH );
 			}
 			else
 			{
-				ED_DrawSprite( POS_LEVELVIEW_X + j * 16,
-					POS_LEVELVIEW_Y + i * 16,
+				ED_DrawSprite( POS_LEVELVIEW_X + j * BLOCKW,
+					POS_LEVELVIEW_Y + i * BLOCKH,
 					a, b );
 				if ( ((a) || (b)) )
 				{
@@ -1261,8 +1260,8 @@ void DrawMinimap()
 				b = *(level_pointer( 0, levelview_x + j, levelview_y + i) + 1);
 				if ((a) || (b))
 				{
-					ED_DrawSprite( POS_LEVELVIEW_X + j * 16,
-					POS_LEVELVIEW_Y + i * 16,
+					ED_DrawSprite( POS_LEVELVIEW_X + j * BLOCKW,
+					POS_LEVELVIEW_Y + i * BLOCKH,
 					a, b );
 					if (g_bFlashingIndicatorTimer)
 					{
@@ -1270,11 +1269,11 @@ void DrawMinimap()
 						if (a==sprite0a && b==sprite0b)
 						{
 							djgSetColorFore( pVisMain, djColor(0,0,0,200) );//black
-							djgDrawBox( pVisMain, -1+POS_LEVELVIEW_X + j*16, -2+POS_LEVELVIEW_Y + i*16   ,18,4);
-							djgDrawBox( pVisMain, -1+POS_LEVELVIEW_X + j*16,    POS_LEVELVIEW_Y + i*16+12,18,4);
+							djgDrawBox( pVisMain, -1+POS_LEVELVIEW_X + j*BLOCKW, -2+POS_LEVELVIEW_Y + i*BLOCKH   ,18,4);
+							djgDrawBox( pVisMain, -1+POS_LEVELVIEW_X + j*BLOCKW,    POS_LEVELVIEW_Y + i*BLOCKH+12,18,4);
 							djgSetColorFore( pVisMain, djColor(255,255,0,200) );//yellow
-							djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*16, -2+POS_LEVELVIEW_Y + i*16 +1,16,2);
-							djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*16,    POS_LEVELVIEW_Y + i*16+13,16,2);
+							djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*16, -2+POS_LEVELVIEW_Y + i*BLOCKH +1,16,2);
+							djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*16,    POS_LEVELVIEW_Y + i*BLOCKH+13,16,2);
 						}
 
 						if ( (g_aMouseHighlighted | g_bMouseHighlighted)!=0  &&
@@ -1282,8 +1281,8 @@ void DrawMinimap()
 						{
 							const int nCROSSHAIROFFSET=4;
 							djgSetColorFore( pVisMain, djColor(0,255,255,200) );//cyan
-							djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*16,nCROSSHAIRSIZE,1);
-							djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*16,1,nCROSSHAIRSIZE);
+							djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*BLOCKW, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*BLOCKH,nCROSSHAIRSIZE,1);
+							djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*BLOCKW, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*BLOCKH,1,nCROSSHAIRSIZE);
 						}
 					}
 				}
@@ -1293,15 +1292,15 @@ void DrawMinimap()
 			{
 				const int nCROSSHAIROFFSET=0;
 				djgSetColorFore( pVisMain, djColor(255,255,0,150) );//yellow
-				djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*16,nCROSSHAIRSIZE,1);
-				djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*16,1,nCROSSHAIRSIZE);
+				djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*BLOCKW, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*BLOCKH,nCROSSHAIRSIZE,1);
+				djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*BLOCKW, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*BLOCKH,1,nCROSSHAIRSIZE);
 			}
 			if (g_bFlashingIndicatorTimer && bHighlightBackMouseOver)
 			{
 				const int nCROSSHAIROFFSET=8;
 				djgSetColorFore( pVisMain, djColor(0,255,255,200) );//cyan
-				djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*16,nCROSSHAIRSIZE,1);
-				djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*16, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*16,1,nCROSSHAIRSIZE);
+				djgDrawBox( pVisMain, nCROSSHAIROFFSET +                    POS_LEVELVIEW_X + j*BLOCKW, nCROSSHAIROFFSET+(nCROSSHAIRSIZE/2)+POS_LEVELVIEW_Y + i*BLOCKH,nCROSSHAIRSIZE,1);
+				djgDrawBox( pVisMain, nCROSSHAIROFFSET + (nCROSSHAIRSIZE/2)+POS_LEVELVIEW_X + j*BLOCKW, nCROSSHAIROFFSET+                   POS_LEVELVIEW_Y + i*BLOCKH,1,nCROSSHAIRSIZE);
 			}
 		}
 	}
@@ -1309,21 +1308,21 @@ void DrawMinimap()
 	// If hold in Ctrl+Alt, draw hero overlay at mouse cursor position to indicate the new hero 'drop-in-level-here' functionality [dj2016-10]
 	if (INBOUNDS( mouse_x, mouse_y,
 		POS_LEVELVIEW_X, POS_LEVELVIEW_Y,
-		POS_LEVELVIEW_X + levelview_w * 16 - 1,
-		POS_LEVELVIEW_Y + levelview_h * 16 - 1 ))
+		POS_LEVELVIEW_X + levelview_w * BLOCKW - 1,
+		POS_LEVELVIEW_Y + levelview_h * BLOCKH - 1 ))
 	{
-		int ax = (mouse_x - POS_LEVELVIEW_X) / 16;
-		int ay = (mouse_y - POS_LEVELVIEW_Y) / 16;
+		int ax = (mouse_x - POS_LEVELVIEW_X) / BLOCKW;
+		int ay = (mouse_y - POS_LEVELVIEW_Y) / BLOCKH;
 		if (g_iKeys[DJKEY_CTRL]!=0 && g_iKeys[DJKEY_ALT]!=0)
 		{
 			// These sprite offsets etc. are horribly hardcoded [show hero sprite]
 			if (ay>0)
 			{
-				ED_DrawSprite( POS_LEVELVIEW_X + (ax-1) * 16+8, POS_LEVELVIEW_Y + (ay-1) * 16, 4, 16 );
-				ED_DrawSprite( POS_LEVELVIEW_X + (ax  ) * 16+8, POS_LEVELVIEW_Y + (ay-1) * 16, 4, 17 );
+				ED_DrawSprite( POS_LEVELVIEW_X + (ax-1) * BLOCKW+8, POS_LEVELVIEW_Y + (ay-1) * BLOCKH, 4, 16 );
+				ED_DrawSprite( POS_LEVELVIEW_X + (ax  ) * BLOCKW+8, POS_LEVELVIEW_Y + (ay-1) * BLOCKH, 4, 17 );
 			}
-			ED_DrawSprite( POS_LEVELVIEW_X + (ax-1) * 16+8, POS_LEVELVIEW_Y + ay * 16, 4, 18 );
-			ED_DrawSprite( POS_LEVELVIEW_X + (ax  ) * 16+8, POS_LEVELVIEW_Y + ay * 16, 4, 19 );
+			ED_DrawSprite( POS_LEVELVIEW_X + (ax-1) * BLOCKW+8, POS_LEVELVIEW_Y + ay * BLOCKH, 4, 18 );
+			ED_DrawSprite( POS_LEVELVIEW_X + (ax  ) * BLOCKW+8, POS_LEVELVIEW_Y + ay * BLOCKH, 4, 19 );
 		}
 	}
 }
@@ -1360,7 +1359,7 @@ void ShowInstructions()
 void DrawSpritesel ()
 {
 	ED_DrawSprite(  4, 308, sprite0a, sprite0b );
-	ED_DrawSprite( 24, 308, sprite1a, sprite1b );
+	ED_DrawSprite( BLOCKW+8, 308, sprite1a, sprite1b );
 	DBC_DrawBoxContents();
 }
 
@@ -1391,7 +1390,7 @@ void SetSpriteSelection( int a0, int b0, int a1, int b1 )
 void SetLevel( int x, int y, int a, int b, bool bforeground )
 {
 	if (x<0 || y<0) return;
-	if (x>=128 || y>=100) return;
+	if (x>=LEVEL_WIDTH || y>=LEVEL_HEIGHT) return;
 	if (bforeground)
 	{
 		*(level_pointer(0, x, y) + 0) = a;
@@ -1415,8 +1414,8 @@ void SetLevel( int x, int y, int a, int b, bool bforeground )
 		&& ( y >= levelview_y )
 		&& ( x < levelview_x + levelview_w )
 		&& ( y < levelview_y + levelview_h ) )
-		ED_DrawSprite( POS_LEVELVIEW_X + (x - levelview_x) * 16,
-		POS_LEVELVIEW_Y + (y - levelview_y) * 16,
+		ED_DrawSprite( POS_LEVELVIEW_X + (x - levelview_x) * BLOCKW,
+		POS_LEVELVIEW_Y + (y - levelview_y) * BLOCKH,
 		a, b );
 }
 

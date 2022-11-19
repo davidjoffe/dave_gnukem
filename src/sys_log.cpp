@@ -9,7 +9,7 @@
  * Description: System logger
  *
  * BUGS:
- *	(+) The bitch refused to log anything if no '\n' specified. Also,
+ *	(+) [It] refused to log anything if no '\n' specified. Also,
  *	garbage at the end of line appeared sometimes. Seems like it was
  *	a matter of lacking terminating zero. Looks like fixed :)
  *	(-) Still needs testing. Won't take long, i think :)
@@ -25,14 +25,16 @@
 #include "sys_defs.h"
 #include "djstring.h"//djAppendPathStr [should move elsewhere?? dj2018-03]
 
-#ifdef WIN32
-//#include <windows.h>//OutputDebugString
-#endif
+//#if defined(WIN32) && defined(_DEBUG)
+////#include <Windows.h>//For OutputDebugString
+//#endif
 
 #define DEFAULT_LOG_FILE	"game.log"
 
 #define MAX_LOGS		32
 
+
+//dj2022-11 note some of this stuff probably not used anymore, maybe clean up someday .. also don't think we really need the rotating logs stuff just adds complexity at this point that I don't think justifies benefit
 
 static bool	log2screen = false;
 static bool	log2console = false;
@@ -122,54 +124,59 @@ void DisposeLog ( dword log_id )
 }
 
 
-
-void Log ( const char *fmt, ... )
+//dj2022-11 refactoring some of the log stuff ..
+void djLog::LogStr(const char* szPlainString)
 {
-	char		text[4096]={0};
-	va_list		ap;
+	if (!initialised) return;
+	if (szPlainString == nullptr) return;
 
-	if ( !initialised )
-		return;
-
-	if ( NULL == fmt )
-		return;
-
-	memset ( text, 0, 4096 );
-
-	va_start ( ap, fmt );
-		vsprintf ( (char*)text, fmt, ap );
-	va_end ( ap );
-
-	if (log_files[0]!=NULL)
+	if (log_files[0] != NULL)
 	{
-		fprintf ( log_files[0], "%s", text );
-		fflush ( log_files[0] );
+		fprintf(log_files[0], "%s", szPlainString);
+		fflush(log_files[0]);
 	}
 
-	#if defined(WIN32) && defined(_DEBUG)
+#if defined(WIN32) && defined(_DEBUG)
 	//dj2016-10 Log to debugger in Windows
-	//::OutputDebugString( text );
-	#endif
+	//::OutputDebugString( szPlainString );
+#endif
+}
+
+
+void djLog::LogFormatStr( const char *fmt, ... )
+{
+	if (!initialised)
+		return;
+	if (NULL == fmt)
+		return;
+
+	static thread_local char		text[4096]={0};
+	memset ( text, 0, 4096 );
+
+	va_list		ap;
+	va_start ( ap, fmt );
+		vsnprintf ( (char*)text, sizeof(text), fmt, ap );
+	va_end ( ap );
+
+	djLog::LogStr(text);
 }
 
 
 
-
-void Log ( dword log_mask, const char *fmt, ... )
+/*
+void djLog::LogFormatStr2( dword log_mask, const char *fmt, ... )
 {
-	char		text[4096]={0};
-	va_list		ap;
-
 	if ( !initialised )
 		return;
-
 	if ( NULL == fmt )
 		return;
 
-	memset ( text, 0, 4096 );
+	static thread_local char		text[4096] = { 0 };
+	memset(text, 0, 4096);
 
+	va_list		ap;
 	va_start ( ap, fmt );
-		vsprintf ( (char*)text, fmt, ap );
+		vsnprintf ( (char*)text, sizeof(text), fmt, ap );
 	va_end ( ap );
 
 	for ( unsigned int i=0; i<num_logs; i++ )
@@ -189,7 +196,7 @@ void Log ( dword log_mask, const char *fmt, ... )
 		}
 	}
 }
-
+*/
 
 
 
@@ -221,7 +228,12 @@ void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 	strcpy ( log_filename_base, file );
 	M_StripFileExtension ( log_filename_base );
 
-	PushBackup ( file, bklevel );
+	// dj2019-06 Commenting this out to effectively disable rotating of logs to fix this issue as reported by keithbowes:
+	// https://github.com/davidjoffe/dave_gnukem/issues/120
+	// ("home directory is littered with files like ~/.old0, ~/.old1, ~/.old2")
+	// I don't really feel it's worth rotating logs; I seldom if ever go look at old logs. We can maybe add it
+	// later (and fix the 'littering' issue) IF it seems in future like it's worth it to have rotating logs.
+	//PushBackup ( file, bklevel );
 
 	*f = fopen ( file, "w" );
 
@@ -249,7 +261,7 @@ void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 
 	while ( ff && log_backup_level != bklevel )
 	{
-		sprintf ( appendix, "old%d", bklevel );
+		snprintf ( appendix, sizeof(appendix), "old%d", bklevel );
 		strcpy ( newname, log_filename_base );
 		M_ForceFileExtension ( newname, appendix );
 
@@ -270,11 +282,17 @@ void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 
 
 
+// dj2019-06 Commenting out call to this function to effectively disable rotating of logs to fix this issue as reported by keithbowes:
+// https://github.com/davidjoffe/dave_gnukem/issues/120
+// ("home directory is littered with files like ~/.old0, ~/.old1, ~/.old2")
+// I don't really feel it's worth rotating logs; I seldom if ever go look at old logs. We can maybe add it
+// later (and fix the 'littering' issue) IF it seems in future like it's worth it to have rotating logs.
+// Otherwise, later maybe just delete this function (that's my recommendation, to simplify this code)
 void PushBackup ( const char *filename, int bklevel )
 {
 	char		newname[SYS_MAX_FILE]={0};
 	char		appendix[SYS_MAX_EXT]={0};
-	FILE		*ff;
+	FILE		*ff=nullptr;
 
 	ff = fopen ( filename, "r" );
 	if ( ff )
@@ -292,7 +310,7 @@ void PushBackup ( const char *filename, int bklevel )
 	}
 
 // assemble a new name:
-	sprintf ( appendix, "old%d", bklevel );
+	snprintf ( appendix, sizeof(appendix), "old%d", bklevel );
 	strcpy ( newname, log_filename_base );
 	M_ForceFileExtension ( newname, appendix );
 

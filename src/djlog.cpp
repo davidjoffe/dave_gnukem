@@ -1,7 +1,7 @@
 /*
 djlog.cpp
 
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2022 David Joffe
 */
 
 #ifdef WIN32
@@ -14,7 +14,8 @@ Copyright (C) 1998-2018 David Joffe
 
 void log_message( const char * szFormat, ... )
 {
-	static char buf[4096]={0};
+	//dj2022-11 Making this static buffer thread_local (C++11 onwards) as static buffers will cause thread problems if we ever want to use threads
+	static thread_local char buf[4096]={0};
 
 	if ( szFormat == NULL )
 		return;
@@ -22,7 +23,7 @@ void log_message( const char * szFormat, ... )
 	// print the formatted log string onto buf
 	va_list args;
 	va_start(args, szFormat);
-	vsnprintf(buf, 4096, szFormat, args);
+	vsnprintf(buf, sizeof(buf), szFormat, args);
 	va_end(args);
 
 #ifdef WIN32
@@ -30,13 +31,9 @@ void log_message( const char * szFormat, ... )
    OutputDebugString( (LPCTSTR)buf );
 #else
    // dump message on stdout
+	// NB! (security) - do NOT do "printf(buf) here because if it contains e.g. a "%s" we'll have a crash - hence the deliberate ("%s", buf) [dj2022-11]
    printf( "%s", buf );
    fflush(NULL);
 #endif
-}
-
-void log_do_nothing( char * szFormat, ... )
-{
-	szFormat = szFormat;		// shut up the "unused patameter" warning
 }
 

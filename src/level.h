@@ -3,7 +3,7 @@
 \brief   Level stuff
 \author  David Joffe
 
-Copyright (C) 1995-2018 David Joffe
+Copyright (C) 1995-2019 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _LEVEL_H_
@@ -29,16 +29,17 @@ void KillLevelSystem ();
 //Returns NULL if bad filename, but still allocates a default empty level, which will be loaded into apLevels[0]. dj2017-06 First parameter is level 'slot' which I think is now always 0 and thus not used, I think some older version of the code used to load level N datablock in slot N. Now only one level's datablock is actually loaded at any time.
 extern unsigned char * level_load( int i, const char * szfilename );
 int                    level_save( int i, const char * szfilename );
+//cbsu/sbsu this might be worth inlining (LOW prio - dj2019-07)
 extern unsigned char * level_pointer( int i, int x, int y );
 //! This is 'friendlier' than using level_pointer() but slightly slower so where speed is sensitive don't use it [dj2017-06]
 extern SLevelBlock     level_get_block( int i, int x, int y );
 extern void            level_delete( int i );
 
 /*--------------------------------------------------------------------------*/
-#define LEVCHAR_FOREA(x,y) (*( g_pLevel + (y) * 512 + (x) * 4 + 0 ))
-#define LEVCHAR_FOREB(x,y) (*( g_pLevel + (y) * 512 + (x) * 4 + 1 ))
-#define LEVCHAR_BACKA(x,y) (*( g_pLevel + (y) * 512 + (x) * 4 + 2 ))
-#define LEVCHAR_BACKB(x,y) (*( g_pLevel + (y) * 512 + (x) * 4 + 3 ))
+#define LEVCHAR_FOREA(x,y) (*( g_pLevel + (y) * LEVEL_BYTESPERROW + (x) * LEVEL_BYTESPERBLOCK + 0 ))
+#define LEVCHAR_FOREB(x,y) (*( g_pLevel + (y) * LEVEL_BYTESPERROW + (x) * LEVEL_BYTESPERBLOCK + 1 ))
+#define LEVCHAR_BACKA(x,y) (*( g_pLevel + (y) * LEVEL_BYTESPERROW + (x) * LEVEL_BYTESPERBLOCK + 2 ))
+#define LEVCHAR_BACKB(x,y) (*( g_pLevel + (y) * LEVEL_BYTESPERROW + (x) * LEVEL_BYTESPERBLOCK + 3 ))
 
 #define CHECK_SOLID(a,b)  ( GET_EXTRA( (a), (b), EXTRA_FLAGS ) & FLAG_SOLID )
 

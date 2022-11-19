@@ -7,14 +7,14 @@
 // 1999/12 : re-begin attempted Win32 port
 // 2001/05 : begin SDL port; doxygen comments
 // 2016/10 : new github + livecoding 'era'
+// 2018/04 : 'DG version 1' released
+// ~2022 : Matteo Bini migration from SDL1 to SDL2
 
 /*
-Copyright (C) 1995-2018 David Joffe
+Copyright (C) 1995-2022 David Joffe
 */
 
 /*--------------------------------------------------------------------------*/
-
-#include "mmgr/mmgr.h"
 
 #include <time.h>   // for srand()
 
@@ -39,20 +39,17 @@ Copyright (C) 1995-2018 David Joffe
 #include "sys_error.h"
 #include "datadir.h"//DATA_DIR [might move later - dj2018-05]
 
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__linux__) || defined(__unix__)
+#include <unistd.h>//getcwd, chdir
+#endif
 #ifdef __APPLE__
 #include <mach-o/dyld.h>//_NSGetExecutablePath
 #include <sys/stat.h>//For djFolderExists stuff
 #endif
-//#ifndef djWINXP_SUPPORT
-#ifdef WIN32
-// [dj2018-03] For DPI scaling overly-large-Window issue https://github.com/davidjoffe/dave_gnukem/issues/98
-//#include <ShellScalingApi.h>//<'Newer' 'more correct' way rather than SetProcessDPIAware() but only Win8.1 or higher supported so commenting that out for
-//#pragma comment (lib,"Shcore.lib")//<'Newer' 'more correct' way rather than SetProcessDPIAware()
-#include <Windows.h>//SetProcessDPIAware();
-#endif
-//#endif
 
+#ifndef NOSOUND
 #include <SDL_mixer.h>//For background music stuff
+#endif
 
 #include <map>
 #include <string>
@@ -76,18 +73,6 @@ void KillMainMenu();
 // Main menu [NB, warning, the handling code uses indexes :/ .. so if you add/remove items, must update there too - dj2016-10]
 struct SMenuItem mainMenuItems[] =
 {
-	/*{ false, "{~~~~~~~~~~~~~~~~~}" },//dj2016-10 try without the big borders ..
-	{ true,  "|  Start gnu game |" },
-	{ true,  "|  Select Mission |" },
-	{ true,  "|  Restore game   |" },
-	{ true,  "|  Ordering info  |" },
-	{ true,  "|   (not!)        |" },
-	{ true,  "|  Instructions   |" },
-	{ true,  "|  Redefine keys  |" },
-	{ true,  "|  High scores    |" },
-	{ true,  "|  Credits        |" },
-	{ true,  "|  Quit           |" },
-	{ false, "[~~~~~~~~~~~~~~~~~]" },*/
 	{ false, "                   " },
 	{ true,  "   Start gnu game  " },
 	{ true,  "   Restore game    " },
@@ -99,7 +84,8 @@ struct SMenuItem mainMenuItems[] =
 	{ true,  "   High scores     " },
 	{ true,  "   Credits         " },
 	{ true,  "   About           " },
-	//{ true,  "   Don't quit      " },
+	{ true,  "   Retro Settings  " },
+	{ true,  "   Don't quit      " },
 	{ true,  "   Quit            " },
 	{ false, "                   " },
 	{ false, NULL }
@@ -182,68 +168,9 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	InitLog ();
 
 #ifdef WIN32
-	// [dj2018-03] This is to fix https://github.com/davidjoffe/dave_gnukem/issues/98 .. note we effectively ignore DPI scaling,
-	// which is probably OK in our situation as by default we automatically our scaling our Window to the largest size that fits in the display that is a multiple of 320x200.
-	// Fix: Application window is being scaled with DPI scaling setting, and doesn't fit on screen by default, it's too large
-
-#ifdef djDYNAMICALLY_BIND_SETPROCESSDPIAWARE
-	// dj2018-04-10
-	// We want to call SetProcessDPIAware to fix DPI scaling bug on Win10 etc.
-	// But, that function was only introduced later in Windows +/- Vista-ish. So,
-	// a normal statically-linked call breaks XP support. That didn't bother me
-	// too much, but it seems to also break the (tested-on-latest-nightly) ReactOS.
-	// I would have thought/imagined this should be simple for the ReactOS folks
-	// to just add an empty stub SetProcessDPIAware() (it can do nothing since XP
-	// doesn't have DPI scaling stuff anyway, so no such scaling bug) and possibly
-	// fix thousands of other applications that call SetProcessDPIAware(), but
-	// I don't know if they have good reasons or if it's just not on their radar etc.
-	// In the meantime, this workaround uses GetProcAddress() and a function pointer
-	// to 'dynamically bind to' and call the function; since it's not statically
-	// linked, it then doesn't show the run-time error message of missing function
-	// when you start the application - it should run and just quietly skip over
-	// it as NULL here.
-	// I am a little nervous about this sort of fix - have a feeling like it may
-	// introduce instability here on some systems etc. somehow.
-	// So I'm increasing risk of crashiness to support ReactOS (and XP).
-	// There's another alternative - use the djWINXP_SUPPORT config option as it
-	// had been to build a separate XP/ReactOS-supporting executable and have
-	// say maybe a second shortcut (e.g. 'Dave Gnukem (XP)' in the Start menu.
-	// That has pros and cons of its own. It's a bit ugly, and also, some users
-	// may not see it - they'll just run the main shortcut and get a fault. Likewise,
-	// some Win10 users will run the XP shortcut, and get an overly-large screen
-	// if DPI scaling enabled.
-	// (Another alternative is a separate download entirely for XP/ReactOS but
-	// that's a pain to maintain, I don't want to do that.) Sigh. I've
-	// written a whole book now here on this one stupid issue.
-	Log ("GetProcAddress SetProcessDPIAware\n");//Want lots of logging here as I feel like this might all be relatively higher risk of crashing
-	typedef int (WINAPI *PFN)();//function signature for SetProcessDPIAware
-	PFN MySetProcessDPIAware = NULL;
-	MySetProcessDPIAware = (PFN) GetProcAddress(
-		GetModuleHandle(TEXT("user32.dll")), 
-		"SetProcessDPIAware");
-	if (NULL != MySetProcessDPIAware)
-	{
-		// Call SetProcessDPIAware() through our dynamic pointer to it
-		Log ("Call MySetProcessDPIAware\n");
-		MySetProcessDPIAware();
-		Log ("Call MySetProcessDPIAware done\n");
-	}
-	else
-	{
-		Log ("No GetProcAddress - possibly XP or ReactOS?\n");
-	}
-#else//else statically bind (this breaks XP, and, currently, ReactOS - causes error message about missing function when you run. dj2018-04)
-	#ifndef djWINXP_SUPPORT
-	//::SetProcessDpiAwareness(PROCESS_SYSTEM_DPI_AWARE);// Note we don't a manifest; this seems to work at the moment. "The DPI awareness for an application should be set through the application manifest so that it is determined before any actions are taken which depend on the DPI of the system. Alternatively, you can set the DPI awareness using SetProcessDpiAwareness, but if you do so, you need to make sure to set it before taking any actions dependent on the system DPI. Once you set the DPI awareness for a process, it cannot be changed."
-	// NB: Unfortunately it looks like SetProcessDPIAware(); is only Vista or later,
-	// the more correct newer way SetProcessDpiAwareness() is Win8.1 or later (doesn't build on VS2010)
-	// so it looks like we miiight have to leave XP behind for correct behaviour on a system with DPI scaling set? :/
-	// There will [esp going forward] probably be more users with overly-large DPI-scaled Windows, than XP users, so if it's one or the other, we might have
-	// to leave XP behind rather. Would be interesting though if ReactOS, or WINE etc. support are negatively affected. I'm guessing not.
-	::SetProcessDPIAware();//<- Note this apparently 'may cause race conditions' under some conditions - if we encounter that, then we may have to put this as a manifest setting instead.
-	#endif//#ifndef djWINXP_SUPPORT
-#endif//#ifdef djDYNAMICALLY_BIND_SETPROCESSDPIAWARE
-
+	//dj2022-11 Refactoring just moving this klunky looking Win32-specific DPI scaling fix from 2018 from main.cpp to its own file for neatness
+	extern void djSetProcessDPIAwareHelper();
+	djSetProcessDPIAwareHelper();
 #endif//#ifdef WIN32
 
 #ifdef __APPLE__
@@ -261,7 +188,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		// Check if data folder is present relative to cwd
 		char szDataFile[8192]={0};
 		strcpy(szDataFile,cwd);
-		djAppendPath(szDataFile,"data/missions.txt");//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever
+		djAppendPath(szDataFile, DATA_DIR "missions.txt");//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever
 		//debug//printf("Checking for:%s\n",szDataFile);fflush(NULL);
 		if (!djFileExists(szDataFile))
 		{
@@ -281,7 +208,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 					*(szLast+1) = 0; // NULL-terminate
 
 				strcpy(szDataFile,path);
-				djAppendPath(szDataFile,"data/missions.txt");
+				djAppendPath(szDataFile, DATA_DIR "missions.txt");
 				if (djFileExists(szDataFile))
 				{
 					printf("Successfully found the data path :)\n");fflush(NULL);
@@ -296,7 +223,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	}
 #endif
 
-	Log ( "\n================[ Starting Application Init ]===============\n" );
+	djLOGSTR( "\n================[ Starting Application Init ]===============\n" );
 
 	// Check the data folder is present, and if not, try give the user some basic guidance as to how to address this. [dj2018-05]
 	// This is pretty 'critical' in that we can't recover from it, but not really critical in that the cause is
@@ -304,7 +231,10 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	// Better to offer the user a little guidance rather than just exiting with no clue at all, e.g. [dj2018-05] cf. https://github.com/davidjoffe/dave_gnukem/issues/114
 	if (!djFolderExists( DATA_DIR ))
 	{
+		// dj2019-06 This whole business should be improved on Linux
 		printf("Unable to find data folder '%s'. Please note this is in a separate repo - see the ReadMe.md for details.\n",DATA_DIR);
+		printf("If you have the data folder, then you can generally fix this message by first changing your current\n");
+		printf("directory to the folder in which the 'data' folder is contained, then running the application.\n");
 		return -1;
 	}
 
@@ -349,9 +279,10 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	// )
 	// I think in theory -640 should behave the same as if passing "-scale 2" now
 	// but my memory of this stuff is a little vague so this needs to be checked.
-	Log ("DaveStartup(): Initializing graphics system ...\n");
-	int w=320;
-	int h=200;
+	djLOGSTR("DaveStartup(): Initializing graphics system ...\n");
+	int w=CFG_APPLICATION_RENDER_RES_W;
+	int h=CFG_APPLICATION_RENDER_RES_H;
+	//dj2019 do we really need the b640 option anymore? not sure. Might be used by some ports for DG1? Think I vaguely recall seeing someone mentioning using it on a forum ... maybe Pandora? Or maybe not used anymore? don't know.
 	if (b640 == true)
 	{
 		w = 640;
@@ -367,98 +298,153 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	// [dj2016-10] Note this w/h is effectively now a 'hint' as it may not initialize to the exact requested size
 	if (!GraphInit( bFullScreen, w, h, nForceScale ))
 	{
-		Log( "DaveStartup(): Graphics initialization failed.\n" );
+		djLOGSTR( "DaveStartup(): Graphics initialization failed.\n" );
 		return -1;
 	}
 
 	djSoundInit();				// Initialize sound
 
 	g_pImgMain = new djImage;			// Load main skin (title screen)
-	g_pImgMain->Load("data/main.tga");
+	g_pImgMain->Load(DATA_DIR "main.tga");
 	djCreateImageHWSurface( g_pImgMain );
 
 	InitMissionSystem();
 
 	// Load missions
-	if (0 != LoadMissions("data/missions.txt"))
+	if (0 != LoadMissions(DATA_DIR "missions.txt"))
 		return -1;
-	Log ( "DaveStartup(): %d missions(s) found.\n", g_apMissions.size() );
+	djLog::LogFormatStr( "DaveStartup(): %d missions(s) found.\n", (int)g_apMissions.size() );//NB must convert .size() to int due to risk of 64-bit vs 32-bit mismatch on some platforms! very subtle bug/risk
 
 	//-- Initialize input devices
-	Log ("DaveStartup(): Initializing keys ..\n");
-	if (!djiInit( pVisMain, INPUT_KEYDOWN|INPUT_KEYUP|INPUT_KEYREPEAT ))
+	djLOGSTR("DaveStartup(): Initializing keys ..\n");
+	if (!djiInit( pVisMain ))
 		return -1;
 
 	InitMainMenu();			// fill the structures and load some stuff
 
 	GameInitialSetup();		// Once-off setup for the game itself (e.g. create in-game menu etc)
 
-	Log ( "================[ Application Init Complete ]===============\n\n" );
+	djLOGSTR( "================[ Application Init Complete ]===============\n\n" );
 
 	return 0;
 }
 
 void DaveCleanup()
 {
-	Log ( "\n================[ Starting Application Kill ]===============\n" );
+	djLOGSTR( "\n================[ Starting Application Kill ]===============\n" );
 
 	// Save user volume setting
 	g_Settings.SetSettingInt("Volume",djSoundGetVolume());
 	g_Settings.SetSetting("SoundsOn",djSoundEnabled()?"ON":"OFF");
 
 	KillMainMenu();
-	Log ( "KillMainMenu() ok\n" );
+	djLOGSTR( "KillMainMenu() ok\n" );
 	KillMissionSystem();
-	Log ( "KillMissionSystem() ok\n" );
+	djLOGSTR( "KillMissionSystem() ok\n" );
 	KillCredits();
-	Log ( "KillCredits() ok\n" );
+	djLOGSTR( "KillCredits() ok\n" );
 	SaveHighScores();		// Save high scores
-	Log ( "SaveHighScores() ok\n" );
+	djLOGSTR( "SaveHighScores() ok\n" );
 	GameFinalCleanup();		// Game
-	Log ( "GameFinalCleanup() ok\n" );
+	djLOGSTR( "GameFinalCleanup() ok\n" );
 	djiDone();			// Input
-	Log ( "djiDone() ok\n" );
+	djLOGSTR( "djiDone() ok\n" );
 	djSoundDone();			// Sound
-	Log ( "djSoundDone() ok\n" );
+	djLOGSTR( "djSoundDone() ok\n" );
 	djDestroyImageHWSurface(g_pImgMain);
 	djDEL(g_pImgMain);		// Delete main menu background image (title screen)
-	Log ( "djDEL(g_pImgMain) ok\n" );
+	djLOGSTR( "djDEL(g_pImgMain) ok\n" );
 	GraphDone();			// Graphics
-	Log ( "GraphDone() ok\n" );
+	djLOGSTR( "GraphDone() ok\n" );
 	djTimeDone();			// Timer stuff
-	Log ( "djTimeDone() ok\n" );
+	djLOGSTR( "djTimeDone() ok\n" );
 
 	g_Settings.Save(
 		djAppendPathStr(djGetFolderUserSettings().c_str(), CONFIG_FILE).c_str()
 	);	// Save settings
-	Log ( "g_Settings.Save(CONFIG_FILE) ok\n" );
+	djLOGSTR( "g_Settings.Save(CONFIG_FILE) ok\n" );
 
-	Log ( "================[ Application Kill Complete ]===============\n\n" );
+	djLOGSTR( "================[ Application Kill Complete ]===============\n\n" );
 
 //	KillLog ();
+}
+
+extern int g_nSimulatedGraphics;
+//dj2019-06 just-for-fun extra-retro simulated faux-EGA/CGA
+void SettingsMenu()
+{
+	struct SMenuItem SettingsMenuItems[] =
+	{
+		// this looks very weird; need to fix menu code to handle this better, or wrap setttingsmenu in additional UI stuff
+		//{ false, "                                     " },//(DJ2019-06 low prio, at some stage want to fix up menu code so we can space / layout this thing properly - either that, or change how it draws the background)
+		{ false, " retro user experience settings      " },
+		//{ false, "                                     " },
+		{ true,  "   Mild (Default graphics)           " },
+		{ true,  "   Medium (EGA) (simulated 16-color) " },
+		{ true,  "   High (CGA) (simulated 4-color)    " },
+		//{ false, "                                     " },
+		{ false, "                                     " },
+		{ false, NULL }
+	};
+
+	unsigned char MenuCursor[] = { 128, 129, 130, 131, 0 };
+
+	CMenu Menu("SettingsMenu");
+	Menu.setClrBack( djColor(48,66,128) );
+	Menu.setSize(0);
+	Menu.setItems(SettingsMenuItems);
+	Menu.setMenuCursor(MenuCursor);
+	Menu.setXOffset(-1); // Calculate menu position for us
+	Menu.setYOffset(-1);
+
+	int nMenuOption = do_menu( &Menu );
+	switch (nMenuOption)
+	{
+	case 1:
+		g_nSimulatedGraphics = 0;
+		break;
+	case 2:
+		g_nSimulatedGraphics = 1;
+		break;
+	case 3:
+		g_nSimulatedGraphics = 2;
+		break;
+	}
 }
 
 void DoMainMenu()
 {
 	bool bRunning = true;
 
+#ifndef NOSOUND
 	//dj2016-10 adding background music to main menu, though have not put any real thought into what would
 	// be the best track here so fixme todo maybe dig a bit more and find better choice here etc. [also for levels]
-	Mix_Music* pMusic = Mix_LoadMUS("data/music/eric_matyas/8-Bit-Mayhem.ogg");
+	Mix_Music* pMusic = Mix_LoadMUS(DATA_DIR "music/eric_matyas/8-Bit-Mayhem.ogg");
 	if (pMusic!=NULL)
 		Mix_FadeInMusic(pMusic, -1, 800);
+#endif
 
 	do
 	{
+		// Clear back buffer [dj2019-06 .. adding this just to make as if we drop out of bigviewportmode and the menu skin doesn't cover full size, then there may be junk drawn at right or bottom]
+		djgSetColorFore(pVisBack, djColor(0, 0, 0));
+		djgDrawBox(pVisBack, 0, 0, pVisBack->width, pVisBack->height);
+
 		// Load main menu background image
 		if (g_pImgMain)
+		{
+			// Simple 1 to 1 blit .. later it might be worthwhile doing a stretch blit if size doesn't match resolution? [LOW - dj2019]
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
-		char sz[100]={0};
-		sprintf(sz,"%s","v1.0 - 3 Apr 2018");
-		//GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8*2, (unsigned char*)sz);
-		GraphDrawString(pVisBack, g_pFont8x8, 0, 200 - 8, (unsigned char*)sz);
-		sprintf(sz,"%s","djoffe.com");
-		GraphDrawString(pVisBack, g_pFont8x8, 320 - strlen(sz)*8, 200 - 8, (unsigned char*)sz);
+		}
+		// 'version string history' here:
+		// "v1.0 - 3 Apr 2018" [version 1]
+		// "v1.0.1 - 25 Apr 2020"
+		// "v1.0.2 - 19 Nov 2022" [<- last version on SDL1 - about to update to SDL2]
+		// "v1.0.3 - 19 Nov 2022" [New version number for SDL2 version with Matteo Bini SDL2 commit merged in]
+		const char* szVERSION = "v1.0.3 - 19 Nov 2022";
+		GraphDrawString(pVisBack, g_pFont8x8, 0, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)szVERSION);
+		const char* szURL = "djoffe.com";
+		GraphDrawString(pVisBack, g_pFont8x8, CFG_APPLICATION_RENDER_RES_W - strlen(szURL)*8, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)szURL);
 
 		GraphFlip(true);
 
@@ -474,18 +460,22 @@ void DoMainMenu()
 			//int score = PlayGame ();
 			int score = game_startup();
 			CheckHighScores( score );
+#ifndef NOSOUND
 			// Game levels start their own music, so when come out of game and back to main menu, restart main menu music
 			if (pMusic!=NULL)
 				Mix_FadeInMusic(pMusic, -1, 800);
+#endif
 			break;
 		}
 		case 2: // restore game [dj2016-10 adding implementation for this - it did nothing before]
 			{
 				int score = game_startup(true);
 				CheckHighScores( score );
+#ifndef NOSOUND
 				// Game levels start their own music, so when come out of game and back to main menu, restart main menu music
 				if (pMusic!=NULL)
 					Mix_FadeInMusic(pMusic, -1, 800);
+#endif
 			}
 			break;
 		case 3: // select mission
@@ -506,18 +496,25 @@ void DoMainMenu()
 		case 10: // about
 			ShowAbout();
 			break;
+		case 11://dj2019-06 just-for-fun extra-retro simulated faux-EGA/CGA
+			SettingsMenu();
+			break;
+		case 12://Don't quit
+			break;
 		case -1: // escape
-		case 11: // quit
+		case 13: // quit
 			bRunning = false;
 			break;
 		}
 	} while (bRunning);
 
+#ifndef NOSOUND
 	if (pMusic)
 	{
 		Mix_FreeMusic(pMusic);
 		pMusic = NULL;
 	}
+#endif
 }
 
 void AppendCharacter(char *szBuffer, char c, int nMaxLen)
@@ -593,11 +590,13 @@ void RedefineKeys()
 	do
 	{
 		int nDX = 152*2;
+		//dj2019-06 Either everything should be centered [future?] or everything 320-based [DG1]
+		//int nXLeft = (CFG_APPLICATION_RENDER_RES_W/2) - (nDX/2);
 		int nXLeft = (320/2) - (nDX/2);
 
 		// Black background
 		djgSetColorFore( pVisBack, djColor(0,0,0) );
-		djgDrawBox( pVisBack, 0, 0, 320, 200 );
+		djgDrawBox( pVisBack, 0, 0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H );
 		// Stupid cheesy boring dialog-border effect
 		DialogBoxEffect(nXLeft, 32, nDX, 128);
 
@@ -674,14 +673,14 @@ void RedefineKeys()
 			else if (anKeys[i]!=0)
 			{
 				// Show new key
-				char szBuf[1024] = {0};
-				sprintf(szBuf, "(%s)", GetKeyString(anKeys[i]));
+				char szBuf[2048] = {0};
+				snprintf(szBuf, sizeof(szBuf), "(%s)", GetKeyString(anKeys[i]));
 				GraphDrawString( pVisBack, g_pFont8x8, 64+14*8, 64+i*16, (unsigned char*)szBuf );
 			}
 			// Show previous key
 			{
-				char szBuf[1024] = {0};
-				sprintf(szBuf, "(%s)", GetKeyString(g_anKeys[i]));
+				char szBuf[2048] = {0};
+				snprintf(szBuf, sizeof(szBuf), "(%s)", GetKeyString(g_anKeys[i]));
 				GraphDrawString( pVisBack, g_pFont8x8, 64+22*8, 64+i*16, (unsigned char*)szBuf );
 			}
 		}
@@ -709,16 +708,18 @@ bool GetHighScoreUserName(char *szBuffer)
 	do
 	{
 		int nDX = MAX_HIGHSCORE_LEN*8;
+		//dj2019-07 for now just stick to 320; genericize better later re CFG_APPLICATION_RENDER_RES_W stuff ..
+		//int nXLeft = (CFG_APPLICATION_RENDER_RES_W/2) - (nDX / 2);
 		int nXLeft = (320/2) - (nDX / 2);
 
 		// Black background
 		djgSetColorFore( pVisBack, djColor(0,0,0) );
-		djgDrawBox( pVisBack, 0, 0, 320, 200 );
+		djgDrawBox( pVisBack, 0, 0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H );
 		// Stupid cheesy boring dialog-border effect
 		DialogBoxEffect(nXLeft-12, 64, nDX+24, 64);
 
 		djiPollBegin();
-		SDLMod ModState = SDL_GetModState();
+		SDL_Keymod ModState = SDL_GetModState();
 		SDL_Event Event;
 		while (djiPollEvents(Event))
 		{
@@ -789,6 +790,10 @@ bool GetHighScoreUserName(char *szBuffer)
 
 
 		GraphFlip(true);
+
+		//Prevent CPU hogging or it eats up a full core here [dj2019-07] (A little simplistic but it'll do)
+		SDL_Delay(20);
+
 	} while (bLoop);
 	return bRet;
 }
@@ -826,9 +831,9 @@ void SelectMission()
 	for ( i=0; i<(int)g_apMissions.size(); i++ )
 	{
 		pMenuItems[i+1].m_bitem = true;
-		char* szText = new char[256];
+		char* szText = new char[512];
 		//fixme ^ leaks
-		sprintf( szText, "   %-31.31s  ", g_apMissions[i]->GetName() );//sprintf( szText, "|  %-31.31s |", g_apMissions[i]->GetName() );
+		snprintf( szText, 512, "   %-31.31s  ", g_apMissions[i]->GetName() );//snprintf( szText, 512, "|  %-31.31s |", g_apMissions[i]->GetName() );
 		pMenuItems[i+1].m_szText = szText;//<- a bit gross [a bit you say]
 	}
 	// Top and bottom menu entries, the borders
@@ -873,7 +878,7 @@ void InitMainMenu()
 	//dj2018-04-01 make the Y position sightly higher by 4 pixel than the default, looks slightly better with new city background
 	mainMenu.setYOffset( 8 * (12 - (13 / 2)) - 4 );//13 = num items
 
-	mainMenu.setSoundMove ( djSoundLoad( "data/sounds/cardflip.wav" ) );
+	mainMenu.setSoundMove ( djSoundLoad( DATA_DIR "sounds/cardflip.wav" ) );
 }
 
 void KillMainMenu()

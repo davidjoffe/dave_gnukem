@@ -2,9 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Dave Gnukem"
-#define MyAppVersion "0.91"
+#define MyAppVersion "1.0.3"
 #define MyAppPublisher "TshwaneDJe"
-#define MyAppURL "http://djoffe.com/gnukem"
+#define MyAppURL "https://djoffe.com/gnukem"
 #define MyAppExeName "DaveGnukem.exe"
 
 [Setup]
@@ -21,24 +21,24 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-InfoBeforeFile=C:\dj\src\gnukem_installer\Dave Gnukem\README.md
-OutputDir=C:\dj\src\gnukem_installer
+InfoBeforeFile=C:\src\gnukem\README.md
+OutputDir=C:\src\gnukem\src\installer
 OutputBaseFilename=Dave_Gnukem_Setup
 UninstallDisplayIcon={app}\{#MyAppExeName}
-SetupIconFile=C:\dj\src\gnukem_installer\Dave Gnukem\data\icon\application_icon.ico
+SetupIconFile=C:\src\gnukem\data\icon\application_icon.ico
 Compression=lzma
 SolidCompression=yes
 
 [Languages]
-Name: "english"; MessagesFile: "compiler:..\..\..\dj\src\gnukem_installer\GnukemEnglish.isl"
+Name: "english"; MessagesFile: "compiler:..\..\src\gnukem\src\installer\GnukemEnglish.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "C:\dj\src\gnukem_installer\Dave Gnukem\DaveGnukem.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\dj\src\gnukem_installer\Dave Gnukem\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\src\gnukem\src\installer\ApplicationFolder\DaveGnukem.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\src\gnukem\src\installer\ApplicationFolder\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

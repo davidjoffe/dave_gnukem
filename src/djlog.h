@@ -5,7 +5,7 @@
 
 modified by Vytautas Shaltenis, a.k.a. rtfb
 
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2019 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _DJLOG_H_
@@ -26,7 +26,6 @@ Copyright (C) 1998-2018 David Joffe
 #define djMSG log_message
 
 extern void log_message( const char * szFormat, ... );
-extern void log_do_nothing( const char * szFormat, ... );
 */
 
 #endif

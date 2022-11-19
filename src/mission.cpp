@@ -5,7 +5,7 @@
 /*
 mission.cpp
 
-Copyright (C) 1999-2018 David Joffe
+Copyright (C) 1999-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "config.h"
@@ -18,11 +18,9 @@ Copyright (C) 1999-2018 David Joffe
 #include <string.h>
 #include <stdlib.h>
 
-#include "mmgr/nommgr.h"
 #include <string>
 #include <fstream>
 using namespace std;
-#include "mmgr/mmgr.h"
 
 vector<CMission * > g_apMissions;
 // FIXME: Does this stuff really belong here? Probably not.
@@ -106,11 +104,11 @@ int CMission::Load( const char * szfilename )
 	ifstream	fin;
 	string		line;
 	int			state=0;
-	char		filename[2048]={0};
+	char		filename[4096]={0};
 
 	SYS_Debug ( "CMission::Load( %s ): Loading ...\n", szfilename );
 
-	sprintf( filename, "%s%s", DATA_DIR, szfilename );
+	snprintf( filename, sizeof(filename), "%s%s", DATA_DIR, szfilename );
 	// open file
 	fin.open ( filename );
 	if ( !fin.is_open() )
@@ -304,12 +302,12 @@ int CMission::SaveSprites()
 		pSpriteData = g_pCurMission->GetSpriteData( i );
 		if ( pSpriteData != NULL ) // It *can* be NULL
 		{
-			char szFilename[1024]={0};
+			char szFilename[4096]={0};
 			// Save sprite data file
 #ifdef DATA_DIR
-			sprintf( szFilename, "%s%s", DATA_DIR, pSpriteData->m_szFilenameData );
+			snprintf( szFilename, sizeof(szFilename), "%s%s", DATA_DIR, pSpriteData->m_szFilenameData );
 #else
-			sprintf( szFilename, "%s", pSpriteData->m_szFilenameData );
+			snprintf( szFilename, sizeof(szFilename), "%s", pSpriteData->m_szFilenameData );
 #endif
 			if (nRet>=0)
 				nRet = pSpriteData->SaveData( szFilename );
@@ -372,7 +370,6 @@ CSpriteData::CSpriteData()
 	m_szFilenameData = NULL;
 	memset(m_extras, 0, sizeof(m_extras));
 	memset(m_type, 0, sizeof(m_type));
-	memset(m_color, 0, sizeof(m_color));
 }
 
 CSpriteData::~CSpriteData()
@@ -389,6 +386,7 @@ CSpriteData::~CSpriteData()
 
 int CSpriteData::LoadData( const char *szFilename )
 {
+	if (szFilename == nullptr) return -1;
 	FILE	*fin=NULL;
 	int		i=0, j=0;
 	int		temp=0;
@@ -399,8 +397,8 @@ int CSpriteData::LoadData( const char *szFilename )
 	if (NULL == (fin = fopen( szFilename, "r" )))
 	{
 #ifdef DATA_DIR
-		char buf[1024]={0};
-		sprintf( buf, "%s%s", DATA_DIR, szFilename );
+		char buf[4096]={0};
+		snprintf(buf,sizeof(buf), "%s%s", DATA_DIR, szFilename );
 		if (NULL == (fin = fopen( buf, "r" )))
 #endif
 		{
@@ -412,7 +410,7 @@ int CSpriteData::LoadData( const char *szFilename )
 	// Read "128"
 	fscanf ( fin, "%i", &temp );
 
-	for ( i=0; i<128; i++ )
+	for ( i=0; i<SPRITES_PER_SPRITESHEET; i++ )
 	{
 		// Read type
 		fscanf ( fin, "%i", &temp );
@@ -431,23 +429,22 @@ int CSpriteData::LoadData( const char *szFilename )
 		m_extras[i][11] = temp;
 
 		// FIXME: FOLLOWING OLD COLOR OBSOLETE
-		// Read block color
+		// Read block color (2019-06 THIS IS NOW DEPRECATED/OBSOLETE, this was for the old m_color variable, but we still load/save a dummy value to keep compatibility with existing sprite files.)
 		fscanf ( fin, "%i", &temp );
 		if (feof(fin))
 			goto error;
+		//(deprecated)m_color[i] = temp;
 
-		m_color[i] = temp;
 
-
-		// Calculate color from sprite by averaging the 16x16 array of pixels
+		// Calculate color from sprite by averaging the 16x16 array of pixels (or whatever the dimensions are - dj2019-07 extend to handle other size sprites)
 		if (m_pImage)
 		{
-			int iIndexX = (i%16)*16; // x offset into image
-			int iIndexY = (i/16)*16; // y offset into image
+			int iIndexX = (i%SPRITESHEET_NUM_COLS)*BLOCKW; // x offset into image
+			int iIndexY = (i/SPRITESHEET_NUM_COLS)*BLOCKH; // y offset into image
 			int r=0,g=0,b=0;
-			for ( j=0; j<16; j++ )
+			for ( j=0; j<BLOCKH; ++j )
 			{
-				for ( int k=0; k<16; k++ )
+				for ( int k=0; k<BLOCKW; ++k )
 				{
 					const djColor& clr = m_pImage->GetPixelColor(k+iIndexX, j+iIndexY);
 					r += (int)clr.r;
@@ -455,9 +452,9 @@ int CSpriteData::LoadData( const char *szFilename )
 					b += (int)clr.b;
 				}
 			}
-			r /= 256;
-			g /= 256;
-			b /= 256;
+			r /= (BLOCKW*BLOCKH);
+			g /= (BLOCKW*BLOCKH);
+			b /= (BLOCKW*BLOCKH);
 			m_Color[i] = djColor((unsigned char)r,(unsigned char)g,(unsigned char)b);
 		}
 	}
@@ -486,8 +483,8 @@ int CSpriteData::SaveData( const char *szFilename )
 
 	// Print the number of images in the file. Not used yet, but maybe in
 	// the future.
-	fprintf( fout, "%d\n", 128 );
-	for ( i=0; i<128; i++ )
+	fprintf( fout, "%d\n", SPRITES_PER_SPRITESHEET );
+	for ( i=0; i<SPRITES_PER_SPRITESHEET; i++ )
 	{
 		// output block type
 		fprintf( fout, "%d\n", m_type[i] );
@@ -501,8 +498,8 @@ int CSpriteData::SaveData( const char *szFilename )
 				fprintf( fout, "%d\n", m_extras[i][j] );
 		} // j
 
-		// output block color (for level editor)
-		fprintf( fout, "%d\n", m_color[i] );
+		// output block color (for level editor) (DEPRECATED! Changed 2019-07 from m_color[i] to just output a zero.)
+		fprintf( fout, "%d\n", 0);//Deprecated, but still save to file as it's part of the file format! Otherwise file loading won't work.//m_color[i] );
 	} // i
 
 	fclose( fout );
@@ -537,13 +534,30 @@ int CSpriteData::LoadSpriteImage()
 	}
 	else
 	{
-		char buf[1024]={0};
+		char buf[4096]={0};
 #ifdef DATA_DIR
-		sprintf( buf, "%s%s", DATA_DIR, m_szImgFilename );
+		snprintf(buf,sizeof(buf), "%s%s", DATA_DIR, m_szImgFilename );
 #else
-		sprintf( buf, "%s", m_szImgFilename );
+		snprintf(buf,sizeof(buf), "%s", m_szImgFilename );
 #endif
 		iRet = m_pImage->Load( buf );
+
+		//dj2019-07 shrink/resize sprites .. quick n dirty test .. to 'make as if' DG1 use 8x8 blocks instead of 16x16, for testing unhardcoded BLOCKW etc. ..
+		/*
+		if (BLOCKW==8 && m_pImage->Width()==256)
+		{
+			for (int y = 0; y < m_pImage->Height() / 2; ++y)
+			{
+				for (int x = 0; x < m_pImage->Width() / 2; ++x)
+				{
+					// Do quick 'n dirty nearest neighbor downsampling
+					int pixel = m_pImage->GetPixel(x * 2, y * 2);
+					m_pImage->PutPixel(x, y, pixel);
+				}
+			}
+		}
+		//*/
+
 		djCreateImageHWSurface( m_pImage );
 
 #ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS

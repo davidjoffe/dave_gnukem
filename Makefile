@@ -1,6 +1,6 @@
 #
 # David Joffe
-# Copyright 1998-2017 David Joffe
+# Copyright 1998-2022 David Joffe
 # Created 1998/12
 # Makefile for Dave Gnukem
 #
@@ -13,7 +13,7 @@ CC = gcc
 
 
 # dj2016-10 Add L -I/usr/local/include/SDL in process of getting this working on Mac OS X - not sure if this is 'bad' to just have both /usr/include and /usr/local/include??
-INCLUDEDIRS= -I/usr/include/SDL -I/usr/local/include/SDL 
+INCLUDEDIRS= -I/usr/include/SDL2 -I/usr/local/include/SDL2
 
 #CCFLAGS = -O -Wall $(INCLUDEDIRS)
 
@@ -25,7 +25,7 @@ CCFLAGS = -std=c++11 -Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
 #Release version:
 #CCFLAGS = -O -Wall -I/usr/local/include -DHAVE_SOUND $(INCLUDEDIRS)
 
-LIBS = -lSDL -lSDLmain -lSDL_mixer -lpthread 
+LIBS = -lSDL2 -lSDL2_mixer -lpthread
 BIN = davegnukem
 
 
@@ -46,8 +46,16 @@ else
     ifeq ($(UNAME_S),Linux)
         #CCFLAGS += -D LINUX
     endif
+    # dj2020-06 Add basic HaikuOS detection and override some default settings here if detected
+    ifeq ($(UNAME_S),Haiku)
+        INCLUDEDIRS=`sdl2-config --cflags`
+        CCFLAGS=-Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
+        LIBS=`sdl2-config --libs` -lSDL2 -lSDL2_mixer -lpthread
+    endif
     ifeq ($(UNAME_S),Darwin)
-        LIBS += -framework Cocoa 
+        LIBS += -framework Cocoa `sdl2-config --libs` 
+	# dj2022-11 add c++17 min here for Mac (might change this later to c++17)
+	CCFLAGS += -std=c++17 `sdl2-config --cflags`
     endif
     UNAME_P := $(shell uname -p)
     ifeq ($(UNAME_P),x86_64)
@@ -100,3 +108,33 @@ fixme:
 %.o: %.cpp
 	$(CPP) $(CCFLAGS) -c $< -o $@
 
+# The following was added to support debian packaging.  The make install
+# command will probably work on other unix like OS but not sure.
+# There probably should be some checks for different OS to be perfect.
+# Previously there was no install target at all which makes using 
+# packaging tools harder (easier for me to add install to Makefile).
+# Note DESTDIR variable is used by Debian packaging tools for staging
+# and PREFIX may already set as environment variable for some distro
+# -Craig
+ifeq ($(PREFIX),)
+    PREFIX := /usr/local
+endif
+
+install: 
+	@install -m 755 -d $(DESTDIR)/opt/gnukem	
+	@install -m 755 davegnukem $(DESTDIR)/opt/gnukem
+	@install -d $(DESTDIR)/usr/share/icons/hicolor/32x32/apps
+	@install -m 644 debian/gnukem.png $(DESTDIR)/usr/share/icons/hicolor/32x32/apps
+	@install -d $(DESTDIR)/usr/share/applications
+	@install -m 644 debian/gnukem.desktop $(DESTDIR)/usr/share/applications
+	@install -d $(DESTDIR)$(PREFIX)/bin/
+	@install -m 755 debian/gnukem.sh $(DESTDIR)$(PREFIX)/bin/gnukem
+	@cp -r data $(DESTDIR)/opt/gnukem/
+	@echo Dave Gnukem Installed.  Launch with $(DESTDIR)$(PREFIX)/bin/gnukem
+	
+
+uninstall:
+	rm -rf $(DESTDIR)/opt/gnukem
+	rm -f $(DESTDIR)$(PREFIX)/bin/gnukem 
+	rm -f $(DESTDIR)/usr/share/applications/gnukem.desktop
+	rm -f $(DESTDIR)/usr/share/icons/hicolor/32x32/apps/gnukem.png	

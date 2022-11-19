@@ -21,7 +21,7 @@ extern "C"
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
-#if defined(__APPLE__) || defined(__FreeBSD__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__)
 #include <stdlib.h>//Fixing malloc.h 'not found' error compiling on Mac [dj2016-10]
 #else
 #include <malloc.h>
@@ -38,19 +38,11 @@ extern "C"
 #include <float.h>
 
 
-// This should be defined in limits.h, but current MinGW distribution does
-// not have it. So i make it same as in vc6 and bcb5
-#ifndef OPEN_MAX
-#define OPEN_MAX	32
-#endif
-
-
-
-
+// fixme high these are too low - but many probably aren't used anymore? clean up .. [dj2022-11 at least making 4096 which is more reasonable for 2022 FOR NOW but this is not the right way to do things ..]
 #define SYS_MAX_FULL_PATH	4096	// Don't forget these are with
-#define SYS_MAX_PATH		1024	// terminating zeroes. So the real
-#define SYS_MAX_FILE		256	// length is (SYS_MAX_* -1)
-#define SYS_MAX_EXT		5
+#define SYS_MAX_PATH		4096	// terminating zeroes. So the real
+#define SYS_MAX_FILE		4096	// length is (SYS_MAX_* -1)
+#define SYS_MAX_EXT		64
 
 
 #endif   // #ifndef SYS_DEFS_H_KRANKLYS__

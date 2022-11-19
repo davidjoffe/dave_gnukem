@@ -1,17 +1,15 @@
 /*
 hiscores.cpp
 
-Copyright (C) 2001-2018 David Joffe
+Copyright (C) 2001-2022 David Joffe
 */
 
 #include <stdio.h>
 #include <string.h>
 #include "djstring.h"
 
-#include "mmgr/nommgr.h"
 #include <vector>
 using namespace std;
-#include "mmgr/mmgr.h"
 
 
 #include "hiscores.h"
@@ -23,6 +21,16 @@ using namespace std;
 SScore::SScore() : nScore(0)
 {
 	memset(szName,0,sizeof(szName));//ugh, this is 2016
+}
+void SScore::SetName(const char* szNameNew)
+{
+	if (szNameNew == nullptr)
+	{
+		strcpy(szName, "");
+		return;
+	}
+
+	snprintf(szName, sizeof(szName), "%s", szNameNew);
 }
 
 // Scores, sorted from highest to lowest
@@ -74,11 +82,10 @@ void ShowHighScores()
 
 		for ( int i=0; i<(int)g_aScores.size(); i++ )
 		{
-			char buf[128]={0};
-			sprintf(buf, "%d  %d", i, g_aScores[i].nScore);
+			char buf[1024]={0};
+			snprintf(buf, sizeof(buf), "%d  %d", i, g_aScores[i].nScore);
 			GraphDrawString(pVisBack, g_pFont8x8, 24, 24+i*12, (unsigned char*)buf);
-			sprintf(buf, "%s", g_aScores[i].szName);
-			GraphDrawString(pVisBack, g_pFont8x8, 24+11*8, 24+i*12, (unsigned char*)buf);
+			GraphDrawString(pVisBack, g_pFont8x8, 24+11*8, 24+i*12, (unsigned char*)g_aScores[i].szName);
 		}
 
 		GraphFlip(true);
@@ -97,15 +104,18 @@ bool LoadHighScores(const char *szFilename)
 	if (pIn==NULL)
 	{
 		djMSG("LoadHighScores: Failed to open file (%s): Creating default list\n", szFilename);
-		AddHighScore("Todd", 40000);
-		AddHighScore("Scott", 30000);
-		AddHighScore("George", 20000);
-		AddHighScore("Al", 10000);
-		AddHighScore("David", 5000);
+		// The default high scores in DN1 had firstnames of the DN1 developers, so we add that exactly the same here as a sort of 'hat tip' to them (with the same original default scores). And add myself. [dj2020-07]
+		// If we turn this into a generic little game engine this part should not be directly in the core but separated as Gnukem-specific stuff (maybe via derived class or lambda or something)
+		AddHighScore("Todd", 40000);//Todd Replogle
+		AddHighScore("Scott", 30000);//Scott Miller
+		AddHighScore("George", 20000);//George Broussard
+		AddHighScore("Al", 10000);//Allen H. Blum III
+		AddHighScore("David", 5000);//Me [dj2020-07]
+		AddHighScore("John", 500);// Is "John"==Jim Norwood? Not sure. The original DN1 highscores say "John" here but credits say "Jim Norwood" and no John is listed in credits. [dj2020-07]
 		return false;
 	}
 
-	char buf[512]={0};
+	char buf[2048]={0};
 
 	fgets(buf, sizeof(buf), pIn);
 	djStripCRLF(buf); // strip CR/LF characters
@@ -117,7 +127,8 @@ bool LoadHighScores(const char *szFilename)
 
 		fgets(buf, sizeof(buf), pIn);
 		djStripCRLF(buf); // strip CR/LF characters
-		strcpy(Score.szName, buf);
+		//fixme dj2022 small bug here still in loading high scores if very long name in file .. we make it safer but it might not load correct because of newlines still
+		Score.SetName(buf);
 
 		fgets(buf, sizeof(buf), pIn);
 		djStripCRLF(buf); // strip CR/LF characters
@@ -172,7 +183,7 @@ void AddHighScore(const char *szName, int nScore)
 		{
 			SScore Score;
 			Score.nScore = nScore;
-			strcpy(Score.szName, szName);
+			Score.SetName(szName);
 			g_aScores.insert(g_aScores.begin()+i, Score);
 			goto Leave;
 		}
@@ -181,7 +192,7 @@ void AddHighScore(const char *szName, int nScore)
 	{
 		SScore Score;
 		Score.nScore = nScore;
-		strcpy(Score.szName, szName);
+		Score.SetName(szName);
 		g_aScores.push_back(Score);
 	}
 Leave:
@@ -197,6 +208,6 @@ void GetHighScore(int nIndex, SScore &Score)
 		Score.nScore = 0;
 		return;
 	}
-	strcpy(Score.szName, g_aScores[nIndex].szName);
+	snprintf(Score.szName, sizeof(Score.szName), "%s", g_aScores[nIndex].szName);
 	Score.nScore = g_aScores[nIndex].nScore;
 }
