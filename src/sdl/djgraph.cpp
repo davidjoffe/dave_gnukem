@@ -174,7 +174,13 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 	{
 		CdjRect rcSrc(0, 0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H);//E.g. 320x200 for DG1
 		CdjRect rcDest(0, 0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H);
-		SDL_Rect rc = {.w = 1, .h = 1};
+#if __cplusplus>=202002L // c++20?
+		SDL_Rect rc = { .w = 1, .h = 1 };
+#else
+		SDL_Rect rc;
+		rc.w = 1;
+		rc.h = 1;
+#endif
 
 		//fixme this won't work bigendian
 		#if SDL_BYTEORDER==SDL_BIG_ENDIAN
