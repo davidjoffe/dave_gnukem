@@ -241,7 +241,9 @@ struct SMenuItem gameMenuItems[] =
 	{ true,  "   Restore Game    " },
 	{ true,  "   Instructions    " },
 	{ true,  "   Retro Settings  " },//dj2019-06 new
-//	{ true,  "   Toggle Fullscreen" },//Hmm note some consoles/ports might only work in fullscreen mode or something? should have 
+#ifdef djEXPERIMENTAL_FULLSCREEN_TOGGLE
+	{ true,  "   Fullscreen      " },//Hmm note some consoles/ports might only work in fullscreen mode or something? should have 
+#endif
 	{ true,  "   Abort Game      " },
 	{ false, "                   " },
 	{ false, NULL }
