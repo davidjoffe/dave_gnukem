@@ -135,7 +135,7 @@ void ShowMacros()
 	{
 		int iMacro = g_iAssignedMacros[i];
 		char buf[1024]={0};
-		sprintf( buf, "%d.", i+1 );
+		snprintf( buf, sizeof(buf), "%d.", i+1 );
 		ED_DrawStringClear( MACROS_X, y, "Macros:" );
 		ED_DrawString( MACROS_X, y, "Macros:" );
 

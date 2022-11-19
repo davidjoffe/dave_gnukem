@@ -55,8 +55,8 @@ void StoreGameKeys()
 {
 	for ( int i=0; i<KEY_NUMKEYS; i++ )
 	{
-		char szKey[64]={0};
-		sprintf(szKey, "SDL2Key%s", g_aszKeys[i]);
+		char szKey[128]={0};
+		snprintf(szKey, sizeof(szKey), "SDL2Key%s", g_aszKeys[i]);
 		g_Settings.SetSettingInt(szKey, g_anKeys[i]);
 	}
 }
@@ -64,17 +64,17 @@ void StoreGameKeys()
 void InitialiseGameKeySystem()
 {
 	// Set default keys (if not defined in settings already, e.g. if there was no config file)
-	char szKey[64]={0};
+	char szKey[128]={0};
 	for ( int i=0; i<KEY_NUMKEYS; i++ )
 	{
-		sprintf(szKey, "SDL2Key%s", g_aszKeys[i]);
+		snprintf(szKey, sizeof(szKey), "SDL2Key%s", g_aszKeys[i]);
 		g_Settings.SetDefaultSettingInt(szKey, g_anKeys[i]);
 	}
 
 	// Read key settings from config
 	for ( int i=0; i<KEY_NUMKEYS; i++ )
 	{
-		sprintf(szKey, "SDL2Key%s", g_aszKeys[i]);
+		snprintf(szKey, sizeof(szKey), "SDL2Key%s", g_aszKeys[i]);
 		g_anKeys[i] = g_Settings.FindSettingInt(szKey);
 	}
 

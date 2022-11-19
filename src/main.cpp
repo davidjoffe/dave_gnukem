@@ -673,14 +673,14 @@ void RedefineKeys()
 			else if (anKeys[i]!=0)
 			{
 				// Show new key
-				char szBuf[1024] = {0};
-				sprintf(szBuf, "(%s)", GetKeyString(anKeys[i]));
+				char szBuf[2048] = {0};
+				snprintf(szBuf, sizeof(szBuf), "(%s)", GetKeyString(anKeys[i]));
 				GraphDrawString( pVisBack, g_pFont8x8, 64+14*8, 64+i*16, (unsigned char*)szBuf );
 			}
 			// Show previous key
 			{
-				char szBuf[1024] = {0};
-				sprintf(szBuf, "(%s)", GetKeyString(g_anKeys[i]));
+				char szBuf[2048] = {0};
+				snprintf(szBuf, sizeof(szBuf), "(%s)", GetKeyString(g_anKeys[i]));
 				GraphDrawString( pVisBack, g_pFont8x8, 64+22*8, 64+i*16, (unsigned char*)szBuf );
 			}
 		}
@@ -831,9 +831,9 @@ void SelectMission()
 	for ( i=0; i<(int)g_apMissions.size(); i++ )
 	{
 		pMenuItems[i+1].m_bitem = true;
-		char* szText = new char[256];
+		char* szText = new char[512];
 		//fixme ^ leaks
-		sprintf( szText, "   %-31.31s  ", g_apMissions[i]->GetName() );//sprintf( szText, "|  %-31.31s |", g_apMissions[i]->GetName() );
+		snprintf( szText, 512, "   %-31.31s  ", g_apMissions[i]->GetName() );//snprintf( szText, 512, "|  %-31.31s |", g_apMissions[i]->GetName() );
 		pMenuItems[i+1].m_szText = szText;//<- a bit gross [a bit you say]
 	}
 	// Top and bottom menu entries, the borders
