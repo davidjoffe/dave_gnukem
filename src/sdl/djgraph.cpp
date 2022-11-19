@@ -116,17 +116,25 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 		pVis->pSurface = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, bpp,
 			0, 0, 0, 0);
 		pVis->pTexture = SDL_CreateTextureFromSurface(pVis->pRenderer, pVis->pSurface);
+
+		pVis->width = w;
+		pVis->height = h;
+		pVis->stride = w * (bpp/8);
 	}
 	else if (0 == strcmp( vistype, "memory" ))
 	{
+		// [dj2022-11] Small dev note here: In previous SDL1 version this used to create at size w,h so there's a slight behaviour change here with SDL2 version, so e.g.
+		// previously if we were at say 'scale 2' then the game base resolution is e.g. 320x200 but w,h would be e.g. 640x400 at scale 2 (and so on for higher scale values) -
+		// .. the below by Matto Bini seems probably more 'correct' (and probably better performance in some aspects) but just adding a correcton here to also set
+		// "pVis->width = CFG_APPLICATION_RENDER_RES_W" etc. otherwise the actual pSurface resolution (320x200) doesn't match what pVis reports which cause menu rendering funnies and possible crasshes this should fix.
 		pVis->pSurface = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, bpp,
 			0, 0, 0, 0);
+		pVis->width = CFG_APPLICATION_RENDER_RES_W;
+		pVis->height = CFG_APPLICATION_RENDER_RES_H;
+		pVis->stride = CFG_APPLICATION_RENDER_RES_W * (bpp/8);
 	}
 
 	pVis->bpp = pVis->pSurface->format->BitsPerPixel;
-	pVis->width = w;
-	pVis->height = h;
-	pVis->stride = w * (bpp/8);
 	switch (pVis->bpp)
 	{
 	case  8: pVis->pixwidth = 1; break;

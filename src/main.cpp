@@ -8,6 +8,7 @@
 // 2001/05 : begin SDL port; doxygen comments
 // 2016/10 : new github + livecoding 'era'
 // 2018/04 : 'DG version 1' released
+// ~2022 : Matteo Bini migration from SDL1 to SDL2
 
 /*
 Copyright (C) 1995-2022 David Joffe
@@ -506,7 +507,8 @@ void DoMainMenu()
 		// "v1.0 - 3 Apr 2018" [version 1]
 		// "v1.0.1 - 25 Apr 2020"
 		// "v1.0.2 - 19 Nov 2022" [<- last version on SDL1 - about to update to SDL2]
-		const char* szVERSION = "v1.0.2 - 19 Nov 2022";
+		// "v1.0.3 - 19 Nov 2022" [New version number for SDL2 version with Matteo Bini SDL2 commit merged in]
+		const char* szVERSION = "v1.0.3 - 19 Nov 2022";
 		GraphDrawString(pVisBack, g_pFont8x8, 0, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)szVERSION);
 		const char* szURL = "djoffe.com";
 		GraphDrawString(pVisBack, g_pFont8x8, CFG_APPLICATION_RENDER_RES_W - strlen(szURL)*8, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)szURL);
