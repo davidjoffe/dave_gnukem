@@ -8,8 +8,6 @@ Copyright (C) 1998-2018 David Joffe
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "mmgr/mmgr.h"
-
 #include "djstring.h"
 #include <stdarg.h>//va_list etc. [for djStrPrintf dj2016-10]
 #ifdef WIN32

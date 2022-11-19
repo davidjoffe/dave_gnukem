@@ -83,7 +83,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <OutputFile>../../DaveGnukem.exe</OutputFile>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;winmm.lib;SDL.lib;SDLmain.lib;SDL_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -94,8 +94,8 @@
       <Optimization>Disabled</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
-      <MinimalRebuild>true</MinimalRebuild>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <MinimalRebuild>false</MinimalRebuild>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;VISUALC6;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>.\Debug\vcDave.pch</PrecompiledHeaderOutputFile>
@@ -123,12 +123,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OutputFile>../../DaveGnukem.exe</OutputFile>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;winmm.lib;SDL.lib;SDLmain.lib;SDL_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2d.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\gameending.cpp" />
     <ClCompile Include="..\thing_monsters.cpp" />
+    <ClCompile Include="..\win32\dpiscaling.cpp" />
     <ClCompile Include="..\win32\winmain.cpp" />
     <ClCompile Include="..\sdl\djgraph.cpp" />
     <ClCompile Include="..\sdl\djinput.cpp" />
@@ -160,7 +161,6 @@
     <ClCompile Include="..\menu.cpp" />
     <ClCompile Include="..\mission.cpp" />
     <ClCompile Include="..\mixins.cpp" />
-    <ClCompile Include="..\mmgr\mmgr.cpp" />
     <ClCompile Include="..\settings.cpp" />
     <ClCompile Include="..\sys_error.cpp" />
     <ClCompile Include="..\sys_log.cpp" />
@@ -200,8 +200,6 @@
     <ClInclude Include="..\menu.h" />
     <ClInclude Include="..\mission.h" />
     <ClInclude Include="..\mixins.h" />
-    <ClInclude Include="..\mmgr\mmgr.h" />
-    <ClInclude Include="..\mmgr\nommgr.h" />
     <ClInclude Include="..\settings.h" />
     <ClInclude Include="..\sys_defs.h" />
     <ClInclude Include="..\sys_error.h" />

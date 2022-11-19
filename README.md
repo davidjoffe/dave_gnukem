@@ -1,7 +1,7 @@
 # Dave Gnukem
 Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'. It is kind of a parody of the original. Please note it is not a 'clone', and not a 're-make'.)
 
-**News Apr 2018: Version 1.0 released.** Apr 2019 OpenBSD port. (Apr 2020: Version 1.0.1 released.)
+**News Apr 2018: Version 1.0 released.** Apr 2019 OpenBSD port. (Apr 2020: Version 1.0.1 released.) (19 Nov 2022: 1.0.2 and 1.0.3 update to SDL2!)
 
 **Release Downloads:** https://sourceforge.net/projects/gnukem/
 
@@ -22,7 +22,7 @@ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspi
 
 ### Who is to blame for this?
 
-Created by: David Joffe http://djoffe.com/ / https://www.liveedu.tv/david_joffe/ / https://minds.com/David_Joffe
+Created by: David Joffe https://djoffe.com/ / https://www.liveedu.tv/david_joffe/ / https://minds.com/David_Joffe
 
 The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: [T.O.G](http://www.nuke24.net/ "T.O.G."), [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
@@ -38,10 +38,12 @@ It would be really great if someone could create packages for all major Linux di
 
 Dave Gnukem added to the Arch Linux AUR (Arch User Repository) 🙂 (Added May 2020 by https://github.com/caltlgin)
 
-* https://aur.archlinux.org/packages/dave_gnukem/
+* https://aur.archlinux.org/packages/dave-gnukem
+* https://aur.archlinux.org/packages/dave-gnukem-git (build from git master)
 
 Spotted: openSUSE Leap packages :) (seemingly by Martin Hauke)
 
+* https://software.opensuse.org/package/dave_gnukem
 * https://opensuse.pkgs.org/15.2/games-x86_64/dave_gnukem-1.0.1-lp152.1.1.x86_64.rpm.html (the description here is perfect to me - dj)
 * https://opensuse.pkgs.org/15.2/games-x86_64/dave_gnukem-data-1.0.1-lp152.1.1.noarch.rpm.html
 
@@ -129,6 +131,8 @@ TL;DR Shoot anything that moves
 
 # Ports
 
+* Debian (work in progress ~2022 - Matteo Bini; https://github.com/enigma9o7, https://github.com/bgermann; Craig Langman)
+* Bodhi Linux Dec 2021 efforts: https://bodhilinux.boards.net/thread/892/packaged-dave-gnukem-silly-retro
 * Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi and https://github.com/ptitseb)
 * MorphOS [Mar 2018, by Bruno Peloille]: http://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_1.00.lha
 * Instructions for ClockworkPi GameShell: https://forum.clockworkpi.com/t/lets-play-dave-gnukem/1917 by: https://forum.clockworkpi.com/u/Oet
@@ -148,9 +152,38 @@ Then follow the same instructions as for Linux, e.g. git clone the src, cd into 
 
 * "a good time killer when I'm baking" - Alessia_Amelia (Jan 2019)
 
+# FAQ (Frequently Asked Questions)
+
+* Q: 'The scrolling is choppy' or 'framerate low'?
+* A: The code can handle smoother scrolling and faster frame rates by tweaking settings and gameplay code, but is deliberately soft-limited to 18 frames per second (and the scrolling behaviour intended to mimic the original) because the original DN1 behaved close to this, and the point is to offer a nostalgic similar retro 'look and feel' (and thus also frame rate and scrolling behaviour) of the original Duke Nukem 1, which was designed to run on the much slower computers of that era (I used to play DN1 on an 80286 with 16-color EGA graphics in the '90s, and if you've ever had to code for EGA you'd also understand - dj) - so that anyone who also played the original should experience some nostalgic familiarity.
+
+* Q: Why is the game resolution 320x200?
+* A: The original Duke Nukem 1 had 320x200 16-color EGA-mode graphics ("Enhanced Graphics Adapter", an early video standard that supported 16 colors; many games of the time used 320x200). Since this game is intended as a sort of 'retro parody' it deliberately uses the same original resolution (and frame rate) in order to offer some retro nostalgic recognition and familiarity in look and feel and gameplay, especially for those who played the original. (David Joffe note: The first computer I did 'serious' programming on was an 80286 with EGA display adapter in the 1990s, and I spent quite a lot of time playing the original Duke Nukem 1 - I loved the game - and around ~1994 I started working on a very early x86 assembly language DOS/EGA version of what went on to become Dave Gnukem when in ~1995 I started this C++ version. So this wasn't a retro game when I started it - it just took so long to complete it that by the time version 1 was completed, I noticed everyone was calling it a "retro game", so it's now de facto "retro". I felt during development that if one deviates from 320x200 it feels much less like a 'retro parody of Duke Nukem 1'.) The game source code can support higher resolutions - these are controlled by config options - so the 'engine' could be used to make higher-resolution games, and with higher frame rates and smoother scrolling (with some tweaking).
+
+* Q: What does the "Don't quit" menu option do?
+* A: It does just what it says, it doesn't quit the game
+
+* Q: Why does it say "Ordering info" in the menu?
+* A: A small parody and retro recognition item, because the original shareware Duke Nukem 1 had that in the menu - but since this is open source, we add a "not" right after that is [also very 1990s](https://en.wikipedia.org/wiki/..._Not!)
+
 # History / Changes
 
 Recent:
+
+~2022 - Work on Debian support and Debian packaging - user contributions by Matteo Bini, https://github.com/enigma9o7, https://github.com/bgermann, Craig Langman
+
+2022/11/19 - Version 1.0.3
+
+* [19 Nov 2022] Integrating Matteo Bini's implementation of updating the source from SDL1 to SDL2
+
+Matteo Bini implemented SDL2 support (including also contributions for Debian support) https://github.com/davidjoffe/dave_gnukem/pull/135/commits/0f0022b9921982062eb7a93d2aef9a90459f3d33
+
+2022/11/19 - Version 1.0.2 Final SDL1-based release, about to switch to SDL2
+
+* [19 Nov 2022] Final offical SDL1-based release: https://github.com/davidjoffe/dave_gnukem/releases/tag/1.0.2 (https://github.com/davidjoffe/dave_gnukem/releases/tag/1.0.2 (final official SDL1-based source code - if an old downstream port needs to be on SDL1 for some reason we suggest using that 1.0.2 release)
+
+
+2021 - User work for Bodhi Linux port: https://bodhilinux.boards.net/thread/892/packaged-dave-gnukem-silly-retro
 
 2020/04/25 - Version 1.0.1
 
@@ -269,7 +302,7 @@ Recent:
 
 # Developer Info / Build Info
 
-**Dependencies: LibSDL1.2, LibSDL-Mixer 1.2**
+**Dependencies: LibSDL2, LibSDL-Mixer 2**
 
 ## Windows Build Instructions
 
@@ -309,17 +342,42 @@ NB: FIRST INSTALL DEPENDENCIES:
 
 How to install dependencies on Debian, Ubuntu etc.:
 
-$ sudo apt-get install libsdl1.2-dev
+$ sudo apt-get install libsdl2-dev
 
-$ sudo apt-get install libsdl-mixer1.2-dev
+$ sudo apt-get install libsdl2-mixer-dev
 
 (NOTE: If you don't have libsdl-mixer1.2 for whatever reason and you just want to get it compiling without sound, you can add -DNOSOUND to the CCFLAGS in the Makefile, and remove -lSDL_mixer from the Makefile LIBS setting.)
 
+## SDL1.2 or SDL2?
+
+On 19 November 2022 we made an official change from LibSDL1.2 (now very old) to LibSDL2 (thanks to Matteo Bini for that).
+
+https://github.com/davidjoffe/dave_gnukem/releases/tag/1.0.2 (final official SDL1-based source code - if an old downstream port needs to be on SDL1 for some reason we suggest using that 1.0.2 release)
+
+So for builds prior to this, the dependencies would be e.g. along the lines "sudo apt-get install libsdl1.2-dev" and "libsdl-mixer1.2-dev".
+
+Henceforth, it should be e.g.: libsdl2-dev, libsdl2-mixer-dev
+
+SDL2 brings various potential advantages.
+
+
+
 ## Mac OS X Build Instructions
 
-Same as Linux - type 'make'. Run with ./davegnukem if it built correctly.
+Same as Linux - type 'make'. Run with ./davegnukem if it built correctly (and data subfolder present)
 
-Dependencies: You may have to first install LibSDL1.2 and LibSDL-Mixer1.2 (these can be installed by downloading the source code and doing 'make' and 'make install' (as root) for each of these first).
+Installing Dependencies:
+
+If using macports, you should be able to just do:
+
+% sudo port install libsdl2
+
+% sudo port install libsdl2_mixer
+
+Then as with Linux, type 'make' and run with "./davegnukem" if it built correctly (and data subfolder present)
+
+(Alternatively, you could install LibSDL2 and LibSDL-Mixer2 by downloading the source code and doing 'make' and 'make install' (as root) for each of these first).
+
 
 ## Windows Installer Build Instructions
 
@@ -424,7 +482,7 @@ The underlying 'engine' supports high frame rates and smooth scrolling etc.; the
 
 The source code itself (and most of the data/sprites) for Dave Gnukem are dual-licensed under MIT license or GPL.
 
-With respect to particular data items, the following license conditions apply:
+With respect to particular **data items**, the following license conditions apply:
 
 * 2018-03-22 Add boots sprite made by freepik.com, from flaticon.com, license Creative Commons BY 3.0
 * 2017-08-04 Add font data/fonts/simple_6x8.tga by http://www.zingot.com/ from https://opengameart.org/content/bitmap-font-pack License https://creativecommons.org/licenses/by/3.0/ (small changes made to color, and convert from PNG to TGA)
@@ -440,3 +498,14 @@ With respect to particular data items, the following license conditions apply:
 
 Apart from the abovementioned, all other data included with 'version 1' is dual-licensed under MIT license or GPL.
 
+Additional game data credits: Apart from the abovementioned, most the sprites were done by David Joffe (with some major contributions by Evil Mr Henry http://www.emhsoft.com/ including the main character sprites). Steve Merrifield made major level editing contributions. Apologies if anyone left out.
+
+# Additional Development Credits
+
+* ~2022 Matteo Bini entirely developed and contributed updates of the code from SDL1 to SDL2 (~2022 merging in progress) https://github.com/davidjoffe/dave_gnukem/pull/135
+
+* ~2021/2022- [Ongoing] Some valuable contributions for Debian support (work in progress, see https://github.com/davidjoffe/dave_gnukem/pull/131 discussion) - amongst others:
+	Matteo Bini
+	https://github.com/enigma9o7
+	https://github.com/bgermann
+	Craig Langman (New ~2022 Debian package files work in progress e.g. )

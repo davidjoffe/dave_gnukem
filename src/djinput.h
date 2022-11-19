@@ -3,6 +3,8 @@
 /* 1999/02 converting over from keys.h/cpp , trying to genericize */
 /* 2001/07 converting to SDL */
 /* Copyright (C) 1995-2019 David Joffe */
+
+// dj2022-11 removing anyway-now-unused "INPUT_.." flags that are now sometimes causing conflicts with existing libs in Win32 builds
 /*--------------------------------------------------------------------------*/
 #ifndef _DJINPUT_H_
 #define _DJINPUT_H_
@@ -15,7 +17,7 @@ extern int g_iKeysLast[DJKEY_MAX];
 
 extern djVisual *g_pVisInput;
 
-extern bool djiInit( djVisual *pVis, int iFlags );
+extern bool djiInit( djVisual *pVis );
 extern void djiDone();
 extern void djiPoll();
 extern void djiPollBegin();
@@ -28,14 +30,6 @@ extern bool djiKeyDown(int iScanCode);
 extern bool djiKeyPressed(int iScanCode);
 void djiClearBuffer ();				// rtfb
 
-// Use to indicate which events you want
-// FIXME: DOES THIS MAKE SNESE? WE CAN ONLY CHECK KEY STATE! (Make event based?)
-#define INPUT_MOUSE     1
-#define INPUT_KEYDOWN   2
-#define INPUT_KEYUP     4
-#define INPUT_KEYREPEAT 8
-#define INPUT_KEYBOARD (INPUT_KEYDOWN|INPUT_KEYUP|INPUT_KEYREPEAT)
-
 //! Maps a platform-dependent key code to a DJ key scan code. This will quite likely
 //! go now that SDL is in
 struct SdjKeyMapping
@@ -44,7 +38,7 @@ struct SdjKeyMapping
 	unsigned int m_iPlatformCode; // platform dependent scan code
 };
 
-
+//fixme [low prio] slightly gross globals ..
 extern int mouse_x;
 extern int mouse_y;
 extern int mouse_b;

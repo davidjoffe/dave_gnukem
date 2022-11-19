@@ -5,7 +5,7 @@
 /*
 mission.cpp
 
-Copyright (C) 1999-2019 David Joffe
+Copyright (C) 1999-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "config.h"
@@ -18,11 +18,9 @@ Copyright (C) 1999-2019 David Joffe
 #include <string.h>
 #include <stdlib.h>
 
-#include "mmgr/nommgr.h"
 #include <string>
 #include <fstream>
 using namespace std;
-#include "mmgr/mmgr.h"
 
 vector<CMission * > g_apMissions;
 // FIXME: Does this stuff really belong here? Probably not.
@@ -106,11 +104,11 @@ int CMission::Load( const char * szfilename )
 	ifstream	fin;
 	string		line;
 	int			state=0;
-	char		filename[2048]={0};
+	char		filename[4096]={0};
 
 	SYS_Debug ( "CMission::Load( %s ): Loading ...\n", szfilename );
 
-	sprintf( filename, "%s%s", DATA_DIR, szfilename );
+	snprintf( filename, sizeof(filename), "%s%s", DATA_DIR, szfilename );
 	// open file
 	fin.open ( filename );
 	if ( !fin.is_open() )
@@ -304,12 +302,12 @@ int CMission::SaveSprites()
 		pSpriteData = g_pCurMission->GetSpriteData( i );
 		if ( pSpriteData != NULL ) // It *can* be NULL
 		{
-			char szFilename[1024]={0};
+			char szFilename[4096]={0};
 			// Save sprite data file
 #ifdef DATA_DIR
-			sprintf( szFilename, "%s%s", DATA_DIR, pSpriteData->m_szFilenameData );
+			snprintf( szFilename, sizeof(szFilename), "%s%s", DATA_DIR, pSpriteData->m_szFilenameData );
 #else
-			sprintf( szFilename, "%s", pSpriteData->m_szFilenameData );
+			snprintf( szFilename, sizeof(szFilename), "%s", pSpriteData->m_szFilenameData );
 #endif
 			if (nRet>=0)
 				nRet = pSpriteData->SaveData( szFilename );
@@ -388,6 +386,7 @@ CSpriteData::~CSpriteData()
 
 int CSpriteData::LoadData( const char *szFilename )
 {
+	if (szFilename == nullptr) return -1;
 	FILE	*fin=NULL;
 	int		i=0, j=0;
 	int		temp=0;
@@ -398,8 +397,8 @@ int CSpriteData::LoadData( const char *szFilename )
 	if (NULL == (fin = fopen( szFilename, "r" )))
 	{
 #ifdef DATA_DIR
-		char buf[1024]={0};
-		sprintf( buf, "%s%s", DATA_DIR, szFilename );
+		char buf[4096]={0};
+		snprintf(buf,sizeof(buf), "%s%s", DATA_DIR, szFilename );
 		if (NULL == (fin = fopen( buf, "r" )))
 #endif
 		{
@@ -535,11 +534,11 @@ int CSpriteData::LoadSpriteImage()
 	}
 	else
 	{
-		char buf[1024]={0};
+		char buf[4096]={0};
 #ifdef DATA_DIR
-		sprintf( buf, "%s%s", DATA_DIR, m_szImgFilename );
+		snprintf(buf,sizeof(buf), "%s%s", DATA_DIR, m_szImgFilename );
 #else
-		sprintf( buf, "%s", m_szImgFilename );
+		snprintf(buf,sizeof(buf), "%s", m_szImgFilename );
 #endif
 		iRet = m_pImage->Load( buf );
 

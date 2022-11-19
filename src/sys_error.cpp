@@ -16,100 +16,60 @@
 #include "sys_defs.h"
 #include <string>
 
-std::string g_sFile;
-static int	g_nLine = 0;
-
-void _SetFileAndLine ( const char *filename, const int linenum )
+void _SYS_Error ( const char *file, int line, const char *fmt, ... )
 {
-	// [dj2017-06-20] Make a copy of the passed-in filename string rather than keep pointer to it (in case caller deletes string, then this would crash)
-	g_sFile = "";
-	if (filename!=NULL)
-		g_sFile = filename;
-	g_nLine = linenum;
-}
-
-
-void _SYS_Error ( const char *fmt, ... )
-{
-	char		text[2048]={0};
-	char		text2[2048]={0};
-	char		*ptr=NULL, *ptr2=NULL;
-	va_list		args;
-
-	if ( NULL == fmt )
+	if (NULL == fmt)
 		return;
 
+	static thread_local char		text[4096]={0};
+	static thread_local char		text2[4096+1024]={0};
+
+	va_list		args;
 	va_start ( args, fmt );
-		vsprintf ( text, fmt, args );
+		vsnprintf ( text, sizeof(text), fmt, args );
 	va_end ( args );
 
-	sprintf ( text2, "[Error] %s line %d: ", g_sFile.c_str(), g_nLine );
-	ptr2 = text2 + strlen ( text2 );
+	snprintf ( text2, sizeof(text2), "[Error] %s line %d: %s", file, line, text);
 
-	ptr = text;
-	while ( *ptr )
-	{
-		*ptr2++ = *ptr++;
-	}
-	*ptr2 = '\0';
-
-	Log ( "%s", text2 );
+	djLog::LogStr( text2 );
 	//DaveCleanup ();			// main application cleanup
 	//exit ( 0 );
 }
 
 
-void _SYS_Warning ( const char *fmt, ... )
+void _SYS_Warning ( const char *file, int line, const char *fmt, ... )
 {
-	char		text[2048]={0};
-	char		text2[2048]={0};
-	char		*ptr=NULL, *ptr2=NULL;
-	va_list		args;
-
-	if ( NULL == fmt )
+	if (NULL == fmt)
 		return;
 
+	static thread_local char		text[4096] = { 0 };
+	static thread_local char		text2[4096+1024] = { 0 };
+
+	va_list		args;
 	va_start ( args, fmt );
-		vsprintf ( text, fmt, args );
+		vsnprintf ( text, sizeof(text), fmt, args );
 	va_end ( args );
 
-	sprintf ( text2, "[Warning] %s line %d: ", g_sFile.c_str(), g_nLine );
-	ptr2 = text2 + strlen ( text2 );
-
-	ptr = text;
-	while ( *ptr )
-	{
-		*ptr2++ = *ptr++;
-	}
-	*ptr2 = '\0';
-
-	Log ( "%s", text2 );
+	snprintf ( text2, sizeof(text2), "[Warning] %s line %d: %s", file, line, text);
+  
+	djLog::LogStr(text2);
 }
 
 
-void _SYS_Debug ( const char *fmt, ... )
+void _SYS_Debug ( const char *file, int line, const char *fmt, ... )
 {
-	char		text[2048]={0};
-	char		text2[2048]={0};
-	char		*ptr=NULL, *ptr2=NULL;
-	va_list		args;
-
-	if ( NULL == fmt )
+	if (NULL == fmt)
 		return;
 
+	static thread_local char		text[4096]={0};
+	static thread_local char		text2[4096+1024]={0};
+
+	va_list		args;
 	va_start ( args, fmt );
-		vsprintf ( text, fmt, args );
+		vsnprintf ( text, sizeof(text), fmt, args );
 	va_end ( args );
 
-	sprintf ( text2, "[Debug] %s line %d: ", g_sFile.c_str(), g_nLine );
-	ptr2 = text2 + strlen ( text2 );
+	snprintf( text2, sizeof(text2), "[Debug] %s line %d: %s", file, line, text);
 
-	ptr = text;
-	while ( *ptr )
-	{
-		*ptr2++ = *ptr++;
-	}
-	*ptr2 = '\0';
-
-	Log ( "%s", text2 );
+	djLog::LogStr(text2);
 }

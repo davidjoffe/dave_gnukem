@@ -42,6 +42,13 @@ static djImage		*pFont = NULL;
 
 void ED_CommonInit ()
 {
+	SDL_FreeSurface(pVisMain->pSurface);
+	SDL_DestroyTexture(pVisMain->pTexture);
+	SDL_RenderSetLogicalSize(pVisMain->pRenderer, pVisMain->width, pVisMain->height);
+	pVisMain->pSurface = SDL_CreateRGBSurface(0, pVisMain->width, pVisMain->height, pVisMain->bpp,
+		0, 0, 0, 0);
+	pVisMain->pTexture = SDL_CreateTextureFromSurface(pVisMain->pRenderer, pVisMain->pSurface);
+
 	// rtfb:
 	// i don't know how and why it worked before i set this,
 	// but when i first tried to put my hands on Editor,
@@ -54,12 +61,12 @@ void ED_CommonInit ()
 		SYS_Warning ( "Failed to load macros!\n" );
 
 	pFont = new djImage;
-	pFont->Load( "data/simplefont.tga" );
+	pFont->Load( DATA_DIR "simplefont.tga" );
 	djCreateImageHWSurface(pFont);
 
 	SDL_ShowCursor ( 1 );
 
-	if (!djiInit( pVisMain, INPUT_MOUSE|INPUT_KEYBOARD ))
+	if (!djiInit( pVisMain ))
 	{
 		printf("failed init input stuff\n");
 	}
@@ -70,13 +77,20 @@ void ED_CommonInit ()
 
 void ED_CommonKill ()
 {
-	djiInit( pVisMain, INPUT_KEYDOWN|INPUT_KEYUP|INPUT_KEYREPEAT );
+	djiInit( pVisMain );
 	SDL_ShowCursor(0);
 	djDestroyImageHWSurface(pFont);
 	delete pFont;
 	pFont = NULL;
 	DeleteMacros ();
 	djiClearBuffer ();
+
+	SDL_FreeSurface(pVisMain->pSurface);
+	SDL_DestroyTexture(pVisMain->pTexture);
+	SDL_RenderSetLogicalSize(pVisMain->pRenderer, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H);
+	pVisMain->pSurface = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, pVisMain->bpp,
+		0, 0, 0, 0);
+	pVisMain->pTexture = SDL_CreateTextureFromSurface(pVisMain->pRenderer, pVisMain->pSurface);
 }
 
 
@@ -136,8 +150,8 @@ void ED_SetSprite( int ispritenew, int ox, int oy )
 
 	g_iSprite = ispritenew;
 	// show sprite index
-	char buf[64]={0};
-	sprintf( buf, "%3d", (int)g_iSprite );
+	char buf[128]={0};
+	snprintf( buf, sizeof(buf), "%3d", (int)g_iSprite );
 	ED_DrawStringClear( 0, 472, buf );
 	ED_DrawString( 0, 472, buf );
 
@@ -205,8 +219,8 @@ void ED_SpriteShowType( int c )
 
 void ED_SpriteShowExtra( int i, int c )
 {
-	char buf[128]={0};
-	sprintf( buf, "%2d:[%4d]", i, ED_GetSpriteExtra( g_iSpriteset, g_iSprite, i ) );
+	char buf[256]={0};
+	snprintf(buf,sizeof(buf), "%2d:[%4d]", i, ED_GetSpriteExtra( g_iSpriteset, g_iSprite, i ) );
 	switch (i)
 	{
 	case 4: strcat(buf, "flags");break;

@@ -1,7 +1,7 @@
 /*
 keys.cpp
 
-Copyright (C) 2001-2018 David Joffe
+Copyright (C) 2001-2022 David Joffe
 
 Created: 09/2001
 */
@@ -49,12 +49,18 @@ const char *g_aszKeys[KEY_NUMKEYS] =
 
 vector<int> g_anValidGameKeys;
 
+// dj: IMPORTANT NOTE FOR ~2022-11 SDL1 TO SDL2 IMPLEMENTATION:
+// Previously the settings file stored the defined keys with keyname "Key" in front; however with SDL2 support this
+// introduces a small bug where if you have already played the SDL1-based version it loads SDL1 scancode settings from the defined keys configuration file
+// and then several keys e.g. left/right don't work because the scancodes changes. Simple fix, for SDL2 we now use a different setting name prefix
+// and then e.g. whether you run SDL1 or SDL2 version it should in theory just load different sets of defined (or default) gameplay keys.
+
 void StoreGameKeys()
 {
 	for ( int i=0; i<KEY_NUMKEYS; i++ )
 	{
-		char szKey[64]={0};
-		sprintf(szKey, "Key%s", g_aszKeys[i]);
+		char szKey[128]={0};
+		snprintf(szKey, sizeof(szKey), "SDL2Key%s", g_aszKeys[i]);
 		g_Settings.SetSettingInt(szKey, g_anKeys[i]);
 	}
 }
@@ -62,17 +68,17 @@ void StoreGameKeys()
 void InitialiseGameKeySystem()
 {
 	// Set default keys (if not defined in settings already, e.g. if there was no config file)
-	char szKey[64]={0};
+	char szKey[128]={0};
 	for ( int i=0; i<KEY_NUMKEYS; i++ )
 	{
-		sprintf(szKey, "Key%s", g_aszKeys[i]);
+		snprintf(szKey, sizeof(szKey), "SDL2Key%s", g_aszKeys[i]);
 		g_Settings.SetDefaultSettingInt(szKey, g_anKeys[i]);
 	}
 
 	// Read key settings from config
 	for ( int i=0; i<KEY_NUMKEYS; i++ )
 	{
-		sprintf(szKey, "Key%s", g_aszKeys[i]);
+		snprintf(szKey, sizeof(szKey), "SDL2Key%s", g_aszKeys[i]);
 		g_anKeys[i] = g_Settings.FindSettingInt(szKey);
 	}
 
@@ -148,112 +154,16 @@ void InitialiseGameKeySystem()
 	g_anValidGameKeys.push_back(SDLK_y);
 	g_anValidGameKeys.push_back(SDLK_z);
 	g_anValidGameKeys.push_back(SDLK_DELETE);
-	g_anValidGameKeys.push_back(SDLK_WORLD_0);
-	g_anValidGameKeys.push_back(SDLK_WORLD_1);
-	g_anValidGameKeys.push_back(SDLK_WORLD_2);
-	g_anValidGameKeys.push_back(SDLK_WORLD_3);
-	g_anValidGameKeys.push_back(SDLK_WORLD_4);
-	g_anValidGameKeys.push_back(SDLK_WORLD_5);
-	g_anValidGameKeys.push_back(SDLK_WORLD_6);
-	g_anValidGameKeys.push_back(SDLK_WORLD_7);
-	g_anValidGameKeys.push_back(SDLK_WORLD_8);
-	g_anValidGameKeys.push_back(SDLK_WORLD_9);
-	g_anValidGameKeys.push_back(SDLK_WORLD_10);
-	g_anValidGameKeys.push_back(SDLK_WORLD_11);
-	g_anValidGameKeys.push_back(SDLK_WORLD_12);
-	g_anValidGameKeys.push_back(SDLK_WORLD_13);
-	g_anValidGameKeys.push_back(SDLK_WORLD_14);
-	g_anValidGameKeys.push_back(SDLK_WORLD_15);
-	g_anValidGameKeys.push_back(SDLK_WORLD_16);
-	g_anValidGameKeys.push_back(SDLK_WORLD_17);
-	g_anValidGameKeys.push_back(SDLK_WORLD_18);
-	g_anValidGameKeys.push_back(SDLK_WORLD_19);
-	g_anValidGameKeys.push_back(SDLK_WORLD_20);
-	g_anValidGameKeys.push_back(SDLK_WORLD_21);
-	g_anValidGameKeys.push_back(SDLK_WORLD_22);
-	g_anValidGameKeys.push_back(SDLK_WORLD_23);
-	g_anValidGameKeys.push_back(SDLK_WORLD_24);
-	g_anValidGameKeys.push_back(SDLK_WORLD_25);
-	g_anValidGameKeys.push_back(SDLK_WORLD_26);
-	g_anValidGameKeys.push_back(SDLK_WORLD_27);
-	g_anValidGameKeys.push_back(SDLK_WORLD_28);
-	g_anValidGameKeys.push_back(SDLK_WORLD_29);
-	g_anValidGameKeys.push_back(SDLK_WORLD_30);
-	g_anValidGameKeys.push_back(SDLK_WORLD_31);
-	g_anValidGameKeys.push_back(SDLK_WORLD_32);
-	g_anValidGameKeys.push_back(SDLK_WORLD_33);
-	g_anValidGameKeys.push_back(SDLK_WORLD_34);
-	g_anValidGameKeys.push_back(SDLK_WORLD_35);
-	g_anValidGameKeys.push_back(SDLK_WORLD_36);
-	g_anValidGameKeys.push_back(SDLK_WORLD_37);
-	g_anValidGameKeys.push_back(SDLK_WORLD_38);
-	g_anValidGameKeys.push_back(SDLK_WORLD_39);
-	g_anValidGameKeys.push_back(SDLK_WORLD_40);
-	g_anValidGameKeys.push_back(SDLK_WORLD_41);
-	g_anValidGameKeys.push_back(SDLK_WORLD_42);
-	g_anValidGameKeys.push_back(SDLK_WORLD_43);
-	g_anValidGameKeys.push_back(SDLK_WORLD_44);
-	g_anValidGameKeys.push_back(SDLK_WORLD_45);
-	g_anValidGameKeys.push_back(SDLK_WORLD_46);
-	g_anValidGameKeys.push_back(SDLK_WORLD_47);
-	g_anValidGameKeys.push_back(SDLK_WORLD_48);
-	g_anValidGameKeys.push_back(SDLK_WORLD_49);
-	g_anValidGameKeys.push_back(SDLK_WORLD_50);
-	g_anValidGameKeys.push_back(SDLK_WORLD_51);
-	g_anValidGameKeys.push_back(SDLK_WORLD_52);
-	g_anValidGameKeys.push_back(SDLK_WORLD_53);
-	g_anValidGameKeys.push_back(SDLK_WORLD_54);
-	g_anValidGameKeys.push_back(SDLK_WORLD_55);
-	g_anValidGameKeys.push_back(SDLK_WORLD_56);
-	g_anValidGameKeys.push_back(SDLK_WORLD_57);
-	g_anValidGameKeys.push_back(SDLK_WORLD_58);
-	g_anValidGameKeys.push_back(SDLK_WORLD_59);
-	g_anValidGameKeys.push_back(SDLK_WORLD_60);
-	g_anValidGameKeys.push_back(SDLK_WORLD_61);
-	g_anValidGameKeys.push_back(SDLK_WORLD_62);
-	g_anValidGameKeys.push_back(SDLK_WORLD_63);
-	g_anValidGameKeys.push_back(SDLK_WORLD_64);
-	g_anValidGameKeys.push_back(SDLK_WORLD_65);
-	g_anValidGameKeys.push_back(SDLK_WORLD_66);
-	g_anValidGameKeys.push_back(SDLK_WORLD_67);
-	g_anValidGameKeys.push_back(SDLK_WORLD_68);
-	g_anValidGameKeys.push_back(SDLK_WORLD_69);
-	g_anValidGameKeys.push_back(SDLK_WORLD_70);
-	g_anValidGameKeys.push_back(SDLK_WORLD_71);
-	g_anValidGameKeys.push_back(SDLK_WORLD_72);
-	g_anValidGameKeys.push_back(SDLK_WORLD_73);
-	g_anValidGameKeys.push_back(SDLK_WORLD_74);
-	g_anValidGameKeys.push_back(SDLK_WORLD_75);
-	g_anValidGameKeys.push_back(SDLK_WORLD_76);
-	g_anValidGameKeys.push_back(SDLK_WORLD_77);
-	g_anValidGameKeys.push_back(SDLK_WORLD_78);
-	g_anValidGameKeys.push_back(SDLK_WORLD_79);
-	g_anValidGameKeys.push_back(SDLK_WORLD_80);
-	g_anValidGameKeys.push_back(SDLK_WORLD_81);
-	g_anValidGameKeys.push_back(SDLK_WORLD_82);
-	g_anValidGameKeys.push_back(SDLK_WORLD_83);
-	g_anValidGameKeys.push_back(SDLK_WORLD_84);
-	g_anValidGameKeys.push_back(SDLK_WORLD_85);
-	g_anValidGameKeys.push_back(SDLK_WORLD_86);
-	g_anValidGameKeys.push_back(SDLK_WORLD_87);
-	g_anValidGameKeys.push_back(SDLK_WORLD_88);
-	g_anValidGameKeys.push_back(SDLK_WORLD_89);
-	g_anValidGameKeys.push_back(SDLK_WORLD_90);
-	g_anValidGameKeys.push_back(SDLK_WORLD_91);
-	g_anValidGameKeys.push_back(SDLK_WORLD_92);
-	g_anValidGameKeys.push_back(SDLK_WORLD_93);
-	g_anValidGameKeys.push_back(SDLK_WORLD_94);
-	g_anValidGameKeys.push_back(SDLK_WORLD_95);
-	g_anValidGameKeys.push_back(SDLK_KP0);
-	g_anValidGameKeys.push_back(SDLK_KP1);
-	g_anValidGameKeys.push_back(SDLK_KP2);
-	g_anValidGameKeys.push_back(SDLK_KP3);
-	g_anValidGameKeys.push_back(SDLK_KP4);
-	g_anValidGameKeys.push_back(SDLK_KP5);
-	g_anValidGameKeys.push_back(SDLK_KP6);
-	g_anValidGameKeys.push_back(SDLK_KP7);
-	g_anValidGameKeys.push_back(SDLK_KP8);
-	g_anValidGameKeys.push_back(SDLK_KP9);
+	g_anValidGameKeys.push_back(SDLK_KP_0);
+	g_anValidGameKeys.push_back(SDLK_KP_1);
+	g_anValidGameKeys.push_back(SDLK_KP_2);
+	g_anValidGameKeys.push_back(SDLK_KP_3);
+	g_anValidGameKeys.push_back(SDLK_KP_4);
+	g_anValidGameKeys.push_back(SDLK_KP_5);
+	g_anValidGameKeys.push_back(SDLK_KP_6);
+	g_anValidGameKeys.push_back(SDLK_KP_7);
+	g_anValidGameKeys.push_back(SDLK_KP_8);
+	g_anValidGameKeys.push_back(SDLK_KP_9);
 	g_anValidGameKeys.push_back(SDLK_KP_PERIOD);
 	g_anValidGameKeys.push_back(SDLK_KP_DIVIDE);
 	g_anValidGameKeys.push_back(SDLK_KP_MULTIPLY);
@@ -294,19 +204,17 @@ void InitialiseGameKeySystem()
 	g_anValidGameKeys.push_back(SDLK_LCTRL);
 	g_anValidGameKeys.push_back(SDLK_RALT);
 	g_anValidGameKeys.push_back(SDLK_LALT);
-	g_anValidGameKeys.push_back(SDLK_RMETA);
-	g_anValidGameKeys.push_back(SDLK_LMETA);
-	g_anValidGameKeys.push_back(SDLK_LSUPER);
-	g_anValidGameKeys.push_back(SDLK_RSUPER);
+	g_anValidGameKeys.push_back(SDLK_RGUI);
+	g_anValidGameKeys.push_back(SDLK_LGUI);
 	g_anValidGameKeys.push_back(SDLK_MODE);
-	g_anValidGameKeys.push_back(SDLK_COMPOSE);
+	g_anValidGameKeys.push_back(SDLK_APPLICATION);
 	g_anValidGameKeys.push_back(SDLK_HELP);
-	g_anValidGameKeys.push_back(SDLK_PRINT);
+	g_anValidGameKeys.push_back(SDLK_PRINTSCREEN);
 	//g_anValidGameKeys.push_back(SDLK_SYSREQ);
 	//g_anValidGameKeys.push_back(SDLK_BREAK);
 	g_anValidGameKeys.push_back(SDLK_MENU);
 	//g_anValidGameKeys.push_back(SDLK_POWER);
-	g_anValidGameKeys.push_back(SDLK_EURO);
+	g_anValidGameKeys.push_back(SDLK_CURRENCYSUBUNIT);
 }
 
 bool IsGameKey(int nKeyCode)

@@ -3,7 +3,7 @@
 \brief   "Thing"
 \author  David Joffe
 
-Copyright (C) 1999-2018 David Joffe
+Copyright (C) 1999-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 /* David Joffe 1999/03/25 */
@@ -552,7 +552,7 @@ public:
 	void SetScore( int score );
 
 	int m_height;
-	unsigned char m_buffer[16];
+	unsigned char m_buffer[64] = { 0 };//dj2022 make this a bit larger in case someone sets max values on e.g. 64-bit (or hypothetical 128-bit) platforms
 	int m_bufferlength;
 };
 /*-----------------------------------------------------------*/

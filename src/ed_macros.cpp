@@ -26,7 +26,7 @@ bool LoadMacros()
 {
 	FILE *fin=NULL;
 	char buf[1024]={0};
-	if (NULL == (fin = fopen( "data/editor/macros.txt", "r" )))
+	if (NULL == (fin = fopen( DATA_DIR "editor/macros.txt", "r" )))
 		return false;
 
 	SMacro* pMacro=NULL;
@@ -135,7 +135,7 @@ void ShowMacros()
 	{
 		int iMacro = g_iAssignedMacros[i];
 		char buf[1024]={0};
-		sprintf( buf, "%d.", i+1 );
+		snprintf( buf, sizeof(buf), "%d.", i+1 );
 		ED_DrawStringClear( MACROS_X, y, "Macros:" );
 		ED_DrawString( MACROS_X, y, "Macros:" );
 

@@ -13,12 +13,13 @@ Copyright (C) 1998-2018 David Joffe
 #ifndef _GRAPH_H_
 #define _GRAPH_H_
 
+#include "datadir.h"
 #include "djgraph.h"
 #include "djimage.h"
 #include <string>
 
 //! Image file to use for font
-#define FILE_IMG_FONT "data/font.tga"
+#define FILE_IMG_FONT DATA_DIR "font.tga"
 
 //! Main visual
 extern djVisual *pVisMain;

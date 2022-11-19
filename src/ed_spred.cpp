@@ -16,7 +16,7 @@ TODO:
 #include "block.h"
 #include "sys_error.h"
 
-#include <stdio.h>		// sprintf
+#include <stdio.h>		// sprintf (NB don't use sprintf anymore, use sprintfs etc.!)
 
 
 #define POS_FLAGS ((POS_SPRITES_Y + 8 * 16) + 8)
@@ -299,7 +299,7 @@ belong to sprite.
 void SpriteDrawFlags()
 {
 	int  i=0;
-	unsigned char buf[64]={0}, c=0;
+	unsigned char buf[128]={0}, c=0;
 	for ( i=0; i<NUMFLAGS; i++ )
 	{
 		if (ED_GetSpriteExtra( ED_GetCurrSpriteSet(), ED_GetCurrSprite(), 4 ) & (1 << i))
@@ -307,7 +307,7 @@ void SpriteDrawFlags()
 			c = 'X';
 		else
 			c = 255; // solid black block
-		sprintf( (char*)buf, "[ ] %s", szFlags[i] );
+		snprintf( (char*)buf, sizeof(buf), "[ ] %s", szFlags[i] );
 		buf[1] = c;
 
 		ED_DrawString( 0, POS_FLAGS + i * 8, (char*)buf );
@@ -375,10 +375,10 @@ void DrawSprites ()
 	int i=0;
 	int ox=0, oy=0;
 	int xoffset=0, yoffset=0;
-	char buf[1024]={0};
+	char buf[4096]={0};//possible long filenames?
 
 //	djgSetColorFore( pVisMain, djColor(255,255,255) );
-	sprintf( buf, "%d,%-15.15s", ED_GetCurrSpriteSet(), g_pCurMission->GetSpriteData(ED_GetCurrSpriteSet())->m_szImgFilename );
+	snprintf( buf, sizeof(buf), "%d,%-15.15s", ED_GetCurrSpriteSet(), g_pCurMission->GetSpriteData(ED_GetCurrSpriteSet())->m_szImgFilename );
 
 	ED_DrawString( 120, POS_SPRITES_Y - 8, buf );
 	ox = POS_SPRITES_X;
