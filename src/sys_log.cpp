@@ -254,7 +254,7 @@ void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 
 	while ( ff && log_backup_level != bklevel )
 	{
-		sprintf ( appendix, "old%d", bklevel );
+		snprintf ( appendix, sizeof(appendix), "old%d", bklevel );
 		strcpy ( newname, log_filename_base );
 		M_ForceFileExtension ( newname, appendix );
 
@@ -285,7 +285,7 @@ void PushBackup ( const char *filename, int bklevel )
 {
 	char		newname[SYS_MAX_FILE]={0};
 	char		appendix[SYS_MAX_EXT]={0};
-	FILE		*ff;
+	FILE		*ff=nullptr;
 
 	ff = fopen ( filename, "r" );
 	if ( ff )
@@ -303,7 +303,7 @@ void PushBackup ( const char *filename, int bklevel )
 	}
 
 // assemble a new name:
-	sprintf ( appendix, "old%d", bklevel );
+	snprintf ( appendix, sizeof(appendix), "old%d", bklevel );
 	strcpy ( newname, log_filename_base );
 	M_ForceFileExtension ( newname, appendix );
 

@@ -227,7 +227,7 @@ Get filename without path or extension
 char* M_GetFileRoot ( const char* filename )
 {
 	static char	root[SYS_MAX_PATH]={0};
-	const char		*ptr;
+	const char		*ptr=nullptr;
 
 	ptr = strrchr ( filename, '\\' );
 	if ( !ptr )
@@ -380,6 +380,7 @@ char* M_GetFilePathAlloc ( const char* filename )
 	char	*ptr;
 
 	path = new char[SYS_MAX_PATH];
+	memset(path, 0, SYS_MAX_PATH);
 
 	strcpy ( path, filename );
 	ptr = strrchr ( path, '\\' );
@@ -418,6 +419,7 @@ char* M_GetFileRootAlloc ( const char* filename )
 	const char	*ptr;
 
 	root = new char [SYS_MAX_PATH];
+	memset(root, 0, SYS_MAX_PATH);
 
 	ptr = strrchr ( filename, '\\' );
 	if ( !ptr )
@@ -441,6 +443,7 @@ char* M_GetFileRootAlloc ( const char* filename )
 	const char	*ptr = strrchr ( filename, '.' );
 
 	ext = new char [SYS_MAX_EXT];
+	memset(ext, 0, SYS_MAX_EXT);
 
 	if ( ptr )
 	{

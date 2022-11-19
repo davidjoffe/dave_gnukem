@@ -43,7 +43,7 @@ void _SYS_Error ( const char *fmt, ... )
 		vsprintf ( text, fmt, args );
 	va_end ( args );
 
-	sprintf ( text2, "[Error] %s line %d: ", g_sFile.c_str(), g_nLine );
+	snprintf ( text2, sizeof(text2), "[Error] %s line %d: ", g_sFile.c_str(), g_nLine );
 	ptr2 = text2 + strlen ( text2 );
 
 	ptr = text;
@@ -73,7 +73,7 @@ void _SYS_Warning ( const char *fmt, ... )
 		vsprintf ( text, fmt, args );
 	va_end ( args );
 
-	sprintf ( text2, "[Warning] %s line %d: ", g_sFile.c_str(), g_nLine );
+	snprintf ( text2, sizeof(text2), "[Warning] %s line %d: ", g_sFile.c_str(), g_nLine );
 	ptr2 = text2 + strlen ( text2 );
 
 	ptr = text;
@@ -101,7 +101,7 @@ void _SYS_Debug ( const char *fmt, ... )
 		vsprintf ( text, fmt, args );
 	va_end ( args );
 
-	sprintf ( text2, "[Debug] %s line %d: ", g_sFile.c_str(), g_nLine );
+	snprintf( text2, sizeof(text2), "[Debug] %s line %d: ", g_sFile.c_str(), g_nLine );
 	ptr2 = text2 + strlen ( text2 );
 
 	ptr = text;

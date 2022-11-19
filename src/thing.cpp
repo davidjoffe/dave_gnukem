@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------------*/
 // thing.cpp
 /*
-Copyright (C) 2000-2020 David Joffe
+Copyright (C) 2000-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "thing.h"
@@ -646,7 +646,8 @@ CFloatingScore::CFloatingScore()
 void CFloatingScore::SetScore( int score )
 {
 	m_height = 25; // fixme; was 24; tick first before first draw??? check
-	sprintf( (char*)m_buffer, "%d", score );
+	// Must use snprintf as safeguard
+	snprintf( (char*)m_buffer, sizeof(m_buffer), "%d", (int)score );
 	m_bufferlength = (int)strlen( (char*)m_buffer );
 	for ( int i=0; i<m_bufferlength; i++ )
 	{
