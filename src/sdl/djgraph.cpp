@@ -639,7 +639,7 @@ void SetPixelConversion ( djVisual *vis )
 {
 	SDL_PixelFormat *f = vis->pSurface->format;
 
-	Log ( "Setting up pixel conversion attributes...:\n" );
+	djLOGSTR( "Setting up pixel conversion attributes...:\n" );
 	rMask = f->Rmask;
 	gMask = f->Gmask;
 	bMask = f->Bmask;
@@ -649,8 +649,8 @@ void SetPixelConversion ( djVisual *vis )
 	bShift = f-> Bshift;
 	aShift = f-> Ashift;
 
-	Log ( "\t[RGBA]Mask: 0x%x; 0x%x; 0x%x 0x%x\n", rMask, gMask, bMask, aMask );
-	Log ( "\t[RGBA]Shift: 0x%x; 0x%x; 0x%x 0x%x\n", rShift, gShift, bShift, aShift );
+	djLog::LogFormatStr( "\t[RGBA]Mask: 0x%x; 0x%x; 0x%x 0x%x\n", (int)rMask, (int)gMask, (int)bMask, (int)aMask );
+	djLog::LogFormatStr( "\t[RGBA]Shift: 0x%x; 0x%x; 0x%x 0x%x\n", (int)rShift, (int)gShift, (int)bShift, (int)aShift );
 }
 
 void djDestroyImageHWSurface( djImage* pImage )

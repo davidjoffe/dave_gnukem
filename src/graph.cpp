@@ -16,7 +16,7 @@ Copyright (C) 1998-2019 David Joffe
 #include <string.h>
 #include <stdlib.h>
 #include "SDL.h"
-#include "sys_log.h"//Log
+#include "sys_log.h"//djLog helpers
 #include "djstring.h"//djStrPrintf
 
 #include "graph.h"
@@ -167,7 +167,7 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 			iWidth *= nMultiple;
 			iHeight *= nMultiple;
 		}
-		Log( "GraphInit(): DisplayResolution(%d,%d).\n", max_w, max_h );
+		djLog::LogFormatStr( "GraphInit(): DisplayResolution(%d,%d).\n", max_w, max_h );
 	}
 #endif
 
@@ -176,13 +176,13 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 	SDL_ShowCursor(0);
 
 	//--- (1) - Front buffer
-	Log( "GraphInit(): djgOpenVisual(w,h=%d,%d).\n", iWidth, iHeight );
+	djLog::LogFormatStr( "GraphInit(): djgOpenVisual(w,h=%d,%d).\n", iWidth, iHeight );
 	if (NULL == (pVisMain = djgOpenVisual( bFullScreen?"fullscreen":NULL, iWidth, iHeight, 32 )))
 	{
 		printf( "GraphInit(): COULDN'T OPEN GMAIN\n" );
 		return false;
 	}
-	Log( "GraphInit(): Display bytes per pixel %d\n", pVisMain->bpp) ;
+	djLog::LogFormatStr( "GraphInit(): Display bytes per pixel %d\n", (int)pVisMain->bpp) ;
 	int imode = pVisMain->bpp;
 
 	// Set the 32<->16 pixel conversion atributes, so the

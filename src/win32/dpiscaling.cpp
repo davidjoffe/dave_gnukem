@@ -3,6 +3,8 @@
 //dj2022-11 note we may just get rid of djWINXP_SUPPORT flag probably if this dynamic loading workaround generally works without causing problems then we don't need static linking (static linking is what causes XP issue because that function isn't present)
 #ifdef WIN32
 
+#include "../sys_log.h"
+
 //#ifndef djWINXP_SUPPORT
 
 // [dj2018-03] For DPI scaling overly-large-Window issue https://github.com/davidjoffe/dave_gnukem/issues/98
@@ -48,7 +50,7 @@ void djSetProcessDPIAwareHelper()
 	// that's a pain to maintain, I don't want to do that.) Sigh. I've
 	// written a whole book now here on this one stupid issue.
 
-	Log("GetProcAddress SetProcessDPIAware\n");//Want lots of logging here as I feel like this might all be relatively higher risk of crashing
+	djLOGSTR("GetProcAddress SetProcessDPIAware\n");//Want lots of logging here as I feel like this might all be relatively higher risk of crashing
 	typedef int (WINAPI* PFN)();//function signature for SetProcessDPIAware
 	PFN MySetProcessDPIAware = NULL;
 	MySetProcessDPIAware = (PFN)GetProcAddress(
@@ -57,13 +59,13 @@ void djSetProcessDPIAwareHelper()
 	if (NULL != MySetProcessDPIAware)
 	{
 		// Call SetProcessDPIAware() through our dynamic pointer to it
-		Log("Call MySetProcessDPIAware\n");
+		djLOGSTR("Call MySetProcessDPIAware\n");
 		MySetProcessDPIAware();
-		Log("Call MySetProcessDPIAware done\n");
+		djLOGSTR("Call MySetProcessDPIAware done\n");
 	}
 	else
 	{
-		Log("No GetProcAddress - possibly XP or ReactOS?\n");
+		djLOGSTR("No GetProcAddress - possibly XP or ReactOS?\n");
 	}
 #else//else statically bind (this breaks XP, and, currently, ReactOS - causes error message about missing function when you run. dj2018-04)
 	#ifndef djWINXP_SUPPORT
