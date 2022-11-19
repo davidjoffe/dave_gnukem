@@ -1,7 +1,7 @@
 /*
 djinput.cpp
 
-Copyright (C) 1995-2019 David Joffe
+Copyright (C) 1995-2022 David Joffe
 
 Created: '95/07/20 (originally as a test keyboard interrupt hook)
 */
@@ -254,7 +254,6 @@ const char *GetKeyString(int nSDLKeyCode)
 
 /*--------------------------------------------------------------------------*/
 djVisual *g_pVisInput = NULL;
-int           g_iFlags = 0;
 int           mouse_x = 0;
 int           mouse_y = 0;
 int           mouse_b = 0;
@@ -375,10 +374,8 @@ void djiPoll()
 }
 /*--------------------------------------------------------------------------*/
 
-bool djiInit( djVisual *pVis, int iFlags )
+bool djiInit( djVisual *pVis )
 {
-	g_iFlags = iFlags;
-
 	g_pVisInput = pVis;
 
 	// Initialize mouse variables

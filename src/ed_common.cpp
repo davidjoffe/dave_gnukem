@@ -66,7 +66,7 @@ void ED_CommonInit ()
 
 	SDL_ShowCursor ( 1 );
 
-	if (!djiInit( pVisMain, INPUT_MOUSE|INPUT_KEYBOARD ))
+	if (!djiInit( pVisMain ))
 	{
 		printf("failed init input stuff\n");
 	}
@@ -77,7 +77,7 @@ void ED_CommonInit ()
 
 void ED_CommonKill ()
 {
-	djiInit( pVisMain, INPUT_KEYDOWN|INPUT_KEYUP|INPUT_KEYREPEAT );
+	djiInit( pVisMain );
 	SDL_ShowCursor(0);
 	djDestroyImageHWSurface(pFont);
 	delete pFont;
