@@ -1,7 +1,7 @@
 /*
 keys.cpp
 
-Copyright (C) 2001-2018 David Joffe
+Copyright (C) 2001-2022 David Joffe
 
 Created: 09/2001
 */
@@ -45,12 +45,18 @@ const char *g_aszKeys[KEY_NUMKEYS] =
 
 vector<int> g_anValidGameKeys;
 
+// dj: IMPORTANT NOTE FOR ~2022-11 SDL1 TO SDL2 IMPLEMENTATION:
+// Previously the settings file stored the defined keys with keyname "Key" in front; however with SDL2 support this
+// introduces a small bug where if you have already played the SDL1-based version it loads SDL1 scancode settings from the defined keys configuration file
+// and then several keys e.g. left/right don't work because the scancodes changes. Simple fix, for SDL2 we now use a different setting name prefix
+// and then e.g. whether you run SDL1 or SDL2 version it should in theory just load different sets of defined (or default) gameplay keys.
+
 void StoreGameKeys()
 {
 	for ( int i=0; i<KEY_NUMKEYS; i++ )
 	{
 		char szKey[64]={0};
-		sprintf(szKey, "Key%s", g_aszKeys[i]);
+		sprintf(szKey, "SDL2Key%s", g_aszKeys[i]);
 		g_Settings.SetSettingInt(szKey, g_anKeys[i]);
 	}
 }
@@ -61,14 +67,14 @@ void InitialiseGameKeySystem()
 	char szKey[64]={0};
 	for ( int i=0; i<KEY_NUMKEYS; i++ )
 	{
-		sprintf(szKey, "Key%s", g_aszKeys[i]);
+		sprintf(szKey, "SDL2Key%s", g_aszKeys[i]);
 		g_Settings.SetDefaultSettingInt(szKey, g_anKeys[i]);
 	}
 
 	// Read key settings from config
 	for ( int i=0; i<KEY_NUMKEYS; i++ )
 	{
-		sprintf(szKey, "Key%s", g_aszKeys[i]);
+		sprintf(szKey, "SDL2Key%s", g_aszKeys[i]);
 		g_anKeys[i] = g_Settings.FindSettingInt(szKey);
 	}
 
