@@ -1,7 +1,7 @@
 /*
 djlog.cpp
 
-Copyright (C) 1998-2019 David Joffe
+Copyright (C) 1998-2022 David Joffe
 */
 
 #ifdef WIN32
@@ -30,6 +30,7 @@ void log_message( const char * szFormat, ... )
    OutputDebugString( (LPCTSTR)buf );
 #else
    // dump message on stdout
+	// NB! (security) - do NOT do "printf(buf) here because if it contains e.g. a "%s" we'll have a crash - hence the deliberate ("%s", buf) [dj2022-11]
    printf( "%s", buf );
    fflush(NULL);
 #endif
