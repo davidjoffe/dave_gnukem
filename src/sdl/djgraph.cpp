@@ -98,37 +98,29 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 	djVisual * pVis;
 	pVis = new djVisual;
 
-	pVis->m_bFullscreen = false;
+	pVis->m_bFullscreen = NULL != vistype && 0 == strcmp ( vistype, "fullscreen" ) ? true : false;
+
 
 	//dj2016-10 fixmelow_tocheck i am wondering if the below is doing speed optimal way of doing everything as this hasn't been looked at in years
 
-	// Create a default visual, just a plain non-resizing window
+	// Create a default visual: a resizable window or fullscreen
 	//static SDL_Surface *p = NULL;
-	if (NULL == vistype)
+	if (NULL == vistype || pVis->m_bFullscreen)
 	{
-		/*p = */pVis->pSurface = SDL_SetVideoMode(w, h, bpp, SDL_HWSURFACE|(bBackbuffer?SDL_DOUBLEBUF:0));
+		SDL_Window *win = SDL_CreateWindow("Dave Gnukem", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h,
+			pVis->m_bFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_RESIZABLE);
+		SDL_SetWindowIcon(win, SDL_LoadBMP("data/icon.bmp"));
+		pVis->pRenderer = SDL_CreateRenderer(win, -1, 0);
+		SDL_RenderSetLogicalSize(pVis->pRenderer, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H);
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+		pVis->pSurface = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, bpp,
+			0, 0, 0, 0);
+		pVis->pTexture = SDL_CreateTextureFromSurface(pVis->pRenderer, pVis->pSurface);
 	}
 	else if (0 == strcmp( vistype, "memory" ))
 	{
-		SDL_Surface *pSurface = SDL_CreateRGBSurface(SDL_HWSURFACE, w, h,
-			bpp,
-			//fixme [dj2016-10] this doesn't quite seem right to me ? must come back to this and have a closer look at all this again later ..
-			// in theory this works but might be less efficient
-			0xFF000000,
-			0x00FF0000,
-			0x0000FF00,
-			0x000000FF);
-		if (pSurface!=NULL)
-		{
-			//SDL_SetColorKey(pSurface, SDL_SRCCOLORKEY|SDL_RLEACCEL, SDL_MapRGB(pSurface->format, 255, 0, 255));
-			pVis->pSurface = SDL_DisplayFormat(pSurface);
-			SDL_FreeSurface(pSurface);
-		}
-	}
-	else if (0 == strcmp( vistype, "fullscreen" ))
-	{
-		pVis->pSurface = SDL_SetVideoMode(w, h, bpp, SDL_HWSURFACE|(bBackbuffer?SDL_DOUBLEBUF:0)|SDL_FULLSCREEN);
-		pVis->m_bFullscreen = true;
+		pVis->pSurface = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, bpp,
+			0, 0, 0, 0);
 	}
 
 	pVis->bpp = pVis->pSurface->format->BitsPerPixel;
@@ -170,49 +162,19 @@ void djgFlush( djVisual * /*pVis*/)
 
 void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 {
-	if (pVisSrc==NULL)//<- Level editor etc.
+	if (pVisSrc!=NULL)//<- Not level editor etc.
 	{
-		SDL_Flip(pVisDest->pSurface);
-	}
-	else
-	{
-		// [dj2016-10-08] If have large modern monitor then 320x200 window is really tiny and unpleasant to play - added
-		// this quick-n-dirty scaling blit to let the main window be any 'arbitrary' larger resolution to allow the
-		// gameplay window to at least be larger - my idea/thinking is just to e.g. try create the main window sort of
-		// (basically) the largest 'multiple' of 320x200 (ideally incorporating window dressing) that fits in your
-		// screen ... this is not entirely perfect but is a quick and easy way to get the game relatively playable
-		// as compared to the tiny gameplay window we have now (and also, NB, makes level editing much more
-		// user-friendly).
-		// Note pVisSrc->width could be eg 1600 while gamerendering is 320
 		CdjRect rcSrc(0, 0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H);//E.g. 320x200 for DG1
-		CdjRect rcDest(0, 0, pVisDest->width, pVisDest->height);
-		unsigned int uScaleX = (pVisDest->width / CFG_APPLICATION_RENDER_RES_W); // Note we deliberately do *integer* division as we *want* to round down etc.
-		unsigned int uScaleY = (pVisDest->height / CFG_APPLICATION_RENDER_RES_H); // Note we deliberately do *integer* division as we *want* to round down etc.
-		unsigned int uScaleMax = djMAX(1,djMIN(uScaleX,uScaleY));//Select smallest of vertical/horizontal scaling factor in order to fit everything in the window
-		SDL_Rect rc;
-		rc.w = uScaleMax;
-		rc.h = uScaleMax;
+		CdjRect rcDest(0, 0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H);
+		SDL_Rect rc = {.w = 1, .h = 1};
 
-		//dj2019-07 Hm leaving this change commented out for now (retro settings at very high resolution CFG_APPLICATION_RENDER_RES_W etc.) as it's very slow, and not necessary for anything yet, so still rethink this stuff; want to keep it clean/simple as possible or later this will just seem like spaghetti & I won't know what's what.
-		/*
-		bool bForceOwnScaleBlitHereEvenIf1to1=false;//dj2019-06
+		//fixme this won't work bigendian
 		#if SDL_BYTEORDER==SDL_BIG_ENDIAN
+		// Not yet supported for big-endian platforms (dj2019-06)
+		if (false)
 		#else
-		// If retro settings requested, 'force' use own blit here so we can do the effect, even if it's a 1-1 pixel ratio [dj2019-06]
-		// This is really not that important, it's just 'silly' stuff for the extra-retro settings, but the 'force' option might
-		// come in handy later for other viewport-related stuff for genericizing this stuff, not sure.
 		if (g_nSimulatedGraphics>0) //'Simulate' CGA/EGA
-			bForceOwnScaleBlitHereEvenIf1to1 = true;
-		#endif
-		//*/
-
-		if (bScaleView
-			&& (/*bForceOwnScaleBlitHereEvenIf1to1 || */rcSrc.w!=rcDest.w || rcSrc.h!=rcDest.h)
-		//fixme is this righT? waht if bpp == 2 ..
-			&& pVisSrc->pSurface->format->BytesPerPixel == 4//Current scaling blit implementation only supports 4BPP [dj2016-10] [TODO: Handle other format, OR if upgrading to libsdl2, just use libsdl's scale blit function]
-			)
 		{
-			//Quick-n-dirty scaling blit [dj2016-10] NB note that if/when we migrate to LibSDL2 we can just use the API functions for this instead
 			djgLock(pVisSrc);
 			djgLock(pVisDest);
 			unsigned int uBPP = pVisSrc->pSurface->format->BytesPerPixel;
@@ -220,14 +182,6 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 			unsigned int uMemOffsetRow = 0;
 
 
-			//fixme this won't work bigendian
-			#if SDL_BYTEORDER==SDL_BIG_ENDIAN
-			// Not yet supported for big-endian platforms (dj2019-06)
-			if (false)
-			#else
-			if (g_nSimulatedGraphics>0) //'Simulate' CGA/EGA
-			#endif
-			{
 				// Select target simulated-graphics palette
 				const unsigned int NUMCOLORS = (g_nSimulatedGraphics==1?16:4);
 				const djColor* pPalette = (g_nSimulatedGraphics==1 ? djPALETTE_EGA : djPALETTE_CGA);
@@ -286,41 +240,25 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 						nPixel = SDL_MapRGB(pVisDest->pSurface->format,pPalette[nClosest].r,pPalette[nClosest].g,pPalette[nClosest].b);//djgMapColor( pVis, pVis->colorfore );
 						SDL_FillRect(pVisDest->pSurface, &rc, nPixel);
 						++pSurfaceMem;
-						rc.x += uScaleMax;
+						++rc.x;
 					}//x
-					rc.y += uScaleMax;
+					++rc.y;
 				}//y
-			}
-			else//Normal default
-			{
-				//cbsu/sbsu?[low-dj2019-06]
-				rc.y=0;
-				for ( unsigned int y=0; y<CFG_APPLICATION_RENDER_RES_H; ++y )
-				{
-					uMemOffsetRow = (y * (pVisSrc->pSurface->pitch/uBPP));
-					pSurfaceMem = ((unsigned int*)pVisSrc->pSurface->pixels) + uMemOffsetRow;
-					// Note we must be careful here, pVisSrc->pSurface->pitch is in *bytes*, pSurfaceMem is a pointer to unsigned int* so pointer 'math' in multiples of 4
-					rc.x = 0;
-					for ( unsigned int x=0; x<CFG_APPLICATION_RENDER_RES_W; ++x )
-					{
-						SDL_FillRect(pVisDest->pSurface, &rc, *pSurfaceMem);
-						++pSurfaceMem;
-						rc.x += uScaleMax;
-					}
-					rc.y += uScaleMax;
-				}
-			}
 			djgUnlock(pVisDest);
 			djgUnlock(pVisSrc);
 		}
+		#endif
 		else
 		{
 			CdjRect rcSrc(0, 0, pVisSrc->width, pVisSrc->height);
 			//Non-scaling blit [faster, but can only do if src same size as dest]
 			SDL_BlitSurface(pVisSrc->pSurface, &rcSrc, pVisDest->pSurface, &rcDest);
 		}
-		SDL_Flip(pVisDest->pSurface);
 	}
+	SDL_UpdateTexture(pVisDest->pTexture, NULL, pVisDest->pSurface->pixels, pVisDest->pSurface->pitch);
+	SDL_RenderClear(pVisDest->pRenderer);
+	SDL_RenderCopy(pVisDest->pRenderer, pVisDest->pTexture, NULL, NULL);
+	SDL_RenderPresent(pVisDest->pRenderer);
 }
 
 void djgClear( djVisual * pVis )
@@ -912,7 +850,7 @@ SDL_SWSURFACE,
 		}
 		SDL_UnlockSurface(pSurfaceImg);
 		SDL_UnlockSurface(pSurface);
-SDL_SetAlpha(pSurface, SDL_SRCALPHA, 0);
+SDL_SetSurfaceAlphaMod(pSurface, 0);
 		//SDL_UnlockSurface(pSurfaceImg);
 
 		//SDL_FreeSurface(pSurfaceImg);
