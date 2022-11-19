@@ -384,7 +384,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 	//-- Initialize input devices
 	Log ("DaveStartup(): Initializing keys ..\n");
-	if (!djiInit( pVisMain, INPUT_KEYDOWN|INPUT_KEYUP|INPUT_KEYREPEAT ))
+	if (!djiInit( pVisMain ))
 		return -1;
 
 	InitMainMenu();			// fill the structures and load some stuff
