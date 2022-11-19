@@ -54,7 +54,7 @@ void GraphFlip(bool bScaleView)
 	// leaving text looking messed up [dj2016-10]
 	if (pVisBack!=NULL && g_pFont8x8!=NULL && (!g_sMsg.empty() || bShowFrameRate))
 	{
-		pVisTemp = SDL_CreateRGBSurface(SDL_HWSURFACE, CFG_APPLICATION_RENDER_RES_W, 8, pVisBack->pSurface->format->BitsPerPixel,
+		pVisTemp = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, 8, pVisBack->pSurface->format->BitsPerPixel,
 			pVisBack->pSurface->format->Rmask,
 			pVisBack->pSurface->format->Gmask,
 			pVisBack->pSurface->format->Bmask,
@@ -144,14 +144,15 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 	// tries to set a 'true' 320x200 fullscreen display mode, IIRC - dj2017-08.)
 	// No that doesn't seem to be what happens, press F5 when running with "-f" and see.
 	// [low/future] - if 2 monitors, will this behave 'correct'
-	const SDL_VideoInfo* vidinfo = SDL_GetVideoInfo();
+	SDL_DisplayMode dm;
+	int err = SDL_GetCurrentDisplayMode(0, &dm);
 	int max_w = -1;
 	int max_h = -1;
-	if (vidinfo)
+	if (!err)
 	{
 		// THIS MUST BE TESTED ON LINUX [dj2016-10]
-		max_w = vidinfo->current_w;
-		max_h = vidinfo->current_h;
+		max_w = dm.w;
+		max_h = dm.h;
 		if (max_w>iWidth && max_h>iHeight)
 		{
 			int nMultiple = djMAX(1, djMIN( max_w / iWidth, max_h / iHeight ) );
@@ -166,22 +167,17 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 			iWidth *= nMultiple;
 			iHeight *= nMultiple;
 		}
-
 		Log( "GraphInit(): DisplayResolution(%d,%d).\n", max_w, max_h );
 	}
 #endif
 
-	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
-	// Window dressing crap
-	SDL_WM_SetCaption("Dave Gnukem", NULL);
-	SDL_WM_SetIcon(SDL_LoadBMP(DATA_DIR "icon.bmp"), NULL);
 	// Hide mouse cursor
 	SDL_ShowCursor(0);
 
 	//--- (1) - Front buffer
 	Log( "GraphInit(): djgOpenVisual(w,h=%d,%d).\n", iWidth, iHeight );
-	if (NULL == (pVisMain = djgOpenVisual( bFullScreen?"fullscreen":NULL, iWidth, iHeight )))
+	if (NULL == (pVisMain = djgOpenVisual( bFullScreen?"fullscreen":NULL, iWidth, iHeight, 32 )))
 	{
 		printf( "GraphInit(): COULDN'T OPEN GMAIN\n" );
 		return false;
