@@ -40,7 +40,7 @@ void _SYS_Error ( const char *fmt, ... )
 		return;
 
 	va_start ( args, fmt );
-		vsprintf ( text, fmt, args );
+		vsnprintf ( text, sizeof(text), fmt, args );
 	va_end ( args );
 
 	snprintf ( text2, sizeof(text2), "[Error] %s line %d: ", g_sFile.c_str(), g_nLine );
@@ -70,7 +70,7 @@ void _SYS_Warning ( const char *fmt, ... )
 		return;
 
 	va_start ( args, fmt );
-		vsprintf ( text, fmt, args );
+		vsnprintf ( text, sizeof(text), fmt, args );
 	va_end ( args );
 
 	snprintf ( text2, sizeof(text2), "[Warning] %s line %d: ", g_sFile.c_str(), g_nLine );
@@ -98,7 +98,7 @@ void _SYS_Debug ( const char *fmt, ... )
 		return;
 
 	va_start ( args, fmt );
-		vsprintf ( text, fmt, args );
+		vsnprintf ( text, sizeof(text), fmt, args );
 	va_end ( args );
 
 	snprintf( text2, sizeof(text2), "[Debug] %s line %d: ", g_sFile.c_str(), g_nLine );
