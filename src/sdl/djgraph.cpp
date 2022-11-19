@@ -26,6 +26,11 @@ Copyright (C) 1997-2022 David Joffe
 
 // [dj2016-10] For 'texture' manager'
 #include <map>
+
+#ifdef _DEBUG
+#include <cassert>//assert
+#endif
+
 //fixme[dj2020] low priority, should ideally be sped up:
 // 1. A map is not really the most efficient way to do this as it must do a lookup for every blit
 // 2. std::map is probably not the fastest map for this either .. unordered_map may be (we don't need correct sorting and we're happy with slower inserts for faster lookups)
@@ -684,6 +689,15 @@ void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 	SDL_Surface* pSurfaceHardware = nullptr;
 
 	//fixmeLOW should ideally warn or assert or something if pImage already in map here??? [dj2017-06-20]
+#ifdef _DEBUG
+	//dj2022-11 try make sure we don't have some sort of pointer re-use bug or something going on where we failed to remove a previous one and so maybe dangling etc.? (only in debug mode for speed reasons!)
+	const std::map< djImage*, SDL_Surface*>::const_iterator iter = g_SurfaceMap.find(pImage);
+	if (iter != g_SurfaceMap.end())
+	{
+		// UNSURE if necessarily dangling? or just already created?
+		assert(iter == g_SurfaceMap.end());
+	}
+#endif
 
 	//fixme to check are these actually hardware surfaces
 

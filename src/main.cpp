@@ -284,7 +284,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		SetConsoleMessage("Sounds OFF (Ins)");
 	}
 
-	srand(time(NULL));				// Seed the random number generator
+	srand((unsigned int)time(NULL));				// Seed the random number generator
 
 	djTimeInit();					// Initialise timer
 

@@ -279,6 +279,7 @@ void GraphFlipView( int iViewWidth, int iViewHeight, int nXS, int nYS, int nXD, 
 // FIXME: Currenetly assumes a 256-char 32x8 character 256x128 pixel alpha-mapped image
 void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const unsigned char *szStr )
 {
+	if (szStr == nullptr) return;
 	// FIXME: bounds check properyl
 	if (x<0 || y<0) return;
 

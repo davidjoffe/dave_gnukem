@@ -1,7 +1,7 @@
 /*
 djstring.cpp
 
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2022 David Joffe
 */
 
 #include <string.h>
@@ -46,7 +46,7 @@ char *djStrDeepCopy( const char * src, int n )
 	// FIXME: If src is shorter than n then allocate less
 	char* szNewStr = new char[ n + 1 ];
 	strncpy( szNewStr, src, n );
-	szNewStr[n] = '\0';
+	szNewStr[n] = 0;
 
 	return szNewStr;
 }
