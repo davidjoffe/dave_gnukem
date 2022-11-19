@@ -95,7 +95,7 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 	djImage* pImgFont = NULL;
 	djImage* pImgFontS = NULL;//shadow
 	pImgFont = new djImage;
-	if (pImgFont->Load( "data/fonts/simple_6x8.tga" )>=0)
+	if (pImgFont->Load( DATA_DIR "fonts/simple_6x8.tga" )>=0)
 	{
 		djCreateImageHWSurface( pImgFont );
 		FW=6;
@@ -107,7 +107,7 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 	}
 	if (!pImgFont)return;
 	pImgFontS = new djImage;
-	if (pImgFontS->Load( "data/fonts/simple_6x8_shadow.tga" )>=0)
+	if (pImgFontS->Load( DATA_DIR "fonts/simple_6x8_shadow.tga" )>=0)
 	{
 		djCreateImageHWSurface( pImgFontS );
 	}

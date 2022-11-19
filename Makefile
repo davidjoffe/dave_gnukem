@@ -106,3 +106,33 @@ fixme:
 %.o: %.cpp
 	$(CPP) $(CCFLAGS) -c $< -o $@
 
+# The following was added to support debian packaging.  The make install
+# command will probably work on other unix like OS but not sure.
+# There probably should be some checks for different OS to be perfect.
+# Previously there was no install target at all which makes using 
+# packaging tools harder (easier for me to add install to Makefile).
+# Note DESTDIR variable is used by Debian packaging tools for staging
+# and PREFIX may already set as environment variable for some distro
+# -Craig
+ifeq ($(PREFIX),)
+    PREFIX := /usr/local
+endif
+
+install: 
+	@install -m 755 -d $(DESTDIR)/opt/gnukem	
+	@install -m 755 davegnukem $(DESTDIR)/opt/gnukem
+	@install -d $(DESTDIR)/usr/share/icons/hicolor/32x32/apps
+	@install -m 644 debian/gnukem.png $(DESTDIR)/usr/share/icons/hicolor/32x32/apps
+	@install -d $(DESTDIR)/usr/share/applications
+	@install -m 644 debian/gnukem.desktop $(DESTDIR)/usr/share/applications
+	@install -d $(DESTDIR)$(PREFIX)/bin/
+	@install -m 755 debian/gnukem.sh $(DESTDIR)$(PREFIX)/bin/gnukem
+	@cp -r data $(DESTDIR)/opt/gnukem/
+	@echo Dave Gnukem Installed.  Launch with $(DESTDIR)$(PREFIX)/bin/gnukem
+	
+
+uninstall:
+	rm -rf $(DESTDIR)/opt/gnukem
+	rm -f $(DESTDIR)$(PREFIX)/bin/gnukem 
+	rm -f $(DESTDIR)/usr/share/applications/gnukem.desktop
+	rm -f $(DESTDIR)/usr/share/icons/hicolor/32x32/apps/gnukem.png	

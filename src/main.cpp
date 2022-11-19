@@ -15,8 +15,6 @@ Copyright (C) 1995-2022 David Joffe
 
 /*--------------------------------------------------------------------------*/
 
-#include "mmgr/mmgr.h"
-
 #include <time.h>   // for srand()
 
 #include "graph.h"
@@ -256,7 +254,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		// Check if data folder is present relative to cwd
 		char szDataFile[8192]={0};
 		strcpy(szDataFile,cwd);
-		djAppendPath(szDataFile,"data/missions.txt");//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever
+		djAppendPath(szDataFile, DATA_DIR "missions.txt");//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever
 		//debug//printf("Checking for:%s\n",szDataFile);fflush(NULL);
 		if (!djFileExists(szDataFile))
 		{
@@ -276,7 +274,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 					*(szLast+1) = 0; // NULL-terminate
 
 				strcpy(szDataFile,path);
-				djAppendPath(szDataFile,"data/missions.txt");
+				djAppendPath(szDataFile, DATA_DIR "missions.txt");
 				if (djFileExists(szDataFile))
 				{
 					printf("Successfully found the data path :)\n");fflush(NULL);
@@ -373,13 +371,13 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	djSoundInit();				// Initialize sound
 
 	g_pImgMain = new djImage;			// Load main skin (title screen)
-	g_pImgMain->Load("data/main.tga");
+	g_pImgMain->Load(DATA_DIR "main.tga");
 	djCreateImageHWSurface( g_pImgMain );
 
 	InitMissionSystem();
 
 	// Load missions
-	if (0 != LoadMissions("data/missions.txt"))
+	if (0 != LoadMissions(DATA_DIR "missions.txt"))
 		return -1;
 	Log ( "DaveStartup(): %d missions(s) found.\n", g_apMissions.size() );
 
@@ -487,7 +485,7 @@ void DoMainMenu()
 #ifndef NOSOUND
 	//dj2016-10 adding background music to main menu, though have not put any real thought into what would
 	// be the best track here so fixme todo maybe dig a bit more and find better choice here etc. [also for levels]
-	Mix_Music* pMusic = Mix_LoadMUS("data/music/eric_matyas/8-Bit-Mayhem.ogg");
+	Mix_Music* pMusic = Mix_LoadMUS(DATA_DIR "music/eric_matyas/8-Bit-Mayhem.ogg");
 	if (pMusic!=NULL)
 		Mix_FadeInMusic(pMusic, -1, 800);
 #endif
@@ -504,12 +502,14 @@ void DoMainMenu()
 			// Simple 1 to 1 blit .. later it might be worthwhile doing a stretch blit if size doesn't match resolution? [LOW - dj2019]
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
 		}
-		char sz[100]={0};
-		//sprintf(sz,"%s","v1.0 - 3 Apr 2018");
-		sprintf(sz,"%s","v1.0.1 - 25 Apr 2020");
-		GraphDrawString(pVisBack, g_pFont8x8, 0, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)sz);
-		sprintf(sz,"%s","djoffe.com");
-		GraphDrawString(pVisBack, g_pFont8x8, CFG_APPLICATION_RENDER_RES_W - strlen(sz)*8, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)sz);
+		// 'version string history' here:
+		// "v1.0 - 3 Apr 2018" [version 1]
+		// "v1.0.1 - 25 Apr 2020"
+		// "v1.0.2 - 19 Nov 2022" [<- last version on SDL1 - about to update to SDL2]
+		const char* szVERSION = "v1.0.2 - 19 Nov 2022";
+		GraphDrawString(pVisBack, g_pFont8x8, 0, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)szVERSION);
+		const char* szURL = "djoffe.com";
+		GraphDrawString(pVisBack, g_pFont8x8, CFG_APPLICATION_RENDER_RES_W - strlen(szURL)*8, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)szURL);
 
 		GraphFlip(true);
 
@@ -943,7 +943,7 @@ void InitMainMenu()
 	//dj2018-04-01 make the Y position sightly higher by 4 pixel than the default, looks slightly better with new city background
 	mainMenu.setYOffset( 8 * (12 - (13 / 2)) - 4 );//13 = num items
 
-	mainMenu.setSoundMove ( djSoundLoad( "data/sounds/cardflip.wav" ) );
+	mainMenu.setSoundMove ( djSoundLoad( DATA_DIR "sounds/cardflip.wav" ) );
 }
 
 void KillMainMenu()

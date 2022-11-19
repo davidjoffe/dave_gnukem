@@ -10,7 +10,6 @@ Copyright (C) 1998-2018 David Joffe
 #define _DJGRAPH_H_
 
 #include "SDL.h"
-#include "mmgr/mmgr.h"
 
 #include "djimage.h"
 #include "djtypes.h"
