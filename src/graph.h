@@ -3,7 +3,7 @@
 \brief   Graphics helpers
 \author  David Joffe
 
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 // graph.h
@@ -29,6 +29,8 @@ extern djVisual *pVisBack;
 extern djVisual *pVisView;
 
 extern djImage *g_pFont8x8;
+extern void djFontInit();
+extern void djFontDone();
 
 //! Convenience macro to call the sprite draw function for 16x16 sprite b in sprite set a
 #define DRAW_SPRITE16(vis,a,b,x,y) djgDrawImage( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%SPRITESHEET_NUM_COLS)*BLOCKW,((b)/SPRITESHEET_NUM_COLS)*BLOCKH, (x),(y), BLOCKW,BLOCKH )
@@ -43,11 +45,29 @@ extern bool g_bSpriteDropShadows;
 
 #define DRAW_SPRITEA(vis,a,b,x,y,w,h) djgDrawImageAlpha( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%SPRITESHEET_NUM_COLS)*BLOCKW,((b)/SPRITESHEET_NUM_COLS)*BLOCKH, (x),(y), (w),(h) )
 
-//! Initialize the graphics system for the game
-extern bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale=-1 );
+//dj2022-11 start refactoring this stuff to think of things like potential fullscreen toggle (and possibly later we might use derived classes perhaps to change the instantiation behaviour for different games?)
+class djGraphicsSystem
+{
+public:
 
-//! Shut down the graphics system
-extern void GraphDone();
+	//! Initialize the graphics system for the game
+	static bool GraphInit(bool bFullScreen, int iWidth, int iHeight, int nForceScale = -1);
+
+	//! Shut down the graphics system
+	static void GraphDone();
+
+	static bool IsInitialized() { return m_bInitialized; }
+
+	//dj2022-11 experimental live fullscreen toggle? this ought to bring out some bugs
+	static void ToggleFullscreen();
+
+	static int m_nW;
+	static int m_nH;
+	static int m_nForceScale;
+	static bool m_bFullscreen;
+	static bool m_bInitialized;
+};
+
 
 //! Flip the back buffer to the front buffer
 extern void GraphFlip(bool bScaleView);

@@ -241,6 +241,7 @@ struct SMenuItem gameMenuItems[] =
 	{ true,  "   Restore Game    " },
 	{ true,  "   Instructions    " },
 	{ true,  "   Retro Settings  " },//dj2019-06 new
+//	{ true,  "   Toggle Fullscreen" },//Hmm note some consoles/ports might only work in fullscreen mode or something? should have 
 	{ true,  "   Abort Game      " },
 	{ false, "                   " },
 	{ false, NULL }
@@ -1371,6 +1372,16 @@ int game_startup(bool bLoadGame)
 								g_bEnableDebugStuff = true;
 								ShowGameMessage("DebugStuff Enabled", 64);
 							}
+#ifdef djEXPERIMENTAL_FULLSCREEN_TOGGLE//dj2022-11
+							else if (Event.key.keysym.sym == SDLK_f)
+							{
+								//dj2022-11 experimental toggle fullscreen probably going to crash a lot
+								djGraphicsSystem::ToggleFullscreen();
+								RedrawEverythingHelper();
+								bForceUpdate = true;
+								//return;
+							}
+#endif//djEXPERIMENTAL_FULLSCREEN_TOGGLE
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
 							else if (Event.key.keysym.sym==SDLK_w)
 							{
@@ -3124,7 +3135,20 @@ void IngameMenu()
 		SettingsMenu();
 	}
 	break;
+#ifdef djEXPERIMENTAL_FULLSCREEN_TOGGLE
 	case 6:
+	{
+		//dj2022-11 experimental toggle fullscreen probably going to crash a lot
+		djGraphicsSystem::ToggleFullscreen();
+		//ReInitGameViewport();
+		RedrawEverythingHelper();
+		//bForceUpdate = true;
+	}
+	break;
+	case 7:
+#else
+	case 6:
+#endif
 		g_bGameRunning = false;
 		break;
 	}

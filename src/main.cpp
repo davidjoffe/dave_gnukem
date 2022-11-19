@@ -290,6 +290,10 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 	InitialiseGameKeySystem();		// Initialise game keys
 
+	djFontInit();					// Initialize main font [dj2022-11]
+
+	djSDLInit();					// Initialize SDL2 [dj2022-11 refactoring a bit to have possible live in-game fullscreen toggle support]
+
 	//-- Initialize graphics
 	//
 	// NOTE: Use 640x480 if you want to use the built-in editor (F4/F5)
@@ -325,7 +329,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		nForceScale = atoi( iter->second.c_str() );
 	}
 	// [dj2016-10] Note this w/h is effectively now a 'hint' as it may not initialize to the exact requested size
-	if (!GraphInit( bFullScreen, w, h, nForceScale ))
+	if (!djGraphicsSystem::GraphInit( bFullScreen, w, h, nForceScale ))
 	{
 		djLOGSTR( "DaveStartup(): Graphics initialization failed.\n" );
 		return -1;
@@ -383,8 +387,10 @@ void DaveCleanup()
 	djDestroyImageHWSurface(g_pImgMain);
 	djDEL(g_pImgMain);		// Delete main menu background image (title screen)
 	djLOGSTR( "djDEL(g_pImgMain) ok\n" );
-	GraphDone();			// Graphics
+	djGraphicsSystem::GraphDone();			// Graphics
 	djLOGSTR( "GraphDone() ok\n" );
+	djFontDone();			// Font helper [dj2022-11]
+	djLOGSTR("djFontDone() ok\n");
 	djTimeDone();			// Timer stuff
 	djLOGSTR( "djTimeDone() ok\n" );
 
@@ -392,6 +398,8 @@ void DaveCleanup()
 		djAppendPathStr(djGetFolderUserSettings().c_str(), CONFIG_FILE).c_str()
 	);	// Save settings
 	djLOGSTR( "g_Settings.Save(CONFIG_FILE) ok\n" );
+
+	djSDLDone();
 
 	djLOGSTR( "================[ Application Kill Complete ]===============\n\n" );
 

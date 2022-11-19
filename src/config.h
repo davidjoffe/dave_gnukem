@@ -1,4 +1,4 @@
-// Copyright (C) 1998-2020 David Joffe
+// Copyright (C) 1998-2022 David Joffe
 /*--------------------------------------------------------------------------*/
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
@@ -37,6 +37,8 @@
 #endif
 
 
+//! dj2022-11 experimental live in-game fullscreen toggle (off by default for now, needs some more testing ..
+//#define djEXPERIMENTAL_FULLSCREEN_TOGGLE
 
 //! dj2018-01 Experimental auto drop shadows in sprites
 #define EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS

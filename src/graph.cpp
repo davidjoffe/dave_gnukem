@@ -3,7 +3,7 @@
 // David Joffe 1998/12
 // replacing the old djgega.cpp graphics interface
 /*
-Copyright (C) 1998-2019 David Joffe
+Copyright (C) 1998-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 
@@ -44,6 +44,23 @@ void SetConsoleMessage( const std::string& sMsg )
 {
 	g_sMsg = sMsg;
 	g_nConsoleMsgTimer = 2000;//Display message for ~2s then it disappears
+}
+
+//dj2022-11 new helpers refactoring to try fullscreen toggle. Load the image but not yet the hardware surface cache item (do that after GraphInit) so we can do fullscreen toggle (semi-experimental this stuff may change)
+void djFontInit()
+{
+	if (g_pFont8x8 != nullptr) return;
+
+	//--- Load 8x8 font bitmap (FIXME error check)
+	if (NULL != (g_pFont8x8 = new djImage))
+	{
+		g_pFont8x8->Load(FILE_IMG_FONT);
+	}
+}
+void djFontDone()
+{
+	if (g_pFont8x8 == nullptr) return;
+	djDEL(g_pFont8x8);
 }
 
 // ScaleView should also be false for the level editor [why does that already work?]
@@ -128,10 +145,43 @@ void GraphFlip(bool bScaleView)
 	}
 }
 
-bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
+int djGraphicsSystem::m_nW = 0;
+int djGraphicsSystem::m_nH = 0;
+int djGraphicsSystem::m_nForceScale = 1;
+bool djGraphicsSystem::m_bFullscreen = false;
+bool djGraphicsSystem::m_bInitialized = false;
+void djGraphicsSystem::ToggleFullscreen()
+{
+	if (!IsInitialized()) return;
+	// Clear texture cache
+	// fixme auto delete and recreate hardware texture cache here?
+	djImageHardwareSurfaceCache::ClearHardwareSurfaces();
+	djGraphicsSystem::GraphDone();
+	m_bFullscreen = !m_bFullscreen;
+	djGraphicsSystem::GraphInit(m_bFullscreen, m_nW, m_nH, m_nForceScale);
+	djImageHardwareSurfaceCache::RecreateHardwareSurfaces();
+}
+
+bool djSDLInit()
 {
 	// Initialize graphics library
 	SDL_Init(SDL_INIT_VIDEO);
+	return true;
+}
+bool djSDLDone()
+{
+	SDL_Quit();
+	return true;
+}
+
+bool djGraphicsSystem::GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
+{
+	djGraphicsSystem::m_bInitialized = false;
+	// Remember requested base settings for later fullscreen toggle [dj2022-11]
+	djGraphicsSystem::m_bFullscreen = bFullScreen;
+	djGraphicsSystem::m_nForceScale = nForceScale;
+	djGraphicsSystem::m_nW = iWidth;
+	djGraphicsSystem::m_nH = iHeight;
 
 #ifdef PANDORA
 	//[dj2018-03] Not sure if this is quite the right way to go, but this is based roughly on
@@ -207,12 +257,8 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 		return false;
 	}
 
-	//--- (5) - Load 8x8 font bitmap (FIXME error check)
-	if (NULL != (g_pFont8x8 = new djImage))
-	{
-		g_pFont8x8->Load( FILE_IMG_FONT );
-		djCreateImageHWSurface( g_pFont8x8 );
-	}
+	//--- (5) Create hardware surface for main 8x8 font bitmap (FIXME error check)
+	djCreateImageHWSurface(g_pFont8x8);
 
 #ifdef WIN32
 	// [Windows] Not sure if it's LibSDL or Windows but the window keeps getting created positioned so that the bottom portion of it is
@@ -250,13 +296,17 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 #endif
 
 
+	djGraphicsSystem::m_bInitialized = true;
+	djImageHardwareSurfaceCache::RecreateHardwareSurfaces();//<- check if images in cache that 'want' hardware surfaces? create now. This allows us to potentially e.g. add the font before or after GraphInit and it just 'figures it out'
 	return true;
 }
 
-void GraphDone()
+void djGraphicsSystem::GraphDone()
 {
-	djDestroyImageHWSurface(g_pFont8x8);
-	djDEL(g_pFont8x8);
+	// Why not just call this here? and init the font image separately
+	djImageHardwareSurfaceCache::ClearHardwareSurfaces();
+	//djDestroyImageHWSurface(g_pFont8x8);
+	//djDEL(g_pFont8x8);
 
 	djgCloseVisual( pVisView );
 	djgCloseVisual( pVisBack );
@@ -266,7 +316,8 @@ void GraphDone()
 	djDEL(pVisBack);
 	djDEL(pVisMain);
 
-	SDL_Quit();
+	djGraphicsSystem::m_bInitialized = false;
+	//SDL_Quit();
 }
 
 // FIXME: , view_height?

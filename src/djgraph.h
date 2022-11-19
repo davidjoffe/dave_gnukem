@@ -70,6 +70,10 @@ public:
 	bool                     m_bFullscreen;
 };
 
+//dj2022-11 refactoring to help with potential fullscreen toggle capability
+extern bool djSDLInit();
+extern bool djSDLDone();
+
 /*--------------------------------------------------------------------------*/
 // Color management
 
@@ -158,6 +162,18 @@ public:
 extern void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ );
 extern void djDestroyImageHWSurface( djImage* pImage );//dj2017-06-20 Added the 'destroy'
 /*--------------------------------------------------------------------------*/
+class djImageHardwareSurfaceCache
+{
+public:
+	// Add image to cache and try create corresponding hardware surface (dj2022-11 this should maybe replace djCreateImageHWSurface global)
+	static void* CreateImageHWSurface(djImage* pImage/*, djVisual* pVisDisplayBuffer*/);
+	// Destroy and entirely remove this particular image and its corresponding hardware surface (if any) from the hardware image cache (dj2022-11 this should maybe replace djDestroyImageHWSurface)
+	static void DestroyImageHWSurface(djImage* pImage);//dj2017-06-20 Added the 'destroy'
+
+	// Clear all hardware surfaces but do NOT remove the image from the cache - we want to potentially recreate them with RecreateHardwareSurfaces [dj2022-11 toward possible fullscreen toggle etc.]
+	static void ClearHardwareSurfaces();
+	static void RecreateHardwareSurfaces();
+};
+/*--------------------------------------------------------------------------*/
 
 #endif
-

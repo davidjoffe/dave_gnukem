@@ -662,6 +662,40 @@ void SetPixelConversion ( djVisual *vis )
 	djLog::LogFormatStr( "\t[RGBA]Shift: 0x%x; 0x%x; 0x%x 0x%x\n", (int)rShift, (int)gShift, (int)bShift, (int)aShift );
 }
 
+
+//----------------------------
+void* djImageHardwareSurfaceCache::CreateImageHWSurface(djImage* pImage/*, djVisual* pVisDisplayBuffer*/)
+{
+	return djCreateImageHWSurface(pImage);
+}
+void djImageHardwareSurfaceCache::DestroyImageHWSurface(djImage* pImage)
+{
+	djDestroyImageHWSurface(pImage);
+}
+void djImageHardwareSurfaceCache::ClearHardwareSurfaces()
+{
+	for (auto& iter : g_SurfaceMap)
+	{
+		djImage* pImage = iter.first;
+		// Destroy the hardware surface but DON'T remove the image from cache!
+		SDL_Surface* pHardwareSurface = iter.second;
+		if (pHardwareSurface)
+		{
+			SDL_FreeSurface(pHardwareSurface);
+			// fixme check if the above leaks?
+			g_SurfaceMap[pImage] = nullptr;
+		}
+	}
+}
+void djImageHardwareSurfaceCache::RecreateHardwareSurfaces()
+{
+	for (auto& iter : g_SurfaceMap)
+	{
+		djImage* pImage = iter.first;
+		djCreateImageHWSurface(pImage);
+	}
+}
+//----------------------------
 void djDestroyImageHWSurface( djImage* pImage )
 {
 	if (pImage==NULL) return;
@@ -672,9 +706,12 @@ void djDestroyImageHWSurface( djImage* pImage )
 
 	// Delete the associated hardware surface
 	SDL_Surface* pHardwareSurface = iter->second;
-	SDL_FreeSurface(pHardwareSurface);
-	//? ?delete pHardwareSurface;
-	pHardwareSurface = NULL;
+	if (pHardwareSurface)
+	{
+		SDL_FreeSurface(pHardwareSurface);
+		//? ?delete pHardwareSurface;
+		pHardwareSurface = NULL;
+	}
 
 	// Remove from 'map'
 	g_SurfaceMap.erase( pImage );
@@ -688,16 +725,19 @@ void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 
 	SDL_Surface* pSurfaceHardware = nullptr;
 
-	//fixmeLOW should ideally warn or assert or something if pImage already in map here??? [dj2017-06-20]
-#ifdef _DEBUG
-	//dj2022-11 try make sure we don't have some sort of pointer re-use bug or something going on where we failed to remove a previous one and so maybe dangling etc.? (only in debug mode for speed reasons!)
+	// [dj2022-11] Here we check if graphics 'system' not actually initialized and if not just add an item for the image but set the surface to null ... during GraphInit we could just hypothetically instantiate hardware surfaces for any not present? This code also helps facilitate fullscreen toggle
+	// fixme low to check is it sufficient for SDL_init to be called or do we need the GraphInit to be done? not sure [dj2022-11]
+	//if (!djGraphicsSystem::IsInitialized())
+		//return (void*)pSurfaceHardware;
+
+	// Check if already have a hardware surface in the cache for the requested image and return it if we do [dj2022-11 part of changes to help with potential fullscreen toggle ability]
 	const std::map< djImage*, SDL_Surface*>::const_iterator iter = g_SurfaceMap.find(pImage);
 	if (iter != g_SurfaceMap.end())
 	{
-		// UNSURE if necessarily dangling? or just already created?
-		assert(iter == g_SurfaceMap.end());
+		pSurfaceHardware = iter->second;
+		if (pSurfaceHardware!=nullptr)
+			return (void*)pSurfaceHardware;
 	}
-#endif
 
 	//fixme to check are these actually hardware surfaces
 
@@ -745,76 +785,9 @@ void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 	g_SurfaceMap[ pImage ] = pSurfaceHardware;
 
 	return (void*)pSurfaceHardware;
+					
 
-
-
-
-
-
-
-	/*	SDL_SetAlpha(pVisDisplayBuffer->pSurface, SDL_SRCALPHA, 255);
-	SDL_Surface* pSurfaceImg2 = ::SDL_CreateRGBSurfaceFrom(
-		pImage->Data(),
-		pImage->Width(),
-		pImage->Height(),
-		32,
-		pImage->Pitch(),//		pImage->Width() * 4,
-		0xFF0000,
-		0xFF00,
-		0xFF,
-		0xFF000000);
-	if (pSurfaceImg2)
-	{
-		SDL_Surface* pSurface = SDL_ConvertSurface(pSurfaceImg2,
-			pVisDisplayBuffer->pSurface->format,
-                                0);
-		if (pSurface)
-		{
-//SDL_SetAlpha(pSurface, SDL_SRCALPHA, 0);
-			g_SurfaceMap[ pImage ] = pSurface;
-
-
-
-
-		SDL_LockSurface(pSurface);
-		SDL_LockSurface(pSurfaceImg2);
-		unsigned int *pSurfaceMemImg = (unsigned int*)pSurfaceImg2->pixels;
-		unsigned int *pSurfaceMem = (unsigned int*)pSurface->pixels;
-		//unsigned int *pSurfaceMem2 = (unsigned int*)pSurfaceImg->pixels;
-		for ( int y=0; y<pImage->Height(); ++y )
-		{
-			for ( int i=0; i<pImage->Width(); ++i )
-			{
-				if ((y%3)==0)
-				{
-					*(pSurfaceMem + i + ((y*pSurface->pitch)/4)) = 0x50FF8822;
-					if (y>0)
-						*(pSurfaceMem + i + (((y-1)*pSurface->pitch)/4)) = 0x0000FF00;
-					//unsigned int vOrig = *(pSurfaceMemImg + i + ((y*pSurfaceImg2->pitch)/4));
-					//if ((vOrig & 0xFF000000)==0)
-					// *(pSurfaceMem + i + ((y*pSurface->pitch)/4)) = *(pSurfaceMem + i + ((y*pSurface->pitch)/4))  &  0x00FFFFFF;
-				}
-				// *(pSurfaceMem2 + i + ((y*pSurface->pitch)/4)) = 0x00FF000000;
-			}
-		}
-		SDL_UnlockSurface(pSurfaceImg2);
-		SDL_UnlockSurface(pSurface);
-
-
-
-
-
-
-			return true;
-		}
-		return false;
-	}
-	return false;
-*/
-
-
-								
-								
+	/*
 								
 								
 								// TO CHECK - if fail to create in hardware, will it automatically created in SW or must we do that ourselves (!?)s
@@ -889,5 +862,7 @@ SDL_SetSurfaceAlphaMod(pSurface, 0);
 		//delete pSurface;//?
 	}
 	return (void*)pSurface;
+
+	*/
 }
 
