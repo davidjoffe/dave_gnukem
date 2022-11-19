@@ -18,6 +18,8 @@
  * </quote>
  *
  * :))
+ *
+ * Update: It's toned down now - we couldn't handle the danger.
  */
 
 #ifndef __SYS_ERROR_H_RTFB__
@@ -26,21 +28,14 @@
 
 inline void the_void ( const char*, ... ){ return; }
 
-#define SYS_Error (_SetFileAndLine ( __FILE__, __LINE__ ),false)?(void)the_void:_SYS_Error
-#define SYS_Warning (_SetFileAndLine ( __FILE__, __LINE__ ),false)?(void)the_void:_SYS_Warning
-
-//#if !defined(DAVE_RELEASE)
-#define SYS_Debug (_SetFileAndLine ( __FILE__, __LINE__ ),false)?(void)the_void:_SYS_Debug
-//#else
-//#define SYS_Debug (void)the_void
-//#endif
+#define SYS_Error(...) (_SYS_Error(__FILE__, __LINE__, __VA_ARGS__))
+#define SYS_Warning(...) (_SYS_Warning(__FILE__, __LINE__, __VA_ARGS__))
+#define SYS_Debug(...) (_SYS_Debug(__FILE__, __LINE__, __VA_ARGS__))
 
 
-
-void _SetFileAndLine ( const char *filename, const int linenum );
-void _SYS_Error ( const char *fmt, ... );
-void _SYS_Warning ( const char *fmt, ... );
-void _SYS_Debug ( const char *fmt, ... );
+void _SYS_Error ( const char *file, int line, const char *fmt, ... );
+void _SYS_Warning ( const char *file, int line, const char *fmt, ... );
+void _SYS_Debug ( const char *file, int line, const char *fmt, ... );
 
 
 #endif			// #ifndef __SYS_ERROR_H_RTFB__
