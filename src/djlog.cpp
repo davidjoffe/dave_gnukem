@@ -14,7 +14,8 @@ Copyright (C) 1998-2022 David Joffe
 
 void log_message( const char * szFormat, ... )
 {
-	static char buf[4096]={0};
+	//dj2022-11 Making this static buffer thread_local (C++11 onwards) as static buffers will cause thread problems if we ever want to use threads
+	static thread_local char buf[4096]={0};
 
 	if ( szFormat == NULL )
 		return;
@@ -22,7 +23,7 @@ void log_message( const char * szFormat, ... )
 	// print the formatted log string onto buf
 	va_list args;
 	va_start(args, szFormat);
-	vsnprintf(buf, 4096, szFormat, args);
+	vsnprintf(buf, sizeof(buf), szFormat, args);
 	va_end(args);
 
 #ifdef WIN32

@@ -9,7 +9,7 @@
  * Description: System logger
  *
  * BUGS:
- *	(+) The bitch refused to log anything if no '\n' specified. Also,
+ *	(+) [It] refused to log anything if no '\n' specified. Also,
  *	garbage at the end of line appeared sometimes. Seems like it was
  *	a matter of lacking terminating zero. Looks like fixed :)
  *	(-) Still needs testing. Won't take long, i think :)
@@ -137,7 +137,7 @@ void Log ( const char *fmt, ... )
 	memset ( text, 0, 4096 );
 
 	va_start ( ap, fmt );
-		vsprintf ( (char*)text, fmt, ap );
+		vsnprintf ( (char*)text, sizeof(text), fmt, ap );
 	va_end ( ap );
 
 	if (log_files[0]!=NULL)
@@ -169,7 +169,7 @@ void Log ( dword log_mask, const char *fmt, ... )
 	memset ( text, 0, 4096 );
 
 	va_start ( ap, fmt );
-		vsprintf ( (char*)text, fmt, ap );
+		vsnprintf ( (char*)text, sizeof(text), fmt, ap );
 	va_end ( ap );
 
 	for ( unsigned int i=0; i<num_logs; i++ )
