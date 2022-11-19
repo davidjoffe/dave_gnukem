@@ -808,7 +808,7 @@ SDL_SWSURFACE,
 		pImage->Width(),
 		pImage->Height(),
 		32,
-		pImage->Pitch(),//		pImage->Width() * 4,
+		pImage->Pitch(),
 		0xFF0000,
 		0xFF00,
 		0xFF,
@@ -845,12 +845,10 @@ SDL_SWSURFACE,
 			{
 				if ((y%3)==0)
 				{
-					//*(pSurfaceMem + i + ((y*pSurface->pitch)/4)) = 0x50FF8822;
 					unsigned int vOrig = *(pSurfaceMemImg + i + ((y*pSurfaceImg->pitch)/4));
 					if ((vOrig & 0xFF000000)==0)
 					*(pSurfaceMem + i + ((y*pSurface->pitch)/4)) = *(pSurfaceMem + i + ((y*pSurface->pitch)/4))  &  0x00FFFFFF;
 				}
-				//*(pSurfaceMem2 + i + ((y*pSurface->pitch)/4)) = 0x00FF000000;
 			}
 		}
 		SDL_UnlockSurface(pSurfaceImg);
@@ -863,6 +861,6 @@ SDL_SetSurfaceAlphaMod(pSurface, 0);
 	}
 	return (void*)pSurface;
 
-	*/
+	//*/
 }
 
