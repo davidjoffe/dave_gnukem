@@ -25,14 +25,12 @@
 #include "sys_defs.h"
 #include "djstring.h"//djAppendPathStr [should move elsewhere?? dj2018-03]
 
-#ifdef WIN32
-//#include <windows.h>//OutputDebugString
-#endif
-
 #define DEFAULT_LOG_FILE	"game.log"
 
 #define MAX_LOGS		32
 
+
+//dj2022-11 note some of this stuff probably not used anymore, maybe clean up someday .. also don't think we really need the rotating logs stuff just adds complexity at this point that I don't think justifies benefit
 
 static bool	log2screen = false;
 static bool	log2console = false;

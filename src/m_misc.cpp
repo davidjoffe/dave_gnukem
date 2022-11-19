@@ -183,10 +183,11 @@ M_GetFilePath
 Get filename path directory
 ==================
 */
+/*
 char* M_GetFilePath ( const char* filename )
 {
 	static thread_local char	path[SYS_MAX_PATH]={0};
-	char		*ptr;
+	char		*ptr=nullptr;
 
 	strcpy ( path, filename );
 	ptr = strrchr ( path, '\\' );
@@ -215,7 +216,7 @@ char* M_GetFilePath ( const char* filename )
 	path[0] = 0;
 	return path;
 }
-
+*/
 
 /*
 ======================
@@ -224,6 +225,7 @@ M_GetFileRoot
 Get filename without path or extension
 ======================
 */
+/*
 char* M_GetFileRoot ( const char* filename )
 {
 	static thread_local char	root[SYS_MAX_PATH]={0};
@@ -242,7 +244,7 @@ char* M_GetFileRoot ( const char* filename )
 
 	return root;
 }
-
+*/
 
 /*
 =====================
@@ -276,7 +278,7 @@ Get filename extension (without the '.')
 */
 
 
-
+/*
 void M_GetFilePath ( char* filename )
 {
 	char	*ptr;
@@ -309,7 +311,6 @@ void M_GetFilePath ( char* filename )
 
 
 
-
 void M_GetFileRoot ( char* filename )
 {
 	char	*ptr;
@@ -326,6 +327,7 @@ void M_GetFileRoot ( char* filename )
 		*ptr = 0;
 }
 
+*/
 
 
 
