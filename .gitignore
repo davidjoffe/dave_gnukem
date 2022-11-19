@@ -12,6 +12,11 @@
 # Temporary local Visual Studio settings and cached stuff eg precompiled headers that should not be committed
 /src/vcDave/.vs/
 
+# OS2 (dj2022-11 Merging Andreas Peters OS2 commits)
+/**/*.o
+/*.exe
+
+# Linux/Mac etc. build products:
 davegnukem
 src/*.o
 src/sdl/*.o

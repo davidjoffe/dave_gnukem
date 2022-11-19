@@ -43,7 +43,11 @@ using namespace std;
 #include "instructions.h"//Slightly don't like this dependency. For ShowInstructions() from in-game menu. [dj2017-08]
 
 #ifndef NOSOUND
+#ifdef __OS2__
+#include <SDL/SDL_mixer.h>
+#else
 #include <SDL_mixer.h>//For background music stuff
+#endif
 Mix_Music* g_pGameMusic=NULL;
 #endif
 

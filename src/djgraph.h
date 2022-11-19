@@ -9,7 +9,11 @@ Copyright (C) 1998-2022 David Joffe
 #ifndef _DJGRAPH_H_
 #define _DJGRAPH_H_
 
+#ifdef __OS2__
+#include <SDL/SDL.h>
+#else
 #include "SDL.h"
+#endif
 
 #include "djimage.h"
 #include "djtypes.h"

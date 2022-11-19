@@ -47,8 +47,18 @@ Copyright (C) 1995-2022 David Joffe
 #include <sys/stat.h>//For djFolderExists stuff
 #endif
 
+// dj2022-11 Merging Andreas Peters OS2 commits https://github.com/davidjoffe/dave_gnukem/pull/128
+#ifdef __OS2__
+#define INCL_DOS
+#include <os2.h>
+#endif
+
 #ifndef NOSOUND
+#ifdef __OS2__
+#include <SDL/SDL_mixer.h>
+#else
 #include <SDL_mixer.h>//For background music stuff
+#endif
 #endif
 
 #include <map>
@@ -68,6 +78,19 @@ void CheckHighScores( int score );	// check if high score table is beaten,
 						// and show the table after all
 void InitMainMenu();
 void KillMainMenu();
+
+#ifdef __OS2__
+void MorphToPM()
+{
+   PPIB pib;
+   PTIB tib;
+
+   DosGetInfoBlocks(&tib, &pib);
+
+   // Change flag from VIO to PM:
+   if (pib->pib_ultype==2) pib->pib_ultype = 3;
+}
+#endif
 
 /*--------------------------------------------------------------------------*/
 // Main menu [NB, warning, the handling code uses indexes :/ .. so if you add/remove items, must update there too - dj2016-10]
@@ -101,6 +124,12 @@ CMenu mainMenu ( "main.cpp:mainMenu" );
 // This is the 'main' function. The big cheese.
 int main ( int argc, char** argv )
 {
+
+
+#ifdef __OS2__
+	MorphToPM();
+#endif
+	
 	// Check commandline args
 	bool bfullscreen = false;
 	bool b640 = false;
