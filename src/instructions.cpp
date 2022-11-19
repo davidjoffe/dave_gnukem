@@ -1,7 +1,7 @@
 /*
 instructions.cpp
 
-Copyright (C) 1999-2019 David Joffe
+Copyright (C) 1999-2022 David Joffe
 */
 #include "config.h"//CFG_APPLICATION_RENDER_RES_W
 #include "djtypes.h"
@@ -95,7 +95,7 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 	djImage* pImgFont = NULL;
 	djImage* pImgFontS = NULL;//shadow
 	pImgFont = new djImage;
-	if (pImgFont->Load( "data/fonts/simple_6x8.tga" )>=0)
+	if (pImgFont->Load( DATA_DIR "fonts/simple_6x8.tga" )>=0)
 	{
 		djCreateImageHWSurface( pImgFont );
 		FW=6;
@@ -107,7 +107,7 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 	}
 	if (!pImgFont)return;
 	pImgFontS = new djImage;
-	if (pImgFontS->Load( "data/fonts/simple_6x8_shadow.tga" )>=0)
+	if (pImgFontS->Load( DATA_DIR "fonts/simple_6x8_shadow.tga" )>=0)
 	{
 		djCreateImageHWSurface( pImgFontS );
 	}
@@ -327,14 +327,14 @@ void ShowInstructions()
 	asText.push_back("");
 	asText.push_back("### KEYS ###");
 
-	char szBuf[1024] = {0};
-	sprintf(szBuf, "%s", GetKeyString(g_anKeys[KEY_LEFT]));
+	char szBuf[2048] = {0};
+	snprintf(szBuf, sizeof(szBuf), "%s", GetKeyString(g_anKeys[KEY_LEFT]));
 	asText.push_back(std::string("LEFT:  ") + szBuf
 		+ PadSpaces(szBuf,18-7) + std::string("SHOOT: ") + GetKeyStringS(g_anKeys[KEY_SHOOT]) );
-	sprintf(szBuf, "%s", GetKeyString(g_anKeys[KEY_RIGHT]));
+	snprintf(szBuf, sizeof(szBuf), "%s", GetKeyString(g_anKeys[KEY_RIGHT]));
 	asText.push_back(std::string("RIGHT: ") + szBuf
 		+ PadSpaces(szBuf,18-7) + std::string("JUMP:  ") + GetKeyStringS(g_anKeys[KEY_JUMP]) );
-	sprintf(szBuf, "%s", GetKeyString(g_anKeys[KEY_ACTION]));
+	snprintf(szBuf, sizeof(szBuf), "%s", GetKeyString(g_anKeys[KEY_ACTION]));
 	//asText.push_back(std::string(" Action: ") + szBuf + std::string(" (Activate doors,"));
 	//asText.push_back("  exits, lifts, teleporters etc.)");
 	asText.push_back(std::string("ACTION:") + szBuf + std::string(" Activate doors, lifts, etc."));

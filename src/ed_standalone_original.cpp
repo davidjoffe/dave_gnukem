@@ -210,7 +210,7 @@ int main( int argc, char** argv )
 
 	
 	pFont = new djImage;
-	pFont->Load( "data/simplefont.tga" );
+	pFont->Load( DATA_DIR "simplefont.tga" );
 
 	djgSetColorFore( pVis, djColor(0,0,0) );
 	djgClear( pVis );
@@ -225,7 +225,7 @@ int main( int argc, char** argv )
 
 	// level initialization stuff
 	// load level sets
-	if ( 0 != LoadMissions( "data/missions.txt" ) )
+	if ( 0 != LoadMissions( DATA_DIR "missions.txt" ) )
 		return -1;
 	TRACE( "main(): %d game(s) found.\n", g_apMissions.size() );
 
@@ -1376,7 +1376,7 @@ bool LoadMacros()
 {
 	FILE *fin;
 	char buf[1024];
-	if (NULL == (fin = fopen( "data/editor/macros.txt", "r" )))
+	if (NULL == (fin = fopen( DATA_DIR "editor/macros.txt", "r" )))
 		return false;
 
 	SMacro *pMacro;

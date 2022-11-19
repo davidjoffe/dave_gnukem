@@ -29,10 +29,22 @@ void DisposeLog ( unsigned long lg_id );
 unsigned long SysLog ();
 
 
-// The logger itself. Shall be more overloads on demand
-void Log ( unsigned long log_mask, const char *fmt, ... );
-void Log ( const char *fmt, ... );
+//dj2022 these are 'risky' names for global namespace :/ .. fix all that
+class djLog
+{
+public:
+	// The logger itself. Shall be more overloads on demand
+	// dj2022 making these names longer LogFormatStr() to make it semantically CLEAR you are calling a printf-style formatting thing (which is thus riskier i.e. extra risk of introducing bugs of mismatched printf strings and parameters) (rather use LogStr when don't need formatting)
+	static void LogFormatStr(const char* fmt, ...);
 
+	//dj2022-11 RENAMING THIS as using function overloading creates risk of ambiguously calling wrong version of this function .. should we phase out below also, not sure
+	//static void LogFormatStr2(unsigned long log_mask, const char* fmt, ...);
+
+	// Log plain string (no printf formatting) - safer than printf so lean towards using this when you don't need printf style formatting [dj2022-11]
+	static void LogStr(const char* szStr);
+};
+//dj2022-11 convenience helper for new log of plain string (with no printf style formatting)
+#define djLOGSTR(sz) djLog::LogStr(sz)
 
 // This tells logger whether or not to log to system console
 void LogToScreen ( const bool l2s );

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Dave Gnukem"
-#define MyAppVersion "1.0.1"
+#define MyAppVersion "1.0.3"
 #define MyAppPublisher "TshwaneDJe"
 #define MyAppURL "https://djoffe.com/gnukem"
 #define MyAppExeName "DaveGnukem.exe"

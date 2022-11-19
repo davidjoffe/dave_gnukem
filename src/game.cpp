@@ -3,7 +3,7 @@
 //
 // Created 1995/07/28
 //
-// Copyright (C) 1995-2020 David Joffe
+// Copyright (C) 1995-2022 David Joffe
 //
 /*--------------------------------------------------------------------------*/
 
@@ -12,10 +12,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-#include "mmgr/nommgr.h"
 #include <string>
 using namespace std;
-#include "mmgr/mmgr.h"
 
 #ifdef WIN32
 #else
@@ -117,16 +115,16 @@ void IngameMenu();
 
 const char *g_szSoundFiles[SOUND_MAX] =
 {
-	"data/sounds/pickup.wav",
-	"data/sounds/shoot_cg1_modified.wav",//<- Hero shoot sound
-	"data/sounds/exit.ogg",//<-dj2016-10-28 New proper exit sound (is "PowerUp13.mp3" by Eric Matyas http://soundimage.org/)
-	"data/sounds/wooeep.wav",
-	"data/sounds/explode.wav",
-	"data/sounds/sfx_weapon_singleshot7.wav"//<- Monster shoot sound
-	,"data/sounds/jump.wav"//dj2016-10-30
-	,"data/sounds/jump_landing.wav"//dj2016-10-30
-	,"data/sounds/soft_explode.wav"//dj2016-10-30
-	,"data/sounds/key_pickup.wav"//dj2016-10-30
+	DATA_DIR "sounds/pickup.wav",
+	DATA_DIR "sounds/shoot_cg1_modified.wav",//<- Hero shoot sound
+	DATA_DIR "sounds/exit.ogg",//<-dj2016-10-28 New proper exit sound (is "PowerUp13.mp3" by Eric Matyas http://soundimage.org/)
+	DATA_DIR "sounds/wooeep.wav",
+	DATA_DIR "sounds/explode.wav",
+	DATA_DIR "sounds/sfx_weapon_singleshot7.wav"//<- Monster shoot sound
+	,DATA_DIR "sounds/jump.wav"//dj2016-10-30
+	,DATA_DIR "sounds/jump_landing.wav"//dj2016-10-30
+	,DATA_DIR "sounds/soft_explode.wav"//dj2016-10-30
+	,DATA_DIR "sounds/key_pickup.wav"//dj2016-10-30
 };
 SOUND_HANDLE g_iSounds[SOUND_MAX]={0};
 
@@ -210,13 +208,13 @@ int CountHeroBullets()
 vector<float> afTimeTaken;
 #define MAX_DEBUGGRAPH 128
 
-const char *FILE_GAMESKIN = "data/gameskin.tga";
+const char *FILE_GAMESKIN = DATA_DIR "gameskin.tga";
 djImage *pSkinGame        = NULL; // Main game view skin (while playing)
 djImage *pBackground      = NULL; // Level background image
 
 // Game effects [dj2018-01]
 // 'Map auto-shadows' [dj2018-01]
-const char* FILE_SHADOWS = "data/shadows.tga";
+const char* FILE_SHADOWS = DATA_DIR "shadows.tga";
 djImage* g_pImgShadows = NULL;
 
 #ifdef djBETA_SHADOWFOLLOWEFFECT2020
@@ -951,7 +949,7 @@ void GameFinalCleanup()
 // Per-game initialization
 void PerGameSetup()
 {
-	Log("PerGameSetup(): InitLevelSystem()\n");
+	djLOGSTR("PerGameSetup(): InitLevelSystem()\n");
 	InitLevelSystem();
 
 	g_nHealth = HEALTH_INITIAL; // Initial health
@@ -973,7 +971,7 @@ void PerGameSetup()
 
 void PerLevelSetup()
 {
-	Log ( "PerLevelSetup()\n" );
+	djLOGSTR( "PerLevelSetup()\n" );
 
 	g_nRecentlyFallingOrJumping=0;
 	g_nNoShootCounter = 0;
@@ -1013,7 +1011,7 @@ void PerLevelSetup()
 #ifndef NOSOUND
 	// This is somewhat gross quick n dirty simplistic for now - should rather have ability to assign music file in the level file format [dj2016-10]
 	int nMusicFile = (g_nLevel % asMusicFiles.size());
-	std::string sBasePath = "data/music/eric_matyas/";
+	std::string sBasePath = DATA_DIR "music/eric_matyas/";
 	if (g_pGameMusic!=NULL)
 	{
 		Mix_FreeMusic(g_pGameMusic);
@@ -1216,7 +1214,7 @@ void PerGameCleanup()
 	djDEL(pBackground);
 	// Delete all levels
 	KillLevelSystem();
-	Log ( "KillLevelSystem() ok\n" );
+	djLOGSTR( "KillLevelSystem() ok\n" );
 }
 
 void PerLevelCleanup()
@@ -1391,7 +1389,7 @@ int game_startup(bool bLoadGame)
 						{
 						/*{
 						char buf[1024]={0};
-						sprintf(buf,"%08x,%08x,%08x",(int)Event.key.keysym.sym, (int)Event.key.keysym.mod, (int)Event.key.keysym.scancode);
+						snprintf(buf,sizeof(buf),"%08x,%08x,%08x",(int)Event.key.keysym.sym, (int)Event.key.keysym.mod, (int)Event.key.keysym.scancode);
 						ShowGameMessage(buf, 32);
 						}*/
 						if (Event.key.keysym.sym==SDLK_F6)
@@ -1404,7 +1402,7 @@ int game_startup(bool bLoadGame)
 								g_fFrameRate = 1.f;
 							fTIMEFRAME = (1.0f / g_fFrameRate);
 							char buf[1024]={0};
-							sprintf(buf,"Dec framerate %.2f",g_fFrameRate);
+							snprintf(buf,sizeof(buf),"Dec framerate %.2f",g_fFrameRate);
 							ShowGameMessage(buf, 32);
 						}
 						else if (Event.key.keysym.sym==SDLK_F7)
@@ -1412,7 +1410,7 @@ int game_startup(bool bLoadGame)
 							g_fFrameRate += 1.0f;
 							fTIMEFRAME = (1.0f / g_fFrameRate);
 							char buf[1024]={0};
-							sprintf(buf,"Inc framerate %.2f",g_fFrameRate);
+							snprintf(buf,sizeof(buf),"Inc framerate %.2f",g_fFrameRate);
 							ShowGameMessage(buf, 32);
 						}
 						else if (Event.key.keysym.sym==SDLK_F8)
@@ -1455,7 +1453,7 @@ int game_startup(bool bLoadGame)
 							{
 								++n;
 								char szBuf[8192]={0};//fixLOW MAX_PATH? Some issue with MAX_PATH I can't remember what right now [dj2017-08]
-								sprintf(szBuf,"gnukem_recording_%03d", n);
+								snprintf(szBuf, sizeof(szBuf), "gnukem_recording_%03d", n);
 								sFilenameWithPath = djAppendPathStr(sBasePath.c_str(),szBuf);
 							} while (djFolderExists(sFilenameWithPath.c_str()));
 							djEnsureFolderTreeExists(sFilenameWithPath.c_str());
@@ -1480,7 +1478,7 @@ int game_startup(bool bLoadGame)
 						{
 							++n;
 							char szBuf[8192]={0};//fixLOW MAX_PATH? Some issue with MAX_PATH I can't remember what right now [dj2017-08]
-							sprintf(szBuf,"gnukem_screenshot_%03d.bmp", n);
+							snprintf(szBuf, sizeof(szBuf), "gnukem_screenshot_%03d.bmp", n);
 
 							sFilenameWithPath = djAppendPathStr(sPath.c_str(),szBuf);
 						} while (djFileExists(sFilenameWithPath.c_str()));
@@ -1756,8 +1754,8 @@ int game_startup(bool bLoadGame)
 		fTimeRun = fTimeNow - fTimeFirst;
 		iFrameCount++;
 		static char sbuf[1024]={0};
-		sprintf( sbuf, "%.2f", (float)iFrameCount / fTimeRun );
-		//sprintf( sbuf, "%.2f %d %d", (float)iFrameCount / fTimeRun ,HERO_PIXELX,HERO_PIXELY);
+		snprintf( sbuf, sizeof(sbuf), "%.2f", (float)iFrameCount / fTimeRun );
+		//snprintf( sbuf, sizeof(sbuf), "%.2f %d %d", (float)iFrameCount / fTimeRun ,HERO_PIXELX,HERO_PIXELY);
 		if (iFrameCount==60)
 		{
 			iFrameCount /= 2;
@@ -1774,7 +1772,7 @@ int game_startup(bool bLoadGame)
 		if (!g_sAutoScreenshotFolder.empty())
 		{
 			char szFilename[4096]={0};
-			sprintf(szFilename,"gnukem_%08d.bmp",g_nScreenshotNumber);
+			snprintf(szFilename,sizeof(szFilename),"gnukem_%08d.bmp",g_nScreenshotNumber);
 			std::string sPath = djAppendPathStr(g_sAutoScreenshotFolder.c_str(),szFilename);
 			SDL_SaveBMP(pVisMain->pSurface, sPath.c_str());//"c:\\dj\\DelmeTestMain.bmp");
 			++g_nScreenshotNumber;
@@ -1782,7 +1780,7 @@ int game_startup(bool bLoadGame)
 
 			//static int nFrameCounter=0;
 			//char szFilename[4096]={0};
-			//sprintf(szFilename,"c:\\dj\\rectest\\dave_gnukem_%08d.bmp",nFrameCounter);
+			//snprintf(szFilename,sizeof(szFilename),"c:\\dj\\rectest\\dave_gnukem_%08d.bmp",nFrameCounter);
 			//SDL_SaveBMP(pVisMain->pSurface, szFilename);//"c:\\dj\\DelmeTestMain.bmp");
 			//nFrameCounter++;
 		}
@@ -2170,8 +2168,8 @@ void SetScore(int nScore)
 
 void DrawScore()
 {
-	char score_buf[64]={0};
-	sprintf( score_buf, "%10d", (int)g_nScore );
+	char score_buf[128]={0};
+	snprintf( score_buf, sizeof(score_buf), "%10d", (int)g_nScore );
 	// Display score
 	if (g_bLargeViewport || g_bBigViewportMode)
 	{
@@ -2764,28 +2762,28 @@ void DrawDebugInfo()
 
 	GraphDrawString(pVisView, g_pFont8x8, 32, 16, (unsigned char*)"Debug info on (D)" );
 	char buf[256]={0};
-	sprintf(buf, "%d things", (int)g_apThings.size());
+	snprintf(buf,sizeof(buf), "%d things", (int)g_apThings.size());// VERY NB that we convert .size() to 'int' because on some platforms size() is 64-bit but int 32-bit so can crash otherwise if not careful!
 	GraphDrawString(pVisView, g_pFont8x8, 32, 24, (unsigned char*)buf );
-	sprintf(buf, "%d visible", nNumVisible);
+	snprintf(buf,sizeof(buf), "%d visible", nNumVisible);
 	GraphDrawString(pVisView, g_pFont8x8, 32, 32, (unsigned char*)buf );
-	sprintf(buf, "[%d,%d] [%d firepower]", g_Player.x, g_Player.y, g_nFirepower);
+	snprintf(buf,sizeof(buf), "[%d,%d] [%d firepower]", g_Player.x, g_Player.y, g_nFirepower);
 	GraphDrawString(pVisView, g_pFont8x8, 32, 40, (unsigned char*)buf );
 
 	if (HeroIsFrozen())
 	{
-		sprintf(buf, "[FROZEN]");
+		snprintf(buf,sizeof(buf), "[FROZEN]");
 		GraphDrawString(pVisView, g_pFont8x8, 32, 48, (unsigned char*)buf );
 	}
 
 	extern int nFrozenCount;
-	sprintf(buf, "frozecount=%d", nFrozenCount);
+	snprintf(buf,sizeof(buf), "frozecount=%d", nFrozenCount);
 	GraphDrawString(pVisView, g_pFont8x8, 32, 56, (unsigned char*)buf );
-	//sprintf(buf, "[%d,%d,%d,%d]", x,y,x_small,y_offset);
+	//snprintf(buf,sizeof(buf), "[%d,%d,%d,%d]", x,y,x_small,y_offset);
 	//GraphDrawString(pVisView, g_pFont8x8, 32, 56+8, (unsigned char*)buf );
-	//sprintf(buf, "hero_mode=%d", hero_mode);
+	//snprintf(buf,sizeof(buf), "hero_mode=%d", hero_mode);
 	//GraphDrawString(pVisView, g_pFont8x8, 32, 62, (unsigned char*)buf );
 
-	//sprintf(buf, "xo,yo=%d,%d", xo, yo);
+	//snprintf(buf,sizeof(buf), "xo,yo=%d,%d", xo, yo);
 	//GraphDrawString(pVisView, g_pFont8x8, 32, 70, (unsigned char*)buf );
 }
 

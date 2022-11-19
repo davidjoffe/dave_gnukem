@@ -315,26 +315,26 @@ void DisplayLevelStats( CLevelStats& Stats)
 				//a,b pair
 				const std::pair< unsigned char, unsigned char >& pair = iter->first;
 
-				sprintf(buf, "%3d,%3d", (unsigned int)pair.first, (unsigned int)pair.second );
+				snprintf(buf,sizeof(buf), "%3d,%3d", (unsigned int)pair.first, (unsigned int)pair.second );
 				ED_DrawString( xleft+16+8, y*16+4, buf );
 
 				// Count
 				if (iter->second!=0)
 				{
-					sprintf(buf, "%8d", (int)iter->second );
+					snprintf(buf,sizeof(buf), "%8d", (int)iter->second );
 					ED_DrawString( xleft+16+8+10*8, y*16+4, buf );
 				}
 
 				// Count (background instances)
 				if (Stats.SpriteCountsB[ pair ]!=0)
 				{
-					sprintf(buf, "%8d", Stats.SpriteCountsB[ pair ] );
+					snprintf(buf,sizeof(buf), "%8d", Stats.SpriteCountsB[ pair ] );
 					ED_DrawString( xleft+16+8 + 136, y*16+4, buf );
 				}
 				// Count (foreground instances)
 				if (Stats.SpriteCountsF[ pair ]!=0)
 				{
-					sprintf(buf, "%8d", Stats.SpriteCountsF[ pair ] );
+					snprintf(buf,sizeof(buf), "%8d", Stats.SpriteCountsF[ pair ] );
 					ED_DrawString( xleft+16+8 + 136+9*8, y*16+4, buf );
 				}
 
@@ -362,11 +362,11 @@ void DisplayLevelStats( CLevelStats& Stats)
 				++y;
 			}
 
-			sprintf(buf,"Level Statistics. Page %d/%d", nPage+1, nPages);
+			snprintf(buf,sizeof(buf),"Level Statistics. Page %d/%d", nPage+1, nPages);
 			ED_DrawString( 0, pVisMain->height-24, buf );
 
 			const char * szfilename = g_pCurMission->GetLevel(g_nLevel)->GetFilename();
-			sprintf(buf,"Level:%s",szfilename==NULL?"":szfilename);
+			snprintf(buf,sizeof(buf),"Level:%s",szfilename==NULL?"":szfilename);
 			ED_DrawString( 0, pVisMain->height-16, buf );
 
 			ED_DrawString( 0, pVisMain->height-8, "Help: Esc exit stats. PgUp/PgDn to scroll. Home/End 1st/last page. Counts are total,background,foreground" );
@@ -500,10 +500,10 @@ void DoAllLevelsOverview()
 				// Show stats on 'important' pickups/objects etc., e.g. powerboots, firepower
 				const int nTEXTHEIGHT = 8;
 				int nTextY = 0;
-				sprintf(buf,"LEVEL[%d/%d] %s", iLev+1,g_pCurMission->NumLevels(), g_pCurMission->GetLevel(iLev)->GetFilename() );
+				snprintf(buf,sizeof(buf),"LEVEL[%d/%d] %s", iLev+1,g_pCurMission->NumLevels(), g_pCurMission->GetLevel(iLev)->GetFilename() );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
-				sprintf(buf,"Keys    : [1]%03d [2]%03d [3]%03d [4]%03d",
+				snprintf(buf,sizeof(buf),"Keys    : [1]%03d [2]%03d [3]%03d [4]%03d",
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,117) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,118) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,119) ],
@@ -511,7 +511,7 @@ void DoAllLevelsOverview()
 				);
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
-				sprintf(buf,"KeyLocks: [1]%03d [2]%03d [3]%03d [4]%03d",
+				snprintf(buf,sizeof(buf),"KeyLocks: [1]%03d [2]%03d [3]%03d [4]%03d",
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,121) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,122) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(0,123) ],
@@ -519,7 +519,7 @@ void DoAllLevelsOverview()
 				);
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
-				sprintf(buf,"Doors   : [1]%03d [2]%03d [3]%03d [4]%03d",
+				snprintf(buf,sizeof(buf),"Doors   : [1]%03d [2]%03d [3]%03d [4]%03d",
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 0) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1,16) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1,32) ],
@@ -527,7 +527,7 @@ void DoAllLevelsOverview()
 				);
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
-				sprintf(buf,"Box[GNUKEM]: %-3d %-3d %-3d %-3d %-3d %-3d",
+				snprintf(buf,sizeof(buf),"Box[GNUKEM]: %-3d %-3d %-3d %-3d %-3d %-3d",
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 117) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 118) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 119) ],
@@ -536,7 +536,7 @@ void DoAllLevelsOverview()
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 122) ]
 				);
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
-				sprintf(buf,"    GNUKEM : %-3d %-3d %-3d %-3d %-3d %-3d",
+				snprintf(buf,sizeof(buf),"    GNUKEM : %-3d %-3d %-3d %-3d %-3d %-3d",
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 58) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 59) ],
 					aLevelStats[iLev].SpriteCounts[ std::make_pair(1, 60) ],
@@ -551,33 +551,33 @@ void DoAllLevelsOverview()
 				int nType = TYPE_ACCESSCARD;
 				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
 				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
-				sprintf(buf,"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
 				nType = TYPE_FIREPOWER;
 				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
 				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
-				sprintf(buf,"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
 				nType = TYPE_MASTERCOMPUTER;
 				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
 				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
-				sprintf(buf,"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
 				nType = TYPE_POWERBOOTS;
 				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
 				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
-				sprintf(buf,"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
-				sprintf(buf,"HIGHVOLTAGE: %-3d", aLevelStats[iLev].SpriteCounts[ std::make_pair(5, 31) ] );
+				snprintf(buf,sizeof(buf),"HIGHVOLTAGE: %-3d", aLevelStats[iLev].SpriteCounts[ std::make_pair(5, 31) ] );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 			}
 
 
-			sprintf(buf,"Level overview. Page %d/%d", nPage+1, nPages);
+			snprintf(buf,sizeof(buf),"Level overview. Page %d/%d", nPage+1, nPages);
 			ED_DrawString( 0, pVisMain->height-24, buf );
 
 			ED_DrawString( 0, pVisMain->height-8, "Help: Esc exit stats. PgUp/PgDn to scroll. Home/End 1st/last page." );
@@ -667,7 +667,7 @@ void DoCreateNewLevel()
 	{
 		++n;
 		char szBuf[8192]={0};//fixLOW MAX_PATH? Some issue with MAX_PATH I can't remember what right now [dj2017-08]
-		sprintf(szBuf,"newlevel%03d.lev", n);
+		snprintf(szBuf,sizeof(szBuf),"newlevel%03d.lev", n);
 		sFilenameWithoutPath = szBuf;
 
 		sFilenameWithPath = sPath;
@@ -683,7 +683,7 @@ void DoCreateNewLevel()
 	djAppendPathS(sLevelRelativePath, sFilenameWithoutPath.c_str());
 	pLevel->SetFilename(sLevelRelativePath.c_str());
 	pLevel->m_szName		= djStrDeepCopy("");
-	pLevel->m_szBackground	= djStrDeepCopy("data/levels/bg1.tga");//fixme for now hardcoded
+	pLevel->m_szBackground	= djStrDeepCopy(DATA_DIR "levels/bg1.tga");//fixme for now hardcoded
 	pLevel->m_szAuthor		= djStrDeepCopy("");
 	g_pCurMission->AddLevel(pLevel);
 
@@ -1126,7 +1126,7 @@ void DrawSprites ()
 
 //	djgSetColorFore( pVisMain, djColor(255,255,255) );
 
-	sprintf( buf, "%d,%-15.15s", ED_GetCurrSpriteSet(), g_pCurMission->GetSpriteData(ED_GetCurrSpriteSet())->m_szImgFilename );
+	snprintf(buf,sizeof(buf), "%d,%-15.15s", ED_GetCurrSpriteSet(), g_pCurMission->GetSpriteData(ED_GetCurrSpriteSet())->m_szImgFilename );
 
 	ED_DrawString( 120, POS_LEVELSPRITES_Y - 8, buf );
 	ox = POS_LEVELSPRITES_X;
@@ -1197,7 +1197,7 @@ void DrawLevelname()
 void ShowSettings()
 {
 	char szBuf[4096]={0};
-	sprintf(szBuf, "Selected Sprite Indicators: %s", g_bFlashingIndicatorEnabled ? "ON" : "OFF");
+	snprintf(szBuf,sizeof(szBuf), "Selected Sprite Indicators: %s", g_bFlashingIndicatorEnabled ? "ON" : "OFF");
 	// Clear background
 	djgSetColorFore(pVisMain, djColor(0,0,80));//blue
 	djgDrawBox(pVisMain, 0, POS_LEVELVIEW_Y + 16 * levelview_h + 8 + 8, pVisMain->width/2, 8);
@@ -1216,8 +1216,8 @@ void DrawMinimapRectangle()
 
 void DrawMinimap()
 {
-	int i, j;
-	int a, b;
+	int i = 0, j = 0;
+	int a = 0, b = 0;
 
 	// Draw the purple rectangle indicating where your zoomed view is
 	DrawMinimapRectangle();
