@@ -150,8 +150,8 @@ void ED_SetSprite( int ispritenew, int ox, int oy )
 
 	g_iSprite = ispritenew;
 	// show sprite index
-	char buf[64]={0};
-	sprintf( buf, "%3d", (int)g_iSprite );
+	char buf[128]={0};
+	snprintf( buf, sizeof(buf), "%3d", (int)g_iSprite );
 	ED_DrawStringClear( 0, 472, buf );
 	ED_DrawString( 0, 472, buf );
 
@@ -219,8 +219,8 @@ void ED_SpriteShowType( int c )
 
 void ED_SpriteShowExtra( int i, int c )
 {
-	char buf[128]={0};
-	sprintf( buf, "%2d:[%4d]", i, ED_GetSpriteExtra( g_iSpriteset, g_iSprite, i ) );
+	char buf[256]={0};
+	snprintf(buf,sizeof(buf), "%2d:[%4d]", i, ED_GetSpriteExtra( g_iSpriteset, g_iSprite, i ) );
 	switch (i)
 	{
 	case 4: strcat(buf, "flags");break;

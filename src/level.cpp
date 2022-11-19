@@ -1,7 +1,7 @@
 /*
 level.cpp
 
-Copyright (C) 1995-2019 David Joffe
+Copyright (C) 1995-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "level.h"
@@ -53,7 +53,7 @@ void KillLevelSystem()
 unsigned char * level_load( int i, const char * szfilename )
 {
 	unsigned char* pRet = NULL;
-	unsigned char * buffer;
+	unsigned char * buffer=nullptr;
 
 	printf( "level_load( %s ): loading at slot %d.\n", szfilename, i );
 
@@ -62,7 +62,7 @@ unsigned char * level_load( int i, const char * szfilename )
 
 	char filename[4096]={0};
 
-	sprintf( filename, "%s%s", DATA_DIR, szfilename );
+	snprintf( filename, sizeof(filename), "%s%s", DATA_DIR, szfilename );
 
 	// open level file
 	int file_handle = -1;
@@ -102,7 +102,7 @@ int level_save( int i, const char * szfilename )
 	unsigned char * level=NULL;
 	char filename[4096]={0};
 
-	sprintf( filename, "%s%s", DATA_DIR, szfilename );
+	snprintf( filename, sizeof(filename), "%s%s", DATA_DIR, szfilename );
 
 	level = apLevels[i];
 	if ( level == NULL )
