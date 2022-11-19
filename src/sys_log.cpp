@@ -25,6 +25,10 @@
 #include "sys_defs.h"
 #include "djstring.h"//djAppendPathStr [should move elsewhere?? dj2018-03]
 
+//#if defined(WIN32) && defined(_DEBUG)
+////#include <Windows.h>//For OutputDebugString
+//#endif
+
 #define DEFAULT_LOG_FILE	"game.log"
 
 #define MAX_LOGS		32
@@ -120,52 +124,57 @@ void DisposeLog ( dword log_id )
 }
 
 
-
-void Log ( const char *fmt, ... )
+//dj2022-11 refactoring some of the log stuff ..
+void djLog::LogStr(const char* szPlainString)
 {
-	char		text[4096]={0};
-	va_list		ap;
+	if (!initialised) return;
+	if (szPlainString == nullptr) return;
 
-	if ( !initialised )
+	if (log_files[0] != NULL)
+	{
+		fprintf(log_files[0], "%s", szPlainString);
+		fflush(log_files[0]);
+	}
+
+#if defined(WIN32) && defined(_DEBUG)
+	//dj2016-10 Log to debugger in Windows
+	//::OutputDebugString( szPlainString );
+#endif
+}
+
+
+void djLog::LogFormatStr( const char *fmt, ... )
+{
+	if (!initialised)
+		return;
+	if (NULL == fmt)
 		return;
 
-	if ( NULL == fmt )
-		return;
-
+	static thread_local char		text[4096]={0};
 	memset ( text, 0, 4096 );
 
+	va_list		ap;
 	va_start ( ap, fmt );
 		vsnprintf ( (char*)text, sizeof(text), fmt, ap );
 	va_end ( ap );
 
-	if (log_files[0]!=NULL)
-	{
-		fprintf ( log_files[0], "%s", text );
-		fflush ( log_files[0] );
-	}
-
-	#if defined(WIN32) && defined(_DEBUG)
-	//dj2016-10 Log to debugger in Windows
-	//::OutputDebugString( text );
-	#endif
+	djLog::LogStr(text);
 }
 
 
 
-
-void Log ( dword log_mask, const char *fmt, ... )
+/*
+void djLog::LogFormatStr2( dword log_mask, const char *fmt, ... )
 {
-	char		text[4096]={0};
-	va_list		ap;
-
 	if ( !initialised )
 		return;
-
 	if ( NULL == fmt )
 		return;
 
-	memset ( text, 0, 4096 );
+	static thread_local char		text[4096] = { 0 };
+	memset(text, 0, 4096);
 
+	va_list		ap;
 	va_start ( ap, fmt );
 		vsnprintf ( (char*)text, sizeof(text), fmt, ap );
 	va_end ( ap );
@@ -187,7 +196,7 @@ void Log ( dword log_mask, const char *fmt, ... )
 		}
 	}
 }
-
+*/
 
 
 

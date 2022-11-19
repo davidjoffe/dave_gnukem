@@ -386,6 +386,7 @@ CSpriteData::~CSpriteData()
 
 int CSpriteData::LoadData( const char *szFilename )
 {
+	if (szFilename == nullptr) return -1;
 	FILE	*fin=NULL;
 	int		i=0, j=0;
 	int		temp=0;

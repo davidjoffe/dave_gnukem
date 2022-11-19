@@ -945,7 +945,7 @@ void GameFinalCleanup()
 // Per-game initialization
 void PerGameSetup()
 {
-	Log("PerGameSetup(): InitLevelSystem()\n");
+	djLOGSTR("PerGameSetup(): InitLevelSystem()\n");
 	InitLevelSystem();
 
 	g_nHealth = HEALTH_INITIAL; // Initial health
@@ -967,7 +967,7 @@ void PerGameSetup()
 
 void PerLevelSetup()
 {
-	Log ( "PerLevelSetup()\n" );
+	djLOGSTR( "PerLevelSetup()\n" );
 
 	g_nRecentlyFallingOrJumping=0;
 	g_nNoShootCounter = 0;
@@ -1210,7 +1210,7 @@ void PerGameCleanup()
 	djDEL(pBackground);
 	// Delete all levels
 	KillLevelSystem();
-	Log ( "KillLevelSystem() ok\n" );
+	djLOGSTR( "KillLevelSystem() ok\n" );
 }
 
 void PerLevelCleanup()

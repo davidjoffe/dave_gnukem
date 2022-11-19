@@ -223,7 +223,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	}
 #endif
 
-	Log ( "\n================[ Starting Application Init ]===============\n" );
+	djLOGSTR( "\n================[ Starting Application Init ]===============\n" );
 
 	// Check the data folder is present, and if not, try give the user some basic guidance as to how to address this. [dj2018-05]
 	// This is pretty 'critical' in that we can't recover from it, but not really critical in that the cause is
@@ -279,7 +279,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	// )
 	// I think in theory -640 should behave the same as if passing "-scale 2" now
 	// but my memory of this stuff is a little vague so this needs to be checked.
-	Log ("DaveStartup(): Initializing graphics system ...\n");
+	djLOGSTR("DaveStartup(): Initializing graphics system ...\n");
 	int w=CFG_APPLICATION_RENDER_RES_W;
 	int h=CFG_APPLICATION_RENDER_RES_H;
 	//dj2019 do we really need the b640 option anymore? not sure. Might be used by some ports for DG1? Think I vaguely recall seeing someone mentioning using it on a forum ... maybe Pandora? Or maybe not used anymore? don't know.
@@ -298,7 +298,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	// [dj2016-10] Note this w/h is effectively now a 'hint' as it may not initialize to the exact requested size
 	if (!GraphInit( bFullScreen, w, h, nForceScale ))
 	{
-		Log( "DaveStartup(): Graphics initialization failed.\n" );
+		djLOGSTR( "DaveStartup(): Graphics initialization failed.\n" );
 		return -1;
 	}
 
@@ -313,10 +313,10 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	// Load missions
 	if (0 != LoadMissions(DATA_DIR "missions.txt"))
 		return -1;
-	Log ( "DaveStartup(): %d missions(s) found.\n", g_apMissions.size() );
+	djLog::LogFormatStr( "DaveStartup(): %d missions(s) found.\n", (int)g_apMissions.size() );//NB must convert .size() to int due to risk of 64-bit vs 32-bit mismatch on some platforms! very subtle bug/risk
 
 	//-- Initialize input devices
-	Log ("DaveStartup(): Initializing keys ..\n");
+	djLOGSTR("DaveStartup(): Initializing keys ..\n");
 	if (!djiInit( pVisMain ))
 		return -1;
 
@@ -324,47 +324,47 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 	GameInitialSetup();		// Once-off setup for the game itself (e.g. create in-game menu etc)
 
-	Log ( "================[ Application Init Complete ]===============\n\n" );
+	djLOGSTR( "================[ Application Init Complete ]===============\n\n" );
 
 	return 0;
 }
 
 void DaveCleanup()
 {
-	Log ( "\n================[ Starting Application Kill ]===============\n" );
+	djLOGSTR( "\n================[ Starting Application Kill ]===============\n" );
 
 	// Save user volume setting
 	g_Settings.SetSettingInt("Volume",djSoundGetVolume());
 	g_Settings.SetSetting("SoundsOn",djSoundEnabled()?"ON":"OFF");
 
 	KillMainMenu();
-	Log ( "KillMainMenu() ok\n" );
+	djLOGSTR( "KillMainMenu() ok\n" );
 	KillMissionSystem();
-	Log ( "KillMissionSystem() ok\n" );
+	djLOGSTR( "KillMissionSystem() ok\n" );
 	KillCredits();
-	Log ( "KillCredits() ok\n" );
+	djLOGSTR( "KillCredits() ok\n" );
 	SaveHighScores();		// Save high scores
-	Log ( "SaveHighScores() ok\n" );
+	djLOGSTR( "SaveHighScores() ok\n" );
 	GameFinalCleanup();		// Game
-	Log ( "GameFinalCleanup() ok\n" );
+	djLOGSTR( "GameFinalCleanup() ok\n" );
 	djiDone();			// Input
-	Log ( "djiDone() ok\n" );
+	djLOGSTR( "djiDone() ok\n" );
 	djSoundDone();			// Sound
-	Log ( "djSoundDone() ok\n" );
+	djLOGSTR( "djSoundDone() ok\n" );
 	djDestroyImageHWSurface(g_pImgMain);
 	djDEL(g_pImgMain);		// Delete main menu background image (title screen)
-	Log ( "djDEL(g_pImgMain) ok\n" );
+	djLOGSTR( "djDEL(g_pImgMain) ok\n" );
 	GraphDone();			// Graphics
-	Log ( "GraphDone() ok\n" );
+	djLOGSTR( "GraphDone() ok\n" );
 	djTimeDone();			// Timer stuff
-	Log ( "djTimeDone() ok\n" );
+	djLOGSTR( "djTimeDone() ok\n" );
 
 	g_Settings.Save(
 		djAppendPathStr(djGetFolderUserSettings().c_str(), CONFIG_FILE).c_str()
 	);	// Save settings
-	Log ( "g_Settings.Save(CONFIG_FILE) ok\n" );
+	djLOGSTR( "g_Settings.Save(CONFIG_FILE) ok\n" );
 
-	Log ( "================[ Application Kill Complete ]===============\n\n" );
+	djLOGSTR( "================[ Application Kill Complete ]===============\n\n" );
 
 //	KillLog ();
 }
