@@ -1,7 +1,7 @@
 # Dave Gnukem
 Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'. It is kind of a parody of the original. Please note it is not a 'clone', and not a 're-make'.)
 
-**News Apr 2018: Version 1.0 released.** Apr 2019 OpenBSD port. (Apr 2020: Version 1.0.1 released.)
+**News Apr 2018: Version 1.0 released.** Apr 2019 OpenBSD port. (Apr 2020: Version 1.0.1 released.) (19 Nov 2022: 1.0.2 and 1.0.3 update to SDL2!)
 
 **Release Downloads:** https://sourceforge.net/projects/gnukem/
 
@@ -169,9 +169,18 @@ Then follow the same instructions as for Linux, e.g. git clone the src, cd into 
 
 Recent:
 
-2022 - Work on Debian support and Debian packaging - user contributions by Matteo Bini, https://github.com/enigma9o7, https://github.com/bgermann, Craig Langman
+~2022 - Work on Debian support and Debian packaging - user contributions by Matteo Bini, https://github.com/enigma9o7, https://github.com/bgermann, Craig Langman
 
-2022 - Matteo Bini implemented SDL2 support (including also contributions for Debian support) (merging of these changes in progress) https://github.com/davidjoffe/dave_gnukem/pull/135/commits/0f0022b9921982062eb7a93d2aef9a90459f3d33
+2022/11/19 - Version 1.0.3
+
+* [19 Nov 2022] Integrating Matteo Bini's implementation of updating the source from SDL1 to SDL2
+
+Matteo Bini implemented SDL2 support (including also contributions for Debian support) https://github.com/davidjoffe/dave_gnukem/pull/135/commits/0f0022b9921982062eb7a93d2aef9a90459f3d33
+
+2022/11/19 - Version 1.0.2 Final SDL1-based release, about to switch to SDL2
+
+* [19 Nov 2022] Final offical SDL1-based release: https://github.com/davidjoffe/dave_gnukem/releases/tag/1.0.2 (https://github.com/davidjoffe/dave_gnukem/releases/tag/1.0.2 (final official SDL1-based source code - if an old downstream port needs to be on SDL1 for some reason we suggest using that 1.0.2 release)
+
 
 2021 - User work for Bodhi Linux port: https://bodhilinux.boards.net/thread/892/packaged-dave-gnukem-silly-retro
 
@@ -292,7 +301,7 @@ Recent:
 
 # Developer Info / Build Info
 
-**Dependencies: LibSDL1.2, LibSDL-Mixer 1.2**
+**Dependencies: LibSDL2, LibSDL-Mixer 2**
 
 ## Windows Build Instructions
 
@@ -332,11 +341,25 @@ NB: FIRST INSTALL DEPENDENCIES:
 
 How to install dependencies on Debian, Ubuntu etc.:
 
-$ sudo apt-get install libsdl1.2-dev
+$ sudo apt-get install libsdl2-dev
 
-$ sudo apt-get install libsdl-mixer1.2-dev
+$ sudo apt-get install libsdl2-mixer-dev
 
 (NOTE: If you don't have libsdl-mixer1.2 for whatever reason and you just want to get it compiling without sound, you can add -DNOSOUND to the CCFLAGS in the Makefile, and remove -lSDL_mixer from the Makefile LIBS setting.)
+
+## SDL1.2 or SDL2?
+
+On 19 November 2022 we made an official change from LibSDL1.2 (now very old) to LibSDL2 (thanks to Matteo Bini for that).
+
+https://github.com/davidjoffe/dave_gnukem/releases/tag/1.0.2 (final official SDL1-based source code - if an old downstream port needs to be on SDL1 for some reason we suggest using that 1.0.2 release)
+
+So for builds prior to this, the dependencies would be e.g. along the lines "sudo apt-get install libsdl1.2-dev" and "libsdl-mixer1.2-dev".
+
+Henceforth, it should be e.g.: libsdl2-dev, libsdl2-mixer-dev
+
+SDL2 brings various potential advantages.
+
+
 
 ## Mac OS X Build Instructions
 
