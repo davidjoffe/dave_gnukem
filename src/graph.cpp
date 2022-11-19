@@ -171,6 +171,7 @@ bool GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 	}
 #endif
 
+
 	// Hide mouse cursor
 	SDL_ShowCursor(0);
 

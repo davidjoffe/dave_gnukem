@@ -41,7 +41,7 @@ extern void KillHighScores();
 
 
 //! High-scores background "skin" (image file)
-#define FILE_IMG_HIGHSCORES "data/hiscores.tga"
+#define FILE_IMG_HIGHSCORES DATA_DIR "hiscores.tga"
 //! Display high scores
 extern void ShowHighScores();
 

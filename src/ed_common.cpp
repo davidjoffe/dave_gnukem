@@ -61,7 +61,7 @@ void ED_CommonInit ()
 		SYS_Warning ( "Failed to load macros!\n" );
 
 	pFont = new djImage;
-	pFont->Load( "data/simplefont.tga" );
+	pFont->Load( DATA_DIR "simplefont.tga" );
 	djCreateImageHWSurface(pFont);
 
 	SDL_ShowCursor ( 1 );

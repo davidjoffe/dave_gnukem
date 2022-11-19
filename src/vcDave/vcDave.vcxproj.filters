@@ -111,9 +111,6 @@
     <ClCompile Include="..\settings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\mmgr\mmgr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\mixins.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -261,12 +258,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\mixins.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\mmgr\mmgr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\mmgr\nommgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\settings.h">
