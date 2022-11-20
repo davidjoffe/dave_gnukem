@@ -70,6 +70,8 @@ else
 endif
 
 
+# dj2022-11 in theory would be nice if OBJFILES list could be auto-generated from the presence of .c or .cpp files in the src folder so we could more easily add new .cpp files without having to update Makefiles
+
 OBJFILES = src/main.o     src/graph.o   src/game.o         src/menu.o\
            src/block.o    src/credits.o src/instructions.o src/djstring.o \
            src/djimage.o  src/djlog.o   src/inventory.o    src/mission.o\
@@ -92,15 +94,12 @@ clean:
 	rm -f $(BIN) *~ core \#*
 	find src -name '*.o' | xargs rm -f
 
+# dj2022-11 do we even need this "make dist" is it used for anything anymore? used to be for preparing a "distribution" ie release. can we remove this? want to simplify Makefile (I know I added this looong ago so in theory I should know, but I don't remember, and I don't know if any downstream port maintainers now use it for anything)
+
 dist:
 	rm -f core *~ \#*
 	find src -name '*.o' | xargs rm -f
 
-linecount:
-	cat src/*.cpp src/*.h src/sdl/*.h src/sdl/*.cpp | wc -l
-
-fixme:
-	ls src/*.c src/*.cpp src/*.h | xargs grep -i fixme
 
 %.o: %.c
 	$(CPP) $(CCFLAGS) -c $< -o $@
