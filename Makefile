@@ -94,7 +94,7 @@ clean:
 	rm -f $(BIN) *~ core \#*
 	find src -name '*.o' | xargs rm -f
 
-# dj2022-11 do we even need this "make dist" is it used for anything anymore? used to be for preparing a "distribution" ie release. can we remove this? want to simplify Makefile (I know I added this looong ago so in theory I should know, but I don't remember, and I don't know if any downstream port maintainers now use it for anything)
+# dj2022-11 do we even need this "make dist" is it used for anything anymore? used to be for preparing a "distribution" ie release. can we remove this? want to simplify Makefile (I know I added this looong ago so in theory I should know, but I don't remember, and I don't know if any downstream port maintainers now use it for anything). Certainly I don't use it or want or need it for anything myself so I don't mind if it's gone.
 
 dist:
 	rm -f core *~ \#*
