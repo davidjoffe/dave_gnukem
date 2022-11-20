@@ -1,7 +1,7 @@
 /*
 djsound.cpp
 
-Copyright (C) 1999-2018 David Joffe and Kent Mein
+Copyright (C) 1999-2022 David Joffe and Kent Mein
 */
 
 #include "../djsound.h"
@@ -88,6 +88,22 @@ bool djSoundEnabled()
 int djSoundInit()
 {
 #ifndef NOSOUND
+	//dj2022-11 Fix music files not playing with SDL2
+	int nRet = Mix_Init(
+		MIX_INIT_FLAC|
+		MIX_INIT_MOD |
+		MIX_INIT_MP3 |
+		MIX_INIT_OGG |
+		MIX_INIT_MID |
+		MIX_INIT_OPUS
+	);
+	// [dj2022-11] for now Dave Gnukem only using .wav and .ogg (I think?) though we should want to support more formats ..
+	if ((nRet & MIX_INIT_OGG) == 0)  djMSG("ERROR[sound]: SDL2_mixer: OGG file support failed to initialize, some sounds may not play");
+	if ((nRet & MIX_INIT_MP3) == 0)  djMSG("WARNING[sound]: SDL2_mixer: MP3 file support failed to initialize");
+	if ((nRet & MIX_INIT_FLAC) == 0) djMSG("WARNING[sound]: SDL2_mixer: FLAC file support failed to initialize");
+	if ((nRet & MIX_INIT_OPUS) == 0) djMSG("WARNING[sound]: SDL2_mixer: OPUS file support failed to initialize");
+	//if ((nRet & MIX_INIT_MID) == 0) djMSG("ERROR[sound]: SDL2_mixer: MP3 file support failed to initialize");
+
 	//if (!g_bSoundInit)
 	//{
 	numsounds = 0;
