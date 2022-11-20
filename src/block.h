@@ -3,7 +3,7 @@
 \brief   Level block types
 \author  David Joffe
 
-Copyright (C) 2000-2018 David Joffe
+Copyright (C) 2000-2022 David Joffe
 */
 #ifndef _BLOCK_H_
 #define _BLOCK_H_
@@ -69,7 +69,7 @@ enum EBlockType
 	TYPE_EXIT,
 	//! 32 Hero starting position
 	TYPE_HEROSTART,
-	//! 33 Master Computer
+	//! 33 Main Computer
 	TYPE_MASTERCOMPUTER,
 	TYPE_34,
 	//! 35 Acme falling block

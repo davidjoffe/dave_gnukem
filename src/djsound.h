@@ -12,6 +12,8 @@
 typedef unsigned int SOUND_HANDLE;
 #define SOUNDHANDLE_INVALID ((unsigned int)~0)
 
+//gross globals ..
+
 extern int          djSoundInit();
 extern void         djSoundDone();
 extern void         djSoundEnable();

@@ -20,6 +20,8 @@
  * :))
  *
  * Update: It's toned down now - we couldn't handle the danger.
+ * 
+ * dj2022-11 note that comment about using "quite an intensive and dangerous perprocessor hackery" was not mine and I agree all this code must be simpler/safter more robust and easier to maintain.
  */
 
 #ifndef __SYS_ERROR_H_RTFB__

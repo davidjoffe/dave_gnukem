@@ -1,7 +1,7 @@
 /*********
 block.cpp
 
-Copyright (C) 2000-2018 David Joffe
+Copyright (C) 2000-2022 David Joffe
 *********/
 #include "block.h"
 
@@ -40,7 +40,7 @@ const char * block_type_names[TYPE_LASTONE+1] =
    "30 Antivirus",
    "31 Exit",
    "32 HeroStart",
-   "33 Master Computer",
+   "33 Main Computer",
    "34 ",
    "35 Acme",
    "36 Balloon",

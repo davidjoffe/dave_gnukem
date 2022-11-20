@@ -651,8 +651,11 @@ class CMasterComputer : public CDoorActivator
 {
 public:
 	CMasterComputer();
+	virtual int  Tick();
 	virtual void Draw();
 	virtual void OnActivated();
+protected:
+	int m_nAnimationCount=0; // -1 if non-animated, otherwise [0, 3]
 };
 /*-----------------------------------------------------------*/
 /*!

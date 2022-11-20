@@ -88,7 +88,12 @@ bool djSoundEnabled()
 int djSoundInit()
 {
 #ifndef NOSOUND
-	//dj2022-11 Fix music files not playing with SDL2
+	//dj2022-11 Fix music files not playing with SDL2.
+	// Note that currently (as of writing this comment) this game only needs basically .wav and .ogg but I'm passing all flags
+	// here in case someone wants to create new levels etc. or add more audio in other formats - but the SDL mixer library dynamically checks/loads support by checking
+	// for presence of dynamic libraries (at least on Windows) so in theory it should work then as long as whatever game you create, you make sure to include
+	// the associated libraries along with. So e.g. if using vcpkg to build libraries do e.g.:
+	// "vcpkg search sdl2-mixer" and you can see which to build to support required/desired formats.
 	int nRet = Mix_Init(
 		MIX_INIT_FLAC|
 		MIX_INIT_MOD |
@@ -97,12 +102,13 @@ int djSoundInit()
 		MIX_INIT_MID |
 		MIX_INIT_OPUS
 	);
-	// [dj2022-11] for now Dave Gnukem only using .wav and .ogg (I think?) though we should want to support more formats ..
-	if ((nRet & MIX_INIT_OGG) == 0)  djMSG("ERROR[sound]: SDL2_mixer: OGG file support failed to initialize, some sounds may not play");
-	if ((nRet & MIX_INIT_MP3) == 0)  djMSG("WARNING[sound]: SDL2_mixer: MP3 file support failed to initialize");
-	if ((nRet & MIX_INIT_FLAC) == 0) djMSG("WARNING[sound]: SDL2_mixer: FLAC file support failed to initialize");
-	if ((nRet & MIX_INIT_OPUS) == 0) djMSG("WARNING[sound]: SDL2_mixer: OPUS file support failed to initialize");
-	//if ((nRet & MIX_INIT_MID) == 0) djMSG("ERROR[sound]: SDL2_mixer: MP3 file support failed to initialize");
+	// [dj2022-11] for now Dave Gnukem only using .wav and .ogg (I think?) though we should want to support more formats .. we say 'ERROR' for OGG support because it's definitely required for Dave Gnukem but for now the others are warnings
+	if ((nRet & MIX_INIT_OGG) == 0)  djMSG("ERROR[sound]: djSoundInit: OGG support failed to initialize, some sounds may not play");
+	if ((nRet & MIX_INIT_MP3) == 0)  djMSG("WARNING[sound]: djSoundInit: MP3 support failed to initialize");
+	if ((nRet & MIX_INIT_FLAC) == 0) djMSG("WARNING[sound]: djSoundInit: FLAC support failed to initialize");
+	if ((nRet & MIX_INIT_OPUS) == 0) djMSG("WARNING[sound]: djSoundInit: OPUS support failed to initialize");
+	if ((nRet & MIX_INIT_OPUS) == 0) djMSG("WARNING[sound]: djSoundInit: OPUS support failed to initialize");
+	if ((nRet & MIX_INIT_MID) == 0)  djMSG("WARNING[sound]: djSoundInit: MID support failed to initialize");
 
 	//if (!g_bSoundInit)
 	//{

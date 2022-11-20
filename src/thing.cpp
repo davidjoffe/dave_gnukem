@@ -835,9 +835,25 @@ void CMasterComputer::OnActivated()
 	// [TODO] What exactly to do over here? You've just saved the world.
 	update_score(10000, m_x, m_y - 1);
 }
+int CMasterComputer::Tick()
+{
+	//dj2022-11 adding basic animation effect for main computer
+	++m_nAnimationCount;
+	m_nAnimationCount = (m_nAnimationCount % 4);
+	return CDoorActivator::Tick();
+}
 void CMasterComputer::Draw()
 {
-	DRAW_SPRITEA(pVisView, m_a, m_b-16, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y-1),32,32);
+	// This is not to be confused with BLOCKW also being 16 (it's a bit confusing but "m_b" means "Nth sprite in bitmap" but the bitmap currently contains 16 sprites along X axis and 8 along Y axis .. all that's very hardcoded and should change in future - dj2022
+	const int uSPRITES_PER_SPRITE_BITMAP_ON_XAXIS = 16;
+	//dj2022-11 make this animate and add some more cool 90s reference (main computer is an SGI, put subtle pixely Jurassic Park reference on its screen .. ILM rendering on SGI .. groundbreaking 90s computer graphics stuff .. in the 90s SGI computers were considered some of the best/coolest computers/servers you could have ..)
+	switch (m_nAnimationCount)
+	{
+	case 0: DRAW_SPRITEA(pVisView, m_a, m_b - (uSPRITES_PER_SPRITE_BITMAP_ON_XAXIS),    CALC_XOFFSET(m_x), CALC_YOFFSET(m_y - 1), BLOCKW * 2, BLOCKH * 2); break;
+	case 1: DRAW_SPRITEA(pVisView, m_a, m_b - (uSPRITES_PER_SPRITE_BITMAP_ON_XAXIS) + 2,CALC_XOFFSET(m_x), CALC_YOFFSET(m_y - 1), BLOCKW * 2, BLOCKH * 2); break;
+	case 2: DRAW_SPRITEA(pVisView, m_a, m_b - (uSPRITES_PER_SPRITE_BITMAP_ON_XAXIS*3)-2,CALC_XOFFSET(m_x), CALC_YOFFSET(m_y - 1), BLOCKW * 2, BLOCKH * 2); break;
+	case 3: DRAW_SPRITEA(pVisView, m_a, m_b - (uSPRITES_PER_SPRITE_BITMAP_ON_XAXIS*3),  CALC_XOFFSET(m_x), CALC_YOFFSET(m_y - 1), BLOCKW * 2, BLOCKH * 2); break;
+	}
 }
 /*-----------------------------------------------------------*/
 CSoftBlock::CSoftBlock()
