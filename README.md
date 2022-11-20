@@ -89,7 +89,7 @@ Power boots allow you to jump higher. The special molecule pickup gives you full
 
 ### Storyline/Plot:
 
-The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the CIA to infect the world's computers with a virus called SystemD, crippling them. Only you can stop him. You must find the floppy disk with the Devuan Antivirus on it, and install it on the master computer, which is hidden in Vault7.
+The year is $CURRENTYEAR+8. An evil genius, Dr Proetton, has been hired by the CIA to infect the world's computers with a virus called SystemD, crippling them. Only you can stop him. You must find the floppy disk with the Devuan Antivirus on it, and install it on the main computer, which is hidden in Vault7.
 
 *Any resemblance to actual persons or entities is purely coincidental*
 
@@ -234,7 +234,7 @@ Matteo Bini implemented SDL2 support (including also contributions for Debian su
 2017/08/05 - Version 0.72 [Linux/Mac source release, Windows source and binary]:
 
 * Add new 'sort of looks like a cannon on wheels' monster type
-* Implemented new inventory pickup item 'antivirus disk' and corresponding 'master computer' (when we insert AV disk into master computer we save the world) (should only be one of each of these, and in last level of a 'mission')
+* Implemented new inventory pickup item 'antivirus disk' and corresponding 'main computer' (when we insert "AV" (anti-virus) disk into main computer we save the world) (should only be one of each of these, and in last level of a 'mission')
 * Add new high-voltage "barrier" that must be shot multiple times to destroy before hero can pass through (touching it results in immediate death)
 * Add new monster that constitutes the approximate equivalent of DN1 rabbits (for now, or maybe permanently, this is just a sort of 'evil Tux' - not sure yet if placeholder sprite, or part of plot)
 * Add new floor type that auto-crumbles after hero walks or jumps twice on it (2nd spriteset, position 5x4 - place only 1 block per segment)
