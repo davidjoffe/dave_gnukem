@@ -1,7 +1,7 @@
 /*
 hero.cpp
 
-Copyright (C) 2000-2020 David Joffe
+Copyright (C) 2000-2022 David Joffe
 */
 
 #include "hero.h"
@@ -115,7 +115,7 @@ void HeroUpdateJump()
 		//else
 		{
 			// Check if gonna hit head on solid as result of fine 'pixel' movement?
-			bool bSolid = check_solid( g_Player.x, g_Player.y - 2 ) | check_solid( g_Player.x + g_Player.x_small, g_Player.y - 2 );
+			const bool bSolid = check_solid( g_Player.x, g_Player.y - 2 ) || check_solid( g_Player.x + g_Player.x_small, g_Player.y - 2 );
 			if (bSolid)
 			{
 				g_Player.y_offset += nJUMP_VERTICAL_PIXELS;
@@ -221,14 +221,14 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 			bsolid = false;
 			if ( g_Player.x_small == 0 )
 			{
-				bsolid = check_solid( g_Player.x + 1, g_Player.y ) | check_solid( g_Player.x + 1, g_Player.y - 1 );
+				bsolid = check_solid( g_Player.x + 1, g_Player.y ) || check_solid( g_Player.x + 1, g_Player.y - 1 );
 				// Prevent being able to walk into floors left/right while falling [dj2017-06]
 				if (g_bSmoothVerticalMovementEnabled)
 				{
 					if (g_Player.y_offset<0)
-						bsolid |= check_solid( g_Player.x + 1, g_Player.y-1 ) | check_solid( g_Player.x + 1, g_Player.y - 2 );
+						bsolid |= check_solid( g_Player.x + 1, g_Player.y-1 ) || check_solid( g_Player.x + 1, g_Player.y - 2 );
 					else if (g_Player.y_offset>0)
-						bsolid |= check_solid( g_Player.x + 1, g_Player.y+1 ) | check_solid( g_Player.x + 1, g_Player.y );
+						bsolid |= check_solid( g_Player.x + 1, g_Player.y+1 ) || check_solid( g_Player.x + 1, g_Player.y );
 				}
 			}
 			ret = 2;
@@ -259,14 +259,14 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 			bsolid = false;
 			if (!(g_Player.x_small))
 			{
-				bsolid = check_solid( g_Player.x - 1, g_Player.y ) | check_solid( g_Player.x - 1, g_Player.y - 1 );
+				bsolid = check_solid( g_Player.x - 1, g_Player.y ) || check_solid( g_Player.x - 1, g_Player.y - 1 );
 				// Prevent being able to walk into floors left/right while falling [dj2017-06]
 				if (g_bSmoothVerticalMovementEnabled)
 				{
 					if (g_Player.y_offset<0)
-						bsolid |= check_solid( g_Player.x - 1, g_Player.y-1 ) | check_solid( g_Player.x - 1, g_Player.y - 2 );
+						bsolid |= check_solid( g_Player.x - 1, g_Player.y-1 ) || check_solid( g_Player.x - 1, g_Player.y - 2 );
 					else if (g_Player.y_offset>0)
-						bsolid |= check_solid( g_Player.x - 1, g_Player.y+1 ) | check_solid( g_Player.x - 1, g_Player.y );
+						bsolid |= check_solid( g_Player.x - 1, g_Player.y+1 ) || check_solid( g_Player.x - 1, g_Player.y );
 				}
 			}
 			ret = 2;
@@ -303,7 +303,7 @@ int move_hero(int xdiff, int ydiff, bool bChangeLookDirection)
 			n = -2;     // going up, check above hero's head
 		
 		// also stop hero falling if at bottom of screen
-		bsolid = check_solid( g_Player.x, g_Player.y + n ) | check_solid( g_Player.x + g_Player.x_small, g_Player.y + n );
+		bsolid = check_solid( g_Player.x, g_Player.y + n ) || check_solid( g_Player.x + g_Player.x_small, g_Player.y + n );
 		
 		ret = 1;
 		if (!bsolid) {
