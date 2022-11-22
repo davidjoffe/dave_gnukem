@@ -75,11 +75,6 @@ extern bool djSDLInit();
 extern bool djSDLDone();
 
 /*--------------------------------------------------------------------------*/
-// Color management
-
-//! Create a 32-bit unsigned int representing the given colour as it should be written to the given display surface.
-extern unsigned int djgMapColor( djVisual *pVis, const djColor& color );
-/*--------------------------------------------------------------------------*/
 // Visual management
 
 //! Create a visual
@@ -158,8 +153,11 @@ public:
 
 
 /*--------------------------------------------------------------------------*/
+// Create corresponding hardware surface image (or return existing if already present)
 //[dj2016-10] experimenting here with attempted HW surface cache, needs work [started as fixing wrong colors on Linux VNC]
 extern void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ );
+
+// ["dj2020 Adding that this returns a void* as a sort of 'handle'"] -> dj2022-11 NOTE Am now thinking why bother returning a void* I think that's just confusing now .. was trying to be 'generic' but at this point maybe can just as well return SDL_Surface* for clarity? unless there's some chance it might change drastically in a way that needs genericization (unlikely)
 extern void djDestroyImageHWSurface( djImage* pImage );//dj2017-06-20 Added the 'destroy'
 /*--------------------------------------------------------------------------*/
 class djImageHardwareSurfaceCache

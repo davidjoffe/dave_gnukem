@@ -53,25 +53,25 @@ enum EfdTGAType
 // TGA file header
 struct SdjHeaderTGA
 {
-	unsigned char m_idLength;
-	unsigned char m_colorMapType;
-	unsigned char m_iType;
-	unsigned char m_colorMapIndexLo;
-	unsigned char m_colorMapIndexHi;
-	unsigned char m_colorMapLengthLo;
-	unsigned char m_colorMapLengthHi;
-	unsigned char m_colorMapSize;
-	unsigned char m_xOriginLo;
-	unsigned char m_xOriginHi;
-	unsigned char m_yOriginLo;
-	unsigned char m_yOriginHi;
+	unsigned char m_idLength = 0;
+	unsigned char m_colorMapType = 0;
+	unsigned char m_iType = 0;
+	unsigned char m_colorMapIndexLo = 0;
+	unsigned char m_colorMapIndexHi = 0;
+	unsigned char m_colorMapLengthLo = 0;
+	unsigned char m_colorMapLengthHi = 0;
+	unsigned char m_colorMapSize = 0;
+	unsigned char m_xOriginLo = 0;
+	unsigned char m_xOriginHi = 0;
+	unsigned char m_yOriginLo = 0;
+	unsigned char m_yOriginHi = 0;
 	// Lo and Hi must be seperate to avoid endianness problems
-	unsigned char m_iWidthLo;
-	unsigned char m_iWidthHi;
-	unsigned char m_iHeightLo;
-	unsigned char m_iHeightHi;
-	unsigned char m_iBitsPerPixel;
-	unsigned char m_iDescriptor;
+	unsigned char m_iWidthLo = 0;
+	unsigned char m_iWidthHi = 0;
+	unsigned char m_iHeightLo = 0;
+	unsigned char m_iHeightHi = 0;
+	unsigned char m_iBitsPerPixel = 0;
+	unsigned char m_iDescriptor = 0;
 };
 /*--------------------------------------------------------------------------*/
 djImage::djImage()

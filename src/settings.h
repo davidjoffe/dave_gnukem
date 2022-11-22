@@ -54,9 +54,9 @@ protected:
 	struct SSetting
 	{
 		// Setting "key"
-		char *szKey;
+		char *szKey = nullptr;
 		// Value associated with key
-		char *szValue;
+		char *szValue = nullptr;
 	};
 	vector<SSetting> m_aSettings;
 };

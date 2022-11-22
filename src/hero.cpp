@@ -47,9 +47,10 @@ const int nJUMP_VERTICAL_PIXELS=8;
 // jumping
 struct SJumpInfo
 {
-	int size;         // number of offsets
-	const int * jump_diffs; // offsets (y axis)
+	int size=0;         // number of offsets
+	const int * jump_diffs=nullptr; // offsets (y axis)
 };
+// The hero can jump further/higher after collecting the powerboots pickup, that is why there are two jump info structs here - g_aiJumpBoots is for when hero has powerboots. All these slightly gross globals should change. [dj2022-11]
 const int g_aiJumpNormal[] = { -1, -1, -1,  0, 0, 0, 1, 1, 1 };
 const int g_aiJumpBoots[]  = { -1, -1, -1, -1, 0, 0, 0, 1, 1, 1, 1 };
 

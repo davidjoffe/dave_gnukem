@@ -208,6 +208,7 @@ protected:
 	static CDrProton* g_pGameEnding;
 };
 /*-----------------------------------------------------------*/
+// a few ideas for things from DN1 that didn't quite make it into DG v1: [dj2022-11] (helicopter is self-explanatory, there are helicopters in DN1 but can't remember what loop and spinning things are)
 /*
 class CLoopThing : public CMonster
 {

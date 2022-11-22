@@ -3,7 +3,7 @@
 \brief   Hero-related stuff
 \author  David Joffe
 
-Copyright (C) 2001-2020 David Joffe
+Copyright (C) 2001-2022 David Joffe
 
 I'm not a fan of the various globals here; they're mostly from the very
 oldest parts of the codebase, when I was still an inexperienced coder ...
@@ -22,7 +22,6 @@ enum
 	MODE_JUMPING
 };
 
-// Fixme, these names have GOT to change! [should be in a class too - not globals - dj2016-10]
 class CPlayer
 {
 public:

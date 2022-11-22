@@ -34,6 +34,8 @@ void djiClearBuffer ();				// rtfb
 //! go now that SDL is in
 struct SdjKeyMapping
 {
+	//SdjKeyMapping() : m_iScanCode(-1), m_iPlatformCode(0) {};
+
 	int          m_iScanCode;     // DJ scan code
 	unsigned int m_iPlatformCode; // platform dependent scan code
 };
@@ -45,6 +47,13 @@ extern int mouse_b;
 
 extern const char *GetKeyString(int nSDLKeyCode);
 
+
+//dj2022-11 Note it's questionable whethere these DJKEY_ values still serve any purpose
+// About ~20 years ago the thinking was roughly that we'd be genericizing away different backends for different platforms etc.
+// (e.g. GGI on Linux, or DirectX on Windows) ... but then libs like SDL came along that do basically just that already ..
+// so now there's this extra 'layer' that some parts of the code still use to just map from these "DJKEY" values
+// to SDL keys. If we ever port to other platforms other than SDL then maybe something like this might be useful
+// again but for now it could/should probably just be phased out in favor of directly using SDLK everywhere (I think, probably) - dj2022-11
 
 // This struct is the "future" (on the way in)
 // This struct is no longer the "future". Its on the way out.

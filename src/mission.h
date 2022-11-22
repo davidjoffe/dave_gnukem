@@ -102,6 +102,9 @@ protected:
 /*!
 \class CLevel
 \nosubgrouping
+
+Level descriptor (e.g. information such as filename). Not to be confused with a particular LOADED level while in-game (which is a large memory block currently).
+This should probably be renamed to LevelDescriptor
 */
 class CLevel : public CNamed
 {
@@ -112,10 +115,10 @@ public:
 	void SetFilename( const char *szFilename );
 	const char *GetFilename() const { return m_szFilename; }
 
-	char *m_szFilename;
-	char *m_szName;
-	char *m_szAuthor;
-	char *m_szBackground; // background image filename
+	char *m_szFilename = nullptr;
+	char *m_szName = nullptr;
+	char *m_szAuthor = nullptr;
+	char *m_szBackground = nullptr; // background image filename
 };
 /*--------------------------------------------------------------------------*/
 // This 128 has nothing to do with the levelwidth 128, not to be confused with it (dj2019-07):

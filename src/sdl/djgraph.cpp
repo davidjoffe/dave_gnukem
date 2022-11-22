@@ -22,6 +22,8 @@ Copyright (C) 1997-2022 David Joffe
 #endif
 #include "../config.h"//[For CFG_APPLICATION_RENDER_RES_W etc. dj2019-06 slightly ugly dependency direction, conceptually, but not the biggest thing in the world to worry about now, maybe later.]
 
+#include <cstdint>//for uint32_t
+
 #include <string.h>
 
 // [dj2016-10] For 'texture' manager'
@@ -43,7 +45,7 @@ int	rMask=0, gMask=0, bMask=0, aMask=0;
 int	rShift=0, gShift=0, bShift=0, aShift=0;
 
 // 0=default
-// 1=EGA
+// 1=EGA (Enhanced Graphics Adapter - simulate retro old 16 color display mode)
 // 2=CGA (simulated retro)
 int g_nSimulatedGraphics = 0;
 
@@ -75,31 +77,6 @@ const djColor djPALETTE_EGA[16] = {
 	djColor(0xFF,0xFF,0x55),//bright yellow
 	djColor(0xFF,0xFF,0xFF)//bright white
 };
-
-unsigned int djgMapColor( djVisual * pVis, const djColor& color )
-{
-	return SDL_MapRGB(pVis->pSurface->format, color.r, color.g, color.b);
-//	unsigned int ret = 0;
-//
-//	switch ( pVis->bpp )
-//	{
-//	case 16:
-//		// FIXME: assume 5-6-5 = wrong
-//// DEBUG: changed by rtfb
-//
-//		ret = ((color.r/8)<<11) | ((color.g/4)<<5) | (color.b/8);
-///*/
-//		ret = ((color.r/8)<<10) | ((color.g/4)<<5) | (color.b/8);
-///**/
-//		break;
-//	case 24:
-//	case 32:
-//		ret = 0xFF000000 | (color.r<<16) | (color.g<<8) | color.b;
-//		break;
-//	}
-//
-//	return ret;
-}
 
 djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackbuffer )
 {
@@ -260,7 +237,7 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 						}
 						*/
 
-						nPixel = SDL_MapRGB(pVisDest->pSurface->format,pPalette[nClosest].r,pPalette[nClosest].g,pPalette[nClosest].b);//djgMapColor( pVis, pVis->colorfore );
+						nPixel = SDL_MapRGB(pVisDest->pSurface->format,pPalette[nClosest].r,pPalette[nClosest].g,pPalette[nClosest].b);
 						SDL_FillRect(pVisDest->pSurface, &rc, nPixel);
 						++pSurfaceMem;
 						++rc.x;
@@ -291,15 +268,12 @@ void djgClear( djVisual * pVis )
 	rc.y = 0;
 	rc.w = pVis->width;
 	rc.h = pVis->height;
-	SDL_FillRect(pVis->pSurface, &rc, djgMapColor(pVis, djColor(0,0,0)));
+	SDL_FillRect(pVis->pSurface, &rc, SDL_MapRGB(pVis->pSurface->format, 0, 0, 0));//black
 }
 
 void djgPutPixel( djVisual * pVis, int x, int y, int r, int g, int b )
 {
-	//djColor       col;
-	//col = djColor( r, g, b );
-	//pixel = djgMapColor( pVis, col );
-	unsigned int pixel = SDL_MapRGB(pVis->pSurface->format, r, g, b);
+	const uint32_t pixel = SDL_MapRGB(pVis->pSurface->format, r, g, b);
 	SDL_Rect rc;
 	rc.x = x;
 	rc.y = y;
@@ -308,6 +282,7 @@ void djgPutPixel( djVisual * pVis, int x, int y, int r, int g, int b )
 	SDL_FillRect(pVis->pSurface, &rc, pixel);
 }
 
+//[low prio] these types of functions could/should ideally be sped up with inlining? [dj2022-11] [and/or avoid for sensitive performance bottleneck areas]
 void djgPutPixel( djVisual * pVis, int x, int y, const djColor& color )
 {
 	djgPutPixel(pVis, x, y, color.r, color.g, color.b);
@@ -348,7 +323,7 @@ void djgDrawRectangle( djVisual * pVis, int x, int y, int w, int h )
 
 void djgDrawBox( djVisual * pVis, int x, int y, int w, int h )
 {
-	unsigned int pixel = SDL_MapRGB(pVis->pSurface->format, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);//djgMapColor( pVis, pVis->colorfore );
+	const uint32_t pixel = SDL_MapRGB(pVis->pSurface->format, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);
 	CdjRect rc(x, y, w, h);
 	SDL_FillRect(pVis->pSurface, &rc, pixel);
 }
@@ -360,7 +335,7 @@ void djgDrawHLine( djVisual * pVis, int x, int y, int n )
 	if (x+n>pVis->width) { n=pVis->width-x; }
 	if (n<=0) return;
 
-	unsigned int pixel = SDL_MapRGB(pVis->pSurface->format, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);//djgMapColor( pVis, pVis->colorfore );
+	const uint32_t pixel = SDL_MapRGB(pVis->pSurface->format, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);
 
 	djgLock( pVis );
 	for ( int i=0; i<n; i++ )
@@ -376,7 +351,7 @@ void djgDrawVLine( djVisual * pVis, int x, int y, int n )
 	if (y+n>pVis->height) { n=pVis->height-y; }
 	if (n<=0) return;
 
-	unsigned int pixel = SDL_MapRGB(pVis->pSurface->format, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);//djgMapColor( pVis, pVis->colorfore );
+	const uint32_t pixel = SDL_MapRGB(pVis->pSurface->format, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);
 
 	djgLock( pVis );
 	for ( int i=0; i<n; i++ )
@@ -716,7 +691,9 @@ void djDestroyImageHWSurface( djImage* pImage )
 	// Remove from 'map'
 	g_SurfaceMap.erase( pImage );
 }
+// Create corresponding hardware surface image (or return existing if already present)
 // dj2020 Adding that this returns a void* as a sort of 'handle', which is in fact the SDL_Surface*, so it can be used as such which is faster than the map, see comments at top of file .. later this might return SDL_Surface* or some sort of 'handle' or struct that includes the SDL_Surface*.
+// dj2022 Why bother returning a void* I think that's just confusing now .. was trying to be 'generic' but at this point maybe can just as well return SDL_Surface* for clarity? unless there's some chance it might change drastically in a way that needs genericization (unlikely)
 void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 {
 	//extern djVisual* pVisView;

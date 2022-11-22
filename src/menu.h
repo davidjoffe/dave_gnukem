@@ -3,7 +3,7 @@
 \brief   Main menu
 \author  David Joffe
 
-Copyright (C) 1995-2018 David Joffe
+Copyright (C) 1995-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 /* menu.h
@@ -20,9 +20,12 @@ Copyright (C) 1995-2018 David Joffe
 struct SMenuItem
 {
 	//! A real menu item (true), or just a string (false)?
-	bool m_bitem;
+	bool m_bitem=false;
 	//! The menu text to display
-	const char *m_szText;
+	const char *m_szText=nullptr;
+
+	//! dj2022-11 [optional] new return by a string identifier so we can try have slightly more sane (and potentially less bug-introducing) handling than gross switch statements with lists of hardcoded numerical values henceforth
+	const char* m_szRetVal = nullptr;
 };
 /*--------------------------------------------------------------------------*/
 /*!
@@ -32,6 +35,8 @@ struct SMenuItem
 A menu (e.g. the main menu). Consists of an array of menu items (\ref SMenuItem).
 A menu item with \ref SMenuItem::m_szText value NULL indicates the end of the
 array.
+
+(Note that using a null-terminator to indicate end of menu is a bit 'risky' as any programmer who naively creates a new menu may not realize .. and then it reads past of end of their memory menu .. so not the best strategy .. this was 20 years ago urg ..~dj2022 Refactor someday.)
 */
 class CMenu
 {

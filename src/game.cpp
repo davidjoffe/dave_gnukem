@@ -20,7 +20,15 @@ using namespace std;
 #include <unistd.h>
 #endif
 
+//#ifdef EXPERIMENTAL_MAP_AUTO_DROPSHADOWS
 #include <map>//For map auto-shadows' [dj2018-01]
+//#endif
+
+//dj2022-11 adding this into official but still off by default for now as is a bit a bit beta and needs more testing and not sure if i like it yet .. dj2022-11:
+#define djBETA_SHADOWFOLLOWEFFECT2020
+#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+#include <math.h>//sqrtf
+#endif
 
 #include "mission.h"
 #include "hero.h"
@@ -218,14 +226,113 @@ const char* FILE_SHADOWS = DATA_DIR "shadows.tga";
 djImage* g_pImgShadows = NULL;
 
 #ifdef djBETA_SHADOWFOLLOWEFFECT2020
+// EXPERIMENTAL 'faux shadowing around hero' shadowing effect - not quite sure if I like this or not.
+// Sometimes, sometimes not, some things about it I like, some things maybe not .. could maybe be tweaked and improved .. [dj2022-11]
+// [Ideally at some stage want to try experimental more 'proper' lightmap effect also across level - someday - low prior - dj2022]
+// 
+// THESE EFFECTS SHOULD LIVE IN SEPARATE CPP/H FILES
 // dj2020-07 Playing around with a new visual effect to try improve the graphics slightly ...
 // subtle 'shadowing' that is focused around hero as he moves around viewport .. so walls behind
 // hero aren't perfectly uniform, and get slightly darker toward corners, given a crude 'pretend effect'
 // of lighting in the room. Not sure if this sucks? Will maybe add it as an option and let users decide.
 // I think I overall prefer it on, to off. But it needs more testing before I add it to the real game.
-djImage* g_pImgShadows2 = nullptr;
-SDL_Surface* g_pShadows2 = nullptr;
-const unsigned int SHADSIZE=4;
+class djEffectFauxShadowingAroundHero
+{
+public:
+	djImage* m_pImgShadows = nullptr;
+	
+	// NOT OUR POINTER WE DON'T DELETE IT (CACHE DOES) we just want a copy but it can change sometimes maybe [dj2022 ingame fullscreen toggle? not sure]
+	SDL_Surface* m_pShadows = nullptr;
+	void OnDrawFrameStart()
+	{
+		// NB even if we already have m_pShadows non-null the point is to re-get it (in case the 'cache' HW surface 'manager' thing flushed the surface and we need a new one) [dj2022-11 see notes around ingame fullscreen toggle etc.]
+		// Get from cache
+		if (m_pImgShadows)
+		{
+			// This name djCreate.. is now misleading most the time (if not all) it's not creating it just getting it from cache
+			m_pShadows = (SDL_Surface*)djCreateImageHWSurface(m_pImgShadows);
+		}
+	}
+	// we shouldn't keep a pointer to the surface if it can change on fullscreentoggle? hm SDL_Surface* m_pShadows = nullptr;
+	// either we must get again after fullscreen toggle or get before using [via map] but that's not ideal speedwise ..
+	//void OnFullscreenToggle();
+	//void OnStartDraw();
+
+	// USER SETTING. 0=off, or 1, 2, 3 (currently .. this is very beta-ish) [or fo rnow just off/on .. later add more]
+	unsigned int m_nEnabledIntensity = 0;
+
+
+	int nHIGH = 180;
+	float fFADEOVERNUMBLOCKS = 7.2f;
+	float fLOWRANGEEXTENT = 130.0f;
+	const unsigned int SHADSIZE = 4;
+
+	/*
+	//dj2022-11 some quick n crude subjective values from quick testing .. needs more thought and testing but let's run with this for now:
+	// DARK effect: nHIGH=180, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 130.0f
+	// SUBTLE, light effect:  nHIGH=262, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 110.0f
+	// ALSO OK, light effect: nHIGH=262, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 160.0f
+
+	const float fLOWRANGEEXTENT = 130.0f; // Higher numbers toward 250 make for very dark 'corners' .. lower numbers around 100 etc. make for more subtle effect
+	*/
+	void SetIntensity(unsigned int nIntensity)
+	{
+		m_nEnabledIntensity = (nIntensity % 4);
+
+		// MORE TESTING NEEDED on these values this is beta stuff .. dj2022-11
+		switch (m_nEnabledIntensity)
+		{
+		case 1://SUBTLE, light effect
+			nHIGH = 262; fFADEOVERNUMBLOCKS = 7.2f; fLOWRANGEEXTENT = 110.0f;
+			break;
+		case 2://ALSO OK, light effect
+			nHIGH = 262; fFADEOVERNUMBLOCKS = 7.2f; fLOWRANGEEXTENT = 160.0f;
+			break;
+		case 3:// DARK effect
+			nHIGH = 180; fFADEOVERNUMBLOCKS = 7.2f; fLOWRANGEEXTENT = 130.0f;
+			break;
+		}
+	}
+
+	// Once-off setup during game init
+	void InitEffect()
+	{
+		if (m_pImgShadows != nullptr) return;
+
+		// Basically a black image with 0-255 'shades' of alpha transparency
+		m_pImgShadows = new djImage(SHADSIZE * 16, SHADSIZE * 16, 32);
+		int nAlpha = 255;//start with darkness at top left
+		for (int y = 0; y < 16; ++y)
+		{
+			for (int x = 0; x < 16; ++x)
+			{
+				// Black pixel, with different alpha
+				int nPixel = ((unsigned int)(nAlpha & 0xFF) << 24); //fixme which bits should be alpha?
+				for (unsigned int i = 0; i < SHADSIZE; ++i)
+				{
+					for (unsigned int j = 0; j < SHADSIZE; ++j)
+					{
+						m_pImgShadows->PutPixel(x * SHADSIZE + i, y * SHADSIZE + j, nPixel);
+					}
+				}
+				--nAlpha;
+			}
+		}
+		// Create corresponding hardware surface image
+		m_pShadows = (SDL_Surface*)djCreateImageHWSurface(m_pImgShadows);
+	}
+	void CleanupEffect()
+	{
+		if (m_pImgShadows)
+		{
+			djDestroyImageHWSurface(m_pImgShadows);// Remove from cache we don't need anymore
+			djDEL(m_pImgShadows);
+		}
+		m_pShadows = nullptr;
+	}
+};
+//gross global
+djEffectFauxShadowingAroundHero g_Effect;
 #endif
 
 // Use config options to turn on/off specific effects if need be or desired (ideally these shouldn't be ugly globals, should have some sort of generic properties type thing - LOW prio - dj2018)
@@ -240,11 +347,14 @@ struct SMenuItem gameMenuItems[] =
 	{ true,  "   Save Game       " },
 	{ true,  "   Restore Game    " },
 	{ true,  "   Instructions    " },
-	{ true,  "   Retro Settings  " },//dj2019-06 new
-#ifdef djEXPERIMENTAL_FULLSCREEN_TOGGLE
-	{ true,  "   Fullscreen      " },//Hmm note some consoles/ports might only work in fullscreen mode or something? should have 
+	{ true,  "   Retro Settings  ", "show_retrosettings_menu" },//dj2019-06 new
+#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+	{ true,  "   Shadow effect   ", "setting/betashadoweffect" },
 #endif
-	{ true,  "   Abort Game      " },
+#ifdef djEXPERIMENTAL_FULLSCREEN_TOGGLE//dj2022-11 will think about these names, hmm
+	{ true,  "   Fullscreen      ", "ingame/toggle_fullscreen" },//Hmm note some consoles/ports might only work in fullscreen mode or something? should have 
+#endif
+	{ true,  "   Abort Game      ", "ingame/abort_game" },
 	{ false, "                   " },
 	{ false, NULL }
 };
@@ -894,30 +1004,8 @@ void GameInitialSetup()
 	}
 
 #ifdef djBETA_SHADOWFOLLOWEFFECT2020
-	if (!g_pImgShadows2)
-	{
-		g_pImgShadows2 = new djImage(SHADSIZE*16, SHADSIZE*16, 32);
-		int nAlpha = 255;//start with darkness at top left
-		for ( int y=0; y<16; ++y )
-		{
-			for ( int x=0; x<16; ++x )
-			{
-				// Black pixel, with different alpha
-				int nPixel = ((unsigned int)(nAlpha & 0xFF) << 24); //fixme which bits should be alpha?
-				for (unsigned int i=0; i<SHADSIZE; ++i)
-				{
-					for ( unsigned int j=0; j<SHADSIZE; ++j )
-					{
-						g_pImgShadows2->PutPixel(x*SHADSIZE+i, y*SHADSIZE+j, nPixel);
-					}
-				}
-				--nAlpha;
-			}
-		}
-		g_pShadows2 = (SDL_Surface*)djCreateImageHWSurface( g_pImgShadows2 );
-	}
-#endif//djBETA_SHADOWFOLLOWEFFECT2020
-
+	g_Effect.InitEffect();
+#endif
 
 	// Register the "thing"'s that need to be registered dynamically at runtime [dj2017-07-29]
 	RegisterThings_Monsters();
@@ -929,12 +1017,7 @@ void GameFinalCleanup()
 	SYS_Debug( "GameFinalCleanup()\n" );
 
 #ifdef djBETA_SHADOWFOLLOWEFFECT2020
-	if (g_pImgShadows2)
-	{
-		djDestroyImageHWSurface(g_pImgShadows2);
-		djDEL(g_pImgShadows2);
-		g_pShadows2 = nullptr;
-	}
+	g_Effect.CleanupEffect();
 #endif
 
 	djDestroyImageHWSurface(g_pImgShadows);
@@ -1574,13 +1657,13 @@ int game_startup(bool bLoadGame)
 			//if (g_iKeys[DJKEY_UP])		key_action = 1;
 			//if (g_iKeys[DJKEY_LEFT])	key_left = 1;
 			//if (g_iKeys[DJKEY_RIGHT])	key_right = 1;
-			
+
+			//dj2022-11 it's debatable whether to do below as it 'interferes' with e.g. some shortcut keys			
 			// We allow ctrl as a sort of 'default' fallback jump if (and only if) it isn't assigned/redefined to anything
 			if (!IsGameKeyAssigned(SDLK_RCTRL))
 			{
 				if (g_iKeys[DJKEY_CTRL])	key_jump = 1;
 			}
-			//if (g_iKeys[DJKEY_ALT])		key_shoot = 1;
 			//[dj2016-10 don't think it really makes sense to have P as jump - if anything, pause??[LOW]](g_iKeys[DJKEY_P])		key_jump = 1;
 			if (g_iKeys[DJKEY_ESC])		iEscape = 1;
 			// oh dear now can't get out of menu if do this ?? if (g_iKeys[DJKEY_F1])		iEscape = 1;//dj2018-03
@@ -2225,6 +2308,11 @@ void GameDrawView()
 	int anim_offset = 0;
 	unsigned char *pLevelBlockPointer=NULL;
 
+#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+	// dj2022-11 This function OnDrawFrameStart() for issue of e.g. hardware surface correspodnign to our image possibly needing to be re-fetched etc.
+	g_Effect.OnDrawFrameStart();
+#endif
+
 	// Draw view background
 	if (pBackground)
 		djgDrawImage(pVisView, pBackground, 0, 0, g_nViewOffsetX, g_nViewOffsetY, VIEW_WIDTH*BLOCKW, VIEW_HEIGHT*BLOCKH);
@@ -2301,19 +2389,30 @@ void GameDrawView()
 						}
 
 #ifdef djBETA_SHADOWFOLLOWEFFECT2020
-						// These shadowings look crap in simulator EGA/CGA retro so don't do if g_nSimulatedGraphics!=0
-						bool bBackgroundSolid = CHECK_SOLID( a, b );
+						// These shadowings look crap in simulated EGA/CGA retro so don't do if g_nSimulatedGraphics!=0
+						//const bool bBackgroundSolid = CHECK_SOLID( a, b );
 						extern int g_nSimulatedGraphics;
-						if (g_nSimulatedGraphics==0 && g_pShadows2!=nullptr/*g_pImgShadows2*/ && !bBackgroundSolid)
+						if (g_Effect.m_nEnabledIntensity!=0 && g_nSimulatedGraphics==0 && g_Effect.m_pShadows!=nullptr && CHECK_SOLID(a, b)==0)//<-only non-solid blocks
 						{
-							const int nHIGH = 262;
-							const float fFADEOVERNUMBLOCKS = 7.2f;
-							const float fLOWRANGEEXTENT = 110.0f; // Higher numbers toward 250 make for very dark 'corners' .. lower numbers around 100 etc. make for more subtle effect
+							// DARK effect: nHIGH=180, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 130.0f
+							// SUBTLE, light effect:  nHIGH=262, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 110.0f
+							// ALSO OK, light effect: nHIGH=262, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 160.0f
+
+							const int nHIGH = g_Effect.nHIGH;// 180;
+							const float fFADEOVERNUMBLOCKS = g_Effect.fFADEOVERNUMBLOCKS;// 7.2f;
+							//const float fLOWRANGEEXTENT = 160.0f; // Higher numbers toward 250 make for very dark 'corners' .. lower numbers around 100 etc. make for more subtle effect
+							const float fLOWRANGEEXTENT = g_Effect.fLOWRANGEEXTENT;// 130.0f; // Higher numbers toward 250 make for very dark 'corners' .. lower numbers around 100 etc. make for more subtle effect
+							const int SHADSIZE = g_Effect.SHADSIZE;
+
+							// SUBTLE, light effect:  const int nHIGH = 262; const float fFADEOVERNUMBLOCKS = 7.2f; const float fLOWRANGEEXTENT = 110.0f;
 
 							float fBlockWorldXStart = (float)(j + g_Viewport.xo) * (float)BLOCKW;
 							float fBlockWorldY = (float)(i + g_Viewport.yo) * (float)BLOCKH;
-							const float fHeroWorldX = (float)(HERO_PIXELX) + ((float)BLOCKW/2.0f);
-							const float fHeroWorldY = (float)(HERO_PIXELY) + (float)BLOCKH;
+							//const float fHeroWorldX = (float)(HERO_PIXELX) + ((float)BLOCKW/2.0f);
+							//const float fHeroWorldY = (float)(HERO_PIXELY) + (float)BLOCKH;
+							const float fHeroWorldX = ( (float)(g_Viewport.xo) + ((float)VIEW_WIDTH)/2.0f ) * (float)BLOCKW;
+							const float fHeroWorldY = ( (float)(g_Viewport.yo) + ((float)VIEW_HEIGHT)/2.0f ) * (float)BLOCKH;
+
 							int nIntensity = 0;//0-255, 0 is darkness, 255 is fully lit (or rather, no darkness)
 							float fDistance = 0.0f;
 
@@ -2327,6 +2426,9 @@ void GameDrawView()
 							rectDest.y = nYOffset;
 							rectDest.w = SHADSIZE;
 							rectDest.h = SHADSIZE;
+							//const float fFACTOR = 1.0f;
+							///// dj2022-11 TODO could should this factor stuff should what, be table-driven for speed reasons?
+							const float fFACTOR = 0.9f;//dj2022-11 added this 0.9f factor but can't remember exactly why, basically in my original  tests on the effect this was 1 then I changed it to 0.9 maybe later just try see if i can remember why and what value it should be
 							for (int nY = 0; nY < BLOCKH; nY += SHADSIZE)
 							{
 								rectDest.x = nXOffset;
@@ -2334,53 +2436,53 @@ void GameDrawView()
 
 								//for (int nX = 0; nX < BLOCKW; nX += SHADSIZE)
 								{
-									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + (fBlockWorldX-fHeroWorldX)*(fBlockWorldX-fHeroWorldX) );
+									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
 									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
 									if (nIntensity<0)nIntensity=0;
 									if (nIntensity<255)
 									{
 										rectSrc.x = (nIntensity % 16) * SHADSIZE;
 										rectSrc.y = (nIntensity / 16) * SHADSIZE;
-										SDL_BlitSurface(g_pShadows2, &rectSrc, pVisView->pSurface, &rectDest);
+										SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
 									}
 
 									rectDest.x += SHADSIZE;
 									fBlockWorldX += (float)SHADSIZE;
 
-									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + (fBlockWorldX-fHeroWorldX)*(fBlockWorldX-fHeroWorldX) );
+									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
 									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
 									if (nIntensity<0)nIntensity=0;
 									if (nIntensity<255)
 									{
 										rectSrc.x = (nIntensity % 16) * SHADSIZE;
 										rectSrc.y = (nIntensity / 16) * SHADSIZE;
-										SDL_BlitSurface(g_pShadows2, &rectSrc, pVisView->pSurface, &rectDest);
+										SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
 									}
 
 									rectDest.x += SHADSIZE;
 									fBlockWorldX += (float)SHADSIZE;
 
-									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + (fBlockWorldX-fHeroWorldX)*(fBlockWorldX-fHeroWorldX) );
+									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
 									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
 									if (nIntensity<0)nIntensity=0;
 									if (nIntensity<255)
 									{
 										rectSrc.x = (nIntensity % 16) * SHADSIZE;
 										rectSrc.y = (nIntensity / 16) * SHADSIZE;
-										SDL_BlitSurface(g_pShadows2, &rectSrc, pVisView->pSurface, &rectDest);
+										SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
 									}
 
 									rectDest.x += SHADSIZE;
 									fBlockWorldX += (float)SHADSIZE;
 
-									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + (fBlockWorldX-fHeroWorldX)*(fBlockWorldX-fHeroWorldX) );
+									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
 									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
 									if (nIntensity<0)nIntensity=0;
 									if (nIntensity<255)
 									{
 										rectSrc.x = (nIntensity % 16) * SHADSIZE;
 										rectSrc.y = (nIntensity / 16) * SHADSIZE;
-										SDL_BlitSurface(g_pShadows2, &rectSrc, pVisView->pSurface, &rectDest);
+										SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
 									}
 								}
 								
@@ -3116,6 +3218,47 @@ void ShowGameMessage(const char *szMessage, int nFrames)
 void IngameMenu()
 {
 	int nMenuOption = do_menu( &gameMenu );
+	//dj2022-11 testing moving away from gross hardcoded numbers for menu return values but only a few implemented so far ..
+	// hm should maybe make a new small wrapper for this
+	std::string sSelectedMenuCommand;
+	if (nMenuOption >= 0 && gameMenu.getItems()[nMenuOption].m_szRetVal != nullptr)
+		sSelectedMenuCommand = gameMenu.getItems()[nMenuOption].m_szRetVal;
+#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+	//dj2022-11 testing new beta shadow effect
+	if (sSelectedMenuCommand == "setting/betashadoweffect")
+	{
+		g_Effect.SetIntensity(g_Effect.m_nEnabledIntensity + 1);
+		std::string sMsg = "beta shadow effect toggled to: ";
+		if (g_Effect.m_nEnabledIntensity == 0) sMsg += "OFF";
+		else
+			sMsg += djStrPrintf("%d", (int)g_Effect.m_nEnabledIntensity);
+		SetConsoleMessage(sMsg);
+		return;
+	}
+#endif
+#ifdef djEXPERIMENTAL_FULLSCREEN_TOGGLE
+	if (sSelectedMenuCommand == "ingame/toggle_fullscreen")
+	{
+		//dj2022-11 experimental toggle fullscreen probably going to crash a lot
+		djGraphicsSystem::ToggleFullscreen();
+		//ReInitGameViewport();
+		RedrawEverythingHelper();
+		//bForceUpdate = true;
+		return;
+	}
+#endif
+	if (sSelectedMenuCommand == "ingame/abort_game")
+	{
+		g_bGameRunning = false;
+		return;
+	}
+	else if (sSelectedMenuCommand == "show_retrosettings_menu")//dj2019-06 just-for-fun extra-retro simulated faux-EGA/CGA
+	{
+		extern void SettingsMenu();
+		SettingsMenu();
+		return;
+	}
+
 	switch (nMenuOption)
 	{
 	case 2:
@@ -3130,28 +3273,6 @@ void IngameMenu()
 		{
 			ShowInstructions();
 		}
-		break;
-	case 5://dj2019-06 just-for-fun extra-retro simulated faux-EGA/CGA
-	{
-		extern void SettingsMenu();
-		SettingsMenu();
-	}
-	break;
-#ifdef djEXPERIMENTAL_FULLSCREEN_TOGGLE
-	case 6:
-	{
-		//dj2022-11 experimental toggle fullscreen probably going to crash a lot
-		djGraphicsSystem::ToggleFullscreen();
-		//ReInitGameViewport();
-		RedrawEverythingHelper();
-		//bForceUpdate = true;
-	}
-	break;
-	case 7:
-#else
-	case 6:
-#endif
-		g_bGameRunning = false;
 		break;
 	}
 }
