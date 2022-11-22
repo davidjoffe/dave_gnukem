@@ -39,11 +39,13 @@ djVisual *pVisView = NULL;
 
 //Very simple pseudo 'console message' [dj2016-10]
 std::string g_sMsg("");
-int g_nConsoleMsgTimer=0;//[milliseconds]
+unsigned int g_nConsoleMsgTimer=0;//[milliseconds]
+unsigned int g_uConsoleMsgTimeStart = 0;
 void SetConsoleMessage( const std::string& sMsg )
 {
 	g_sMsg = sMsg;
 	g_nConsoleMsgTimer = 2000;//Display message for ~2s then it disappears
+	g_uConsoleMsgTimeStart = SDL_GetTicks();//'Reset' timer
 }
 
 //dj2022-11 new helpers refactoring to try fullscreen toggle. Load the image but not yet the hardware surface cache item (do that after GraphInit) so we can do fullscreen toggle (semi-experimental this stuff may change)
@@ -90,27 +92,26 @@ void GraphFlip(bool bScaleView)
 			SDL_BlitSurface(pVisBack->pSurface, &Rect, pVisTemp, &Rect);
 		}
 
+		// crude 'console message' stuff .. should make this nicer someday
+		if (!g_sMsg.empty())
+		{
+			GraphDrawString(pVisBack, g_pFont8x8, 0, 0, (const unsigned char*)g_sMsg.c_str());
+
+			// Clear console message after a certain time
+			unsigned int uTimeNow = SDL_GetTicks();
+			if ((uTimeNow - g_uConsoleMsgTimeStart) > g_nConsoleMsgTimer)
+			{
+				g_sMsg.clear();
+				g_nConsoleMsgTimer = -1;
+			}
+		}
+
+
 		//SDL_GetTicks "Get the number of milliseconds since the SDL library initialization". Note that SDL_GetTicks wraps at ~49days
 		static unsigned int uTimeLast = 0;
 		if (uTimeLast==0)
 			uTimeLast = SDL_GetTicks();
 		unsigned int uTimeNow = SDL_GetTicks();
-
-		if (!g_sMsg.empty())
-		{
-			GraphDrawString( pVisBack, g_pFont8x8, 0, 0, (const unsigned char*)g_sMsg.c_str() );
-			
-			// Clear console message after a certain time
-			if (uTimeNow>=0 && uTimeNow>uTimeLast)
-			{
-				g_nConsoleMsgTimer -= ((int)uTimeNow - (int)uTimeLast);
-				if (g_nConsoleMsgTimer<=0)
-				{
-					g_sMsg.clear();
-					g_nConsoleMsgTimer = -1;
-				}
-			}
-		}
 
 		// should this frame rate stuff be here ?? [dj2017-08]
 		if (bShowFrameRate)
