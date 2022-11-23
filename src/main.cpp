@@ -268,7 +268,8 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		// I think it's better to have 'more possibly helpful info for users' that may help them get up and running and maybe refine this later - dj2022-11)
 		// We could also consider doing 'fancy' things like just exec'ing a git clone if the user wants or something .. and/or add some small little helper scripts to do things like below. Or even auto-downloading data. Anyway. Low priority for now.
 		// Also to consider is doing it generically so this code could support more games (and/or a hypothetical 'DG version 2')
-		printf("You can also get it by running: git clone https://github.com/davidjoffe/gnukem_data.git %s\n", DATA_DIR);
+		// dj2022-11 One additional thought on the below is that the below may fetch a 'bleeding edge' version with unstable stuff in it in future - hmm - maybe this needs more thought. LOW prio though.
+		//printf("You can also get it by running: git clone https://github.com/davidjoffe/gnukem_data.git %s\n", DATA_DIR);
 		return -1;
 	}
 

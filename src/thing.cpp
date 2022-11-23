@@ -43,7 +43,7 @@ int CThingFactory::Register(int nTypeID, THING_ALLOCATER pAllocateProc, THING_PE
 
 CThing* CThingFactory::Allocate(int nTypeID)
 {
-	vector<SDescriptor>::const_iterator i;
+	std::vector<SDescriptor>::const_iterator i;
 
 	for ( i=m_aDescriptors.begin(); i!=m_aDescriptors.end(); ++i )
 	{

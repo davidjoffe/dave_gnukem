@@ -9,7 +9,6 @@ Copyright (C) 2001-2022 David Joffe
 #include "djstring.h"
 
 #include <vector>
-using namespace std;
 
 
 #include "hiscores.h"
@@ -34,15 +33,12 @@ void SScore::SetName(const char* szNameNew)
 }
 
 // Scores, sorted from highest to lowest
-vector<SScore> g_aScores;
+std::vector<SScore> g_aScores;
 
 djImage *g_pImgHighScores = NULL;
 
 struct SMenuItem instructionsHighScoreItems[] =
 {
-   /*{ false, "{~~~~~~}" },
-   { true,  "|  OK  |" },
-   { false, "[~~~~~~]" },*/
    { false, "        " },
    { true,  "   OK   " },
    { false, "        " },

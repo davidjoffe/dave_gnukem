@@ -20,9 +20,9 @@ Copyright (C) 1999-2022 David Joffe
 
 #include <string>
 #include <fstream>
-using namespace std;
 
-vector<CMission * > g_apMissions;
+
+std::vector<CMission * > g_apMissions;
 // FIXME: Does this stuff really belong here? Probably not.
 CMission * g_pCurMission = NULL;
 /*--------------------------------------------------------------------------*/
@@ -101,8 +101,8 @@ int CMission::Load( const char * szfilename )
 	if (szfilename==NULL) return -1; // NULL string
 	if (szfilename[0]==0) return -2; // empty string
 
-	ifstream	fin;
-	string		line;
+	std::ifstream	fin;
+	std::string		line;
 	int			state=0;
 	char		filename[4096]={0};
 
@@ -325,7 +325,7 @@ void InitMissionSystem()
 
 void KillMissionSystem()
 {
-	vector<CMission*>::iterator	i;
+	std::vector<CMission*>::iterator	i;
 
 	for ( i=g_apMissions.begin(); i!=g_apMissions.end(); ++i )
 	{
@@ -397,7 +397,8 @@ int CSpriteData::LoadData( const char *szFilename )
 	if (NULL == (fin = fopen( szFilename, "r" )))
 	{
 #ifdef DATA_DIR
-		char buf[4096]={0};
+		// safety? we want to be able to handle VERY long paths elegantly all over the code (and also Unicode filenames) .. maybe make some file helpers etc.
+		char buf[8192]={0};
 		snprintf(buf,sizeof(buf), "%s%s", DATA_DIR, szFilename );
 		if (NULL == (fin = fopen( buf, "r" )))
 #endif

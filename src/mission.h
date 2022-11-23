@@ -18,7 +18,7 @@ Copyright (C) 1998-2019 David Joffe
 #include "djimage.h"
 
 #include <vector>
-using namespace std;
+
 #include <string>
 /*--------------------------------------------------------------------------*/
 class CMission;
@@ -48,7 +48,7 @@ class CSpriteData;
 #define EXTRA_FLAGS    4
 
 /*--------------------------------------------------------------------------*/
-extern vector<CMission * > g_apMissions;
+extern std::vector<CMission * > g_apMissions;
 extern CMission * g_pCurMission;
 extern int LoadMissions( const char * szfilename );
 extern void InitMissionSystem();
@@ -91,7 +91,7 @@ public:
 
 	// Attributes
 
-	vector<CLevel *>	m_apLevels;
+	std::vector<CLevel *>	m_apLevels;
 	CSpriteData			*m_apSpriteData[NUM_SPRITE_DATA];
 
 	std::string GetFilename() const { return m_sFilename; }

@@ -36,8 +36,9 @@ Copyright (C) 1999-2022 David Joffe
 
 #include "djtypes.h"
 #include "djsound.h"
+// This is used for the thing factory, which should perhaps in future be a separate .h/.cpp hmm [low dj2022-11]
 #include <vector>
-using namespace std;
+
 /*-----------------------------------------------------------*/
 //! Used to indicate the order in which "things" get drawn. Things at higher
 //! layers get drawn over things at lower layers.
@@ -105,7 +106,7 @@ protected:
 		THING_PERLEVELINIT 	pPerLevelInitProc;	// Optional pointer to per-level initialization
 	};
 
-	vector<SDescriptor> m_aDescriptors;
+	std::vector<SDescriptor> m_aDescriptors;
 };
 
 //! Single global "thing" factory

@@ -16,7 +16,7 @@ class CBullet;
 
 #include <cstddef>//NULL
 #include <vector>
-using namespace std;
+
 #include "config.h"
 
 //! Visible 'blocks' on X axis in game viewport
@@ -33,7 +33,7 @@ extern int g_nViewOffsetY;//Top left of game viewport in pixels (Y)
 
 
 class CThing;
-extern vector<CThing *> g_apThings;
+extern std::vector<CThing *> g_apThings;
 
 //! Add a \ref CThing to the current array of things in the level.
 extern void AddThing(CThing *pThing);

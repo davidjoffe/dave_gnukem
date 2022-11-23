@@ -13,7 +13,6 @@
 #include <fcntl.h>
 
 #include <string>
-using namespace std;
 
 #ifdef WIN32
 #else
@@ -166,15 +165,15 @@ unsigned char *g_pLevel = NULL;
 int g_nLevel = 0;
 bool bShowDebugInfo = false;
 bool g_bEnableDebugStuff = false;//dj2017-08-13 Enable 'cheats'/debug-settings at run-time (later might want to distinguish between 'cheats' and 'debug stuff' but for now treat the same - dj2018)
-vector<CThing *> g_apThings;
+std::vector<CThing *> g_apThings;
 
-string g_sGameMessage;
+std::string g_sGameMessage;
 int g_nGameMessageCount = -1;
 
-vector<CBullet*> g_apBullets;
-vector<CBullet*> g_apBulletsDeleted;//This is perhaps slightly kludgy but the purpose of this is to draw bullets 'one last frame' just as/after they've been destroyed when they collide with something - looks better visually I think - dj2018-01-12/13 (see livestream of same date) ... in theory these could even 'look different' later but that's very low prio
+std::vector<CBullet*> g_apBullets;
+std::vector<CBullet*> g_apBulletsDeleted;//This is perhaps slightly kludgy but the purpose of this is to draw bullets 'one last frame' just as/after they've been destroyed when they collide with something - looks better visually I think - dj2018-01-12/13 (see livestream of same date) ... in theory these could even 'look different' later but that's very low prio
 
-void DestroyBullets(vector<CBullet*>& apBullets)
+void DestroyBullets(std::vector<CBullet*>& apBullets)
 {
 	for ( unsigned int i=0; i<apBullets.size(); ++i )
 	{
@@ -208,12 +207,12 @@ int CountHeroBullets()
 	for ( i=0; i<g_apBullets.size(); ++i )
 	{
 		if (g_apBullets[i]->eType==CBullet::BULLET_HERO)
-			nCount++;
+			++nCount;
 	}
 	return nCount;
 }
 
-vector<float> afTimeTaken;
+std::vector<float> afTimeTaken;
 #define MAX_DEBUGGRAPH 128
 
 const char *FILE_GAMESKIN = DATA_DIR "gameskin.tga";
