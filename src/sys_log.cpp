@@ -24,6 +24,15 @@
 #include <time.h>
 #include "sys_defs.h"
 #include "djstring.h"//djAppendPathStr [should move elsewhere?? dj2018-03]
+#include <stdarg.h>//va_start etc.
+
+#ifdef WIN32
+#include <direct.h>//unlink
+#else
+#include <unistd.h>//unlink
+#endif
+
+#include <cstring>//strlen,strcpy etc. [dj2022-11 refactoring and cleanups]
 
 //#if defined(WIN32) && defined(_DEBUG)
 ////#include <Windows.h>//For OutputDebugString
@@ -34,17 +43,22 @@
 #define MAX_LOGS		32
 
 
+// dj2022-11 this "dword" is firstly only used in this file so moving it from the header to here (especially as names like "dword" have a HIGH risk of clashing with existing names in global namespace on some platforms)
+// Also changing it slightly from "dword" for same reason .. is there some reason we can't just an unsigned here? not sure .. most this older logging stuff not really my part of the code [dj2022]
+#define gnukemlogsdword	unsigned long int
+
+
 //dj2022-11 note some of this stuff probably not used anymore, maybe clean up someday .. also don't think we really need the rotating logs stuff just adds complexity at this point that I don't think justifies benefit
 
 static bool	log2screen = false;
 static bool	log2console = false;
-static bool	initialised = false;
+static bool	g_bLogInitialized = false;
 static int	log_backup_level = 5;
 static char	log_filename_base[SYS_MAX_FILE] = { 0 };
-static dword	sys_log = 0;
+static gnukemlogsdword	sys_log = 0;
 
 static FILE	*log_files[MAX_LOGS] = { NULL };
-static dword	masks[MAX_LOGS] = { 0 };
+static gnukemlogsdword	masks[MAX_LOGS] = { 0 };
 static unsigned int	num_logs = 0;
 
 
@@ -72,14 +86,14 @@ void InitLog ()
 
 void KillLog ()
 {
-	initialised = false;
+	g_bLogInitialized = false;
 }
 
 
 
 
 
-dword CreateLog ( const char *filename, const char *descr )
+gnukemlogsdword CreateLog ( const char *filename, const char *descr )
 {
 	time_t		t 	= time ( NULL );
 	struct tm	*tme 	= localtime ( &t );
@@ -102,7 +116,7 @@ dword CreateLog ( const char *filename, const char *descr )
 		fflush ( log_files[num_logs] );
 	}
 
-	initialised = true;
+	g_bLogInitialized = true;
 
 	num_logs++;
 	return masks[num_logs-1];
@@ -110,7 +124,7 @@ dword CreateLog ( const char *filename, const char *descr )
 
 
 
-void DisposeLog ( dword log_id )
+void DisposeLog (gnukemlogsdword log_id )
 {
 	for ( unsigned int i=0; i<num_logs; ++i )
 	{
@@ -118,7 +132,7 @@ void DisposeLog ( dword log_id )
 		{
 			if (log_files[i] != NULL)
 				fclose ( log_files[i] );
-			initialised = false;
+			g_bLogInitialized = false;
 		}
 	}
 }
@@ -127,7 +141,7 @@ void DisposeLog ( dword log_id )
 //dj2022-11 refactoring some of the log stuff ..
 void djLog::LogStr(const char* szPlainString)
 {
-	if (!initialised) return;
+	if (!g_bLogInitialized) return;
 	if (szPlainString == nullptr) return;
 
 	if (log_files[0] != NULL)
@@ -145,7 +159,7 @@ void djLog::LogStr(const char* szPlainString)
 
 void djLog::LogFormatStr( const char *fmt, ... )
 {
-	if (!initialised)
+	if (!g_bLogInitialized)
 		return;
 	if (NULL == fmt)
 		return;
@@ -320,10 +334,9 @@ void PushBackup ( const char *filename, int bklevel )
 
 
 
-
-
-dword SysLog ()
+/*//dj2022 commenting this out for now as doesn't seem to be used anywhere in code [anymore]
+unsigned int SysLog ()
 {
 	return sys_log;
 }
-
+*/
