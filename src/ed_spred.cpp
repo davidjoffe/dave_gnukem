@@ -67,7 +67,7 @@ static const char *sprite_instructions[NUM_SPRITE_INSTRUCTIONS] =
 static void HandleMouse(bool bCtrl);
 static void SpriteEd_RedrawView ();
 static void SetSprite ( int new_sprite );
-static void SpriteShowExtras ( int c );
+static void SpriteShowExtras();
 static void SpriteDrawFlags();
 static void ShowInstructions();
 static void DrawSprites ();
@@ -269,21 +269,21 @@ void SetSprite ( int new_sprite )
 
 	ED_SetSprite ( new_sprite, ox, oy );
 
-	ED_SpriteShowType ( 10 );
-	SpriteShowExtras ( 11 );
+	ED_SpriteShowType( false );// 10 ); (don't know or recall what "10" used to mean but doesn't seem to be used anymore, so cleaning up and simplifying - dj2022-11)
+	SpriteShowExtras();// dj2022-11 don't know or recall right now what "11" used to mean here but doesn't seem to be used anymore so cleaning up and simplifying 11 );
 	SpriteDrawFlags();
 }
 
 
 
-static void SpriteShowExtras ( int c )
+static void SpriteShowExtras()
 {
 	//dj2019-06 add these two help lines to try make it more self-documenting
 	ED_DrawString(POS_EXTRAS_X,POS_EXTRAS_Y +12*8,"^ Sprite Metadata" );
 	ED_DrawString(POS_EXTRAS_X,POS_EXTRAS_Y +13*8,"Left/right-click edits these values" );
 	for ( int i=0; i<12; i++ )
 	{
-		ED_SpriteShowExtra ( i, c );
+		ED_SpriteShowExtra ( i );
 	}
 }
 
@@ -364,9 +364,9 @@ void SpriteSetType( int itype )
 {
 	if (itype == ED_GetSpriteType( ED_GetCurrSpriteSet(), ED_GetCurrSprite() ))
 		return;
-	ED_SpriteShowType( 0 );
+	ED_SpriteShowType( true );
 	ED_SetSpriteType( ED_GetCurrSpriteSet(), ED_GetCurrSprite(), itype );
-	ED_SpriteShowType( 10 );
+	ED_SpriteShowType( false );// 10 );
 }
 
 

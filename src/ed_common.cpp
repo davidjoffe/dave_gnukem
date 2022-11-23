@@ -198,11 +198,11 @@ void ED_DrawStringClear( int x, int y, const char *szStr )
 
 
 
-void ED_SpriteShowType( int c )
+void ED_SpriteShowType( bool bClear )
 {
 	int nType = ED_GetSpriteType(g_iSpriteset, g_iSprite);
 
-	if (c==0)
+	if (bClear)
 		ED_DrawStringClear ( POS_BLOCKTYPES_X - 8,
 				POS_BLOCKTYPES_Y + nType * 8,
 				">" );
@@ -217,7 +217,7 @@ void ED_SpriteShowType( int c )
 
 
 
-void ED_SpriteShowExtra( int i, int c )
+void ED_SpriteShowExtra( int i )
 {
 	char buf[256]={0};
 	snprintf(buf,sizeof(buf), "%2d:[%4d]", i, ED_GetSpriteExtra( g_iSpriteset, g_iSprite, i ) );
@@ -228,25 +228,15 @@ void ED_SpriteShowExtra( int i, int c )
 	case 11: strcat(buf, "box-contents-sprite");break;//or letter-ID
 	}
 
-	/*
-	if (c==0)
-		ED_DrawStringClear(
-		POS_EXTRAS_X,
-		POS_EXTRAS_Y + i * 8,
-		buf );
-	else
-	*/
-		ED_DrawStringClear(
-		POS_EXTRAS_X,
-		POS_EXTRAS_Y + i * 8,
-		buf );
-		ED_DrawString(
-		POS_EXTRAS_X,
-		POS_EXTRAS_Y + i * 8,
-		buf );
+	ED_DrawStringClear(
+	POS_EXTRAS_X,
+	POS_EXTRAS_Y + i * 8,
+	buf );
+	ED_DrawString(
+	POS_EXTRAS_X,
+	POS_EXTRAS_Y + i * 8,
+	buf );
 }
-
-
 
 
 int ED_GetSpriteType( int spriteset, int sprite )
@@ -303,7 +293,7 @@ void ED_SetSpriteSet ( int new_spriteset )
 	if (g_iSpriteset == new_spriteset)
 		return;
 
-	ED_SpriteShowType( 0 );
+	ED_SpriteShowType( true );
 
 	direction = (new_spriteset - g_iSpriteset);
 
@@ -342,7 +332,7 @@ void ED_SetSpriteExtra( int spriteset, int sprite, int i, int value )
 
 	g_pCurMission->GetSpriteData(spriteset)->m_extras[sprite][i] = value;
 
-	ED_SpriteShowExtra( i, 11 );
+	ED_SpriteShowExtra( i );
 }
 
 
