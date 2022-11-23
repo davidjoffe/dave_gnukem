@@ -44,11 +44,17 @@ bool g_bSmoothVerticalMovementEnabled=true;
 const int nFALL_VERTICAL_PIXELS=8;
 const int nJUMP_VERTICAL_PIXELS=8;
 
+// gross globals, refactor someday
+
 // jumping
 struct SJumpInfo
 {
-	int size=0;         // number of offsets
-	const int * jump_diffs=nullptr; // offsets (y axis)
+	SJumpInfo(int nSize = 0, const int* pArrJumpDiffs = nullptr) : m_nArrSize(nSize), m_pArrJumpDiffs(pArrJumpDiffs) {}
+
+	// number of jump hero-y-position-offsets in m_pArrJumpDiffs array (i.e. size of array)
+	int m_nArrSize=0;
+	// array of offset values (y axis) (non-owned pointer, points to e.g. g_aiJumpNormal, a bit old-fashioned but anyway)
+	const int * m_pArrJumpDiffs=nullptr;
 };
 // The hero can jump further/higher after collecting the powerboots pickup, that is why there are two jump info structs here - g_aiJumpBoots is for when hero has powerboots. All these slightly gross globals should change. [dj2022-11]
 const int g_aiJumpNormal[] = { -1, -1, -1,  0, 0, 0, 1, 1, 1 };
@@ -64,7 +70,8 @@ const struct SJumpInfo jumpBoots  = { 10, g_aiJumpBoots  }; // Jump offsets with
 //struct SJumpInfo jumpNormal = {  9, g_aiJumpNormal }; // "Normal" jump offsets
 //struct SJumpInfo jumpBoots  = { 11, g_aiJumpBoots  }; // Jump offsets with boots
 const struct SJumpInfo * pJumpInfo; // Points to current jump info, normal or boots
-int jump_pos = 0; // Offset into the "jump info" array of y-axis offsets
+int g_nJumpArrayPos = 0; // Offset into the "jump info" array of y-axis offsets while jumping
+// Normal jump or powerboots jump?
 EJump g_eJump = JUMP_NORMAL;
 
 void HeroSetJumpMode(EJump eJump)
@@ -85,7 +92,7 @@ EJump HeroGetJumpMode()
 void HeroStartJump()
 {
 	g_Player.hero_mode = MODE_JUMPING;
-	jump_pos = 0;
+	g_nJumpArrayPos = 0;
 	g_Player.y_offset = 0;
 	
 	djSoundPlay( g_iSounds[SOUND_JUMP] );
@@ -94,16 +101,14 @@ void HeroStartJump()
 void HeroCancelJump()
 {
 	g_Player.hero_mode = MODE_NORMAL;
-	jump_pos = 0;
+	g_nJumpArrayPos = 0;
 }
 
 void HeroUpdateJump()
 {
-	int n=0;
-	
 	bool bDo = true;//Do 'full-block' movement, i.e. when smooth movement 'wraps' [dj2017-06-24]
 	if (g_bSmoothVerticalMovementEnabled &&
-		pJumpInfo->jump_diffs[jump_pos] < 0)
+		pJumpInfo->m_pArrJumpDiffs[g_nJumpArrayPos] < 0)
 	{
 		g_Player.y_offset -= nJUMP_VERTICAL_PIXELS;
 		
@@ -130,7 +135,7 @@ void HeroUpdateJump()
 	if (bDo)
 	{
 		g_Player.y_offset = 0;
-		n = move_hero(0,pJumpInfo->jump_diffs[jump_pos]);
+		const int n = move_hero(0,pJumpInfo->m_pArrJumpDiffs[g_nJumpArrayPos]);
 		if (n == 1) { //cancel jump, fell on block (x 1 ret?)
 			HeroCancelJump();
 			hero_picoffs = 1;
@@ -138,8 +143,8 @@ void HeroUpdateJump()
 			AddThing(CreateDust(g_Player.x, g_Player.y));
 			djSoundPlay( g_iSounds[SOUND_JUMP_LANDING] );
 		}
-		jump_pos++;
-		if (jump_pos >= pJumpInfo->size)
+		g_nJumpArrayPos++;
+		if (g_nJumpArrayPos >= pJumpInfo->m_nArrSize)
 		{
 			g_Player.hero_mode = MODE_NORMAL;
 		}
