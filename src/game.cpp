@@ -1382,7 +1382,7 @@ int game_startup(bool bLoadGame)
 	float fTimeNext = djTimeGetTime();
 	float fTimeNow = fTimeNext;
 	int iFrameCount=0;
-	int anKeyState[KEY_NUMKEYS] = { 0 };
+	int anKeyState[KEY_NUM_MAIN_REDEFINABLE_KEYS] = { 0 };
 	int i;
 	while (g_bGameRunning)
 	{
@@ -1419,13 +1419,13 @@ int game_startup(bool bLoadGame)
 			// immediate subsequent 'heartbeat'.
 			// (This fixes the loooooong-outstanding annoying issue "Key polling behavior is
 			// subtly incorrect")
-			int key_down_edge[KEY_NUMKEYS] = {0};
+			int key_down_edge[KEY_NUM_MAIN_REDEFINABLE_KEYS] = {0};
 			while (djiPollEvents(Event))
 			{
 				switch (Event.type)
 				{
 				case SDL_KEYDOWN:
-					for ( i=0; i<KEY_NUMKEYS; i++ )
+					for ( i=0; i<KEY_NUM_MAIN_REDEFINABLE_KEYS; i++ )
 					{
 						if (Event.key.keysym.sym==g_anKeys[i])
 						{
@@ -1622,7 +1622,7 @@ int game_startup(bool bLoadGame)
 					}
 					break;
 				case SDL_KEYUP:
-					for ( i=0; i<KEY_NUMKEYS; i++ )
+					for ( i=0; i<KEY_NUM_MAIN_REDEFINABLE_KEYS; i++ )
 					{
 						if (Event.key.keysym.sym==g_anKeys[i])
 						{

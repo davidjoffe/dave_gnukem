@@ -264,6 +264,11 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		printf("Unable to find data folder '%s'. Please note this is in a separate repo - see the ReadMe.md for details.\n",DATA_DIR);
 		printf("If you have the data folder, then you can generally fix this message by first changing your current\n");
 		printf("directory to the folder in which the 'data' folder is contained, then running the application.\n");
+		// (dj2022-11 Add the below line, hmm, not sure whether it really belongs in the help text here to mention things like git repo cloning (and also maybe the URL may change later) but for now
+		// I think it's better to have 'more possibly helpful info for users' that may help them get up and running and maybe refine this later - dj2022-11)
+		// We could also consider doing 'fancy' things like just exec'ing a git clone if the user wants or something .. and/or add some small little helper scripts to do things like below. Or even auto-downloading data. Anyway. Low priority for now.
+		// Also to consider is doing it generically so this code could support more games (and/or a hypothetical 'DG version 2')
+		printf("You can also get it by running: git clone https://github.com/davidjoffe/gnukem_data.git %s\n", DATA_DIR);
 		return -1;
 	}
 
@@ -611,7 +616,7 @@ void DialogBoxEffect(int x1, int y1, int w, int h, bool bInverted = false)
 // Helper for RedefineKeys to prevent assigning same key to two actions [dj2016-10]
 bool IsKeyUsed(int* anKeys, int key)
 {
-	for ( unsigned int i=0; i<KEY_NUMKEYS; ++i )
+	for ( unsigned int i=0; i<KEY_NUM_MAIN_REDEFINABLE_KEYS; ++i )
 	{
 		if (anKeys[i] == key)
 			return true;
@@ -620,7 +625,7 @@ bool IsKeyUsed(int* anKeys, int key)
 }
 void RedefineKeys()
 {
-	int anKeys[KEY_NUMKEYS] = {0};
+	int anKeys[KEY_NUM_MAIN_REDEFINABLE_KEYS] = {0};
 	bool bLoop = true;
 	bool bFinished = false;
 	int nCurrent = 0;
@@ -660,7 +665,7 @@ void RedefineKeys()
 							bLoop = false;
 							// Commit changes
 							int j;
-							for ( j=0; j<KEY_NUMKEYS; j++ )
+							for ( j=0; j<KEY_NUM_MAIN_REDEFINABLE_KEYS; j++ )
 							{
 								g_anKeys[j] = anKeys[j];
 							}
@@ -672,7 +677,7 @@ void RedefineKeys()
 					{
 						anKeys[nCurrent] = Event.key.keysym.sym;
 						nCurrent++;
-						if (nCurrent==KEY_NUMKEYS)
+						if (nCurrent==KEY_NUM_MAIN_REDEFINABLE_KEYS)
 						{
 							bFinished = true;
 						}
@@ -690,7 +695,7 @@ void RedefineKeys()
 
 		//DialogBoxEffect(nXLeft-4, 100, nDX+8, 16, true);
 		int i;
-		for ( i=0; i<KEY_NUMKEYS; i++ )
+		for ( i=0; i<KEY_NUM_MAIN_REDEFINABLE_KEYS; i++ )
 		{
 			int j;
 			GraphDrawString( pVisBack, g_pFont8x8, 64, 64+i*16, (unsigned char*)g_aszKeys[i]);
