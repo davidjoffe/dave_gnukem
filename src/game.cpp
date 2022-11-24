@@ -386,6 +386,27 @@ int g_nHealthOld = 0;
 
 
 /*-----------------------------------------------------------*/
+#if defined(djEXPERIMENTAL_FULLSCREEN_TOGGLE) && defined(djDEV_STRESSTESTS)
+//dj2022-11 add quick n dirty stress-tester to help test in-game fullscreen toggle robustness  [todo lwo move stress tests to seprate .cpp files?]
+bool djStressTestInGameFullscreenToggle(float fDT)
+{
+	static bool g_bStressTestFullscreenToggle = true;
+	static float g_fStressTestFullscreenToggleTimer = 0.f;
+	if (g_bStressTestFullscreenToggle)
+	{
+		g_fStressTestFullscreenToggleTimer += fDT;
+		if (g_fStressTestFullscreenToggleTimer >= 2.f)
+		{
+			g_fStressTestFullscreenToggleTimer = 0.f;
+			//dj2022-11 experimental toggle fullscreen probably going to crash a lot
+			djGraphicsSystem::ToggleFullscreen();
+			return true;
+		}
+	}
+	return false;
+}
+#endif
+/*-----------------------------------------------------------*/
 //
 // GameHeartBeat() helpers
 //
@@ -1863,8 +1884,25 @@ int game_startup(bool bLoadGame)
 		GraphDrawString( pVisBack, g_pFont8x8, 0, 8, (unsigned char*)sbuf );
 
 		// update
+		static float fTLast = -1.f;
 		float fT1 = djTimeGetTime();
-		GameHeartBeat();
+		if (fTLast < 0.f)
+			fTLast = fT1;//<-  hm first tick will be 0.f a bit odd .. but for DN1 should be ~18Hz [dj2022-11 LWO prio as this stuff isn't even used yet]
+		// [dj2022-11] Simple calculate of delta-time since last frame at this point (not currently used for anything but in theory a lot of game update stuff 'should' be driven more by something like this .. should perhaps in future be passed to CThing::Tick or something like that)
+		const float fDT = fT1 - fTLast;//delta-time since last update [new dj2022-11 not yet used for anything really]
+		fTLast = fT1;
+
+		//dj2022-11 add quick n dirty stress-tester to help test in-game fullscreen toggle robustness
+#if defined(djEXPERIMENTAL_FULLSCREEN_TOGGLE) && defined(djDEV_STRESSTESTS)
+		if (djStressTestInGameFullscreenToggle(fDT))
+		{
+			// If toggled
+			RedrawEverythingHelper();
+			bForceUpdate = true;
+		}
+#endif
+
+		GameHeartBeat(fDT);
 		
 		if (!g_sAutoScreenshotFolder.empty())
 		{
@@ -1987,7 +2025,7 @@ int game_startup(bool bLoadGame)
 }
 
 /*-----------------------------------------------------------*/
-void GameHeartBeat()
+void GameHeartBeat(float fDT)
 {
 	// Update hero basic stuff
 	HeroUpdate();

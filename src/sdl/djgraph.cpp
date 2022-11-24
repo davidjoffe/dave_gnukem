@@ -95,6 +95,7 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 	{
 		SDL_Window *win = SDL_CreateWindow("Dave Gnukem", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h,
 			pVis->m_bFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_RESIZABLE);
+		pVis->pWindow = win;//<- dj2022-11 added storing this pWindow pointer so we can cleanup with corresponding SDL_DestroyWindow (for in-game fullscreen toggle etc.)
 		SDL_SetWindowIcon(win, SDL_LoadBMP("data/icon.bmp"));
 		pVis->pRenderer = SDL_CreateRenderer(win, -1, 0);
 		SDL_RenderSetLogicalSize(pVis->pRenderer, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H);
@@ -136,6 +137,14 @@ void djgCloseVisual( djVisual * pVis )
 {
 	SDL_FreeSurface(pVis->pSurface);
 	pVis->pSurface = NULL;//?<- dj2017-01 not sure if this is all that's necessary for cleanup here ...
+
+	//dj2022-11 adding this SDL_DestroyWindow here as I think it may help fix the in-game fullscreen toggle issues
+	// QUESTION[dj2022-11] must we also destroy pRenderer manually here to double check
+	if (pVis->pWindow)
+	{
+		SDL_DestroyWindow(pVis->pWindow);
+		pVis->pWindow = nullptr;
+	}
 }
 
 void djgLock( djVisual * pVis )

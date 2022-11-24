@@ -73,7 +73,7 @@ extern int GetCurrentLevel();
 //! Lose a life
 extern void Die();
 //! The main game "tick" routine
-extern void GameHeartBeat();
+extern void GameHeartBeat(float fDT);
 
 //----- Game screen redrawing
 
