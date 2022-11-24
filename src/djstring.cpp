@@ -293,3 +293,11 @@ std::string djGetFolderUserSettings()
 
 	return s;
 }
+
+std::string djIntToString(int n)
+{
+	// Note NB this must be large enough for e.g. 128-bit ints 'just in case'. Also this function should be threadsafe so no static buffers etc.
+	char buf[128] = { 0 };
+	snprintf(buf, sizeof(buf), "%d", n);
+	return buf;
+}

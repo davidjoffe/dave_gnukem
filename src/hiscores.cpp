@@ -2,15 +2,15 @@
 hiscores.cpp
 
 Copyright (C) 2001-2022 David Joffe
+
+Conceptually should divide this file into more model/view/controller separation? low prio. dj2022-11
 */
 
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
 #include "djstring.h"
-
 #include <vector>
-
-
 #include "hiscores.h"
 #include "djtypes.h"
 #include "menu.h"
@@ -60,6 +60,8 @@ void KillHighScores()
 
 void ShowHighScores()
 {
+	const int nYSTART = 20;
+	const int nHEIGHTPERROW = 14;
 	HighScoresMenu.setSize(0);
 	HighScoresMenu.setItems(instructionsHighScoreItems);
 	HighScoresMenu.setMenuCursor(instructionsHighScoreCursor);
@@ -78,10 +80,9 @@ void ShowHighScores()
 
 		for ( int i=0; i<(int)g_aScores.size(); i++ )
 		{
-			char buf[1024]={0};
-			snprintf(buf, sizeof(buf), "%d  %d", i, g_aScores[i].nScore);
-			GraphDrawString(pVisBack, g_pFont8x8, 24, 24+i*12, (unsigned char*)buf);
-			GraphDrawString(pVisBack, g_pFont8x8, 24+11*8, 24+i*12, (unsigned char*)g_aScores[i].szName);
+			GraphDrawString(pVisBack, g_pFont8x8, 16,          nYSTART + i * nHEIGHTPERROW, (unsigned char*)djIntToString(i + 1).c_str());//i+1 because i is 0-based index but human 1-based
+			GraphDrawString(pVisBack, g_pFont8x8, 16 + 8 * 3,  nYSTART + i * nHEIGHTPERROW, (unsigned char*)djIntToString(g_aScores[i].nScore).c_str());
+			GraphDrawString(pVisBack, g_pFont8x8, 24 + 11 * 8, nYSTART + i * nHEIGHTPERROW, (unsigned char*)g_aScores[i].szName);
 		}
 
 		GraphFlip(true);
