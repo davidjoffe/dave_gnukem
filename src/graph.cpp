@@ -17,8 +17,14 @@ Copyright (C) 1998-2022 David Joffe
 #include <stdlib.h>
 #ifdef __OS2__
 #include <SDL/SDL.h>
+#ifdef djUNICODE_TTF
+	#include <SDL/SDL_ttf.h>//TTF_Init
+#endif
 #else
 #include "SDL.h"
+#ifdef djUNICODE_TTF
+	#include <SDL_ttf.h>//TTF_Init
+#endif
 #endif
 #include "sys_log.h"//djLog helpers
 #include "djstring.h"//djStrPrintf
@@ -167,10 +173,18 @@ bool djSDLInit()
 {
 	// Initialize graphics library
 	SDL_Init(SDL_INIT_VIDEO);
+
+#ifdef djUNICODE_TTF
+	TTF_Init();//dj2022-11
+#endif
 	return true;
 }
 bool djSDLDone()
 {
+#ifdef djUNICODE_TTF
+	TTF_Quit();//dj2022-11
+#endif
+
 	SDL_Quit();
 	return true;
 }
