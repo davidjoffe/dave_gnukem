@@ -7,10 +7,6 @@
 #include "../sys_error.h"
 #include <windows.h>
 
-#ifdef djUNICODE_TTF
-#pragma comment(lib, "SDL2_ttf.lib")
-#endif
-
 
 extern int main( int argc, char ** argv );
 

@@ -93,7 +93,7 @@ public:
 			s = szUTFstring;
 		return FindBestMatchingFontMostCharsStr(apFonts, s, s.length());
 	}
-	static TTF_Font* FindBestMatchingFontMostCharsStr(const std::vector<TTF_Font*>& apFonts, std::string& sText, size_t uLen)
+	static TTF_Font* FindBestMatchingFontMostCharsStr(const std::vector<TTF_Font*>& apFonts, std::string& sText, const size_t uLen)
 	{
 		int nMatchesMost = 0;
 		TTF_Font* pFontMostChars = nullptr;
@@ -114,14 +114,15 @@ public:
 			const char* szStart = sText.c_str();
 			utf8proc_int32_t cp = -1;//codepoint in 32-bit
 			size_t uOffset = 0;
+			size_t uLen2 = uLen;
 			// [dj2022-11] Must convert utf8 to 32-bit Unicode glyphs and iterate over string
 			// Remember that utf8 is multi-byte and variable-width encoding so a single Unicode codepoint (i.e. one 32-bit value) could be maybe e.g. 1 byte or 2 bytes or 3 bytes or 4 bytes etc. in the utf8 string (but strlen returns the full number of bytes, not "Unicode Characters")
 			//"Reads a single codepoint from the UTF-8 sequence being pointed to by str. The maximum number of bytes read is strlen, unless strlen is negative (in which case up to 4 bytes are read). If a valid codepoint could be read, it is stored in the variable pointed to by codepoint_ref, otherwise that variable will be set to -1. In case of success, the number of bytes read is returned; otherwise, a negative error code is returned."
-			utf8proc_ssize_t ret = utf8proc_iterate((const utf8proc_uint8_t*)(szStart + uOffset), uLen, &cp);
+			utf8proc_ssize_t ret = utf8proc_iterate((const utf8proc_uint8_t*)(szStart + uOffset), uLen2, &cp);
 			int nMatches = 0;
 			while (ret > 0)
 			{
-				uLen -= (size_t)ret;
+				uLen2 -= (size_t)ret;
 				uOffset += (size_t)ret;
 				// [dj2022-11] Hmm SDL documentation says "This is the same as TTF_GlyphIsProvided(), but takes a 32-bit character instead of 16-bit, and thus can query a larger range. If you are sure you'll have an SDL_ttf that's version 2.0.18 or newer, there's no reason not to use this function exclusively."
 				// That means we may have a problem here supporting specifically (just) the Unicode SURROGATE PAIRS range IF (and only if) a platform has SDL older than this .. is that worth worrying about? [seems low prio to me dj2022-11 .. a few days ago we had no Unicode support at all so full Unicode support on 2.0.18+ and everything but surrogate pairs on older SDL's seems OK]
@@ -139,7 +140,7 @@ public:
 						pFontMostChars = pFont;
 					}
 				}
-				ret = utf8proc_iterate((const utf8proc_uint8_t*)(szStart + uOffset), uLen, &cp);
+				ret = utf8proc_iterate((const utf8proc_uint8_t*)(szStart + uOffset), uLen2, &cp);
 			}
 		}
 		return pFontMostChars;
@@ -181,8 +182,10 @@ void ShowHighScores()
 	}
 	if (g_pImgHighScores)
 	{
-		djgDrawImage( pVisBack, g_pImgHighScores, 0, 0, g_pImgHighScores->Width(), g_pImgHighScores->Height() );
+		djgDrawImage(pVisBack, g_pImgHighScores, 0, 0, g_pImgHighScores->Width(), g_pImgHighScores->Height());
+	}
 
+	{
 		for ( int i=0; i<(int)g_aScores.size(); i++ )
 		{
 			GraphDrawString(pVisBack, g_pFont8x8, 16,          nYSTART + i * nHEIGHTPERROW, (unsigned char*)djIntToString(i + 1).c_str());//i+1 because i is 0-based index but human 1-based
