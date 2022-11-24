@@ -123,9 +123,9 @@ int do_menu( CMenu *pMenu )
 	{
 		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+(strlen(pMenu->getItems()[i].m_szText))*8, pMenu->getYOffset()+i*8, i==0?szTR:szR );
 	}
-	for ( unsigned int j=1; j<(int)lenLongestString; ++j )
+	for (size_t x = 0; x < lenLongestString; ++x)
 	{
-		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+j*8, pMenu->getYOffset()+size*8, szB );
+		GraphDrawString(pVisBack, g_pFont8x8, pMenu->getXOffset() + (int)x * 8, pMenu->getYOffset() + size * 8, szB);
 	}
 	GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+ (int)lenLongestString*8, pMenu->getYOffset()+size*8, szBR );
 	GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset(), pMenu->getYOffset()+size*8, szBL );
