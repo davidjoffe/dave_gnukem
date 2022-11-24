@@ -138,7 +138,9 @@ extern bool g_bBigViewportMode;//dj2019-06. //Can't have both bigviewport and la
 // EXPERIMENTAL / BETA [dj2022-11] this is relatively large charnge as means new dependencies
 /*--------------------------------------------------------------------------*/
 // Enable Unicode support [BETA] dj2022-11 (EARLY DEV - NOT ready for production do NOT yet enable in a real release - dj2022-11)
+#ifndef djUNICODE_SUPPORT
 //#define djUNICODE_SUPPORT
+#endif
 #ifdef djUNICODE_SUPPORT
 	#define djUNICODE_TTF
 #endif
