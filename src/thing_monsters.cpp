@@ -4,6 +4,7 @@
 Copyright (C) 2000-2020 David Joffe
 */
 /*--------------------------------------------------------------------------*/
+#include "config.h"
 #include "thing_monsters.h"
 #include "block.h"
 #include "mission.h"//GET_EXTRA
@@ -337,7 +338,7 @@ void CFlyingRobot::Draw()
 {
 	if (IsDying())
 	{
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 		DRAW_SPRITEA_SHADOW(pVisView,
 			m_a, m_b + anim4_count + 4,
 			1+CALC_XOFFSET(m_x) + m_xoffset,
@@ -356,14 +357,14 @@ void CFlyingRobot::Draw()
 		// Spriteset has 8 sprites in a row: First 4 is facing right, next 4 facing left
 		if (m_nXDir>0)//Facing right?
 		{
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 			DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count    , 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset,BLOCKW,BLOCKH);
 #endif
 			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count    , CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
 		}
 		else//Facing left
 		{
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 			DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count + 4, 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset,BLOCKW,BLOCKH);
 #endif
 			DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count + 4, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset);
@@ -624,7 +625,7 @@ void CHighVoltage::Draw()
 		int x = CALC_XOFFSET(m_x  );
 		int y = CALC_YOFFSET(m_y+i);
 
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 		DRAW_SPRITEA_SHADOW(pVisView,a,b,x-1,y,BLOCKW,BLOCKH);
 		DRAW_SPRITEA_SHADOW(pVisView,a,b,x+1,y,BLOCKW,BLOCKH);
 #endif
@@ -768,7 +769,7 @@ void CCannon::Draw()
 	int x = CALC_XOFFSET(m_x) + m_xoffset;
 	int y = CALC_YOFFSET(m_y) + m_yoffset;
 
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 	DRAW_SPRITEA_SHADOW(pVisView, a, b, x, y, BLOCKW*2, BLOCKH);
 	DRAW_SPRITEA(pVisView, a, b, x-1, y-1, BLOCKW*2, BLOCKH);
 #else
@@ -854,7 +855,7 @@ int CCrawler::Tick()
 
 void CCrawler::Draw()
 {
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 	DRAW_SPRITEA_SHADOW(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_yoffset,BLOCKW,BLOCKH);
 #endif
 	DRAW_SPRITE16A(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) + m_yoffset);
@@ -1305,7 +1306,7 @@ void CDrProton::Draw()
 		const int b=(m_nXDir>0 ? 0 : 2);
 		int x = CALC_XOFFSET(m_x) + m_xoffset;
 		int y = CALC_YOFFSET(m_y-1) + m_yoffset;//Topleft, hence subtract from m_y
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 		DRAW_SPRITEA_SHADOW(pVisView, a, b, x+1,y+1,32,32);
 #endif
 		DRAW_SPRITEA(pVisView,

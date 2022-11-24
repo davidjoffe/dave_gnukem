@@ -11,9 +11,9 @@ Copyright (C) 1999-2022 David Joffe
 #ifndef _THING_H_
 #define _THING_H_
 
+#include "config.h"
 #include "game.h"
 #include "hero.h"
-#include "config.h"
 
 
 //g_bLargeViewport -> we slow down every calculation for a cheat-only mode we never use :/ .. hrm. surely could do better here://dj2019-07

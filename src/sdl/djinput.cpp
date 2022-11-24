@@ -6,6 +6,7 @@ Copyright (C) 1995-2022 David Joffe
 Created: '95/07/20 (originally as a test keyboard interrupt hook)
 */
 
+#include "../config.h"
 //#include <stdlib.h>
 #include <string.h>
 #include "../djinput.h"

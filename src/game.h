@@ -14,10 +14,9 @@ Copyright (C) 1995-2020 David Joffe
 
 class CBullet;
 
+#include "config.h"
 #include <cstddef>//NULL
 #include <vector>
-
-#include "config.h"
 
 //! Visible 'blocks' on X axis in game viewport
 extern int VIEW_WIDTH;
@@ -39,7 +38,7 @@ extern std::vector<CThing *> g_apThings;
 extern void AddThing(CThing *pThing);
 
 
-#include "djsound.h"
+#include "djsound.h"//SOUND_HANDLE
 enum EdjGameSounds
 {
 	SOUND_PICKUP=0,

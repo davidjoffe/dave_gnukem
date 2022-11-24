@@ -1,4 +1,5 @@
 
+#include "config.h"
 #include "ed_common.h"
 #include "djinput.h"
 #include "djimage.h"

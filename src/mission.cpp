@@ -363,8 +363,8 @@ CSpriteData::CSpriteData()
 {
 	m_iID = -1;
 	m_pImage = NULL;
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-	m_pImageShadow = NULL;
+#ifdef djSPRITE_AUTO_DROPSHADOWS
+	m_pImageAutoShadow = NULL;
 #endif
 	m_szImgFilename = NULL;
 	m_szFilenameData = NULL;
@@ -374,9 +374,9 @@ CSpriteData::CSpriteData()
 
 CSpriteData::~CSpriteData()
 {
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-	djDestroyImageHWSurface(m_pImageShadow);
-	djDEL(m_pImageShadow);
+#ifdef djSPRITE_AUTO_DROPSHADOWS
+	djDestroyImageHWSurface(m_pImageAutoShadow);
+	djDEL(m_pImageAutoShadow);
 #endif
 	djDestroyImageHWSurface(m_pImage);
 	djDEL(m_pImage);
@@ -518,11 +518,11 @@ int CSpriteData::LoadSpriteImage()
 		djDestroyImageHWSurface(m_pImage);
 		djDEL(m_pImage);
 	}
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-	if (m_pImageShadow)
+#ifdef djSPRITE_AUTO_DROPSHADOWS
+	if (m_pImageAutoShadow)
 	{
-		djDestroyImageHWSurface(m_pImageShadow);
-		djDEL(m_pImageShadow);
+		djDestroyImageHWSurface(m_pImageAutoShadow);
+		djDEL(m_pImageAutoShadow);
 	}
 #endif
 
@@ -561,7 +561,7 @@ int CSpriteData::LoadSpriteImage()
 
 		djCreateImageHWSurface( m_pImage );
 
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 		// dj2018-01 SUPER-EXPERIMENTALY EXPERIMENT [see livestreams of 12/13 Jan 2018]
 		// Basically what we're doing here is, we examine the sprite image, and create
 		// a second corresponding sprite image that looks like a 'shadow' (black image
@@ -570,29 +570,25 @@ int CSpriteData::LoadSpriteImage()
 		// a simple drop-shadow effect 'under the sprite', e.g. see DRAW_SPRITEA_SHADOW
 		// helper and g_bSpriteDropShadows setting.
 		// [low]In theory later we can make this 'nicer' e.g. slightly smooth the dropshadow image somewhat
-		m_pImageShadow = new djImage;//( m_pImage->Width(), m_pImage->Height(), m_pImage->BPP() );
+		m_pImageAutoShadow = new djImage;//( m_pImage->Width(), m_pImage->Height(), m_pImage->BPP() );
 		// Create image of exact same width/height/pitch and pixel format.
 		// Note using the djImage constructor didn't seem to work (fixmeFuture some issue there), maybe pitch issues or bpp issues, not sure,
 		// but we had to use CreateImage() rather here (LOW prio but should look into why at
 		// some stage, not a prio unless we want to make this whole thing more generic 'engine') [dj2018-01-12]
-		m_pImageShadow->CreateImage(m_pImage->Width(), m_pImage->Height(), m_pImage->BPP(), m_pImage->Pitch());
+		m_pImageAutoShadow->CreateImage(m_pImage->Width(), m_pImage->Height(), m_pImage->BPP(), m_pImage->Pitch());
 		for (int y=0;y<m_pImage->Height();++y)
 		{
 			for (int x=0;x<m_pImage->Width();++x)
 			{
-				djColor c = m_pImage->GetPixelColor(x,y);
-
-				//[thisdidn'tseemtowork]unsigned int p=m_pImage->GetPixel(x,y);//Note using GetPixel() maybe has issues, not sure
-				//[thisdidn'tseemtowork]m_pImageShadow->PutPixel(x,y,p);
-				
+				const djColor c = m_pImage->GetPixelColor(x,y);
 				// PutPixel: 32-bit hex value containing alpha red green blue 0xAARRGGBB
 				if (c.a!=0)
-					m_pImageShadow->PutPixel(x,y,0x90000000);// <- Highest two hex digits adjust intensity/darkness of dropshadow
+					m_pImageAutoShadow->PutPixel(x,y,0x90000000);// <- Highest two hex digits adjust intensity/darkness of dropshadow
 				else
-					m_pImageShadow->PutPixel(x,y,0x00000000);
+					m_pImageAutoShadow->PutPixel(x,y,0x00000000);
 			}
 		}
-		djCreateImageHWSurface( m_pImageShadow );
+		djCreateImageHWSurface( m_pImageAutoShadow );
 #endif
 
 	}

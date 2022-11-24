@@ -10,7 +10,7 @@ Copyright (C) 2002-2019 David Joffe
 #include "graph.h"
 #include "mission.h"
 #include "thing.h"
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 #include "graph.h"//DRAW_SPRITEA_SHADOW
 #endif
 
@@ -42,7 +42,7 @@ void CBullet::Draw()
 		//dj2019-07: The simplest/quickest/only way to understand all these offsets etc. for the sprites is to look at the sprite image:
 		if (eType==BULLET_HERO)
 		{
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 			DRAW_SPRITEA_SHADOW(pVisView,
 				5,
 				nAnim,

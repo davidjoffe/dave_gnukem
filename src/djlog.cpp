@@ -4,6 +4,7 @@ djlog.cpp
 Copyright (C) 1998-2022 David Joffe
 */
 
+#include "config.h"
 #ifdef WIN32
 #include <windows.h>
 #endif

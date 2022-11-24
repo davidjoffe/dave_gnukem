@@ -1,4 +1,5 @@
 
+#include "config.h"
 #include "ed_lvled.h"
 #include "ed_common.h"
 #include "ed_macros.h"

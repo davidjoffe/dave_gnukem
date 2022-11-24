@@ -5,6 +5,7 @@ TODO:
 	problem "what to do with common data" arises earlier than
 	i hoped it will :))
 */
+#include "config.h"
 #include "ed_spred.h"
 #include "ed_common.h"
 #include "djinput.h"

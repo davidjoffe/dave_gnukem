@@ -148,8 +148,8 @@ public:
 	int          m_iID;
 
 	djImage *m_pImage;
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-	djImage *m_pImageShadow;
+#ifdef djSPRITE_AUTO_DROPSHADOWS
+	djImage *m_pImageAutoShadow;//!< Sprite auto-dropshadow effect
 #endif
 	char * m_szImgFilename;
 
