@@ -9,23 +9,23 @@
 #ifndef _DJINPUT_H_
 #define _DJINPUT_H_
 /*--------------------------------------------------------------------------*/
-#include "djgraph.h"
+#ifdef __OS2__
+#include <SDL/SDL_events.h>
+#else
+#include <SDL_events.h>
+#endif
 
 #define DJKEY_MAX 256
 extern int g_iKeys[DJKEY_MAX];
 extern int g_iKeysLast[DJKEY_MAX];
 
-extern djVisual *g_pVisInput;
-
-extern bool djiInit( djVisual *pVis );
+extern bool djiInit();
 extern void djiDone();
 extern void djiPoll();
 extern void djiPollBegin();
 extern void djiPollEnd();
 extern bool djiPollEvents(SDL_Event &Event);
 extern void djiWaitForKeyUp(unsigned char cKey);
-//dj2019-07 don't think anything uses djiAnyKeyDown anymore, commenting it out for now ..
-//extern bool djiAnyKeyDown();
 extern bool djiKeyDown(int iScanCode);
 extern bool djiKeyPressed(int iScanCode);
 void djiClearBuffer ();				// rtfb
@@ -40,10 +40,20 @@ struct SdjKeyMapping
 	unsigned int m_iPlatformCode; // platform dependent scan code
 };
 
-//fixme [low prio] slightly gross globals ..
-extern int mouse_x;
-extern int mouse_y;
-extern int mouse_b;
+/*--------------------------------------------------------------------------*/
+//dj2022-11 slight refactoring to at least mnake these non-global, simple static class for now .. dj2022-11
+class djMouse
+{
+public:
+	static int x;//!<- X position (horizontal)
+	static int y;//!<- Y position (vertical)
+	static int b;//!<- Mouse button state
+
+	//int GetX() const { return x; }
+	//int GetY() const { return y; }
+	//int GetB() const { return b; }
+};
+/*--------------------------------------------------------------------------*/
 
 extern const char *GetKeyString(int nSDLKeyCode);
 

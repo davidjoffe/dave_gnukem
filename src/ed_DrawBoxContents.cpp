@@ -6,8 +6,11 @@ TODO:
 	contents in different places for LVLED and SPRED,
 	but that difference in what does it draw looks silly
 	for me.
+
+// dj2022-11 not sure anymore who wrote above question? not me but yes someday clean this stuff up a bit
 */
 
+#include "config.h"
 #include "ed_DrawBoxContents.h"
 #include "ed_common.h"
 #include "block.h"

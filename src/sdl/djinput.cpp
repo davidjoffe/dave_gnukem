@@ -6,15 +6,26 @@ Copyright (C) 1995-2022 David Joffe
 Created: '95/07/20 (originally as a test keyboard interrupt hook)
 */
 
-#include <stdlib.h>
+#include "../config.h"
+//#include <stdlib.h>
 #include <string.h>
 #include "../djinput.h"
-#include "../djgraph.h"
 #include "../djlog.h"
+#ifdef __OS2__
+#include <SDL/SDL_timer.h>//dj2022-11 for SDL_Delay (which may change eg cf. emscripten issues) ..
+#else
+#include <SDL_timer.h>//dj2022-11 for SDL_Delay (which may change eg cf. emscripten issues) ..
+#endif
 
 
 int g_iKeys[DJKEY_MAX] = { 0 };
 int g_iKeysLast[DJKEY_MAX] = { 0 };
+/*--------------------------------------------------------------------------*/
+//dj2022-11 slight refactoring to at least make these non-global, simple static class for now .. dj2022-11
+int djMouse::x = 0;
+int djMouse::y = 0;
+int djMouse::b = 0;
+/*--------------------------------------------------------------------------*/
 
 // This structure maps SDL key codes to DJ key codes
 SdjKeyMapping key_pairs[] =
@@ -253,11 +264,6 @@ const char *GetKeyString(int nSDLKeyCode)
 }
 
 /*--------------------------------------------------------------------------*/
-djVisual *g_pVisInput = NULL;
-int           mouse_x = 0;
-int           mouse_y = 0;
-int           mouse_b = 0;
-/*--------------------------------------------------------------------------*/
 
 bool djiPollEvents(SDL_Event &Event)
 {
@@ -291,20 +297,20 @@ bool djiPollEvents(SDL_Event &Event)
 			}
 			break;
 		case SDL_MOUSEMOTION:
-			mouse_x = Event.motion.x;
-			mouse_y = Event.motion.y;
+			djMouse::x = Event.motion.x;
+			djMouse::y = Event.motion.y;
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			if (Event.button.button==1) mouse_b |= 1;
-			if (Event.button.button==3) mouse_b |= 2;
-			mouse_x = Event.button.x;
-			mouse_y = Event.button.y;
+			if (Event.button.button==1) djMouse::b |= 1;
+			if (Event.button.button==3) djMouse::b |= 2;
+			djMouse::x = Event.button.x;
+			djMouse::y = Event.button.y;
 			break;
 		case SDL_MOUSEBUTTONUP:
-			if (Event.button.button==1) mouse_b &= ~1;
-			if (Event.button.button==3) mouse_b &= ~2;
-			mouse_x = Event.button.x;
-			mouse_y = Event.button.y;
+			if (Event.button.button==1) djMouse::b &= ~1;
+			if (Event.button.button==3) djMouse::b &= ~2;
+			djMouse::x = Event.button.x;
+			djMouse::y = Event.button.y;
 			break;
 		}
 		return true;
@@ -352,20 +358,20 @@ void djiPoll()
 		case SDL_QUIT:
 			break;
 		case SDL_MOUSEMOTION:
-			mouse_x = Event.motion.x;
-			mouse_y = Event.motion.y;
+			djMouse::x = Event.motion.x;
+			djMouse::y = Event.motion.y;
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			if (Event.button.button==1) mouse_b |= 1;
-			if (Event.button.button==3) mouse_b |= 2;
-			mouse_x = Event.button.x;
-			mouse_y = Event.button.y;
+			if (Event.button.button==1) djMouse::b |= 1;
+			if (Event.button.button==3) djMouse::b |= 2;
+			djMouse::x = Event.button.x;
+			djMouse::y = Event.button.y;
 			break;
 		case SDL_MOUSEBUTTONUP:
-			if (Event.button.button==1) mouse_b &= ~1;
-			if (Event.button.button==3) mouse_b &= ~2;
-			mouse_x = Event.button.x;
-			mouse_y = Event.button.y;
+			if (Event.button.button==1) djMouse::b &= ~1;
+			if (Event.button.button==3) djMouse::b &= ~2;
+			djMouse::x = Event.button.x;
+			djMouse::y = Event.button.y;
 			break;
 		}
 	}
@@ -374,14 +380,12 @@ void djiPoll()
 }
 /*--------------------------------------------------------------------------*/
 
-bool djiInit( djVisual *pVis )
+bool djiInit()
 {
-	g_pVisInput = pVis;
-
 	// Initialize mouse variables
-	mouse_b = 0;  // button
-	mouse_x = -1; // x
-	mouse_y = -1; // y
+	djMouse::b = 0;  // button
+	djMouse::x = -1; // x
+	djMouse::y = -1; // y
 
 	return true;
 }
@@ -398,18 +402,6 @@ void djiWaitForKeyUp(unsigned char cKey)
 		djiPoll();
 	} while (g_iKeys[cKey]);
 }
-
-/*
-bool djiAnyKeyDown()
-{
-	int i,r=0;
-	for (i = 0;i<128;++i)
-	{
-		r = r | g_iKeys[i];
-	}
-	return(r!=0);
-}
-*/
 
 bool djiKeyDown(int iScanCode)
 {

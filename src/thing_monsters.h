@@ -10,6 +10,7 @@ Copyright (C) 1999-2018 David Joffe
 #ifndef _THING_MONSTERS_H_
 #define _THING_MONSTERS_H_
 
+#include "config.h"
 #include "thing.h"
 
 /*-----------------------------------------------------------*/

@@ -159,6 +159,9 @@ bool djGraphicsSystem::m_bFullscreen = false;
 bool djGraphicsSystem::m_bInitialized = false;
 void djGraphicsSystem::ToggleFullscreen()
 {
+#if defined(djCFG_FORCE_FULLSCREEN_ALWAYS) || defined(djCFG_FORCE_WINDOWED_ALWAYS)
+	// do nothing here
+#else
 	if (!IsInitialized()) return;
 	// Clear texture cache
 	// fixme auto delete and recreate hardware texture cache here?
@@ -167,6 +170,7 @@ void djGraphicsSystem::ToggleFullscreen()
 	m_bFullscreen = !m_bFullscreen;
 	djGraphicsSystem::GraphInit(m_bFullscreen, m_nW, m_nH, m_nForceScale);
 	djImageHardwareSurfaceCache::RecreateHardwareSurfaces();
+#endif
 }
 
 bool djSDLInit()
@@ -191,6 +195,12 @@ bool djSDLDone()
 
 bool djGraphicsSystem::GraphInit( bool bFullScreen, int iWidth, int iHeight, int nForceScale )
 {
+	#ifdef djCFG_FORCE_FULLSCREEN_ALWAYS
+	bFullScreen = true;//dj2022-11
+	#endif
+	#ifdef djCFG_FORCE_WINDOWED_ALWAYS
+	bFullScreen = false;//dj2022-11
+	#endif
 	djGraphicsSystem::m_bInitialized = false;
 	// Remember requested base settings for later fullscreen toggle [dj2022-11]
 	djGraphicsSystem::m_bFullscreen = bFullScreen;

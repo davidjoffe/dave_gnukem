@@ -19,9 +19,9 @@
 #include <unistd.h>
 #endif
 
-//#ifdef EXPERIMENTAL_MAP_AUTO_DROPSHADOWS
+#ifdef djMAP_AUTO_DROPSHADOWS
 #include <map>//For map auto-shadows' [dj2018-01]
-//#endif
+#endif
 
 //dj2022-11 adding this into official but still off by default for now as is a bit a bit beta and needs more testing and not sure if i like it yet .. dj2022-11:
 #define djBETA_SHADOWFOLLOWEFFECT2020
@@ -153,9 +153,17 @@ SOUND_HANDLE g_iSounds[SOUND_MAX]={0};
 
 // some game constants
 
+// dj2022-11 comments: A question I sometime see is 'Why 18 frames per second' (and sometimes criticism) and of course many players feel that sucks by modern standards, the reason is twofold:
+// (1) I want to mimic Duke Nukem 'look and feel' of gameplay
+// (2) I always subjectively felt like DN1 was running 'around' 18Hz but never literally never confirmed this in any technical (I suspect they may have used the old IBM PC timer chip stuff which was 18Hz .. e.g. if you run DN1 in DosBox it doesn't run superfast it still runs 'correctly' at about the same speed it did in the old days)
+// In theory though we can uncap the frame rate here for much higher frame rates (and potential smooth scrolling) a lot of other parts of the code need to be refactored a bit to handle that more correctly/differently, as currently if you uncap it it just everything runs super-fast but with the same "klunky" 8-pixel or 16-pixel 'jumps' in scrolling etc. (because it's a retro nostalgic experience mimicking DN1)
+
 // Yeah its pretty low but thats what I was aiming for back in the EGA days
 // and I don't feel like changing it right now. I might still though.
 float g_fFrameRate=18.0f;
+//float g_fFrameRate=18.2f;
+//float g_fFrameRate = 36.f;
+// Hmm https://retrocomputing.stackexchange.com/questions/1428/why-is-the-8254s-default-rate-18-2-hz should it be 18.2 not 18?
 
 #define MAX_HEALTH (10)
 #define HEALTH_INITIAL MAX_HEALTH
@@ -341,27 +349,6 @@ bool g_bAutoShadows = true;
 bool g_bSpriteDropShadows = true;
 
 /*--------------------------------------------------------------------------*/
-struct SMenuItem gameMenuItems[] =
-{
-	{ false, "                   " },
-	{ true,  "   Continue        " },
-	{ true,  "   Save Game       " },
-	{ true,  "   Restore Game    " },
-	{ true,  "   Instructions    " },
-	{ true,  "   Retro Settings  ", "show_retrosettings_menu" },//dj2019-06 new
-#ifdef djBETA_SHADOWFOLLOWEFFECT2020
-	{ true,  "   Shadow effect   ", "setting/betashadoweffect" },
-#endif
-#ifdef djEXPERIMENTAL_FULLSCREEN_TOGGLE//dj2022-11 will think about these names, hmm
-	{ true,  "   Fullscreen      ", "ingame/toggle_fullscreen" },//Hmm note some consoles/ports might only work in fullscreen mode or something? should have 
-#endif
-	{ true,  "   Abort Game      ", "ingame/abort_game" },
-	{ false, "                   " },
-	{ false, NULL }
-};
-unsigned char gameMenuCursor[] = { 128, 129, 130, 131, 0 };
-CMenu gameMenu ( "game.cpp:gameMenu" );
-/*--------------------------------------------------------------------------*/
 
 //global 4-block sprite animation offset counter for various things
 int anim4_count = 0;
@@ -386,7 +373,7 @@ int g_nHealthOld = 0;
 
 
 /*-----------------------------------------------------------*/
-#if defined(djEXPERIMENTAL_FULLSCREEN_TOGGLE) && defined(djDEV_STRESSTESTS)
+#if defined(djINGAME_FULLSCREEN_TOGGLE) && defined(djDEV_STRESSTESTS)
 //dj2022-11 add quick n dirty stress-tester to help test in-game fullscreen toggle robustness  [todo lwo move stress tests to seprate .cpp files?]
 bool djStressTestInGameFullscreenToggle(float fDT)
 {
@@ -993,14 +980,6 @@ void GameInitialSetup()
 	InitHighScores();
 	LoadHighScores();		// Load high scores
 
-	// Set up the in-game menu
-	gameMenu.setClrBack( djColor(48,66,128) );
-	gameMenu.setSize(0);
-	gameMenu.setItems(gameMenuItems);
-	gameMenu.setMenuCursor(gameMenuCursor);
-	gameMenu.setXOffset(-1); // Calculate menu position for us
-	gameMenu.setYOffset(-1);
-
 	SYS_Debug ( "GameInitialSetup(): loading sounds\n" );
 	// Load the game sounds
 	int i;
@@ -1180,7 +1159,7 @@ void PerLevelSetup()
 	}
 	g_pLevel = apLevels[0];
 
-#ifdef EXPERIMENTAL_MAP_AUTO_DROPSHADOWS
+#ifdef djMAP_AUTO_DROPSHADOWS
 	/*
 	HOW THIS WORKS:
 	[See also streams of 12&13 Jan 2018 where this was implemented. - dj2018-01]
@@ -1479,16 +1458,17 @@ int game_startup(bool bLoadGame)
 								g_bEnableDebugStuff = true;
 								ShowGameMessage("DebugStuff Enabled", 64);
 							}
-#ifdef djEXPERIMENTAL_FULLSCREEN_TOGGLE//dj2022-11
-							else if (Event.key.keysym.sym == SDLK_f)
+#ifdef djINGAME_FULLSCREEN_TOGGLE//dj2022-11
+//dj2022 do we really need to waste yet another key shortcut etc. just for live fullscreen toggle we can do from the ingame menu? what if porters using 'f' and its causing conflict?
+/*							else if (Event.key.keysym.sym == SDLK_f)
 							{
 								//dj2022-11 experimental toggle fullscreen probably going to crash a lot
 								djGraphicsSystem::ToggleFullscreen();
 								RedrawEverythingHelper();
 								bForceUpdate = true;
 								//return;
-							}
-#endif//djEXPERIMENTAL_FULLSCREEN_TOGGLE
+							}*/
+#endif//djINGAME_FULLSCREEN_TOGGLE
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
 							else if (Event.key.keysym.sym==SDLK_w)
 							{
@@ -1893,7 +1873,7 @@ int game_startup(bool bLoadGame)
 		fTLast = fT1;
 
 		//dj2022-11 add quick n dirty stress-tester to help test in-game fullscreen toggle robustness
-#if defined(djEXPERIMENTAL_FULLSCREEN_TOGGLE) && defined(djDEV_STRESSTESTS)
+#if defined(djINGAME_FULLSCREEN_TOGGLE) && defined(djDEV_STRESSTESTS)
 		if (djStressTestInGameFullscreenToggle(fDT))
 		{
 			// If toggled
@@ -2426,111 +2406,111 @@ void GameDrawView()
 								nXOffset, nYOffset,
 								BLOCKW,BLOCKH );
 						}
+					}
 
 #ifdef djBETA_SHADOWFOLLOWEFFECT2020
-						// These shadowings look crap in simulated EGA/CGA retro so don't do if g_nSimulatedGraphics!=0
-						//const bool bBackgroundSolid = CHECK_SOLID( a, b );
-						extern int g_nSimulatedGraphics;
-						if (g_Effect.m_nEnabledIntensity!=0 && g_nSimulatedGraphics==0 && g_Effect.m_pShadows!=nullptr && CHECK_SOLID(a, b)==0)//<-only non-solid blocks
+					// These shadowings look crap in simulated EGA/CGA retro so don't do if g_nSimulatedGraphics!=0
+					//const bool bBackgroundSolid = CHECK_SOLID( a, b );
+					extern int g_nSimulatedGraphics;
+					if (g_Effect.m_nEnabledIntensity!=0 && g_nSimulatedGraphics==0 && g_Effect.m_pShadows!=nullptr && CHECK_SOLID(a, b)==0)//<-only non-solid blocks
+					{
+						// DARK effect: nHIGH=180, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 130.0f
+						// SUBTLE, light effect:  nHIGH=262, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 110.0f
+						// ALSO OK, light effect: nHIGH=262, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 160.0f
+
+						const int nHIGH = g_Effect.nHIGH;// 180;
+						const float fFADEOVERNUMBLOCKS = g_Effect.fFADEOVERNUMBLOCKS;// 7.2f;
+						//const float fLOWRANGEEXTENT = 160.0f; // Higher numbers toward 250 make for very dark 'corners' .. lower numbers around 100 etc. make for more subtle effect
+						const float fLOWRANGEEXTENT = g_Effect.fLOWRANGEEXTENT;// 130.0f; // Higher numbers toward 250 make for very dark 'corners' .. lower numbers around 100 etc. make for more subtle effect
+						const int SHADSIZE = g_Effect.SHADSIZE;
+
+						// SUBTLE, light effect:  const int nHIGH = 262; const float fFADEOVERNUMBLOCKS = 7.2f; const float fLOWRANGEEXTENT = 110.0f;
+
+						float fBlockWorldXStart = (float)(j + g_Viewport.xo) * (float)BLOCKW;
+						float fBlockWorldY = (float)(i + g_Viewport.yo) * (float)BLOCKH;
+						//const float fHeroWorldX = (float)(HERO_PIXELX) + ((float)BLOCKW/2.0f);
+						//const float fHeroWorldY = (float)(HERO_PIXELY) + (float)BLOCKH;
+						const float fHeroWorldX = ( (float)(g_Viewport.xo) + ((float)VIEW_WIDTH)/2.0f ) * (float)BLOCKW;
+						const float fHeroWorldY = ( (float)(g_Viewport.yo) + ((float)VIEW_HEIGHT)/2.0f ) * (float)BLOCKH;
+
+						int nIntensity = 0;//0-255, 0 is darkness, 255 is fully lit (or rather, no darkness)
+						float fDistance = 0.0f;
+
+						SDL_Rect rectSrc;
+						//rectSrc.x = (nIntensity % 16) * SHADSIZE;
+						//rectSrc.y = (nIntensity / 16) * SHADSIZE;
+						rectSrc.w = SHADSIZE;
+						rectSrc.h = SHADSIZE;
+						SDL_Rect rectDest;
+						//rectDest.x = nXOffset;
+						rectDest.y = nYOffset;
+						rectDest.w = SHADSIZE;
+						rectDest.h = SHADSIZE;
+						//const float fFACTOR = 1.0f;
+						///// dj2022-11 TODO could should this factor stuff should what, be table-driven for speed reasons?
+						const float fFACTOR = 0.9f;//dj2022-11 added this 0.9f factor but can't remember exactly why, basically in my original  tests on the effect this was 1 then I changed it to 0.9 maybe later just try see if i can remember why and what value it should be
+						for (int nY = 0; nY < BLOCKH; nY += SHADSIZE)
 						{
-							// DARK effect: nHIGH=180, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 130.0f
-							// SUBTLE, light effect:  nHIGH=262, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 110.0f
-							// ALSO OK, light effect: nHIGH=262, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 160.0f
+							rectDest.x = nXOffset;
+							float fBlockWorldX = fBlockWorldXStart;
 
-							const int nHIGH = g_Effect.nHIGH;// 180;
-							const float fFADEOVERNUMBLOCKS = g_Effect.fFADEOVERNUMBLOCKS;// 7.2f;
-							//const float fLOWRANGEEXTENT = 160.0f; // Higher numbers toward 250 make for very dark 'corners' .. lower numbers around 100 etc. make for more subtle effect
-							const float fLOWRANGEEXTENT = g_Effect.fLOWRANGEEXTENT;// 130.0f; // Higher numbers toward 250 make for very dark 'corners' .. lower numbers around 100 etc. make for more subtle effect
-							const int SHADSIZE = g_Effect.SHADSIZE;
-
-							// SUBTLE, light effect:  const int nHIGH = 262; const float fFADEOVERNUMBLOCKS = 7.2f; const float fLOWRANGEEXTENT = 110.0f;
-
-							float fBlockWorldXStart = (float)(j + g_Viewport.xo) * (float)BLOCKW;
-							float fBlockWorldY = (float)(i + g_Viewport.yo) * (float)BLOCKH;
-							//const float fHeroWorldX = (float)(HERO_PIXELX) + ((float)BLOCKW/2.0f);
-							//const float fHeroWorldY = (float)(HERO_PIXELY) + (float)BLOCKH;
-							const float fHeroWorldX = ( (float)(g_Viewport.xo) + ((float)VIEW_WIDTH)/2.0f ) * (float)BLOCKW;
-							const float fHeroWorldY = ( (float)(g_Viewport.yo) + ((float)VIEW_HEIGHT)/2.0f ) * (float)BLOCKH;
-
-							int nIntensity = 0;//0-255, 0 is darkness, 255 is fully lit (or rather, no darkness)
-							float fDistance = 0.0f;
-
-							SDL_Rect rectSrc;
-							//rectSrc.x = (nIntensity % 16) * SHADSIZE;
-							//rectSrc.y = (nIntensity / 16) * SHADSIZE;
-							rectSrc.w = SHADSIZE;
-							rectSrc.h = SHADSIZE;
-							SDL_Rect rectDest;
-							//rectDest.x = nXOffset;
-							rectDest.y = nYOffset;
-							rectDest.w = SHADSIZE;
-							rectDest.h = SHADSIZE;
-							//const float fFACTOR = 1.0f;
-							///// dj2022-11 TODO could should this factor stuff should what, be table-driven for speed reasons?
-							const float fFACTOR = 0.9f;//dj2022-11 added this 0.9f factor but can't remember exactly why, basically in my original  tests on the effect this was 1 then I changed it to 0.9 maybe later just try see if i can remember why and what value it should be
-							for (int nY = 0; nY < BLOCKH; nY += SHADSIZE)
+							//for (int nX = 0; nX < BLOCKW; nX += SHADSIZE)
 							{
-								rectDest.x = nXOffset;
-								float fBlockWorldX = fBlockWorldXStart;
-
-								//for (int nX = 0; nX < BLOCKW; nX += SHADSIZE)
+								fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
+								nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
+								if (nIntensity<0)nIntensity=0;
+								if (nIntensity<255)
 								{
-									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
-									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
-									if (nIntensity<0)nIntensity=0;
-									if (nIntensity<255)
-									{
-										rectSrc.x = (nIntensity % 16) * SHADSIZE;
-										rectSrc.y = (nIntensity / 16) * SHADSIZE;
-										SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
-									}
-
-									rectDest.x += SHADSIZE;
-									fBlockWorldX += (float)SHADSIZE;
-
-									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
-									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
-									if (nIntensity<0)nIntensity=0;
-									if (nIntensity<255)
-									{
-										rectSrc.x = (nIntensity % 16) * SHADSIZE;
-										rectSrc.y = (nIntensity / 16) * SHADSIZE;
-										SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
-									}
-
-									rectDest.x += SHADSIZE;
-									fBlockWorldX += (float)SHADSIZE;
-
-									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
-									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
-									if (nIntensity<0)nIntensity=0;
-									if (nIntensity<255)
-									{
-										rectSrc.x = (nIntensity % 16) * SHADSIZE;
-										rectSrc.y = (nIntensity / 16) * SHADSIZE;
-										SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
-									}
-
-									rectDest.x += SHADSIZE;
-									fBlockWorldX += (float)SHADSIZE;
-
-									fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
-									nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
-									if (nIntensity<0)nIntensity=0;
-									if (nIntensity<255)
-									{
-										rectSrc.x = (nIntensity % 16) * SHADSIZE;
-										rectSrc.y = (nIntensity / 16) * SHADSIZE;
-										SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
-									}
+									rectSrc.x = (nIntensity % 16) * SHADSIZE;
+									rectSrc.y = (nIntensity / 16) * SHADSIZE;
+									SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
 								}
-								
-								rectDest.y += SHADSIZE;
-								fBlockWorldY += (float)SHADSIZE;
+
+								rectDest.x += SHADSIZE;
+								fBlockWorldX += (float)SHADSIZE;
+
+								fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
+								nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
+								if (nIntensity<0)nIntensity=0;
+								if (nIntensity<255)
+								{
+									rectSrc.x = (nIntensity % 16) * SHADSIZE;
+									rectSrc.y = (nIntensity / 16) * SHADSIZE;
+									SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
+								}
+
+								rectDest.x += SHADSIZE;
+								fBlockWorldX += (float)SHADSIZE;
+
+								fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
+								nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
+								if (nIntensity<0)nIntensity=0;
+								if (nIntensity<255)
+								{
+									rectSrc.x = (nIntensity % 16) * SHADSIZE;
+									rectSrc.y = (nIntensity / 16) * SHADSIZE;
+									SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
+								}
+
+								rectDest.x += SHADSIZE;
+								fBlockWorldX += (float)SHADSIZE;
+
+								fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
+								nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
+								if (nIntensity<0)nIntensity=0;
+								if (nIntensity<255)
+								{
+									rectSrc.x = (nIntensity % 16) * SHADSIZE;
+									rectSrc.y = (nIntensity / 16) * SHADSIZE;
+									SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
+								}
 							}
+								
+							rectDest.y += SHADSIZE;
+							fBlockWorldY += (float)SHADSIZE;
 						}
-#endif//#ifdef djBETA_SHADOWFOLLOWEFFECT2020
 					}
+#endif//#ifdef djBETA_SHADOWFOLLOWEFFECT2020
 				}
 
 				// BLOCK[0,1] -> foreground block
@@ -2594,7 +2574,8 @@ void GameDrawView()
 		{
 			--g_nHeroJustFiredWeaponCounter;
 			int nOffs = (hero_picoffs+1)%4;
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
+			// 'Sprite auto dropshadows' effect
 			DRAW_SPRITEA_SHADOW(pVisView,4,  g_Player.hero_dir*16+nOffs*4,1+xoff       ,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
 			DRAW_SPRITEA_SHADOW(pVisView,4,2+g_Player.hero_dir*16+nOffs*4,1+xoff       ,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
 			DRAW_SPRITEA_SHADOW(pVisView,4,1+g_Player.hero_dir*16+nOffs*4,1+xoff+BLOCKW,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
@@ -2607,7 +2588,8 @@ void GameDrawView()
 		}
 		else
 		{
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
+			// 'Sprite auto dropshadows' effect
 			DRAW_SPRITEA_SHADOW(pVisView,4,  g_Player.hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
 			DRAW_SPRITEA_SHADOW(pVisView,4,2+g_Player.hero_dir*16+hero_picoffs*4,1+xoff       ,1+yoff+BLOCKH+g_Player.y_offset,BLOCKW,BLOCKH-1);
 			DRAW_SPRITEA_SHADOW(pVisView,4,1+g_Player.hero_dir*16+hero_picoffs*4,1+xoff+BLOCKW,1+yoff       +g_Player.y_offset,BLOCKW,BLOCKH);
@@ -3256,6 +3238,51 @@ void ShowGameMessage(const char *szMessage, int nFrames)
 //-------------------------------------------------------
 void IngameMenu()
 {
+	//dj2022-11 Just made gameMenuItems stuff non-global and function scope so I can more easily add 'on/off' info .. but should think about all that
+	/*--------------------------------------------------------------------------*/
+	const std::string sAutoShadows = (g_bAutoShadows ? "   Auto shadows: on    " : "   Auto shadows: off   ");
+#ifdef djSPRITE_AUTO_DROPSHADOWS
+	const std::string sSpriteShadows = (g_bSpriteDropShadows ? "   Sprite shadows: on  " : "   Sprite shadows: off ");
+#endif
+	struct SMenuItem gameMenuItems[] =
+	{
+		{ false, "                       " },
+		{ true,  "   Continue            " },
+		{ true,  "   Save Game           " },
+		{ true,  "   Restore Game        " },
+		{ true,  "   Instructions        " },
+		{ true,  "   Retro Settings      ", "show_retrosettings_menu" },//dj2019-06 new
+		#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+		{ true,  "   Viewport shadow     ", "setting/betashadoweffect" },
+		#endif
+		{ true,  sAutoShadows.c_str(), "setting/autoshadows" },
+		#ifdef djSPRITE_AUTO_DROPSHADOWS
+		{ true,  sSpriteShadows.c_str(), "setting/spriteshadows" },
+		#endif
+		#if defined(djCFG_FORCE_FULLSCREEN_ALWAYS) || defined(djCFG_FORCE_WINDOWED_ALWAYS)
+		#else
+		#ifdef djINGAME_FULLSCREEN_TOGGLE//dj2022-11 will think about these names, hmm
+		{ true,  "   Fullscreen          ", "ingame/toggle_fullscreen" },//Hmm note some consoles/ports might only work in fullscreen mode or something? should have 
+		#endif
+		#endif
+		{ true,  "   Abort Game          ", "ingame/abort_game" },
+		{ false, "                       " },
+		{ false, NULL }
+	};
+	const unsigned char gameMenuCursor[] = { 128, 129, 130, 131, 0 };
+	CMenu gameMenu("game.cpp:gameMenu");
+
+	// Set up the in-game menu
+	gameMenu.setClrBack(djColor(48, 66, 128));
+	gameMenu.setSize(0);
+	gameMenu.setItems(gameMenuItems);
+	gameMenu.setMenuCursor(gameMenuCursor);
+	gameMenu.setXOffset(-1); // Calculate menu position for us
+	gameMenu.setYOffset(-1);
+	/*--------------------------------------------------------------------------*/
+
+
+
 	int nMenuOption = do_menu( &gameMenu );
 	//dj2022-11 testing moving away from gross hardcoded numbers for menu return values but only a few implemented so far ..
 	// hm should maybe make a new small wrapper for this
@@ -3275,7 +3302,30 @@ void IngameMenu()
 		return;
 	}
 #endif
-#ifdef djEXPERIMENTAL_FULLSCREEN_TOGGLE
+
+	// 'auto dropshadows' effect (on level parts)
+	if (sSelectedMenuCommand == "setting/autoshadows")
+	{
+		g_bAutoShadows = !g_bAutoShadows;
+		std::string sMsg = "Auto shadow effect setting turned ";
+		if (g_bAutoShadows) sMsg += "OFF"; else sMsg += "ON";
+		SetConsoleMessage(sMsg);
+		return;
+	}
+
+#ifdef djSPRITE_AUTO_DROPSHADOWS
+	// 'Sprite auto dropshadows' effect
+	if (sSelectedMenuCommand == "setting/spriteshadows")
+	{
+		g_bSpriteDropShadows = !g_bSpriteDropShadows;
+		std::string sMsg = "Sprite shadow effect setting turned ";
+		if (g_bSpriteDropShadows) sMsg += "OFF"; else sMsg += "ON";
+		SetConsoleMessage(sMsg);
+		return;
+	}
+#endif
+
+#ifdef djINGAME_FULLSCREEN_TOGGLE
 	if (sSelectedMenuCommand == "ingame/toggle_fullscreen")
 	{
 		//dj2022-11 experimental toggle fullscreen probably going to crash a lot

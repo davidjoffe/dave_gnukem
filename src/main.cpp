@@ -356,7 +356,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 	//-- Initialize input devices
 	djLOGSTR("DaveStartup(): Initializing keys ..\n");
-	if (!djiInit( pVisMain ))
+	if (!djiInit())
 		return -1;
 
 	InitMainMenu();			// fill the structures and load some stuff
@@ -419,12 +419,12 @@ void SettingsMenu()
 	struct SMenuItem SettingsMenuItems[] =
 	{
 		// this looks very weird; need to fix menu code to handle this better, or wrap setttingsmenu in additional UI stuff
-		//{ false, "                                     " },//(DJ2019-06 low prio, at some stage want to fix up menu code so we can space / layout this thing properly - either that, or change how it draws the background)
-		{ false, " retro user experience settings      " },
+		{ false, " " },//(DJ2019-06 low prio, at some stage want to fix up menu code so we can space / layout this thing properly - either that, or change how it draws the background)
+		{ false, " Retro user experience settings  " },
 		//{ false, "                                     " },
-		{ true,  "   Mild (Default graphics)           " },
-		{ true,  "   Medium (EGA) (simulated 16-color) " },
-		{ true,  "   High (CGA) (simulated 4-color)    " },
+		{ true,  "   Mild (Default graphics)          ", "settings/retro/default" },
+		{ true,  "   Medium (EGA) (simulated 16-color)", "settings/retro/ega" },
+		{ true,  "   High (CGA) (simulated 4-color)   ", "settings/retro/cga" },
 		//{ false, "                                     " },
 		{ false, "                                     " },
 		{ false, NULL }
@@ -440,19 +440,18 @@ void SettingsMenu()
 	Menu.setXOffset(-1); // Calculate menu position for us
 	Menu.setYOffset(-1);
 
+	//dj2022-11 refactoring
 	int nMenuOption = do_menu( &Menu );
-	switch (nMenuOption)
-	{
-	case 1:
+	std::string sSelectedMenuCommand;
+	if (nMenuOption >= 0 && Menu.getItems()[nMenuOption].m_szRetVal != nullptr)
+		sSelectedMenuCommand = Menu.getItems()[nMenuOption].m_szRetVal;
+	
+	if (sSelectedMenuCommand == "settings/retro/default")
 		g_nSimulatedGraphics = 0;
-		break;
-	case 2:
+	else if (sSelectedMenuCommand == "settings/retro/ega")
 		g_nSimulatedGraphics = 1;
-		break;
-	case 3:
+	else if (sSelectedMenuCommand == "settings/retro/cga")
 		g_nSimulatedGraphics = 2;
-		break;
-	}
 }
 
 void DoMainMenu()

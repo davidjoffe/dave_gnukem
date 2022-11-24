@@ -3,6 +3,7 @@ Copyright (C) 1998-2022 David Joffe
 New level editor started: 1998/12/31
 */
 
+#include "config.h"
 #include "ed.h"
 #include "ed_spred.h"
 #include "ed_lvled.h"

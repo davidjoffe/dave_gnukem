@@ -4,6 +4,7 @@ djstring.cpp
 Copyright (C) 1998-2022 David Joffe
 */
 
+#include "config.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
