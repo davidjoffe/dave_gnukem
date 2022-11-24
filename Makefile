@@ -88,7 +88,7 @@ OBJFILES = src/main.o     src/graph.o   src/game.o         src/menu.o\
 default: gnukem
 
 gnukem: $(OBJFILES)
-	$(CPP) -o $(BIN) $(OBJFILES) $(LIBS)
+	$(CPP) -o $(BIN) $(OBJFILES) $(LIBS) $(CCFLAGS)
 
 clean:
 	rm -f $(BIN) *~ core \#*
