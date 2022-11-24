@@ -11,6 +11,24 @@
 CPP = g++
 CC = gcc
 
+djLIBS2=
+djCCFLAGS2=
+djUSE_UNICODE=n
+################################# dj2022-11 BETA
+# dj2022-22 BETA development experimental new TTF TrueType font and Unicode support etc. set to y to enable (NOT in current production Dave Gnukem still very beta)
+#djUSE_UNICODE=y
+
+ifeq ($(djUSE_UNICODE),y)
+    djLIBS_TTF= -lSDL2_ttf 
+    djLIBS2+= $(djLIBS_TTF) 
+
+    djLIBS_UTF8PROC= -lutf8proc 
+    djLIBS2+= $(djLIBS_UTF8PROC) 
+
+    djCCFLAGS2+= -DdjUNICODE_SUPPORT 
+endif
+#################################
+
 
 # dj2016-10 Add L -I/usr/local/include/SDL in process of getting this working on Mac OS X - not sure if this is 'bad' to just have both /usr/include and /usr/local/include??
 INCLUDEDIRS= -I/usr/include/SDL2 -I/usr/local/include/SDL2
@@ -22,10 +40,15 @@ INCLUDEDIRS= -I/usr/include/SDL2 -I/usr/local/include/SDL2
 # to be in current directory
 #CCFLAGS = -Wall -I/usr/local/include -DHAVE_SOUND -DDEBUG -O -m486
 CCFLAGS = -std=c++11 -Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
+
+################################# dj2022-11 BETA
+CCFLAGS += $(djCCFLAGS2)
+#################################
+
 #Release version:
 #CCFLAGS = -O -Wall -I/usr/local/include -DHAVE_SOUND $(INCLUDEDIRS)
 
-LIBS = -lSDL2 -lSDL2_mixer -lpthread
+LIBS = -lSDL2 -lSDL2_mixer $(djLIBS2) -lpthread
 BIN = davegnukem
 
 
