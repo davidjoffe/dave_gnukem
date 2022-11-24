@@ -40,6 +40,9 @@
 //! dj2022-11 experimental live in-game fullscreen toggle (off by default for now, needs some more testing ..
 //#define djEXPERIMENTAL_FULLSCREEN_TOGGLE
 
+//! dj2022-11 start adding some simple stress tests (probably not for actual release/production builds? dev testing only? debatable, or maybe some can be some not)
+//#define djDEV_STRESSTESTS
+
 //! dj2018-01 Experimental auto drop shadows in sprites
 #define EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
 #define EXPERIMENTAL_MAP_AUTO_DROPSHADOWS

@@ -57,6 +57,7 @@ public:
 		pixwidth = 0;
 		m_bFullscreen = false;
 	}
+	SDL_Window* pWindow = nullptr;//dj2022-11 for in-game fullscreen toggle stuff (so we can clean up with SDL_DestroyWindow)
 	SDL_Surface *pSurface = nullptr;
 	SDL_Renderer *pRenderer = nullptr;
 	SDL_Texture *pTexture = nullptr;
