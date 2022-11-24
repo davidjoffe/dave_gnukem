@@ -798,39 +798,39 @@ switch_e LVLED_MainLoop ()
 
 
 
-		if ( (mouse_x >= 0) && (mouse_y >= 0) )
+		if ( (djMouse::x >= 0) && (djMouse::y >= 0) )
 		{
 // TODO: no level filling at this point. Put it back here whenever possible.
 			if (g_iKeys[DJKEY_F])
 			{
 				// if mouse in main level view
-				if (INBOUNDS(mouse_x, mouse_y, 0, 0, LEVEL_WIDTH*LEVEL_GRIDSIZE - 1, LEVEL_HEIGHT*LEVEL_GRIDSIZE - 1))
+				if (INBOUNDS(djMouse::x, djMouse::y, 0, 0, LEVEL_WIDTH*LEVEL_GRIDSIZE - 1, LEVEL_HEIGHT*LEVEL_GRIDSIZE - 1))
 				{
-					LevelFill( mouse_x / LEVEL_GRIDSIZE, mouse_y / LEVEL_GRIDSIZE );
+					LevelFill(djMouse::x / LEVEL_GRIDSIZE, djMouse::y / LEVEL_GRIDSIZE );
 				}
 				// if mouse in zoom level view
 				else if (
-						INBOUNDS( mouse_x, mouse_y,
+						INBOUNDS(djMouse::x, djMouse::y,
 					POS_LEVELVIEW_X, POS_LEVELVIEW_Y,
 					POS_LEVELVIEW_X + levelview_w * 16 - 1,
 					POS_LEVELVIEW_Y + levelview_h * 16 - 1 ))
 				{
 					LevelFill(
-						levelview_x + (mouse_x-POS_LEVELVIEW_X) / 16,
-						levelview_y + (mouse_y-POS_LEVELVIEW_Y) / 16 );
+						levelview_x + (djMouse::x-POS_LEVELVIEW_X) / 16,
+						levelview_y + (djMouse::y-POS_LEVELVIEW_Y) / 16 );
 				}
 			}
 /**/
 		}
 
 		// If the mouse is inside the main level view, do some extra checking
-		if (INBOUNDS( mouse_x, mouse_y,
+		if (INBOUNDS(djMouse::x, djMouse::y,
 			POS_LEVELVIEW_X, POS_LEVELVIEW_Y,
 			POS_LEVELVIEW_X + levelview_w * 16 - 1,
 			POS_LEVELVIEW_Y + levelview_h * 16 - 1 ))
 		{
-			int iLevelX = levelview_x + (mouse_x-POS_LEVELVIEW_X) / 16;
-			int iLevelY = levelview_y + (mouse_y-POS_LEVELVIEW_Y) / 16;
+			int iLevelX = levelview_x + (djMouse::x-POS_LEVELVIEW_X) / 16;
+			int iLevelY = levelview_y + (djMouse::y-POS_LEVELVIEW_Y) / 16;
 			if (g_iKeys[DJKEY_1]) PlaceMacro( iLevelX, iLevelY, 0 );
 			if (g_iKeys[DJKEY_2]) PlaceMacro( iLevelX, iLevelY, 1 );
 			if (g_iKeys[DJKEY_3]) PlaceMacro( iLevelX, iLevelY, 2 );
@@ -979,19 +979,19 @@ bool HandleMouse ()
 	// sprites area
 	g_aMouseHighlighted = 0;
 	g_bMouseHighlighted = 0;
-	if (INBOUNDS( mouse_x, mouse_y,
+	if (INBOUNDS(djMouse::x, djMouse::y,
 		POS_LEVELSPRITES_X, POS_LEVELSPRITES_Y,
 		POS_LEVELSPRITES_X + SPRITESHEET_NUM_COLS * BLOCKW - 1,
 		POS_LEVELSPRITES_Y + SPRITESHEET_NUM_ROWS * BLOCKH - 1 ))
 	{
 		//a,b spriteset,spritenumber that mouse is floating over
-		ax = (mouse_x - POS_LEVELSPRITES_X) / BLOCKW;
-		ay = (mouse_y - POS_LEVELSPRITES_Y) / BLOCKH;
+		ax = (djMouse::x - POS_LEVELSPRITES_X) / BLOCKW;
+		ay = (djMouse::y - POS_LEVELSPRITES_Y) / BLOCKH;
 		g_aMouseHighlighted = ED_GetCurrSpriteSet();
 		g_bMouseHighlighted = ay * SPRITESHEET_NUM_COLS + ax;
-		if (mouse_b & 1)
+		if (djMouse::b & 1)
 			SetSpriteSelection( g_aMouseHighlighted, g_bMouseHighlighted, sprite1a, sprite1b );
-		else if (mouse_b & 2)
+		else if (djMouse::b & 2)
 			SetSpriteSelection( sprite0a, sprite0b, g_aMouseHighlighted, g_bMouseHighlighted );
 
 		// Rectangle around sprite under mouse
@@ -1011,38 +1011,38 @@ bool HandleMouse ()
 			ED_DrawString( 0, POS_LEVELSPRITES_Y+BLOCKH*SPRITESHEET_NUM_ROWS, sType.c_str() );
 	}
 	// main editting area
-	else if (INBOUNDS(mouse_x, mouse_y, 0, 0, LEVEL_WIDTH * LEVEL_GRIDSIZE - 1, LEVEL_HEIGHT * LEVEL_GRIDSIZE - 1))
+	else if (INBOUNDS(djMouse::x, djMouse::y, 0, 0, LEVEL_WIDTH * LEVEL_GRIDSIZE - 1, LEVEL_HEIGHT * LEVEL_GRIDSIZE - 1))
 	{
-		ax = mouse_x / LEVEL_GRIDSIZE;
-		ay = mouse_y / LEVEL_GRIDSIZE;
+		ax = djMouse::x / LEVEL_GRIDSIZE;
+		ay = djMouse::y / LEVEL_GRIDSIZE;
 		if (g_iKeys[DJKEY_ALT])
 		{
-			if (mouse_b & 1)
+			if (djMouse::b & 1)
 				MoveMinimap( ax - (levelview_w / 2),
 //				level_move_view( ax - (levelview_w / 2),
 				ay - (levelview_h / 2) );
 		}
-		else if (mouse_b & 1)
+		else if (djMouse::b & 1)
 		{
 			SetLevel( ax, ay, sprite0a, sprite0b, bLevelFore );
 			SetDocumentDirty();
 		}
-		else if (mouse_b & 2)
+		else if (djMouse::b & 2)
 		{
 			SetLevel( ax, ay, sprite1a, sprite1b, bLevelFore );
 			SetDocumentDirty();
 		}
 	}
 	// zoomed view area
-	else if (INBOUNDS( mouse_x, mouse_y,
+	else if (INBOUNDS(djMouse::x, djMouse::y,
 		POS_LEVELVIEW_X, POS_LEVELVIEW_Y,
 		POS_LEVELVIEW_X + levelview_w * BLOCKW - 1,
 		POS_LEVELVIEW_Y + levelview_h * BLOCKH - 1 ))
 	{
-		ax = (mouse_x - POS_LEVELVIEW_X) / BLOCKW;
-		ay = (mouse_y - POS_LEVELVIEW_Y) / BLOCKH;
+		ax = (djMouse::x - POS_LEVELVIEW_X) / BLOCKW;
+		ay = (djMouse::y - POS_LEVELVIEW_Y) / BLOCKH;
 		// dj2016-10: Hold in Ctrl+Alt and click with the mouse to automatically start level with hero 'dropped in' to the clicked position as starting position (to help with level editing / testing)
-		if ((mouse_b & 1)!=0 && g_iKeys[DJKEY_CTRL]!=0 && g_iKeys[DJKEY_ALT]!=0)
+		if ((djMouse::b & 1)!=0 && g_iKeys[DJKEY_CTRL]!=0 && g_iKeys[DJKEY_ALT]!=0)
 		{
 			extern int g_nOverrideStartX;
 			extern int g_nOverrideStartY;
@@ -1051,13 +1051,13 @@ bool HandleMouse ()
 			g_nOverrideStartY = levelview_y+ay;
 			return false;
 		}
-		else if (mouse_b & 1)
+		else if (djMouse::b & 1)
 		{
 			SetLevel( ax + levelview_x, ay + levelview_y,
 				sprite0a, sprite0b, bLevelFore );
 			SetDocumentDirty();
 		}
-		else if (mouse_b & 2)
+		else if (djMouse::b & 2)
 		{
 			SetLevel( ax + levelview_x, ay + levelview_y,
 				sprite1a, sprite1b, bLevelFore );
@@ -1306,13 +1306,13 @@ void DrawMinimap()
 	}
 
 	// If hold in Ctrl+Alt, draw hero overlay at mouse cursor position to indicate the new hero 'drop-in-level-here' functionality [dj2016-10]
-	if (INBOUNDS( mouse_x, mouse_y,
+	if (INBOUNDS(djMouse::x, djMouse::y,
 		POS_LEVELVIEW_X, POS_LEVELVIEW_Y,
 		POS_LEVELVIEW_X + levelview_w * BLOCKW - 1,
 		POS_LEVELVIEW_Y + levelview_h * BLOCKH - 1 ))
 	{
-		int ax = (mouse_x - POS_LEVELVIEW_X) / BLOCKW;
-		int ay = (mouse_y - POS_LEVELVIEW_Y) / BLOCKH;
+		int ax = (djMouse::x - POS_LEVELVIEW_X) / BLOCKW;
+		int ay = (djMouse::y - POS_LEVELVIEW_Y) / BLOCKH;
 		if (g_iKeys[DJKEY_CTRL]!=0 && g_iKeys[DJKEY_ALT]!=0)
 		{
 			// These sprite offsets etc. are horribly hardcoded [show hero sprite]

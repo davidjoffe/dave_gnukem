@@ -33,8 +33,8 @@ void InitCredits()
 	creditsMenu.setItems ( creditsMenuItems );
 	creditsMenu.setMenuCursor (creditsMenuCursor);
 	creditsMenu.setClrBack( djColor(0,0,0) );
-	creditsMenu.setXOffset (200);
-	creditsMenu.setYOffset (100);
+	creditsMenu.setXOffset (240);
+	creditsMenu.setYOffset (92);
 }
 
 void KillCredits()

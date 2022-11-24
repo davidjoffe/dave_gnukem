@@ -17,6 +17,11 @@ TODO:
 #include "sys_error.h"
 
 #include <stdio.h>		// sprintf (NB don't use sprintf anymore, use sprintfs etc.!)
+#ifdef __OS2__
+#include <SDL/SDL_timer.h>//dj2022-11 for SDL_Delay (which may change eg cf. emscripten issues) ..
+#else
+#include <SDL_timer.h>//dj2022-11 for SDL_Delay (which may change eg cf. emscripten issues) ..
+#endif
 
 
 #define POS_FLAGS ((POS_SPRITES_Y + 8 * 16) + 8)
@@ -166,27 +171,27 @@ void HandleMouse(bool bCtrl)
 
 	int ax, ay;
 	// inside the area for setting sprite type info?
-	if (INBOUNDS( mouse_x, mouse_y,
+	if (INBOUNDS( djMouse::x, djMouse::y,
 		POS_BLOCKTYPES_X - 8,
 		POS_BLOCKTYPES_Y,
 		POS_BLOCKTYPES_X + 16*8,
 		POS_BLOCKTYPES_Y + (TYPE_LASTONE+1) * 8 - 1))
 	{
-		if (mouse_b & 1)
+		if (djMouse::b & 1)
 		{
-			ay = (mouse_y - POS_BLOCKTYPES_Y) / 8;
+			ay = (djMouse::y - POS_BLOCKTYPES_Y) / 8;
 			SpriteSetType( ay );
 		}
 	}
 	// inside the area for adjusting sprite extras info?
-	else if (INBOUNDS( mouse_x, mouse_y,
+	else if (INBOUNDS( djMouse::x, djMouse::y,
 		POS_EXTRAS_X,
 		POS_EXTRAS_Y,
 		POS_EXTRAS_X + 9 * 8 - 1,
 		POS_EXTRAS_Y + 12 * 8 - 1 ))
 	{
-		ay = (mouse_y - POS_EXTRAS_Y) / 8;
-		if ((bCtrl || !bLastL) && (mouse_b & 1))       // left button = decrement
+		ay = (djMouse::y - POS_EXTRAS_Y) / 8;
+		if ((bCtrl || !bLastL) && (djMouse::b & 1))       // left button = decrement
 		{
 			ED_SetSpriteExtra( ED_GetCurrSpriteSet(), ED_GetCurrSprite(), ay,
 				ED_GetSpriteExtra( ED_GetCurrSpriteSet(), ED_GetCurrSprite(), ay ) - 1 );
@@ -196,7 +201,7 @@ void HandleMouse(bool bCtrl)
 			else
 				SDL_Delay( 10 );
 		}
-		else if ((bCtrl || !bLastR) && (mouse_b & 2))  // right button = increment
+		else if ((bCtrl || !bLastR) && (djMouse::b & 2))  // right button = increment
 		{
 			ED_SetSpriteExtra( ED_GetCurrSpriteSet(), ED_GetCurrSprite(), ay,
 				ED_GetSpriteExtra( ED_GetCurrSpriteSet(), ED_GetCurrSprite(), ay ) + 1 );
@@ -208,17 +213,17 @@ void HandleMouse(bool bCtrl)
 		}
 	}
 	// inside the area for editting flags?
-	else if (INBOUNDS( mouse_x, mouse_y, 0, POS_FLAGS, 10*8-1, POS_FLAGS+NUMFLAGS*8-1 ))
+	else if (INBOUNDS( djMouse::x, djMouse::y, 0, POS_FLAGS, 10*8-1, POS_FLAGS+NUMFLAGS*8-1 ))
 	{
-		ay = (mouse_y - POS_FLAGS) / 8;
-		if ( mouse_b & 1 ) // set flag
+		ay = (djMouse::y - POS_FLAGS) / 8;
+		if ( djMouse::b & 1 ) // set flag
 		{
 			ED_SetSpriteExtra( ED_GetCurrSpriteSet(), ED_GetCurrSprite(), 4,
 				ED_GetSpriteExtra( ED_GetCurrSpriteSet(), ED_GetCurrSprite(), 4 ) | (1 << ay) );
 			//	 sprite_set_extra( 4, sprite_get_extra( 4 ) | (1 << ay) );
 			SpriteDrawFlags();
 		}
-		else if ( mouse_b & 2 ) // clear flag
+		else if ( djMouse::b & 2 ) // clear flag
 		{
 			ED_SetSpriteExtra( ED_GetCurrSpriteSet(), ED_GetCurrSprite(), 4,
 				ED_GetSpriteExtra( ED_GetCurrSpriteSet(), ED_GetCurrSprite(), 4 ) & (~(1 << ay)) );
@@ -227,19 +232,19 @@ void HandleMouse(bool bCtrl)
 		}
 	}
 	// inside actual sprites area
-	else if (INBOUNDS( mouse_x, mouse_y,
+	else if (INBOUNDS( djMouse::x, djMouse::y,
 		POS_SPRITES_X, POS_SPRITES_Y,
 		POS_SPRITES_X + 16 * 16 - 1,
 		POS_SPRITES_Y + 16 * 8 - 1 ))
 	{
-		ax = (mouse_x - POS_SPRITES_X) / 16;
-		ay = (mouse_y - POS_SPRITES_Y) / 16;
-		if ( (mouse_b & 1) || (mouse_b & 2) )
+		ax = (djMouse::x - POS_SPRITES_X) / 16;
+		ay = (djMouse::y - POS_SPRITES_Y) / 16;
+		if ( (djMouse::b & 1) || (djMouse::b & 2) )
 			SetSprite( ay * 16 + ax );
 	}
 
-	bLastL = ((mouse_b & 1)!=0);
-	bLastR = ((mouse_b & 2)!=0);
+	bLastL = ((djMouse::b & 1)!=0);
+	bLastR = ((djMouse::b & 2)!=0);
 }
 
 
