@@ -202,14 +202,15 @@ void ShowHighScores()
 			aColorGrad.push_back(SDL_Color{ 233, 185, 139, 255 });
 			aColorGrad.push_back(SDL_Color{ 237, 217, 158, 255 });
 			std::string sText = g_aScores[i].szName;
-			//const std::string& text = asNamesTest[i % asNamesTest.size()];
-			//sText += " / ";
-			//sText += text;
-			//sText = g_aScores[i].szName;
 			// Get best matching font [this needs work]
 			TTF_Font* pFontMostChars = djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(apFonts, sText, sText.length());
-
 			const unsigned nXPOS = 24 + 11 * 8;
+			if (!pFontMostChars)//<- old fallback for safety in case something went wrong and we have no matching fonts
+			{
+				GraphDrawString(pVisBack, g_pFont8x8, nXPOS, nYSTART + i * nHEIGHTPERROW, (unsigned char*)g_aScores[i].szName);
+				continue;
+			}
+
 			//SDL_Surface* sur = TTF_RenderUNICODE_Blended_Wrapped(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
 			//SDL_Surface* sur = TTF_RenderUNICODE_Blended(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
 			//SDL_Surface* sur = TTF_RenderUTF8_Blended(pFontMostChars, sText.c_str(), SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
@@ -238,8 +239,8 @@ void ShowHighScores()
 				sur = nullptr;
 			}
 			//SDL_RenderCopy(pVisBack->pRenderer, tex, NULL, &rect);
-#endif
-		}
+#endif//#ifndef djUNICODE_TTF
+		}//i
 
 		GraphFlip(true);
 
