@@ -5,6 +5,10 @@
  * 2002-09-21: Changed from ed.cpp to ed_standalone_original.cpp.
  */
 /*--------------------------------------------------------------------------*/
+//dj2022-11 hm this file seemingly no longer used - in the early days the editor was a seperate application - someone else integrated it into the game itself
+// so this file is here only now for historical or reference purposes but can probably be deleted
+#define djED_STANDALONE_ORIGINAL_DISABLE
+#ifndef djED_STANDALONE_ORIGINAL_DISABLE
 #include "datadir.h"
 #include "djgamelib.h"
 #include <string.h>
@@ -1487,3 +1491,4 @@ void ShowMacros()
 	}
 }
 
+#endif

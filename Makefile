@@ -93,7 +93,6 @@ else
 endif
 
 
-# dj2022-11 in theory would be nice if OBJFILES list could be auto-generated from the presence of .c or .cpp files in the src folder so we could more easily add new .cpp files without having to update Makefiles
 
 OBJFILES = src/main.o     src/graph.o   src/game.o         src/menu.o\
            src/block.o    src/credits.o src/instructions.o src/djstring.o \
@@ -108,6 +107,15 @@ OBJFILES = src/main.o     src/graph.o   src/game.o         src/menu.o\
            src/sdl/djtime.o \
            src/sys_error.o src/sys_log.o src/m_misc.cpp
 
+# dj2022-11 old list of OBJFILES above - if the below code works generically on all platforms we can probably delete above line OBJFILES= with hardcoded list (more testing needed)
+# dj2022-11 Experimentally change this to try auto-generate this list from the presence of .cpp files in and under the src folder so we could more easily add new .cpp files without having to update Makefiles
+# Note on some platforms find might not be available .. should we try use Make wildcard thing rather .. hm ..dj2022-11. Not sure if the below will work right on Windows etc.
+#djSOURCES:=$(shell find src -type f -name *.cpp)
+djSOURCES=$(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
+djRELEASEOBJECTS=$(patsubst %.cpp,%.o,$(djSOURCES))
+OBJFILES = $(djRELEASEOBJECTS)
+
+
 default: gnukem
 
 gnukem: $(OBJFILES)
@@ -118,6 +126,7 @@ clean:
 	find src -name '*.o' | xargs rm -f
 
 # dj2022-11 do we even need this "make dist" is it used for anything anymore? used to be for preparing a "distribution" ie release. can we remove this? want to simplify Makefile (I know I added this looong ago so in theory I should know, but I don't remember, and I don't know if any downstream port maintainers now use it for anything). Certainly I don't use it or want or need it for anything myself so I don't mind if it's gone.
+# dj2022-11 also note we don't have ".c" files anymore so the ".c" could be removed?
 
 dist:
 	rm -f core *~ \#*
