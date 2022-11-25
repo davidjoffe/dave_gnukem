@@ -6,134 +6,133 @@
 #
 # 2016-10: Get this working on Mac OS X [dj]
 # 2017-07-29: Remove obsolete standalone-editor-related stuff, and add new thing_monsters.o
+# 2022-11-25: Cleanup and fix targets for new debian dir (dist, install and uninstall)
 #
 
-CPP = g++
-CC = gcc
-
-
-# dj2016-10 Add L -I/usr/local/include/SDL in process of getting this working on Mac OS X - not sure if this is 'bad' to just have both /usr/include and /usr/local/include??
-INCLUDEDIRS= -I/usr/include/SDL2 -I/usr/local/include/SDL2
-
-#CCFLAGS = -O -Wall $(INCLUDEDIRS)
-
-# Un/recomment as needed for removing sound support, optimizations etc
-# If you don't -DDATA_DIR to a valid dir, then data files will be assumed
-# to be in current directory
-#CCFLAGS = -Wall -I/usr/local/include -DHAVE_SOUND -DDEBUG -O -m486
-CCFLAGS = -std=c++14 -Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
-#Release version:
-#CCFLAGS = -O -Wall -I/usr/local/include -DHAVE_SOUND $(INCLUDEDIRS)
-
-LIBS = -lSDL2 -lSDL2_mixer -lpthread
 BIN = davegnukem
+# 'version string history' here:
+# "v1.0 - 3 Apr 2018" [version 1]
+# "v1.0.1 - 25 Apr 2020"
+# "v1.0.2 - 19 Nov 2022" [<- last version on SDL1 - about to update to SDL2]
+# "v1.0.3 - 19 Nov 2022" [New version number for SDL2 version with Matteo Bini SDL2 commit merged in]
+V_NUM    = 1.0.3
+V_DATE   = 19 Nov 2022
+VERSION  = v$(V_NUM) - $(V_DATE)
 
+# paths
+PREFIX   = /usr/local
+DATA_DIR = $(PREFIX)/share/games/$(BIN)/# the trailing slash is required for paths in the source
+
+LIBS = `sdl2-config --libs` -lSDL2_mixer
+LDFLAGS = $(LIBS)
+
+CPPFLAGS = -DDATA_DIR=\"$(DATA_DIR)\" -DVERSION=\"'$(VERSION)'\"
+
+CXX = g++
+
+OBJ != find src -iname *.cpp -type f | sed --posix '/src\/ed_standalone_original.cpp/d; s/\.cpp$$/.o/'
 
 ifeq ($(OS),Windows_NT)
-    #CCFLAGS += -D WIN32
+    #CPPFLAGS += -D WIN32
     ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
-        #CCFLAGS += -D AMD64
+        #CPPFLAGS += -D AMD64
     else
         ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
-            #CCFLAGS += -D AMD64
+            #CPPFLAGS += -D AMD64
         endif
         ifeq ($(PROCESSOR_ARCHITECTURE),x86)
-            #CCFLAGS += -D IA32
+            #CPPFLAGS += -D IA32
         endif
     endif
 else
     UNAME_S := $(shell uname -s)
     ifeq ($(UNAME_S),Linux)
-        #CCFLAGS += -D LINUX
-    endif
-    # dj2020-06 Add basic HaikuOS detection and override some default settings here if detected
-    ifeq ($(UNAME_S),Haiku)
-        INCLUDEDIRS=`sdl2-config --cflags`
-        CCFLAGS=-Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
-        LIBS=`sdl2-config --libs` -lSDL2 -lSDL2_mixer -lpthread
+        #CPPFLAGS += -D LINUX
     endif
     ifeq ($(UNAME_S),Darwin)
-        LIBS += -framework Cocoa `sdl2-config --libs` 
+        LIBS += -framework Cocoa 
 	# dj2022-11 add c++17 min here for Mac (might change this later to c++17)
-	CCFLAGS += -std=c++17 `sdl2-config --cflags`
+	CXXFLAGS += -std=c++17
     endif
     UNAME_P := $(shell uname -p)
     ifeq ($(UNAME_P),x86_64)
-        #CCFLAGS += -D AMD64
+        #CPPFLAGS += -D AMD64
     endif
     ifneq ($(filter %86,$(UNAME_P)),)
-        #CCFLAGS += -D IA32
+        #CPPFLAGS += -D IA32
     endif
     ifneq ($(filter arm%,$(UNAME_P)),)
-        #CCFLAGS += -D ARM
+        #CPPFLAGS += -D ARM
     endif
 endif
 
+# debug
+#CXXFLAGS = -ggdb -DDEBUG -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
+CXXFLAGS = -O2 -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
 
-# dj2022-11 in theory would be nice if OBJFILES list could be auto-generated from the presence of .c or .cpp files in the src folder so we could more easily add new .cpp files without having to update Makefiles
+all: options davegnukem
 
-OBJFILES = src/main.o     src/graph.o   src/game.o         src/menu.o\
-           src/block.o    src/credits.o src/instructions.o src/djstring.o \
-           src/djimage.o  src/djlog.o   src/inventory.o    src/mission.o\
-           src/hiscores.o src/mixins.o  src/thing.o        src/hero.o \
-           src/thing_monsters.o src/gameending.o \
-           src/level.o    src/settings.o src/keys.o \
-           src/djtypes.o  src/bullet.o \
-           src/ed.o src/ed_DrawBoxContents.o src/ed_common.o src/ed_lvled.o \
-           src/ed_macros.o src/ed_spred.o \
-           src/sdl/djgraph.o src/sdl/djinput.o src/sdl/djsound.o \
-           src/sdl/djtime.o \
-           src/sys_error.o src/sys_log.o src/m_misc.cpp
-
-default: gnukem
-
-gnukem: $(OBJFILES)
-	$(CPP) -o $(BIN) $(OBJFILES) $(LIBS)
-
-clean:
-	rm -f $(BIN) *~ core \#*
-	find src -name '*.o' | xargs rm -f
-
-# dj2022-11 do we even need this "make dist" is it used for anything anymore? used to be for preparing a "distribution" ie release. can we remove this? want to simplify Makefile (I know I added this looong ago so in theory I should know, but I don't remember, and I don't know if any downstream port maintainers now use it for anything). Certainly I don't use it or want or need it for anything myself so I don't mind if it's gone.
-
-dist:
-	rm -f core *~ \#*
-	find src -name '*.o' | xargs rm -f
-
-
-%.o: %.c
-	$(CPP) $(CCFLAGS) -c $< -o $@
+options:
+	@echo davegnukem build options:
+	@echo "CXXFLAGS = $(CXXFLAGS)"
+	@echo "LDFLAGS  = $(LDFLAGS)"
+	@echo "CXX      = $(CXX)"
 
 %.o: %.cpp
-	$(CPP) $(CCFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# The following was added to support debian packaging.  The make install
-# command will probably work on other unix like OS but not sure.
-# There probably should be some checks for different OS to be perfect.
-# Previously there was no install target at all which makes using 
-# packaging tools harder (easier for me to add install to Makefile).
-# Note DESTDIR variable is used by Debian packaging tools for staging
-# and PREFIX may already set as environment variable for some distro
-# -Craig
-ifeq ($(PREFIX),)
-    PREFIX := /usr/local
-endif
+davegnukem: $(OBJ)
+	$(CXX) -o $(BIN) $(OBJ) $(LDFLAGS)
+
+clean:
+	rm -f $(BIN) $(BIN)-$(V_NUM).tar.gz
+	find src -name '*.o' | xargs rm -f
+
+dist: clean
+	mkdir $(BIN)-$(V_NUM)
+	ls | sed --posix '/data/d; /$(BIN)-$(V_NUM)/d' | xargs -I {} cp -R {} $(BIN)-$(V_NUM)
+	tar cf $(BIN)-$(V_NUM).tar $(BIN)-$(V_NUM)
+	gzip $(BIN)-$(V_NUM).tar
+	rm -fr $(BIN)-$(V_NUM)
 
 install: 
-	@install -m 755 -d $(DESTDIR)/opt/gnukem	
-	@install -m 755 davegnukem $(DESTDIR)/opt/gnukem
-	@install -d $(DESTDIR)/usr/share/icons/hicolor/32x32/apps
-	@install -m 644 debian/gnukem.png $(DESTDIR)/usr/share/icons/hicolor/32x32/apps
-	@install -d $(DESTDIR)/usr/share/applications
-	@install -m 644 debian/gnukem.desktop $(DESTDIR)/usr/share/applications
-	@install -d $(DESTDIR)$(PREFIX)/bin/
-	@install -m 755 debian/gnukem.sh $(DESTDIR)$(PREFIX)/bin/gnukem
-	@cp -r data $(DESTDIR)/opt/gnukem/
-	@echo Dave Gnukem Installed.  Launch with $(DESTDIR)$(PREFIX)/bin/gnukem
-	
+	# binary
+	mkdir -p $(DESTDIR)$(PREFIX)/games
+	cp -f $(BIN) $(DESTDIR)$(PREFIX)/games
+	chmod 755 $(DESTDIR)$(PREFIX)/games/$(BIN)
+	# data
+	mkdir -p $(DESTDIR)$(DATA_DIR)
+	cp -fR data/* $(DESTDIR)$(DATA_DIR)
+	rm -f $(DESTDIR)$(DATA_DIR)README.md
+	find $(DESTDIR)$(DATA_DIR) -type d | xargs chmod 755
+	find $(DESTDIR)$(DATA_DIR) -type f | xargs chmod 644
+	# data doc
+	mkdir -p $(DESTDIR)$(PREFIX)/share/doc/$(BIN)-data
+	cp -f data/README.md $(DESTDIR)$(PREFIX)/share/doc/$(BIN)-data
+	chmod 644 $(DESTDIR)$(PREFIX)/share/doc/$(BIN)-data/README.md
+	# desktop file
+	mkdir -p $(DESTDIR)$(PREFIX)/share/applications
+	cp -f debian/desktop/$(BIN).desktop $(DESTDIR)$(PREFIX)/share/applications
+	chmod 644 $(DESTDIR)$(PREFIX)/share/applications/$(BIN).desktop
+	# doc
+	mkdir -p $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
+	cp -f HISTORY.txt README.md $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
+	chmod 644 $(DESTDIR)$(PREFIX)/share/doc/$(BIN)/HISTORY.txt \
+		$(DESTDIR)$(PREFIX)/share/doc/$(BIN)/README.md
+	# icon
+	mkdir -p $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps
+	cp -f debian/icons/hicolor/32x32/apps/$(BIN).png $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps
+	chmod 644 $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps/$(BIN).png
+	# manual page
+	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man6
+	sed --posix 's/VERSION/$(VERSION)/' < debian/$(BIN).6 > $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
+	chmod 644 $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
 
 uninstall:
-	rm -rf $(DESTDIR)/opt/gnukem
-	rm -f $(DESTDIR)$(PREFIX)/bin/gnukem 
-	rm -f $(DESTDIR)/usr/share/applications/gnukem.desktop
-	rm -f $(DESTDIR)/usr/share/icons/hicolor/32x32/apps/gnukem.png	
+	rm -f $(DESTDIR)$(PREFIX)/games/$(BIN) 
+	rm -fr $(DESTDIR)$(PREFIX)/share/games/$(BIN) 
+	rm -fr $(DESTDIR)$(PREFIX)/share/doc/$(BIN)-data
+	rm -f $(DESTDIR)$(PREFIX)/share/applications/$(BIN).desktop
+	rm -fr $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
+	rm -f $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps/$(BIN).png	
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6

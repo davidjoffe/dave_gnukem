@@ -473,13 +473,7 @@ void DoMainMenu()
 			// Simple 1 to 1 blit .. later it might be worthwhile doing a stretch blit if size doesn't match resolution? [LOW - dj2019]
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
 		}
-		// 'version string history' here:
-		// "v1.0 - 3 Apr 2018" [version 1]
-		// "v1.0.1 - 25 Apr 2020"
-		// "v1.0.2 - 19 Nov 2022" [<- last version on SDL1 - about to update to SDL2]
-		// "v1.0.3 - 19 Nov 2022" [New version number for SDL2 version with Matteo Bini SDL2 commit merged in]
-		const char* szVERSION = "v1.0.3 - 19 Nov 2022";
-		GraphDrawString(pVisBack, g_pFont8x8, 0, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)szVERSION);
+		GraphDrawString(pVisBack, g_pFont8x8, 0, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)VERSION);
 		const char* szURL = "djoffe.com";
 		GraphDrawString(pVisBack, g_pFont8x8, CFG_APPLICATION_RENDER_RES_W - strlen(szURL)*8, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)szURL);
 
