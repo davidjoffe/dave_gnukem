@@ -3,6 +3,7 @@
 //dj2022-11 note we may just get rid of djWINXP_SUPPORT flag probably if this dynamic loading workaround generally works without causing problems then we don't need static linking (static linking is what causes XP issue because that function isn't present)
 #ifdef WIN32
 
+#include "../config.h"
 #include "../sys_log.h"
 
 //#ifndef djWINXP_SUPPORT

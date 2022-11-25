@@ -11,6 +11,24 @@
 CPP = g++
 CC = gcc
 
+djLIBS2=
+djCCFLAGS2=
+djUSE_UNICODE=n
+################################# dj2022-11 BETA
+# dj2022-22 BETA development experimental new TTF TrueType font and Unicode support etc. set to y to enable (NOT in current production Dave Gnukem still very beta)
+#djUSE_UNICODE=y
+
+ifeq ($(djUSE_UNICODE),y)
+    djLIBS_TTF= -lSDL2_ttf 
+    djLIBS2+= $(djLIBS_TTF) 
+
+    djLIBS_UTF8PROC= -lutf8proc 
+    djLIBS2+= $(djLIBS_UTF8PROC) 
+
+    djCCFLAGS2+= -DdjUNICODE_SUPPORT 
+endif
+#################################
+
 
 # dj2016-10 Add L -I/usr/local/include/SDL in process of getting this working on Mac OS X - not sure if this is 'bad' to just have both /usr/include and /usr/local/include??
 INCLUDEDIRS= -I/usr/include/SDL2 -I/usr/local/include/SDL2
@@ -21,11 +39,16 @@ INCLUDEDIRS= -I/usr/include/SDL2 -I/usr/local/include/SDL2
 # If you don't -DDATA_DIR to a valid dir, then data files will be assumed
 # to be in current directory
 #CCFLAGS = -Wall -I/usr/local/include -DHAVE_SOUND -DDEBUG -O -m486
-CCFLAGS = -std=c++14 -Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
+CCFLAGS = -std=c++11 -Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
+
+################################# dj2022-11 BETA
+CCFLAGS += $(djCCFLAGS2)
+#################################
+
 #Release version:
 #CCFLAGS = -O -Wall -I/usr/local/include -DHAVE_SOUND $(INCLUDEDIRS)
 
-LIBS = -lSDL2 -lSDL2_mixer -lpthread
+LIBS = -lSDL2 -lSDL2_mixer $(djLIBS2) -lpthread
 BIN = davegnukem
 
 
@@ -70,7 +93,6 @@ else
 endif
 
 
-# dj2022-11 in theory would be nice if OBJFILES list could be auto-generated from the presence of .c or .cpp files in the src folder so we could more easily add new .cpp files without having to update Makefiles
 
 OBJFILES = src/main.o     src/graph.o   src/game.o         src/menu.o\
            src/block.o    src/credits.o src/instructions.o src/djstring.o \
@@ -85,16 +107,26 @@ OBJFILES = src/main.o     src/graph.o   src/game.o         src/menu.o\
            src/sdl/djtime.o \
            src/sys_error.o src/sys_log.o src/m_misc.cpp
 
+# dj2022-11 old list of OBJFILES above - if the below code works generically on all platforms we can probably delete above line OBJFILES= with hardcoded list (more testing needed)
+# dj2022-11 Experimentally change this to try auto-generate this list from the presence of .cpp files in and under the src folder so we could more easily add new .cpp files without having to update Makefiles
+# Note on some platforms find might not be available .. should we try use Make wildcard thing rather .. hm ..dj2022-11. Not sure if the below will work right on Windows etc.
+#djSOURCES:=$(shell find src -type f -name *.cpp)
+djSOURCES=$(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
+djRELEASEOBJECTS=$(patsubst %.cpp,%.o,$(djSOURCES))
+OBJFILES = $(djRELEASEOBJECTS)
+
+
 default: gnukem
 
 gnukem: $(OBJFILES)
-	$(CPP) -o $(BIN) $(OBJFILES) $(LIBS)
+	$(CPP) -o $(BIN) $(OBJFILES) $(LIBS) $(CCFLAGS)
 
 clean:
 	rm -f $(BIN) *~ core \#*
 	find src -name '*.o' | xargs rm -f
 
 # dj2022-11 do we even need this "make dist" is it used for anything anymore? used to be for preparing a "distribution" ie release. can we remove this? want to simplify Makefile (I know I added this looong ago so in theory I should know, but I don't remember, and I don't know if any downstream port maintainers now use it for anything). Certainly I don't use it or want or need it for anything myself so I don't mind if it's gone.
+# dj2022-11 also note we don't have ".c" files anymore so the ".c" could be removed?
 
 dist:
 	rm -f core *~ \#*

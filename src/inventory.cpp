@@ -13,15 +13,15 @@ Copyright (C) 2001-2019 David Joffe
 
 struct SInvItem
 {
-	CThing *pThing;
+	CThing *pThing=nullptr;
 	// Items picked up during current level must go if we die, so items are
 	// marked "non-persisent" until hero completes level
-	bool bPersistent;
+	bool bPersistent=false;
 };
 
 #include <vector>
-using namespace std;
-vector<SInvItem> g_apInventory;
+
+std::vector<SInvItem> g_apInventory;
 
 
 // X,Y location on screen to draw inventory (in pixels)

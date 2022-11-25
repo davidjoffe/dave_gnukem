@@ -19,13 +19,19 @@ Copyright (C) 1995-2022 David Joffe
 //! A single item in the menu
 struct SMenuItem
 {
-	//! A real menu item (true), or just a string (false)?
+	SMenuItem(bool bItem = false, const char* szText = nullptr, const char* szRetVal = nullptr) : m_bitem(bItem), m_szText(szText), m_szRetVal(szRetVal)
+	{
+	}
+
+	//! A real (i.e. selectable) menu item (true), or just a string (false)?
 	bool m_bitem=false;
 	//! The menu text to display
 	const char *m_szText=nullptr;
 
 	//! dj2022-11 [optional] new return by a string identifier so we can try have slightly more sane (and potentially less bug-introducing) handling than gross switch statements with lists of hardcoded numerical values henceforth
 	const char* m_szRetVal = nullptr;
+
+	const bool IsSelectable() const { return m_bitem; }
 };
 /*--------------------------------------------------------------------------*/
 /*!

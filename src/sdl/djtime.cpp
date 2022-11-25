@@ -4,6 +4,7 @@ djtime.cpp
 Copyright (C) 1999-2018 David Joffe
 */
 
+#include "../config.h"
 #include "../djtime.h"
 #ifdef __OS2__
 #include <SDL/SDL.h>

@@ -17,7 +17,7 @@
 #define ALIASES_H__KRANKLYS__
 
 
-#define dword	unsigned long int
+//#define dword	unsigned long int
 
 
 #endif		// #ifndef ALIASES_H__KRANKLYS__

@@ -4,6 +4,7 @@ djsound.cpp
 Copyright (C) 1999-2022 David Joffe and Kent Mein
 */
 
+#include "../config.h"
 #include "../djsound.h"
 #include "../djstring.h"
 #include "../djlog.h"

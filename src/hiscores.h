@@ -13,7 +13,7 @@ Copyright (C) 2000-2022 David Joffe
 #define FILE_HIGHSCORES "hiscores.dat"
 
 //! Maximum size of high score list
-#define MAX_HIGHSCORES 10
+#define MAX_HIGHSCORES 12
 
 /*
 class CHighScoreList

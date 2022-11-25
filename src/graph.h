@@ -13,6 +13,7 @@ Copyright (C) 1998-2022 David Joffe
 #ifndef _GRAPH_H_
 #define _GRAPH_H_
 
+#include "config.h"
 #include "datadir.h"
 #include "djgraph.h"
 #include "djimage.h"
@@ -35,9 +36,10 @@ extern void djFontDone();
 //! Convenience macro to call the sprite draw function for 16x16 sprite b in sprite set a
 #define DRAW_SPRITE16(vis,a,b,x,y) djgDrawImage( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%SPRITESHEET_NUM_COLS)*BLOCKW,((b)/SPRITESHEET_NUM_COLS)*BLOCKH, (x),(y), BLOCKW,BLOCKH )
 
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
+// 'Sprite auto dropshadows' effect
 extern bool g_bSpriteDropShadows;
-#define DRAW_SPRITEA_SHADOW(vis,a,b,x,y,w,h) if (g_bSpriteDropShadows) djgDrawImageAlpha( vis, g_pCurMission->GetSpriteData(a)->m_pImageShadow, ((b)%SPRITESHEET_NUM_COLS)*BLOCKH,((b)/SPRITESHEET_NUM_COLS)*BLOCKH, (x),(y), (w),(h) )
+#define DRAW_SPRITEA_SHADOW(vis,a,b,x,y,w,h) if (g_bSpriteDropShadows) djgDrawImageAlpha( vis, g_pCurMission->GetSpriteData(a)->m_pImageAutoShadow, ((b)%SPRITESHEET_NUM_COLS)*BLOCKH,((b)/SPRITESHEET_NUM_COLS)*BLOCKH, (x),(y), (w),(h) )
 #endif
 
 //! Same as \ref DRAW_SPRITE16 but also uses alpha map for transparency masking

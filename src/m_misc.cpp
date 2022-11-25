@@ -17,8 +17,15 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <stdio.h>
+#include <cstring>//strlen,strcpy etc. [dj2022-11 refactoring and cleanups]
 #include "sys_defs.h"
 
+#ifdef WIN32
+#include <direct.h> // getcwd etc
+#else
+#include <unistd.h>//getcwd
+#endif
 
 
 /*
@@ -348,7 +355,7 @@ void M_GetFileRoot ( char* filename )
 
 void M_FixFilename ( char *filename )
 {
-	char	*ptr;
+	char	*ptr=nullptr;
 
 	switch ( *filename )
 	{
@@ -378,8 +385,8 @@ void M_FixFilename ( char *filename )
 
 char* M_GetFilePathAlloc ( const char* filename )
 {
-	char	*path;
-	char	*ptr;
+	char	*path=nullptr;
+	char	*ptr = nullptr;
 
 	path = new char[SYS_MAX_PATH];
 	memset(path, 0, SYS_MAX_PATH);
@@ -417,8 +424,8 @@ char* M_GetFilePathAlloc ( const char* filename )
 
 char* M_GetFileRootAlloc ( const char* filename )
 {
-	char	*root;
-	const char	*ptr;
+	char	*root = nullptr;
+	const char	*ptr = nullptr;
 
 	root = new char [SYS_MAX_PATH];
 	memset(root, 0, SYS_MAX_PATH);
@@ -578,6 +585,7 @@ const char* M_GetFirstDir ( const char *filename )
 
 
 
+/*
 char* M_GetFirstPathDirAlloc ( char *filename )
 {
 	char	*dir = NULL;
@@ -596,7 +604,7 @@ char* M_GetFirstPathDirAlloc ( char *filename )
 
 	return dir;
 }
-
+*/
 
 
 

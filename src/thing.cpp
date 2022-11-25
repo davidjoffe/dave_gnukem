@@ -4,6 +4,7 @@
 Copyright (C) 2000-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
+#include "config.h"
 #include "thing.h"
 #include "djtypes.h"
 #include "graph.h"
@@ -43,7 +44,7 @@ int CThingFactory::Register(int nTypeID, THING_ALLOCATER pAllocateProc, THING_PE
 
 CThing* CThingFactory::Allocate(int nTypeID)
 {
-	vector<SDescriptor>::const_iterator i;
+	std::vector<SDescriptor>::const_iterator i;
 
 	for ( i=m_aDescriptors.begin(); i!=m_aDescriptors.end(); ++i )
 	{
@@ -244,7 +245,7 @@ CSpikeBall::CSpikeBall()
 
 void CSpikeBall::Draw()
 {
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_nYOffset*2,BLOCKW,BLOCKH);
 #endif
 	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) + m_nYOffset*2);
@@ -901,7 +902,7 @@ void CCamera::Draw()
 	else if (g_Player.x > m_x + 1)
 		nOffset = 1;
 
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + nOffset, CALC_XOFFSET(m_x)+1, CALC_YOFFSET(m_y)+1,BLOCKW,BLOCKH);
 #endif
 	DRAW_SPRITE16A(pVisView, m_a, m_b + nOffset, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
@@ -930,7 +931,7 @@ CBanana::CBanana()
 
 void CBanana::Draw()
 {
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + m_nState, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y),BLOCKW,BLOCKH);
 	DRAW_SPRITE16A(pVisView, m_a, m_b + m_nState, CALC_XOFFSET(m_x)-1, CALC_YOFFSET(m_y)-1);
 #else
@@ -1120,7 +1121,7 @@ int CAcme::HeroOverlaps()
 
 void CAcme::Draw()
 {
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b, 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset, BLOCKW*2, BLOCKH);
 #endif
 	DRAW_SPRITEA(pVisView, m_a, m_b, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset, BLOCKW*2, BLOCKH);
@@ -1267,7 +1268,7 @@ int CPickup::HeroOverlaps()
 
 void CPickup::Draw()
 {
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 	// Note the 15 height here, this is debatable, some things look better with 16
 	// some better with 15, e.g. rugby ball looks better with 15
 	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + (m_nAnimationCount==-1?0:m_nAnimationCount), CALC_XOFFSET(m_x)+1, CALC_YOFFSET(m_y)+1,BLOCKW,BLOCKH-1);
@@ -1406,7 +1407,7 @@ int CConveyor::Tick()
 
 void CConveyor::Draw()
 {
-#ifdef EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
+#ifdef djSPRITE_AUTO_DROPSHADOWS
 	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y),BLOCKW,BLOCKH);
 #endif
 	DRAW_SPRITE16A(pVisView, m_a, m_b + anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));

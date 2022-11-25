@@ -1,5 +1,5 @@
-gnukem (1.0.1-9~focal) focal; urgency=medium
+davegnukem (1.0.3-1) unstable; urgency=low
 
-  * no change
+  * Initial release (Closes: #1009780)
 
- -- Craig Langman <craig.langman@gmail.com>  Sat, 04 Dec 2021 22:00:00 -0800
+ -- Matteo Bini <matteobin@tiepi.it>  Fri, 25 Nov 2022 20:30:05 +0100

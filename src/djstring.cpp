@@ -4,6 +4,7 @@ djstring.cpp
 Copyright (C) 1998-2022 David Joffe
 */
 
+#include "config.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -292,4 +293,12 @@ std::string djGetFolderUserSettings()
 		//s.clear();
 
 	return s;
+}
+
+std::string djIntToString(int n)
+{
+	// Note NB this must be large enough for e.g. 128-bit ints 'just in case'. Also this function should be threadsafe so no static buffers etc.
+	char buf[128] = { 0 };
+	snprintf(buf, sizeof(buf), "%d", n);
+	return buf;
 }

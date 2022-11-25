@@ -15,6 +15,7 @@
 #include "sys_log.h"
 #include "sys_defs.h"
 #include <string>
+#include <stdarg.h>//va_start etc.
 
 void _SYS_Error ( const char *file, int line, const char *fmt, ... )
 {

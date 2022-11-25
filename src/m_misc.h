@@ -57,7 +57,7 @@ void M_FixFilename ( char *filename );
 char* M_GetFilePathAlloc ( const char* filename );
 char* M_GetFileRootAlloc ( const char* filename );
 //char* M_GetFileExtensionAlloc ( const char* filename );
-char* M_GetFirstPathDirAlloc ( char *filename );
+//char* M_GetFirstPathDirAlloc ( char *filename );
 
 void M_SuggestFileExtension ( char* filename, const char* extension );
 void M_ForceFileExtension ( char* filename, const char* extension );

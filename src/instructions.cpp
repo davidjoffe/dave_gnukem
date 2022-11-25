@@ -320,12 +320,12 @@ void ShowInstructions()
 {
 	std::vector<std::string> asText;
 	//asText.push_back("");
-	asText.push_back("### INSTRUCTIONS ###");
+	asText.push_back("### INSTRUCTIONS:");
 	unsigned int uWIDTH = (CFG_APPLICATION_RENDER_RES_W - 16) / 8;
 	WrapString("Find the exit in each level, while dodging or shooting monsters.", uWIDTH, asText);
 
 	asText.push_back("");
-	asText.push_back("### KEYS ###");
+	asText.push_back("### KEYS: (may differ on some ports)");
 
 	char szBuf[2048] = {0};
 	snprintf(szBuf, sizeof(szBuf), "%s", GetKeyString(g_anKeys[KEY_LEFT]));

@@ -35,7 +35,7 @@ Copyright (C) 1995-2022 David Joffe
 #define FILEOPEN_FLAGS   (O_RDONLY)
 #endif
 /*--------------------------------------------------------------------------*/
-vector<unsigned char *> apLevels;
+std::vector<unsigned char *> apLevels;
 /*--------------------------------------------------------------------------*/
 void InitLevelSystem()
 {
