@@ -742,14 +742,23 @@ void RedefineKeys()
 	} while (bLoop);
 }
 
-bool GetHighScoreUserName(char *szBuffer)
+bool GetHighScoreUserName(std::string& sReturnString)
 {
-#define MAX_HIGHSCORE_LEN 22
+	#define MAX_HIGHSCORE_LEN 256
+	#define WIDTH_INPUTBOX 34
+
+	#ifdef djUNICODE_SUPPORT
+	//SDL_EnableUNICODE(1);
+	std::string sInput;
+	#else
+	char szBuffer[2048] = {0};//temp phase out?
+	#endif
+
 	bool bRet = true; // Return false if user selected quit/close or something
 	bool bLoop = true;
 	do
 	{
-		int nDX = MAX_HIGHSCORE_LEN*8;
+		int nDX = WIDTH_INPUTBOX*8;
 		//dj2019-07 for now just stick to 320; genericize better later re CFG_APPLICATION_RENDER_RES_W stuff ..
 		//int nXLeft = (CFG_APPLICATION_RENDER_RES_W/2) - (nDX / 2);
 		int nXLeft = (320/2) - (nDX / 2);
@@ -767,6 +776,74 @@ bool GetHighScoreUserName(char *szBuffer)
 		{
 			switch (Event.type)
 			{
+#ifdef djUNICODE_SUPPORT
+			case SDL_TEXTINPUT://dj2022-11 NB for Unicode input (what platforms are supported here?)
+				sInput += Event.text.text;
+				break;
+			case SDL_KEYDOWN:
+			{
+				if (((Event.key.keysym.mod & KMOD_LSHIFT) == 0) && 
+					((Event.key.keysym.mod & KMOD_RSHIFT) == 0) &&
+					((Event.key.keysym.mod & KMOD_LCTRL) != 0) || (Event.key.keysym.mod & KMOD_RCTRL) != 0)
+				{
+					// Ctrl+V paste text?
+					if (Event.key.keysym.sym == SDLK_v && SDL_HasClipboardText())
+					{
+						char* sz = SDL_GetClipboardText();
+						if (sz)
+						{
+							// Hm what if it's crazy long .. put some reasonable limit in case someone pastes GBs of text .. this is a bit arb:
+							if (strlen(sz) > 10000)
+							{
+								std::string s;
+								for (int z = 0; z < 10000; ++z)
+									s += sz[z];
+								sInput += s;
+							}
+							else
+								sInput += sz;
+							SDL_free(sz);
+						}
+					}
+				}
+
+
+				switch (Event.key.keysym.sym)
+				{
+				case SDLK_BACKSPACE: // Backspace is slightly non-trivial to handle if we're dealing with utf8 strings but technically we can probably use 
+					if (!sInput.empty())
+					{
+						/*
+						Code point  UTF - 8 conversion
+						First code point	Last code point	Byte 1	Byte 2	Byte 3	Byte 4
+						U + 0000	U + 007F	0xxxxxxx
+						U + 0080	U + 07FF	110xxxxx	10xxxxxx
+						U + 0800	U + FFFF	1110xxxx	10xxxxxx	10xxxxxx
+						U + 10000[nb 2]U + 10FFFF	11110xxx	10xxxxxx	10xxxxxx	10xxxxxx
+						*/
+						// Basically if:
+						// (1) it's "0xxxxxxx" we can delete just that one char
+						// (2) it starts with "10" in high bits we can delete UNTIL we hit something starting with "11" in high bits
+						// We seriously need to double check this
+						char cLast = sInput.back();
+						if ((cLast & 0x80) == 0)//ascii
+							sInput = sInput.substr(0, sInput.size() - 1);
+						else if ((cLast & 0xC0) == 0x80)
+						{
+							while (!sInput.empty() && (cLast & 0xC0) == 0x80)
+							{
+								sInput = sInput.substr(0, sInput.size() - 1);
+								if (!sInput.empty())
+									cLast = sInput.back();
+							}
+							if (!sInput.empty())
+								sInput = sInput.substr(0, sInput.size() - 1);
+						}
+					}
+				}
+			}
+			break;
+#else
 			case SDL_KEYDOWN:
 				if (Event.key.keysym.sym>=SDLK_a && Event.key.keysym.sym<=SDLK_z)
 				{
@@ -798,12 +875,7 @@ bool GetHighScoreUserName(char *szBuffer)
 				break;
 			case SDL_KEYUP:
 				break;
-				/*
-			case SDL_QUIT:
-				bLoop = false;
-				bRet = false;
-				break;
-				*/
+#endif
 			}
 		}
 		djiPollEnd();
@@ -820,15 +892,28 @@ bool GetHighScoreUserName(char *szBuffer)
 			bLoop = false;
 		}
 
+#ifdef djUNICODE_SUPPORT
+		DialogBoxEffect(nXLeft-4, 100, nDX+8, 22, true);
+#else
 		DialogBoxEffect(nXLeft-4, 100, nDX+8, 16, true);
+#endif
 		GraphDrawString( pVisBack, g_pFont8x8, 100,  72, (unsigned char*)"New high score!");
 		GraphDrawString( pVisBack, g_pFont8x8,  96,  88, (unsigned char*)"Enter your name:" );
+
+#ifdef djUNICODE_SUPPORT
+		extern void DrawUnicodeHelper(djVisual * pVis, int x, int y, SDL_Color Color, const std::string & sText);
+		std::string sFakeCursor;
+		if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
+			sFakeCursor = "|";
+		DrawUnicodeHelper(pVisBack, nXLeft - 2, 104, SDL_Color{ 255, 255, 255, 255 }, sInput + sFakeCursor);
+#else
 		GraphDrawString( pVisBack, g_pFont8x8, nXLeft-2, 104, (unsigned char*)szBuffer );
 		if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
 		{
 			unsigned char szCursor[2] = { 254, 0 };
 			GraphDrawString( pVisBack, g_pFont8x8, (nXLeft-2) + 8*strlen(szBuffer), 104, szCursor );
 		}
+#endif
 
 
 		GraphFlip(true);
@@ -837,6 +922,14 @@ bool GetHighScoreUserName(char *szBuffer)
 		SDL_Delay(20);
 
 	} while (bLoop);
+
+#ifdef djUNICODE_SUPPORT
+	sReturnString = sInput;
+	//SDL_EnableUNICODE(0);
+#else
+	sReturnString = szBuffer;
+#endif
+
 	return bRet;
 }
 
@@ -845,9 +938,10 @@ void CheckHighScores( int score )
 	if (IsNewHighScore(score))
 	{
 		char szUserName[1024] = {0};
-		if (GetHighScoreUserName(szUserName))
+		std::string sUserName;
+		if (GetHighScoreUserName(sUserName))
 		{
-			AddHighScore(szUserName, score);
+			AddHighScore(sUserName.c_str(), score);
 			SaveHighScores(); // Save high scores immediately, in case Windows crashes
 		}
 
