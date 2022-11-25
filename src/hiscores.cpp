@@ -83,29 +83,52 @@ void KillHighScores()
 }
 
 #ifdef djUNICODE_TTF
-
-std::vector<TTF_Font*> apFonts;
-void djLoadFonts()
+class djUnicodeFontList
 {
-#ifdef djUNICODE_TTF
-	//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 16);
-	//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 11);
-	const int nPTFONTSIZE = 12;
-	if (apFonts.empty())
-	{
-		apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/DejaVuSansMono-Bold.ttf", nPTFONTSIZE));
-		apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/DejaVuSansMono.ttf", nPTFONTSIZE));
-		apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/NotoSans-Regular.ttf", nPTFONTSIZE));
-		apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/chinese-mainland/NotoSansSC-Regular.otf", nPTFONTSIZE));
+public:
+	std::vector<TTF_Font*> m_apFonts;
 
-		TTF_Font* pFont = TTF_OpenFont(DATA_DIR "fonts/DejaVuSans.ttf", nPTFONTSIZE);
-		TTF_Font* pFont2 = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", nPTFONTSIZE);
-		apFonts.push_back(pFont);
-		apFonts.push_back(pFont2);
-		//apFonts.push_back(TTF_OpenFont("C:\\WINDOWS\\fonts\\Arial.ttf", nPTFONTSIZE));
+	void LoadFonts()
+	{
+		//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 16);
+		//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 11);
+		const int nPTFONTSIZE = 12;
+		if (m_apFonts.empty())
+		{
+			m_apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/DejaVuSansMono-Bold.ttf", nPTFONTSIZE));
+			m_apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/DejaVuSansMono.ttf", nPTFONTSIZE));
+			m_apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/NotoSans-Regular.ttf", nPTFONTSIZE));
+			m_apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/chinese-mainland/NotoSansSC-Regular.otf", nPTFONTSIZE));
+
+			TTF_Font* pFont = TTF_OpenFont(DATA_DIR "fonts/DejaVuSans.ttf", nPTFONTSIZE);
+			TTF_Font* pFont2 = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", nPTFONTSIZE);
+			m_apFonts.push_back(pFont);
+			m_apFonts.push_back(pFont2);
+			//m_apFonts.push_back(TTF_OpenFont("C:\\WINDOWS\\fonts\\Arial.ttf", nPTFONTSIZE));
+		}
 	}
-#endif
+	void CleanupFonts()
+	{
+		for (auto pFont : m_apFonts)
+		{
+			if (pFont)
+				TTF_CloseFont(pFont);
+		}
+		m_apFonts.clear();
+	}
+};
+djUnicodeFontList g_FontList;
+//---------------------------
+void djUnicodeFontInit()
+{
+	// load fonts if not already loaded
+	g_FontList.LoadFonts();
 }
+void djUnicodeFontDone()
+{
+	g_FontList.CleanupFonts();
+}
+//---------------------------
 
 class djUnicodeFontHelpers
 {
@@ -174,9 +197,8 @@ public:
 
 void DrawUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, const std::string& sText)
 {
-	djLoadFonts();
 	// Get best matching font [this needs work]
-	TTF_Font* pFontMostChars = djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(apFonts, sText, sText.length());
+	TTF_Font* pFontMostChars = djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(g_FontList.m_apFonts, sText, sText.length());
 	if (!pFontMostChars)//<- old fallback for safety in case something went wrong and we have no matching fonts
 	{
 		if (g_pFont8x8)
@@ -237,9 +259,7 @@ void ShowHighScores()
 	{
 		djgDrawImage(pVisBack, g_pImgHighScores, 0, 0, g_pImgHighScores->Width(), g_pImgHighScores->Height());
 	}
-#ifdef djUNICODE_TTF
-	djLoadFonts();
-#endif
+
 	{
 		for ( int i=0; i<(int)g_aScores.size(); i++ )
 		{
@@ -271,15 +291,6 @@ void ShowHighScores()
 		// Pop up high scores menu
 		do_menu( &HighScoresMenu);
 	}
-#ifdef djUNICODE_TTF
-	// Should be whne?
-	for (auto pFont : apFonts)
-	{
-		//if (pFont)
-			//TTF_CloseFont(pFont);
-	}
-	apFonts.clear();
-#endif
 }
 
 bool LoadHighScores(const char *szFilename)

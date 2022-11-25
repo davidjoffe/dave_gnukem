@@ -343,6 +343,13 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 	djSoundInit();				// Initialize sound
 
+#ifdef djUNICODE_SUPPORT
+	djLOGSTR("djUnicodeFontInit\n");
+	extern void djUnicodeFontInit();
+	djUnicodeFontInit();		// dj2022-11 Unicode/TTF font system
+	djLOGSTR("djUnicodeFontInit ok\n");
+#endif
+
 	g_pImgMain = new djImage;			// Load main skin (title screen)
 	g_pImgMain->Load(DATA_DIR "main.tga");
 	djCreateImageHWSurface( g_pImgMain );
@@ -390,6 +397,12 @@ void DaveCleanup()
 	djLOGSTR( "djiDone() ok\n" );
 	djSoundDone();			// Sound
 	djLOGSTR( "djSoundDone() ok\n" );
+#ifdef djUNICODE_SUPPORT
+	djLOGSTR("djUnicodeFontDone\n");
+	extern void djUnicodeFontDone();
+	djUnicodeFontDone();		// dj2022-11 Unicode/TTF font system
+	djLOGSTR("djUnicodeFontDone ok\n");
+#endif
 	djDestroyImageHWSurface(g_pImgMain);
 	djDEL(g_pImgMain);		// Delete main menu background image (title screen)
 	djLOGSTR( "djDEL(g_pImgMain) ok\n" );
@@ -782,9 +795,7 @@ bool GetHighScoreUserName(std::string& sReturnString)
 				break;
 			case SDL_KEYDOWN:
 			{
-				if (((Event.key.keysym.mod & KMOD_LSHIFT) == 0) && 
-					((Event.key.keysym.mod & KMOD_RSHIFT) == 0) &&
-					((Event.key.keysym.mod & KMOD_LCTRL) != 0) || (Event.key.keysym.mod & KMOD_RCTRL) != 0)
+				if (((ModState & KMOD_SHIFT)==0) && ((ModState & KMOD_CTRL)!=0))
 				{
 					// Ctrl+V paste text?
 					if (Event.key.keysym.sym == SDLK_v && SDL_HasClipboardText())
@@ -937,7 +948,6 @@ void CheckHighScores( int score )
 {
 	if (IsNewHighScore(score))
 	{
-		char szUserName[1024] = {0};
 		std::string sUserName;
 		if (GetHighScoreUserName(sUserName))
 		{
