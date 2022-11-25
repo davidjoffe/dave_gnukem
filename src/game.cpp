@@ -1273,10 +1273,14 @@ void PerLevelSetup()
 
 	// Load map background image
 	pBackground = new djImage;
-	if (0!=pBackground->Load(g_pCurMission->GetLevel(g_nLevel)->m_szBackground))
+	char *bg = (char *) malloc((strlen(DATA_DIR) + strlen(g_pCurMission->GetLevel(g_nLevel)->m_szBackground) + 1) * sizeof(char));
+	strcpy(bg, DATA_DIR);
+	strcat(bg, g_pCurMission->GetLevel(g_nLevel)->m_szBackground);
+	if (0!=pBackground->Load(bg))
 	{
 		djDEL(pBackground);
 	}
+	free(bg);
 	djCreateImageHWSurface( pBackground );
 
 	// Clear out inventory
