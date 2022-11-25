@@ -1,0 +1,83 @@
+.TH DAVEGNUKEM 6 "VERSION"
+
+.SH NAME
+davegnukem \- A retro-style 2D scrolling platform shooter
+
+.SH SYNOPSIS
+.B davegnukem
+.RI [ OPTIONS ]
+
+.SH DESCRIPTION
+Dave Gnukem is an open source retro-style 2D scrolling platform
+shooter, inspired by and similar to Duke Nukem 1. It is written in C++
+using SDL library and it features an integrated level editor as
+well.
+
+.SH OPTIONS
+.TP
+.B \-f
+Fullscreen.
+.TP
+.B \-640
+Set resolution to 640x480.
+.TP
+.BI \-scale " NUMBER" 
+Force window size to multiple of 320x200 base resolution.
+
+.SH GAMEPLAY
+Try find the exit, while dodging or shooting monsters.
+
+.SH DEFAULT KEYS
+.TP
+.B Left/Right
+Move left/right
+.TP
+.B Ctrl
+Jump
+.TP
+.B Alt
+Shoot
+.TP
+.B Up
+Action key for opening doors, using teleporters or lifts, activating
+the exit, etc
+.TP
+.B Esc
+In-game menu
+.TP
+.B 6/7
+Decrease/increase volume
+.TP
+.B Insert
+Toggle sounds
+.TP
+.B Shift+F6/F7
+Decrease/increase speed (framerate)
+.TP
+.B Shift+F8/F9
+Toggle map/sprite auto-shadows
+.TP
+.B F10
+Save screenshot
+
+.SH LEVEL EDITOR
+To enter the level editor you must first enable DebugStuff by pressing
+.IR Ctrl+Shift+G .
+Then use
+.I F5
+to invoke the level editor or
+.I F4
+for the sprite one. See the
+.I README
+for more details about both the debug mode and the editors.
+
+.SH SEE ALSO
+More information can be found in the
+.I README
+and on the website
+.B https://djoffe.com/gnukem/
+
+.SH AUTHOR
+Dave Gnukem was written by David Joffe <david at djoffe.com>.
+.br
+This manual page was written by Matteo Bini <matteobin@tiepi.it>.
