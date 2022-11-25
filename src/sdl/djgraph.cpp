@@ -16,6 +16,7 @@ Copyright (C) 1997-2022 David Joffe
 #include "../config.h"//[For CFG_APPLICATION_RENDER_RES_W etc. dj2019-06 slightly ugly dependency direction, conceptually, but not the biggest thing in the world to worry about now, maybe later.]
 #include "../djgraph.h"
 #include "../sys_log.h"
+#include "../datadir.h"
 #ifdef __OS2__
 #include <SDL/SDL.h>
 #else
