@@ -135,6 +135,7 @@
     <ClCompile Include="..\sdl\djinput.cpp" />
     <ClCompile Include="..\sdl\djsound.cpp" />
     <ClCompile Include="..\sdl\djtime.cpp" />
+    <ClCompile Include="..\djfonts.cpp" />
     <ClCompile Include="..\djimage.cpp" />
     <ClCompile Include="..\djlog.cpp" />
     <ClCompile Include="..\djstring.cpp" />
@@ -168,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\config.h" />
+    <ClInclude Include="..\djfonts.h" />
     <ClInclude Include="..\djgamelib.h" />
     <ClInclude Include="..\djgraph.h" />
     <ClInclude Include="..\djimage.h" />
