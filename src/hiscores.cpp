@@ -52,6 +52,7 @@ void SScore::SetName(const char* szNameNew)
 		return;
 	}
 
+	// fixmeUNicode dj2022-11 [low prio] but long names that happen to clip in middle of a utf8 multibyte character may leave invalid partial utf8 chars at end of string
 	snprintf(szName, sizeof(szName), "%s", szNameNew);
 }
 
@@ -82,6 +83,30 @@ void KillHighScores()
 }
 
 #ifdef djUNICODE_TTF
+
+std::vector<TTF_Font*> apFonts;
+void djLoadFonts()
+{
+#ifdef djUNICODE_TTF
+	//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 16);
+	//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 11);
+	const int nPTFONTSIZE = 12;
+	if (apFonts.empty())
+	{
+		apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/DejaVuSansMono-Bold.ttf", nPTFONTSIZE));
+		apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/DejaVuSansMono.ttf", nPTFONTSIZE));
+		apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/NotoSans-Regular.ttf", nPTFONTSIZE));
+		apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/chinese-mainland/NotoSansSC-Regular.otf", nPTFONTSIZE));
+
+		TTF_Font* pFont = TTF_OpenFont(DATA_DIR "fonts/DejaVuSans.ttf", nPTFONTSIZE);
+		TTF_Font* pFont2 = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", nPTFONTSIZE);
+		apFonts.push_back(pFont);
+		apFonts.push_back(pFont2);
+		//apFonts.push_back(TTF_OpenFont("C:\\WINDOWS\\fonts\\Arial.ttf", nPTFONTSIZE));
+	}
+#endif
+}
+
 class djUnicodeFontHelpers
 {
 public:
@@ -93,7 +118,7 @@ public:
 			s = szUTFstring;
 		return FindBestMatchingFontMostCharsStr(apFonts, s, s.length());
 	}
-	static TTF_Font* FindBestMatchingFontMostCharsStr(const std::vector<TTF_Font*>& apFonts, std::string& sText, const size_t uLen)
+	static TTF_Font* FindBestMatchingFontMostCharsStr(const std::vector<TTF_Font*>& apFonts, const std::string& sText, const size_t uLen)
 	{
 		int nMatchesMost = 0;
 		TTF_Font* pFontMostChars = nullptr;
@@ -146,28 +171,56 @@ public:
 		return pFontMostChars;
 	}
 };
+
+void DrawUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, const std::string& sText)
+{
+	djLoadFonts();
+	// Get best matching font [this needs work]
+	TTF_Font* pFontMostChars = djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(apFonts, sText, sText.length());
+	if (!pFontMostChars)//<- old fallback for safety in case something went wrong and we have no matching fonts
+	{
+		if (g_pFont8x8)
+			GraphDrawString(pVis, g_pFont8x8, x, y, (unsigned char*)sText.c_str());
+		return;
+	}
+
+	//SDL_Surface* sur = TTF_RenderUNICODE_Blended_Wrapped(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
+	//SDL_Surface* sur = TTF_RenderUNICODE_Blended(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
+	//SDL_Surface* sur = TTF_RenderUTF8_Blended(pFontMostChars, sText.c_str(), SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
+	SDL_Surface* sur = TTF_RenderUTF8_Solid(pFontMostChars, sText.c_str(), SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
+	//SDL_Texture* tex = SDL_CreateTextureFromSurface(pVis->pRenderer, sur);
+	if (sur)
+	{
+		SDL_Rect rcDest{ x + 1, y + 1, pVis->width, pVis->height };
+		CdjRect rcSrc(0, 0, sur->w, sur->h);
+		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		//SDL_FreeSurface(sur);// why does this SDL_FreeSurface crash?SDL_FreeSurface(sur); [dj2022-11 fixme]
+		sur = nullptr;
+	}
+	//sur = TTF_RenderUTF8_Blended(pFontMostChars, sText.c_str(), SDL_Color{ 255, 255, 255, 255 });
+	sur = TTF_RenderUTF8_Blended(pFontMostChars, sText.c_str(), Color);
+	//SDL_Texture* tex = SDL_CreateTextureFromSurface(pVis->pRenderer, sur);
+	if (sur)
+	{
+		SDL_Rect rcDest{ x, y, pVis->width, pVis->height };
+		CdjRect rcSrc(0, 0, sur->w, sur->h);
+		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		//SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		//SDL_FreeSurface(sur);// why does this SDL_FreeSurface crash?SDL_FreeSurface(sur); [dj2022-11 fixme]
+		sur = nullptr;
+	}
+	//SDL_RenderCopy(pVisBack->pRenderer, tex, NULL, &rect);
+}
+
 #endif
 
 void ShowHighScores()
 {
 	const int nYSTART = 20;
 	const int nHEIGHTPERROW = 14;
-#ifdef djUNICODE_TTF
-	//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 16);
-	//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 11);
-	const int nPTFONTSIZE = 12;
-	std::vector<TTF_Font*> apFonts;
-	apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/DejaVuSansMono-Bold.ttf", nPTFONTSIZE));
-	apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/DejaVuSansMono.ttf", nPTFONTSIZE));
-	apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/NotoSans-Regular.ttf", nPTFONTSIZE));
-	apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/chinese-mainland/NotoSansSC-Regular.otf", nPTFONTSIZE));
 
-	TTF_Font* pFont = TTF_OpenFont(DATA_DIR "fonts/DejaVuSans.ttf", nPTFONTSIZE);
-	TTF_Font* pFont2 = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", nPTFONTSIZE);
-	apFonts.push_back(pFont);
-	apFonts.push_back(pFont2);
-	//apFonts.push_back(TTF_OpenFont("C:\\WINDOWS\\fonts\\Arial.ttf", nPTFONTSIZE));
-#endif
 	HighScoresMenu.setSize(0);
 	HighScoresMenu.setItems(instructionsHighScoreItems);
 	HighScoresMenu.setMenuCursor(instructionsHighScoreCursor);
@@ -184,7 +237,9 @@ void ShowHighScores()
 	{
 		djgDrawImage(pVisBack, g_pImgHighScores, 0, 0, g_pImgHighScores->Width(), g_pImgHighScores->Height());
 	}
-
+#ifdef djUNICODE_TTF
+	djLoadFonts();
+#endif
 	{
 		for ( int i=0; i<(int)g_aScores.size(); i++ )
 		{
@@ -193,6 +248,7 @@ void ShowHighScores()
 #ifndef djUNICODE_TTF
 			GraphDrawString(pVisBack, g_pFont8x8, 24 + 11 * 8, nYSTART + i * nHEIGHTPERROW, (unsigned char*)g_aScores[i].szName);
 #else
+			// dj2022-11 though it's not so easy to do the same cheesey gradient we have on our 8x8 font, I grabbed the colors from that font to create a sort of a gradient anyway across the list of names that matches the visual color look .. not wonderful but not awful
 			std::vector< SDL_Color > aColorGrad;
 			aColorGrad.push_back(SDL_Color{ 221, 69, 69, 255 });
 			aColorGrad.push_back(SDL_Color{ 223, 90, 81, 255 });
@@ -205,43 +261,8 @@ void ShowHighScores()
 			aColorGrad.push_back(SDL_Color{ 233, 185, 139, 255 });
 			aColorGrad.push_back(SDL_Color{ 237, 217, 158, 255 });
 			std::string sText = g_aScores[i].szName;
-			// Get best matching font [this needs work]
-			TTF_Font* pFontMostChars = djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(apFonts, sText, sText.length());
 			const unsigned nXPOS = 24 + 11 * 8;
-			if (!pFontMostChars)//<- old fallback for safety in case something went wrong and we have no matching fonts
-			{
-				GraphDrawString(pVisBack, g_pFont8x8, nXPOS, nYSTART + i * nHEIGHTPERROW, (unsigned char*)g_aScores[i].szName);
-				continue;
-			}
-
-			//SDL_Surface* sur = TTF_RenderUNICODE_Blended_Wrapped(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
-			//SDL_Surface* sur = TTF_RenderUNICODE_Blended(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
-			//SDL_Surface* sur = TTF_RenderUTF8_Blended(pFontMostChars, sText.c_str(), SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
-			SDL_Surface* sur = TTF_RenderUTF8_Solid(pFontMostChars, sText.c_str(), SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
-			//SDL_Texture* tex = SDL_CreateTextureFromSurface(pVisBack->pRenderer, sur);
-			if (sur)
-			{
-				SDL_Rect rcDest{ nXPOS+1, nYSTART + i * nHEIGHTPERROW - 5 + 1, pVisBack->width, pVisBack->height };
-				CdjRect rcSrc(0, 0, sur->w, sur->h);
-				SDL_BlitSurface(sur, &rcSrc, pVisBack->pSurface, &rcDest);//blit [is this best way?]
-				SDL_BlitSurface(sur, &rcSrc, pVisBack->pSurface, &rcDest);//blit [is this best way?]
-				//SDL_FreeSurface(sur);// why does this SDL_FreeSurface crash?SDL_FreeSurface(sur); [dj2022-11 fixme]
-				sur = nullptr;
-			}
-			//sur = TTF_RenderUTF8_Blended(pFontMostChars, sText.c_str(), SDL_Color{ 255, 255, 255, 255 });
-			sur = TTF_RenderUTF8_Blended(pFontMostChars, sText.c_str(), aColorGrad[i%aColorGrad.size()]);
-			//SDL_Texture* tex = SDL_CreateTextureFromSurface(pVisBack->pRenderer, sur);
-			if (sur)
-			{
-				SDL_Rect rcDest{ nXPOS, nYSTART + i * nHEIGHTPERROW -5, pVisBack->width, pVisBack->height };
-				CdjRect rcSrc(0, 0, sur->w, sur->h);
-				SDL_BlitSurface(sur, &rcSrc, pVisBack->pSurface, &rcDest);//blit [is this best way?]
-				SDL_BlitSurface(sur, &rcSrc, pVisBack->pSurface, &rcDest);//blit [is this best way?]
-				//SDL_BlitSurface(sur, &rcSrc, pVisBack->pSurface, &rcDest);//blit [is this best way?]
-				//SDL_FreeSurface(sur);// why does this SDL_FreeSurface crash?SDL_FreeSurface(sur); [dj2022-11 fixme]
-				sur = nullptr;
-			}
-			//SDL_RenderCopy(pVisBack->pRenderer, tex, NULL, &rect);
+			DrawUnicodeHelper(pVisBack, nXPOS, nYSTART + i * nHEIGHTPERROW-6, aColorGrad[i % aColorGrad.size()], sText);
 #endif//#ifndef djUNICODE_TTF
 		}//i
 
@@ -251,10 +272,11 @@ void ShowHighScores()
 		do_menu( &HighScoresMenu);
 	}
 #ifdef djUNICODE_TTF
+	// Should be whne?
 	for (auto pFont : apFonts)
 	{
-		if (pFont)
-			TTF_CloseFont(pFont);
+		//if (pFont)
+			//TTF_CloseFont(pFont);
 	}
 	apFonts.clear();
 #endif
