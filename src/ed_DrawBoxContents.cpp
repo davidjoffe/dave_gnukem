@@ -77,11 +77,7 @@ printf ( "switching editor mode...\n" );
 			g_dbc_drawposy = DBC_POS_LEVELSPRITES_Y;
 			break;
 		}
-		case SWITCH_NONE:
-		{
-			//dj2022-11 can this happen? does mean exit level editor or is it just an error path that shouldn't happen? not sure ..
-			printf ( "mode none\n" );
+		default:
 			break;
-		}
 	}
 }
