@@ -30,7 +30,7 @@ CPPFLAGS = -DDATA_DIR=\"$(DATA_DIR)\" -DVERSION=\"'$(VERSION)'\"
 
 CXX = g++
 
-OBJ != find src -iname *.cpp -type f | sed --posix '/src\/ed_standalone_original.cpp/d; s/\.cpp$$/.o/'
+OBJ != find src -iname *.cpp -type f | sed --posix 's/\.cpp$$/.o/'
 
 ifeq ($(OS),Windows_NT)
     #CPPFLAGS += -D WIN32
@@ -50,7 +50,12 @@ else
         #CPPFLAGS += -D LINUX
     endif
     ifeq ($(UNAME_S),Darwin)
-        LIBS += -framework Cocoa 
+        LDFLAGS += -framework Cocoa 
+
+        # dj2022-11 getting Mac to compile here .. Matteo Bini to double-check ..
+        OBJ1 = $(shell find src -iname "*.cpp" -type f)
+        OBJ = $(patsubst %.cpp,%.o,$(OBJ1))
+
 	# dj2022-11 add c++17 min here for Mac (might change this later to c++17)
 	CXXFLAGS += -std=c++17
     endif
