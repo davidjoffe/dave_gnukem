@@ -1,7 +1,7 @@
 /*
 bullet.cpp
 
-Copyright (C) 2002-2019 David Joffe
+Copyright (C) 2002-2022 David Joffe
 */
 
 #include "config.h"
@@ -23,6 +23,10 @@ CBullet::CBullet()
 	nAnim = 0;
 	bDrawnOnce = false;
 	eType = BULLET_HERO;
+}
+
+CBullet::~CBullet()
+{
 }
 
 void CBullet::Tick(float fDeltaTime_ms)

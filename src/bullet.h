@@ -21,6 +21,7 @@ public:
 		BULLET_MONSTER
 	};
 	CBullet();
+	virtual ~CBullet();
 
 	virtual void Tick(float fDeltaTime_ms);
 	virtual void Draw(float fDeltaTime_ms);
