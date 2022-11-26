@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\console.cpp" />
     <ClCompile Include="..\gameending.cpp" />
     <ClCompile Include="..\thing_monsters.cpp" />
     <ClCompile Include="..\win32\dpiscaling.cpp" />
@@ -169,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\config.h" />
+    <ClInclude Include="..\console.h" />
     <ClInclude Include="..\djfonts.h" />
     <ClInclude Include="..\djgamelib.h" />
     <ClInclude Include="..\djgraph.h" />
@@ -209,43 +211,6 @@
     <ClInclude Include="..\thing.h" />
     <ClInclude Include="..\thing_monsters.h" />
     <ClInclude Include="resource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="..\..\data\default.gam">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\foo.gam">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def0spr.dat">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def1spr.dat">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def2spr.dat">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def3spr.dat">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def4spr.dat">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def5spr.dat">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def6spr.dat">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def7spr.dat">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\foo0spr.dat">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\missions.txt" />
-    <CustomBuild Include="..\..\HISTORY.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="vcDave.rc" />

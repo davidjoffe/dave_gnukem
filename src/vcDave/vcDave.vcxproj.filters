@@ -168,6 +168,9 @@
     <ClCompile Include="..\block.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\djgamelib.h">
@@ -222,6 +225,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\bullet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\credits.h">
@@ -293,45 +299,6 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="..\..\data\default.gam">
-      <Filter>Data\games</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\foo.gam">
-      <Filter>Data\games</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def0spr.dat">
-      <Filter>Data\sprites</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def1spr.dat">
-      <Filter>Data\sprites</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def2spr.dat">
-      <Filter>Data\sprites</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def3spr.dat">
-      <Filter>Data\sprites</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def4spr.dat">
-      <Filter>Data\sprites</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def5spr.dat">
-      <Filter>Data\sprites</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def6spr.dat">
-      <Filter>Data\sprites</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\def7spr.dat">
-      <Filter>Data\sprites</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\sprites\foo0spr.dat">
-      <Filter>Data\sprites</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\data\missions.txt">
-      <Filter>Data</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\HISTORY.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="vcDave.rc">
