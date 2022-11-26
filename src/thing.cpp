@@ -243,7 +243,7 @@ CSpikeBall::CSpikeBall()
 	m_eType = TYPE_BOUNCING;
 }
 
-void CSpikeBall::Draw()
+void CSpikeBall::Draw(float fDeltaTime_ms)
 {
 #ifdef djSPRITE_AUTO_DROPSHADOWS
 	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_nYOffset*2,BLOCKW,BLOCKH);
@@ -255,7 +255,7 @@ void CSpikeBall::OnAdded()
 {
 }
 
-int CSpikeBall::Tick()
+int CSpikeBall::Tick(float fDeltaTime_ms)
 {
 	if (m_eType==TYPE_BOUNCING)
 	{
@@ -335,7 +335,7 @@ int CBox::OnHeroShot()
 	return THING_DIE;
 }
 
-void CBox::Draw()
+void CBox::Draw(float fDeltaTime_ms)
 {
 	if ( ( m_a | m_b ) != 0 )
 		DRAW_SPRITE16(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
@@ -369,7 +369,7 @@ int CLetter::HeroOverlaps()
 	return THING_DIE;
 }
 
-void CLetter::Draw()
+void CLetter::Draw(float fDeltaTime_ms)
 {
 	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
@@ -384,7 +384,7 @@ CLift::CLift()
 	SetActionBounds(0, -BLOCKH, BLOCKW-1, -1);
 }
 
-int CLift::Tick()
+int CLift::Tick(float fDeltaTime_ms)
 {
 	if (m_bBusy)
 	{
@@ -420,7 +420,7 @@ int CLift::Action()
 	return 0;
 };
 
-void CLift::Draw()
+void CLift::Draw(float fDeltaTime_ms)
 {
 	for ( int i=0; i<m_height; ++i )
 	{
@@ -459,7 +459,7 @@ CExplosion::CExplosion()
 	m_eLayer    = LAYER_TOP;
 }
 
-int CExplosion::Tick()
+int CExplosion::Tick(float fDeltaTime_ms)
 {
 	m_countdown--;
 	if (m_countdown<0)
@@ -467,7 +467,7 @@ int CExplosion::Tick()
 	return 0;
 }
 
-void CExplosion::Draw()
+void CExplosion::Draw(float fDeltaTime_ms)
 {
 	if (m_iType==1)
 	{
@@ -500,7 +500,7 @@ CExit::CExit()
 	m_nSecondFrameTick = 0;
 }
 
-void CExit::Draw()
+void CExit::Draw(float fDeltaTime_ms)
 {
 	int nOffset;
 	nOffset = (m_nActivated>=1 ? ((djMIN(5,m_nActivated)-1)%4)*2 : 0);
@@ -518,7 +518,7 @@ int CExit::Action()
 	return 0;
 }
 
-int CExit::Tick()
+int CExit::Tick(float fDeltaTime_ms)
 {
 	if (m_nActivated>=0)
 	{
@@ -610,7 +610,7 @@ int CTeleporter::Action()
 	return 0;
 }
 
-int CTeleporter::Tick()
+int CTeleporter::Tick(float fDeltaTime_ms)
 {
 	// Update animation
 	if (m_iAnimationCount>0) m_iAnimationCount--;
@@ -623,7 +623,7 @@ int CTeleporter::Tick()
 	return 0;
 }
 
-void CTeleporter::Draw()
+void CTeleporter::Draw(float fDeltaTime_ms)
 {
 	int nOffset = (m_iAnimationCount % 3) * 3;
 	DRAW_SPRITE16A(pVisView, 5,  48+nOffset, CALC_XOFFSET(m_x-1), CALC_YOFFSET(m_y-2));
@@ -658,7 +658,7 @@ void CFloatingScore::SetScore( int score )
 	}
 }
 
-int CFloatingScore::Tick()
+int CFloatingScore::Tick(float fDeltaTime_ms)
 {
 	m_height--;
 	if (m_height<=0)
@@ -667,7 +667,7 @@ int CFloatingScore::Tick()
 	return 0;
 }
 
-void CFloatingScore::Draw()
+void CFloatingScore::Draw(float fDeltaTime_ms)
 {
 	for ( int i=0; i<m_bufferlength; ++i )
 	{
@@ -703,7 +703,7 @@ CDoor::CDoor()
 	SetShootBounds(0,0,BLOCKW-1,BLOCKH-1);
 }
 
-int CDoor::Tick()
+int CDoor::Tick(float fDeltaTime_ms)
 {
 	if (m_nOpenState!=0)
 	{
@@ -717,7 +717,7 @@ int CDoor::Tick()
 	return 0;
 }
 
-void CDoor::Draw()
+void CDoor::Draw(float fDeltaTime_ms)
 {
 	// Adding ability for door sprite to be animated, as access card is a 'special case' door but is animated [dj2017-06]
 	if (CHECK_FLAG(m_a, m_b, FLAG_ANIMATED))
@@ -754,7 +754,7 @@ int CKey::HeroOverlaps()
 	return 0;
 }
 
-void CKey::Draw()
+void CKey::Draw(float fDeltaTime_ms)
 {
 	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
@@ -805,7 +805,7 @@ int CDoorActivator::Action()
 	return 0;
 }
 
-void CDoorActivator::Draw()
+void CDoorActivator::Draw(float fDeltaTime_ms)
 {
 	// Adding ability for door sprite to be animated, as access card is a 'special case' door but is animated [dj2017-06]
 	if (CHECK_FLAG(m_a, m_b, FLAG_ANIMATED))
@@ -836,14 +836,14 @@ void CMasterComputer::OnActivated()
 	// [TODO] What exactly to do over here? You've just saved the world.
 	update_score(10000, m_x, m_y - 1);
 }
-int CMasterComputer::Tick()
+int CMasterComputer::Tick(float fDeltaTime_ms)
 {
 	//dj2022-11 adding basic animation effect for main computer
 	++m_nAnimationCount;
 	m_nAnimationCount = (m_nAnimationCount % 4);
-	return CDoorActivator::Tick();
+	return CDoorActivator::Tick(fDeltaTime_ms);
 }
-void CMasterComputer::Draw()
+void CMasterComputer::Draw(float fDeltaTime_ms)
 {
 	// This is not to be confused with BLOCKW also being 16 (it's a bit confusing but "m_b" means "Nth sprite in bitmap" but the bitmap currently contains 16 sprites along X axis and 8 along Y axis .. all that's very hardcoded and should change in future - dj2022
 	const int uSPRITES_PER_SPRITE_BITMAP_ON_XAXIS = 16;
@@ -865,7 +865,7 @@ CSoftBlock::CSoftBlock()
 	SetShootBounds(0, 0, BLOCKW-1,BLOCKH-1);
 	m_bShootable = true;
 }
-void CSoftBlock::Draw()
+void CSoftBlock::Draw(float fDeltaTime_ms)
 {
 	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
@@ -893,7 +893,7 @@ CCamera::CCamera()
 	c_nNumCameras++;
 }
 
-void CCamera::Draw()
+void CCamera::Draw(float fDeltaTime_ms)
 {
 	// "Turn" to face hero
 	int nOffset = 0;
@@ -929,7 +929,7 @@ CBanana::CBanana()
 	SetShootBounds(HALFBLOCKW-1, 0, HALFBLOCKW, BLOCKH-1);//dj2018-01-12 (To fix "the banana problem",) make shoot bounds 'thin vertical line' so that the visual effect of rendering bullet 'one last frame' that collided with us, shows us visually with that bullet impacting near the center, looks a bit odd otherwise
 }
 
-void CBanana::Draw()
+void CBanana::Draw(float fDeltaTime_ms)
 {
 #ifdef djSPRITE_AUTO_DROPSHADOWS
 	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + m_nState, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y),BLOCKW,BLOCKH);
@@ -979,14 +979,14 @@ CSoda::CSoda()
 		SetShootBounds(HALFBLOCKW-1, 0, HALFBLOCKW, BLOCKH-1);
 }
 
-void CSoda::Draw()
+void CSoda::Draw(float fDeltaTime_ms)
 {
 	if (IsShot())
 	{
 		DRAW_SPRITE16A(pVisView, 2, 48 + m_nAnim, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) - m_nShotHeight);
 		return;
 	}
-	CPickup::Draw();
+	CPickup::Draw(fDeltaTime_ms);
 }
 
 int CSoda::OnHeroShot()
@@ -1006,7 +1006,7 @@ int CSoda::HeroOverlaps()
 	return CPickup::HeroOverlaps();
 }
 
-int CSoda::Tick()
+int CSoda::Tick(float fDeltaTime_ms)
 {
 	if (IsShot())
 	{
@@ -1024,7 +1024,7 @@ int CSoda::Tick()
 			return THING_DIE;
 		}
 	}
-	return CPickup::Tick();//<- This is important for animation currently as CPickup::Tick() handles animation count [dj2017-06-24]
+	return CPickup::Tick(fDeltaTime_ms);//<- This is important for animation currently as CPickup::Tick(fDeltaTime_ms) handles animation count [dj2017-06-24]
 }
 /*-----------------------------------------------------------*/
 CFullHealth::CFullHealth()
@@ -1059,14 +1059,14 @@ int CBalloon::HeroOverlaps()
 	return THING_DIE;
 }
 
-void CBalloon::Draw()
+void CBalloon::Draw(float fDeltaTime_ms)
 {
 	DRAW_SPRITE16A(pVisView, m_a, m_b,                         CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) - BLOCKH - m_nHeight);
 //fixme32x32 dj2019-07 doesn't look right here:
 	DRAW_SPRITE16A(pVisView, m_a, m_b+16+16*((m_nHeight/4)%2), CALC_XOFFSET(m_x), CALC_YOFFSET(m_y)          - m_nHeight);
 }
 
-int CBalloon::Tick()
+int CBalloon::Tick(float fDeltaTime_ms)
 {
 	m_nHeight++;
 	SetActionBounds (0, -BLOCKH - m_nHeight,BLOCKW-1,-BLOCKH - m_nHeight + (BLOCKH*2-1));
@@ -1119,7 +1119,7 @@ int CAcme::HeroOverlaps()
 	return 0;
 }
 
-void CAcme::Draw()
+void CAcme::Draw(float fDeltaTime_ms)
 {
 #ifdef djSPRITE_AUTO_DROPSHADOWS
 	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b, 1+CALC_XOFFSET(m_x) + m_xoffset, 1+CALC_YOFFSET(m_y) + m_yoffset, BLOCKW*2, BLOCKH);
@@ -1127,7 +1127,7 @@ void CAcme::Draw()
 	DRAW_SPRITEA(pVisView, m_a, m_b, CALC_XOFFSET(m_x) + m_xoffset, CALC_YOFFSET(m_y) + m_yoffset, BLOCKW*2, BLOCKH);
 }
 
-int CAcme::Tick()
+int CAcme::Tick(float fDeltaTime_ms)
 {
 	switch (m_nState)
 	{
@@ -1266,7 +1266,7 @@ int CPickup::HeroOverlaps()
 	return THING_DIE;
 }
 
-void CPickup::Draw()
+void CPickup::Draw(float fDeltaTime_ms)
 {
 #ifdef djSPRITE_AUTO_DROPSHADOWS
 	// Note the 15 height here, this is debatable, some things look better with 16
@@ -1276,7 +1276,7 @@ void CPickup::Draw()
 	DRAW_SPRITE16A(pVisView, m_a, m_b + (m_nAnimationCount==-1?0:m_nAnimationCount), CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
 
-int CPickup::Tick()
+int CPickup::Tick(float fDeltaTime_ms)
 {
 	if (m_nAnimationCount!=-1)
 		m_nAnimationCount = (m_nAnimationCount + 1) % 4;
@@ -1339,7 +1339,7 @@ CCrumblingFloor::CCrumblingFloor() :
 	SetActionBounds(0, -5, BLOCKW-1,BLOCKH-1);
 	SetSolidBounds(0, 0, BLOCKW-1,BLOCKH-1);
 }
-int CCrumblingFloor::Tick()
+int CCrumblingFloor::Tick(float fDeltaTime_ms)
 {
 	bool bHeroTouching = OverlapsBounds(HERO_PIXELX, HERO_PIXELY);
 	//Detect 'edge' when just start touching.
@@ -1361,9 +1361,9 @@ int CCrumblingFloor::Tick()
 		}
 		return THING_DIE;
 	}
-	return CThing::Tick();
+	return CThing::Tick(fDeltaTime_ms);
 }
-void CCrumblingFloor::Draw()
+void CCrumblingFloor::Draw(float fDeltaTime_ms)
 {
 	for ( int i=0; i<m_nWidth; ++i )
 	{
@@ -1396,7 +1396,7 @@ CConveyor::CConveyor()
 	SetSolidBounds(0, 0, BLOCKW-1,BLOCKH-1);
 }
 
-int CConveyor::Tick()
+int CConveyor::Tick(float fDeltaTime_ms)
 {
 	if (m_bHeroInside)
 	{
@@ -1405,7 +1405,7 @@ int CConveyor::Tick()
 	return 0;
 }
 
-void CConveyor::Draw()
+void CConveyor::Draw(float fDeltaTime_ms)
 {
 #ifdef djSPRITE_AUTO_DROPSHADOWS
 	DRAW_SPRITEA_SHADOW(pVisView, m_a, m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y),BLOCKW,BLOCKH);
@@ -1425,7 +1425,7 @@ CFlameThrow::CFlameThrow()
 	m_eLayer = LAYER_TOP;
 }
 
-int CFlameThrow::Tick()
+int CFlameThrow::Tick(float fDeltaTime_ms)
 {
 	m_nCount = (m_nCount + 1) % 60;
 	if (m_nCount < 32)
@@ -1442,7 +1442,7 @@ int CFlameThrow::Tick()
 	return 0;
 }
 
-void CFlameThrow::Draw()
+void CFlameThrow::Draw(float fDeltaTime_ms)
 {
 	if (m_nCount<16)
 	{
@@ -1508,7 +1508,7 @@ CDynamite::CDynamite()
 	SetVisibleBounds(0 - BLOCKW*4, 0, (BLOCKW-1) + BLOCKW*4, BLOCKH-1);
 }
 
-int CDynamite::Tick()
+int CDynamite::Tick(float fDeltaTime_ms)
 {
 	//nFoo++;if ((nFoo%4)!=0) return 0;
 	if (m_nCount==(EXPLODECOUNT-6)) // fixme, fix sound so its explodecount
@@ -1521,7 +1521,7 @@ int CDynamite::Tick()
 	return 0;
 }
 
-void CDynamite::Draw()
+void CDynamite::Draw(float fDeltaTime_ms)
 {
 	if (m_nCount < EXPLODECOUNT)
 	{
@@ -1691,7 +1691,7 @@ CFan::CFan()
 	SetShootBounds(0, 0, 15, 31);
 }
 
-int CFan::Tick()
+int CFan::Tick(float fDeltaTime_ms)
 {
 	if (m_nSpeed!=0)
 	{
@@ -1716,7 +1716,7 @@ int CFan::Tick()
 	return 0;
 }
 
-void CFan::Draw()
+void CFan::Draw(float fDeltaTime_ms)
 {
 	DRAW_SPRITE16A(pVisView, m_a, m_b + m_nAnim   , CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 	DRAW_SPRITE16A(pVisView, m_a, m_b + m_nAnim+16, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y+1));
@@ -1757,7 +1757,7 @@ CRocket::CRocket() :
 {
 }
 
-int CRocket::Tick()
+int CRocket::Tick(float fDeltaTime_ms)
 {
 	if (m_bTakingOff)
 	{
@@ -1781,7 +1781,7 @@ int CRocket::Tick()
 	return 0;
 }
 
-void CRocket::Draw()
+void CRocket::Draw(float fDeltaTime_ms)
 {
 	// Hm, probably one single big blit is more efficient, but would leave 'wasted' space in sprite
 	DRAW_SPRITE16A(pVisView, 16, 1   , CALC_XOFFSET(m_x), CALC_YOFFSET(m_y-3) + m_yoffset);
@@ -1881,7 +1881,7 @@ CFirepower::CFirepower()
 	SetVisibleBounds(0, 0, BLOCKW-1,BLOCKH-1);
 }
 
-void CFirepower::Draw()
+void CFirepower::Draw(float fDeltaTime_ms)
 {
 	DRAW_SPRITE16A(pVisView, m_a, m_b, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
@@ -1906,7 +1906,7 @@ CDust::CDust()
 	m_nPuff = -1;
 }
 
-int CDust::Tick()
+int CDust::Tick(float fDeltaTime_ms)
 {
 	// FIXME:TEMP: This should be 4 puffs, I've made it 1 puff, because
 	// I'm having horrible problems (pixie dust effect if hero jumps immediately
@@ -1931,7 +1931,7 @@ int CDust::Tick()
 	return 0;
 }
 
-void CDust::Draw()
+void CDust::Draw(float fDeltaTime_ms)
 {
 	int i;
 	for ( i=0; i<=m_nPuff; i++ )
@@ -1947,14 +1947,14 @@ CWater::CWater() :
 	m_nAnimationCount(0)
 {
 }
-int CWater::Tick()
+int CWater::Tick(float fDeltaTime_ms)
 {
 	++m_nAnimationCount;
 	if (m_nAnimationCount>=4*4)
 		m_nAnimationCount = 0;
-	return CThing::Tick();
+	return CThing::Tick(fDeltaTime_ms);
 }
-void CWater::Draw()
+void CWater::Draw(float fDeltaTime_ms)
 {
 	DRAW_SPRITE16A(pVisView,
 		m_a, m_b + (m_nAnimationCount/4),
@@ -1979,7 +1979,7 @@ void CWater::Initialize(int a, int b)
 CBlock::CBlock()
 {
 }
-void CBlock::Draw()
+void CBlock::Draw(float fDeltaTime_ms)
 {
 	DRAW_SPRITE16A(pVisView,
 		m_a, m_b,// + anim4_count,

@@ -3,7 +3,7 @@
 \brief   Bullet class
 \author  David Joffe
 
-Copyright (C) 2002-2019 David Joffe
+Copyright (C) 2002-2022 David Joffe
 */
 #ifndef _BULLET_H_
 #define _BULLET_H_
@@ -22,8 +22,8 @@ public:
 	};
 	CBullet();
 
-	void Tick();
-	void Draw();
+	virtual void Tick(float fDeltaTime_ms);
+	virtual void Draw(float fDeltaTime_ms);
 
 	int x; // World (pixel) X coordinate
 	int y; // World (pixel) Y coordinate

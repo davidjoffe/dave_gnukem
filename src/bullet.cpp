@@ -25,7 +25,7 @@ CBullet::CBullet()
 	eType = BULLET_HERO;
 }
 
-void CBullet::Tick()
+void CBullet::Tick(float fDeltaTime_ms)
 {
 	// NB, NOTE [dj2018-01] In theory the bullet move belongs in here,
 	// but it's no longer in here due to refactoring - see the new
@@ -34,7 +34,7 @@ void CBullet::Tick()
 	nAnim = (nAnim+1)%4;
 }
 
-void CBullet::Draw()
+void CBullet::Draw(float fDeltaTime_ms)
 {
 	// Draw 'fire animation' if just shot, else draw bullet
 	if (bDrawnOnce)

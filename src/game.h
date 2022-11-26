@@ -3,7 +3,7 @@
 \brief   The control of the game itself
 \author  David Joffe
 
-Copyright (C) 1995-2020 David Joffe
+Copyright (C) 1995-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 /* [File created] David Joffe '95/07/28 */
@@ -72,14 +72,14 @@ extern int GetCurrentLevel();
 //! Lose a life
 extern void Die();
 //! The main game "tick" routine
-extern void GameHeartBeat(float fDT);
+extern void GameHeartBeat(float fDeltaTime_ms);
 
 //----- Game screen redrawing
 
 //! Draw the main game skin
 extern void GameDrawSkin();
 //! Draw the main game view
-extern void GameDrawView();
+extern void GameDrawView(float fDeltaTime_ms);
 
 //! Once off initialization stuff
 extern void GameInitialSetup();

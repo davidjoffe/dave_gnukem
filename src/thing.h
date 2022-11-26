@@ -4,6 +4,9 @@
 \author  David Joffe
 
 Copyright (C) 1999-2022 David Joffe
+
+dj2022-11 adding basic deltatime support (though Dave Gnukem 1 isn't using it at all [either yet, or may never, not sure, as it's 18Hz frame-capped]) but to potentially allow other games etc. to run at high frame rates with smooth scrolling etc. in future
+Not sure if the official "Dave Gnukem 1" should ever use this though because the whole point is to have similar look and feel to Duke Nukem 1 (i.e. the same old frame rate and similar blocky scrolling behaviour etc.) for that retro nostalgia vibe.
 */
 /*--------------------------------------------------------------------------*/
 /* David Joffe 1999/03/25 */
@@ -68,6 +71,15 @@ class CThing;
 //! The \ref CThingFactory uses functions that look like this to allocate CThing's.
 typedef CThing* (*THING_ALLOCATER)();
 typedef void (*THING_PERLEVELINIT)();
+
+
+/*
+//dj2022-11
+struct djUpdateInfo
+{
+	float fDeltaTime_ms=0.f;
+};
+*/
 
 
 /*-----------------------------------------------------------*/
@@ -168,11 +180,11 @@ public:
 
 	//! Called per frame to update this thing. Returning THING_DIE indicates that this "thing"
 	//! should be deleted from the world.
-	virtual int  Tick() { return 0; }
+	virtual int  Tick(float fDeltaTime_ms) { return 0; }
 	//! Called to draw this thing. Note that this does not get called if thing
 	//! does not get drawn (i.e. if clipped out of visible viewport). Use Tick()
 	//! for updating things that must be updated each frame.
-	virtual void Draw() {}
+	virtual void Draw(float fDeltaTime_ms) {}
 	//! Called when the user presses the action key while within the "action area" (bounds) of the thing.
 	//! This function should return to the game information on what action to perform.
 	//! This function *may* be superceded by the one below it
@@ -376,8 +388,8 @@ public:
 		TYPE_STATIONARY
 	};
 	CSpikeBall();
-	virtual void Draw();
-	virtual int Tick();
+	virtual void Draw(float fDeltaTime_ms) override;
+	virtual int Tick(float fDeltaTime_ms) override;
 	virtual int HeroOverlaps();
 	virtual void OnAdded();
 	virtual void Initialize(int b0, int b1);
@@ -401,7 +413,7 @@ public:
 
 	void SetContents( int iContentsA, int iContentsB );
 
-	virtual void Draw();
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual void Initialize(int b0, int b1);
 	virtual int OnHeroShot();
 
@@ -420,7 +432,7 @@ class CLetter : public CThing
 public:
 	CLetter();
 
-	virtual void Draw();
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual void Initialize(int b0, int b1);
 	virtual int HeroOverlaps();
 protected:
@@ -440,8 +452,8 @@ class CPickup : public CThing
 public:
 	CPickup();
 	virtual int  HeroOverlaps();
-	virtual void Draw();
-	virtual int  Tick();
+	virtual void Draw(float fDeltaTime_ms) override;
+	virtual int  Tick(float fDeltaTime_ms) override;
 	virtual void Initialize(int b0, int b1);
 	virtual bool OnInventoryClear() { return !m_bPersistent; }
 protected:
@@ -464,8 +476,8 @@ class CLift : public CThing
 public:
 	CLift();
 
-	virtual int  Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int  Action();
 	virtual void HeroLeave();
 protected:
@@ -484,8 +496,8 @@ class CExplosion : public CThing
 public:
 	CExplosion();
 
-	virtual int  Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 
 protected:
 	int m_countdown;
@@ -501,9 +513,9 @@ class CExit : public CThing
 {
 public:
 	CExit();
-	virtual void Draw();
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int  Action();
-	virtual int  Tick();
+	virtual int Tick(float fDeltaTime_ms) override;
 protected:
 	int m_nActivated; // -1. Becomes 0 when activated, then increments from 1 - 5, then exit occurs
 	int m_nSecondFrameTick; // To slow down animation to ever second frame ..
@@ -524,8 +536,8 @@ public:
 	CTeleporter();
 	virtual void Initialize(int b0, int b1);
 	virtual int  Action();
-	virtual void Draw();
-	virtual int  Tick();
+	virtual void Draw(float fDeltaTime_ms) override;
+	virtual int Tick(float fDeltaTime_ms) override;
 protected:
 	int m_iAnimationCount;
 	bool m_bActivated;
@@ -547,8 +559,8 @@ class CFloatingScore : public CThing
 public:
 	CFloatingScore();
 
-	virtual int  Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 
 	void SetScore( int score );
 
@@ -585,8 +597,8 @@ class CDoor : public CDoorRelatedType
 {
 public:
 	CDoor();
-	virtual int  Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	void OpenDoor() { m_nOpenState = 1; }
 protected:
 	int m_nOpenState; // 0 when closed, 1,2,3 when opening (corresponds to animation), 4 deletes itself
@@ -603,7 +615,7 @@ class CKey : public CDoorRelatedType
 public:
 	CKey();
 	virtual int HeroOverlaps();
-	virtual void Draw();
+	virtual void Draw(float fDeltaTime_ms) override;
 };
 /*-----------------------------------------------------------*/
 /*!
@@ -638,7 +650,7 @@ class CDoorActivator : public CDoorRelatedType
 public:
 	CDoorActivator();
 	virtual int  Action();
-	virtual void Draw();
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual void OnActivated(){};
 };
 /*-----------------------------------------------------------*/
@@ -652,8 +664,8 @@ class CMasterComputer : public CDoorActivator
 {
 public:
 	CMasterComputer();
-	virtual int  Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual void OnActivated();
 protected:
 	int m_nAnimationCount=0; // -1 if non-animated, otherwise [0, 3]
@@ -669,7 +681,7 @@ class CSoftBlock : public CThing
 {
 public:
 	CSoftBlock();
-	virtual void Draw();
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int OnHeroShot();
 };
 /*-----------------------------------------------------------*/
@@ -684,7 +696,7 @@ class CCamera : public CThing
 {
 public:
 	CCamera();
-	virtual void Draw();
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int  OnHeroShot();
 protected:
 	friend void CCameraPerLevelInit();
@@ -702,7 +714,7 @@ class CBanana : public CThing
 {
 public:
 	CBanana();
-	virtual void Draw();
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int  OnHeroShot();
 	virtual int HeroOverlaps();
 protected:
@@ -719,10 +731,10 @@ class CSoda : public CPickup
 {
 public:
 	CSoda();
-	virtual void Draw();
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int OnHeroShot();
 	virtual int HeroOverlaps();
-	virtual int Tick();
+	virtual int Tick(float fDeltaTime_ms) override;
 protected:
 	bool IsShot() const { return m_nShotHeight!=-1; }
 	int m_nShotHeight; // -1 until shot, otherwise positive=up height (pixels)
@@ -753,8 +765,8 @@ class CBalloon : public CThing
 public:
 	CBalloon();
 	virtual int  HeroOverlaps();
-	virtual void Draw();
-	virtual int  Tick();
+	virtual void Draw(float fDeltaTime_ms) override;
+	virtual int Tick(float fDeltaTime_ms) override;
 	virtual int  OnHeroShot();
 protected:
 	int m_nHeight; // Starts at 0, increases
@@ -771,8 +783,8 @@ class CAcme : public CThing
 public:
 	CAcme();
 	virtual int  HeroOverlaps();
-	virtual void Draw();
-	virtual int  Tick();
+	virtual void Draw(float fDeltaTime_ms) override;
+	virtual int Tick(float fDeltaTime_ms) override;
 	virtual int  OnHeroShot();
 protected:
 	int m_nState;
@@ -805,8 +817,8 @@ class CCrumblingFloor : public CThing
 {
 public:
 	CCrumblingFloor();
-	virtual int Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual void Initialize(int b0, int b1);
 protected:
 	int m_nStrength;//Starts at e.g. 2, each time hero walks on us we decrement the counter, when counter hits 0, we self-terminate
@@ -824,8 +836,8 @@ class CConveyor : public CThing
 {
 public:
 	CConveyor();
-	virtual int Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual void Initialize(int b0, int b1);
 protected:
 	int m_nDir; // Direction, either -1 or 1
@@ -841,8 +853,8 @@ class CFlameThrow : public CThing
 {
 public:
 	CFlameThrow();
-	virtual int Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual void Initialize(int b0, int b1);
 	virtual int HeroOverlaps();
 protected:
@@ -860,8 +872,8 @@ class CDynamite : public CThing
 {
 public:
 	CDynamite();
-	virtual int Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int HeroOverlaps();
 	virtual bool OverlapsBounds(int x, int y);
 	virtual void DrawActionBounds(const djColor &Color);
@@ -884,8 +896,8 @@ class CFan : public CThing
 {
 public:
 	CFan();
-	virtual int Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual void Initialize(int b0, int b1);
 	virtual int OnHeroShot();
 protected:
@@ -906,7 +918,7 @@ class CFirepower : public CThing
 {
 public:
 	CFirepower();
-	virtual void Draw();
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int HeroOverlaps();
 };
 /*-----------------------------------------------------------*/
@@ -920,8 +932,8 @@ class CRocket : public CThing
 {
 public:
 	CRocket();
-	virtual int Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual void Initialize(int a, int b);
 	virtual int OnHeroShot();
 protected:
@@ -945,8 +957,8 @@ class CWater : public CThing
 {
 public:
 	CWater();
-	virtual int Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual void Initialize(int a, int b);
 protected:
 	int m_nAnimationCount;
@@ -964,7 +976,7 @@ class CBlock : public CThing
 {
 public:
 	CBlock();
-	virtual void Draw();
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual void Initialize(int a, int b);
 };
 /*-----------------------------------------------------------*/
@@ -978,8 +990,8 @@ class CDust : public CThing
 {
 public:
 	CDust();
-	virtual int Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 protected:
 	int m_anAnim[4];//!< Animation phase for up to four puffs
 	int m_anX[4];	//!< X positions of puffs

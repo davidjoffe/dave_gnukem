@@ -113,13 +113,13 @@ int CMonster::OnKilled()
 {
 	return 0;//Return THING_DIE if want to immediately die (but most will start some sort of 'death animation', and only thereafter die)
 }
-int CMonster::Tick()
+int CMonster::Tick(float fDeltaTime_ms)
 {
 	if (m_nFlickerCounter>0)
 	{
 		--m_nFlickerCounter;
 	}
-	return CThing::Tick();
+	return CThing::Tick(fDeltaTime_ms);
 }
 int CMonster::OnHeroShot()
 {
@@ -160,7 +160,7 @@ int CRobot::HeroOverlaps()
 	return 0;
 }
 
-void CRobot::Draw()
+void CRobot::Draw(float fDeltaTime_ms)
 {
 	if (m_nType==0) // Robot?
 	{
@@ -172,7 +172,7 @@ void CRobot::Draw()
 	}
 }
 
-int CRobot::Tick()
+int CRobot::Tick(float fDeltaTime_ms)
 {
 	// NOTE: Say the robot is on shootable soft-solid blocks, but with m_xoffset partial e.g.:
 	//
@@ -334,7 +334,7 @@ int CFlyingRobot::OnKilled()
 	}
 	return 0;
 }
-void CFlyingRobot::Draw()
+void CFlyingRobot::Draw(float fDeltaTime_ms)
 {
 	if (IsDying())
 	{
@@ -371,7 +371,7 @@ void CFlyingRobot::Draw()
 		}
 	}
 }
-int CFlyingRobot::Tick()
+int CFlyingRobot::Tick(float fDeltaTime_ms)
 {
 	// Busy dying? Show death animation
 	if (IsDying())
@@ -384,12 +384,12 @@ int CFlyingRobot::Tick()
 		m_xoffset = -10 - (m_nDieAnimLength-m_nDieAnim)*4;
 		m_yoffset += (((m_nDieAnimLength-m_nDieAnim)*(m_nDieAnimLength-m_nDieAnim))/2);
 
-		return CThing::Tick();//Should this be CMonster::Tick()? CRobot::Tick()?
+		return CThing::Tick(fDeltaTime_ms);//Should this be CMonster::Tick(float fDeltaTime_ms)? CRobot::Tick(float fDeltaTime_ms)?
 	}
 
 	// Normal ('alive') tick/update (which we only do if in view)
 	if (!IsInView())
-		return CThing::Tick();
+		return CThing::Tick(fDeltaTime_ms);
 
 	// Turn to face (and move in) direction of hero
 	if (g_Player.x < m_x - 1)
@@ -486,7 +486,7 @@ int CFlyingRobot::Tick()
 		// NB note this also implies we set to same in *constructor*.
 	}
 
-	return CMonster::Tick();
+	return CMonster::Tick(fDeltaTime_ms);
 }
 void CFlyingRobot::Initialize(int a, int b)
 {
@@ -518,7 +518,7 @@ void CRabbit::Initialize(int a, int b)
 	SetLayer(LAYER_4);
 	m_bShootable = true;
 }
-void CRabbit::Draw()
+void CRabbit::Draw(float fDeltaTime_ms)
 {
 	const int a=6;//Spriteset number
 	const int b=(m_nXDir>0 ? 6*16 : 6*16 + 8);//Sprite number within spriteset
@@ -531,7 +531,7 @@ void CRabbit::Draw()
 		x -HALFBLOCKW   ,y-BLOCKH,
 		BLOCKW*2  ,  BLOCKH*2);
 }
-int CRabbit::Tick()
+int CRabbit::Tick(float fDeltaTime_ms)
 {
 	if (++m_nWalkAnimOffsetUpdateCounter>=2)
 	{
@@ -568,7 +568,7 @@ int CRabbit::Tick()
 		}
 	}
 	
-	return CMonster::Tick();
+	return CMonster::Tick(fDeltaTime_ms);
 }
 int CRabbit::HeroOverlaps()
 {
@@ -614,7 +614,7 @@ void CHighVoltage::Initialize(int a, int b)
 	SetShootBounds  (6,0,BLOCKW-7,BLOCKH*m_nHeight-1);//[dj2018-01] Thin shootbounds, in middle, for new bullet code, so it looks like bullets hit around center
 	SetActionBounds (0,0,BLOCKW-1,BLOCKH*m_nHeight-1);
 }
-void CHighVoltage::Draw()
+void CHighVoltage::Draw(float fDeltaTime_ms)
 {
 	for ( int i=0; i<m_nHeight; ++i )
 	{
@@ -632,9 +632,9 @@ void CHighVoltage::Draw()
 		DRAW_SPRITE16A(pVisView,a,b,x,y);
 	}
 }
-int CHighVoltage::Tick()
+int CHighVoltage::Tick(float fDeltaTime_ms)
 {
-	return CMonster::Tick();
+	return CMonster::Tick(fDeltaTime_ms);
 }
 int CHighVoltage::HeroOverlaps()
 {
@@ -686,7 +686,7 @@ void CCannon::Initialize(int a, int b)
 	SetShootBounds  (0,0,BLOCKW*2-1,BLOCKH-1);
 	SetActionBounds (0,0,BLOCKW*2-1,BLOCKH-1);
 }
-int CCannon::Tick()
+int CCannon::Tick(float fDeltaTime_ms)
 {
 	// IF BUMP INTO SOMETHING SOLID, REVERSE DIRECTION
 	//fixmeTHIS and also the rabbit i think might not be 100% correct, check these
@@ -759,9 +759,9 @@ int CCannon::Tick()
 		}
 	}
 
-	return CMonster::Tick();
+	return CMonster::Tick(fDeltaTime_ms);
 }
-void CCannon::Draw()
+void CCannon::Draw(float fDeltaTime_ms)
 {
 	// Draw sprite
 	int a=m_a;//Spriteset number
@@ -826,7 +826,7 @@ CCrawler::CCrawler()
 	m_nXDir = 0;
 }
 
-int CCrawler::Tick()
+int CCrawler::Tick(float fDeltaTime_ms)
 {
 	if (m_yoffset==0)
 	{
@@ -853,7 +853,7 @@ int CCrawler::Tick()
 	return 0;
 }
 
-void CCrawler::Draw()
+void CCrawler::Draw(float fDeltaTime_ms)
 {
 #ifdef djSPRITE_AUTO_DROPSHADOWS
 	DRAW_SPRITEA_SHADOW(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_yoffset,BLOCKW,BLOCKH);
@@ -893,14 +893,14 @@ CSpike::CSpike()
 	SetActionBounds(0,0,BLOCKW-1,BLOCKH-1);
 }
 
-int CSpike::Tick()
+int CSpike::Tick(float fDeltaTime_ms)
 {
 	if (m_nSpikePopupCount>0)
 		m_nSpikePopupCount--;
 	return 0;
 }
 
-void CSpike::Draw()
+void CSpike::Draw(float fDeltaTime_ms)
 {
 	DRAW_SPRITE16A(pVisView, m_a, m_b + (m_nSpikePopupCount>0 ? 1 : 0), CALC_XOFFSET(m_x), CALC_YOFFSET(m_y));
 }
@@ -939,7 +939,7 @@ CJumpingMonster::CJumpingMonster() :
 	m_bLinedUpToShoot(false)
 {
 }
-int CJumpingMonster::Tick()
+int CJumpingMonster::Tick(float fDeltaTime_ms)
 {
 	// Turn to face (and move in) direction of hero
 	if (g_Player.x < m_x - 1)
@@ -1098,9 +1098,9 @@ int CJumpingMonster::Tick()
 		}
 	}
 
-	return CMonster::Tick();
+	return CMonster::Tick(fDeltaTime_ms);
 }
-void CJumpingMonster::Draw()
+void CJumpingMonster::Draw(float fDeltaTime_ms)
 {
 	if (m_nFlickerCounter==0 || ((m_nFlickerCounter%2)==0))
 	{
@@ -1178,7 +1178,7 @@ CDrProton::~CDrProton()
 {
 	g_pGameEnding = NULL;
 }
-int CDrProton::Tick()
+int CDrProton::Tick(float fDeltaTime_ms)
 {
 	//if (m_nOrigX<0)
 		//m_nOrigX = m_x;
@@ -1295,9 +1295,9 @@ int CDrProton::Tick()
 
 	}
 
-	return CMonster::Tick();
+	return CMonster::Tick(fDeltaTime_ms);
 }
-void CDrProton::Draw()
+void CDrProton::Draw(float fDeltaTime_ms)
 {
 	// If flickering-from-hurting, skip every 2nd frame
 	if (m_nFlickerCounter==0 || ((m_nFlickerCounter%2)==0))

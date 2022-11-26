@@ -19,7 +19,7 @@ class CMonster : public CThing
 public:
 	CMonster();
 	virtual void Initialize(int a, int b);
-	virtual int Tick();
+	virtual int Tick(float fDeltaTime_ms) override;
 	virtual int OnHeroShot();
 
 	virtual int OnKilled();
@@ -43,8 +43,8 @@ class CRobot : public CMonster
 public:
 	CRobot();
 	virtual int HeroOverlaps();
-	virtual void Draw();
-	virtual int Tick();
+	virtual void Draw(float fDeltaTime) override;
+	virtual int Tick(float fDeltaTime) override;
 	virtual void Initialize(int a, int b);
 	virtual int OnKilled();
 protected:
@@ -57,8 +57,8 @@ class CFlyingRobot : public CRobot
 public:
 	CFlyingRobot();
 	virtual int HeroOverlaps();
-	virtual void Draw();
-	virtual int Tick();
+	virtual void Draw(float fDeltaTime_ms) override;
+	virtual int Tick(float fDeltaTime) override;
 	virtual int OnKilled();
 	void Initialize(int a, int b);
 protected:
@@ -81,8 +81,8 @@ class CRabbit : public CMonster
 public:
 	CRabbit();
 	virtual void Initialize(int a, int b);
-	virtual void Draw();
-	virtual int Tick();
+	virtual void Draw(float fDeltaTime_ms) override;
+	virtual int Tick(float fDeltaTime) override;
 	virtual int HeroOverlaps();
 	virtual int OnHeroShot();
 protected:
@@ -101,8 +101,8 @@ class CHighVoltage : public CMonster
 public:
 	CHighVoltage();
 	virtual void Initialize(int a, int b);
-	virtual void Draw();
-	virtual int Tick();
+	virtual void Draw(float fDeltaTime_ms) override;
+	virtual int Tick(float fDeltaTime) override;
 	virtual int HeroOverlaps();
 	virtual int OnHeroShot();
 protected:
@@ -114,8 +114,8 @@ class CCannon : public CMonster
 public:
 	CCannon();
 	virtual void Initialize(int a, int b);
-	virtual int Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int HeroOverlaps();
 	virtual int OnHeroShot();
 	virtual int OnKilled();
@@ -131,8 +131,8 @@ class CCrawler : public CThing
 {
 public:
 	CCrawler();
-	virtual int Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int  OnHeroShot();
 	virtual int HeroOverlaps();
 	virtual void Initialize(int b0, int b1);
@@ -153,8 +153,8 @@ class CSpike : public CThing
 {
 public:
 	CSpike();
-	virtual int  Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int  HeroOverlaps();
 	virtual void Initialize(int b0, int b1);
 protected:
@@ -166,8 +166,8 @@ class CJumpingMonster : public CMonster
 {
 public:
 	CJumpingMonster();
-	virtual int  Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual void Initialize(int a, int b);
 	virtual int HeroOverlaps();
 	virtual int OnKilled();
@@ -191,8 +191,8 @@ class CDrProton : public CMonster
 public:
 	CDrProton();
 	virtual ~CDrProton();
-	virtual int  Tick();
-	virtual void Draw();
+	virtual int Tick(float fDeltaTime_ms) override;
+	virtual void Draw(float fDeltaTime_ms) override;
 	virtual void Initialize(int a, int b);
 	virtual int HeroOverlaps();
 	virtual int OnHeroShot();

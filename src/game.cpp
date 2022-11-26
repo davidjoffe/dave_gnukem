@@ -115,7 +115,7 @@ bool g_bGodMode = false;
 // Draw hero firepower
 void GameDrawFirepower();
 // Bullet system
-void DrawBullets();
+void DrawBullets(float fDeltaTime_ms);
 // Draw debug info
 void DrawDebugInfo();
 
@@ -592,14 +592,14 @@ void InteractWithThings()
 	}
 }
 //! GameHeartBeat() helper
-void TickAllThings()
+void TickAllThings(float fDeltaTime_ms)
 {
 	CThing* pThing = NULL;
 	for ( int i=0; i<(int)g_apThings.size(); ++i )
 	{
 		pThing = g_apThings[i];
 		// FIXME: THING_REMOVE?
-		if (pThing->Tick()==THING_DIE)
+		if (pThing->Tick(fDeltaTime_ms)==THING_DIE)
 		{
 			// Delete this
 			delete pThing;
@@ -713,7 +713,7 @@ void CheckIfHeroShooting()
 		g_nNoShootCounter--;
 }
 //! GameHeartBeat() helper
-void UpdateBullets()
+void UpdateBullets(float fDeltaTime_ms)
 {
 	CBullet* pBullet=NULL;
 
@@ -722,7 +722,7 @@ void UpdateBullets()
 	for ( int i=0; i<(int)g_apBullets.size(); ++i )//I think we must use signed here because we do --i in the loop
 	{
 		pBullet = g_apBullets[i];
-		pBullet->Tick();
+		pBullet->Tick(fDeltaTime_ms);
 
 		// NB This only handles simple-case 'horizontal-moving' bullets -
 		// for now that's fine, but if we ever make this a generic
@@ -1367,7 +1367,7 @@ int game_startup(bool bLoadGame)
 
 	TRACE("game_startup(): GameDrawView()\n");
 	// FIXME: Is this necessary?
-	GameDrawView();
+	GameDrawView(0.f);
 
 	g_bGameRunning = true;
 
@@ -2022,7 +2022,7 @@ int game_startup(bool bLoadGame)
 }
 
 /*-----------------------------------------------------------*/
-void GameHeartBeat(float fDT)
+void GameHeartBeat(float fDeltaTime_ms)
 {
 	// Update hero basic stuff
 	HeroUpdate();
@@ -2150,7 +2150,7 @@ void GameHeartBeat(float fDT)
 
 
 	// Update bullets
-	UpdateBullets();
+	UpdateBullets(fDeltaTime_ms);
 	CheckForBulletsOutOfView();
 
 	// Check if hero is shooting and if must create new hero bullets
@@ -2163,7 +2163,7 @@ void GameHeartBeat(float fDT)
 	DropFallableThings();
 
 	// "Tick" (update) all objects
-	TickAllThings();
+	TickAllThings(fDeltaTime_ms);
 
 	if (g_bDied)
 	{
@@ -2173,7 +2173,7 @@ void GameHeartBeat(float fDT)
 	}
 
 	// Redraw the screen according to the current game state
-	GameDrawView();
+	GameDrawView(fDeltaTime_ms);
 
 	// Clear the to-be-deleted bullets that have just hit something (after
 	// drawing them one last time) [dj2018-01-13] [This is a 'kludge' for effective visual effect of drawing these one last frame after they've hit something]
@@ -2326,7 +2326,7 @@ void update_score(int score_diff, int nFloatingScoreXBlockUnits, int nFloatingSc
 		AddThing(CreateFloatingScore(nFloatingScoreXBlockUnits, nFloatingScoreYBlockUnits, score_diff));
 }
 /*-----------------------------------------------------------*/
-void DrawThingsAtLayer(EdjLayer eLayer)
+void DrawThingsAtLayer(EdjLayer eLayer, float fDeltaTime_ms)
 {
 	CThing *pThing;
 	unsigned int i;
@@ -2334,11 +2334,11 @@ void DrawThingsAtLayer(EdjLayer eLayer)
 	{
 		pThing = g_apThings[i];
 		if (pThing->Layer()==eLayer && pThing->IsInView())
-			pThing->Draw();
+			pThing->Draw(fDeltaTime_ms);
 	}
 }
 
-void GameDrawView()
+void GameDrawView(float fDeltaTime_ms)
 {
 	int i=0,j=0,a=0,b=0,nXOffset=0;
 	int anim_offset = 0;
@@ -2552,9 +2552,9 @@ void GameDrawView()
 	}
 
 	// Draw pre-hero layers, then draw hero, then draw post-hero layers.
-	DrawThingsAtLayer(LAYER_BOTTOM);
-	DrawThingsAtLayer(LAYER_2);
-	DrawThingsAtLayer(LAYER_MIDDLE);
+	DrawThingsAtLayer(LAYER_BOTTOM, fDeltaTime_ms);
+	DrawThingsAtLayer(LAYER_2, fDeltaTime_ms);
+	DrawThingsAtLayer(LAYER_MIDDLE, fDeltaTime_ms);
 	// draw hero, but flash if he is currently hurt
 	int yoff=0;
 	if ((g_Player.nHurtCounter == 0) || (g_Player.nHurtCounter%3 != 0))
@@ -2628,11 +2628,11 @@ void GameDrawView()
 				HEROH_COLLISION);
 		}
 	}
-	DrawThingsAtLayer(LAYER_4);
-	DrawThingsAtLayer(LAYER_TOP);
+	DrawThingsAtLayer(LAYER_4, fDeltaTime_ms);
+	DrawThingsAtLayer(LAYER_TOP, fDeltaTime_ms);
 
 	// Draw bullets
-	DrawBullets();
+	DrawBullets(fDeltaTime_ms);
 
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
 	// God mode status display
@@ -2940,7 +2940,7 @@ void DrawDebugInfo()
 	//GraphDrawString(pVisView, g_pFont8x8, 32, 70, (unsigned char*)buf );
 }
 
-void DrawBullets()
+void DrawBullets(float fDeltaTime_ms)
 {
 	unsigned int i;
 	CBullet* pBullet=NULL;
@@ -2949,7 +2949,7 @@ void DrawBullets()
 		pBullet = g_apBulletsDeleted[i];
 		if (OVERLAPS_VIEW(pBullet->x, pBullet->y, pBullet->x+BULLET_WIDTH, pBullet->y+BULLET_HEIGHT))
 		{
-			pBullet->Draw();
+			pBullet->Draw(fDeltaTime_ms);
 		}
 	}
 	for ( i=0; i<g_apBullets.size(); ++i )
@@ -2957,7 +2957,7 @@ void DrawBullets()
 		pBullet = g_apBullets[i];
 		if (OVERLAPS_VIEW(pBullet->x, pBullet->y, pBullet->x+BULLET_WIDTH, pBullet->y+BULLET_HEIGHT))
 		{
-			pBullet->Draw();
+			pBullet->Draw(fDeltaTime_ms);
 		}
 	}
 }
