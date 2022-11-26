@@ -16,6 +16,8 @@ Copyright (C) 1995-2022 David Joffe
 
 /*--------------------------------------------------------------------------*/
 
+#include "config.h"
+#include "version.h"//dj2022-11 for new VERSION
 #include <time.h>   // for srand()
 
 #include "graph.h"
