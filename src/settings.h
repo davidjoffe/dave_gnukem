@@ -13,7 +13,6 @@ Copyright (C) 2001-2018 David Joffe
 #include <vector>
 #include <string.h>
 #include <stdlib.h>
-using namespace std;
 
 //! Configuration class
 class CSettings
@@ -58,7 +57,7 @@ protected:
 		// Value associated with key
 		char *szValue = nullptr;
 	};
-	vector<SSetting> m_aSettings;
+	std::vector<SSetting> m_aSettings;
 };
 
 //! Global game settings

@@ -80,11 +80,11 @@ void ED_SetSpriteSet ( int ispritesetnew );
 
 
 // "show"-functions:
-void ED_SpriteShowType( int c );	// DrawString, DrawBoxContents.
+void ED_SpriteShowType( bool bClear );	// DrawString, DrawBoxContents.
 				// refers to sprite as an object,
 				// not as a sprite editor. hence,
 				// it is common function
-void ED_SpriteShowExtra( int i, int c );	// DrawString
+void ED_SpriteShowExtra( int i );	// DrawString
 				// refers to sprite as an object,
 				// not as a sprite editor. hence,
 				// it is common function

@@ -14,10 +14,22 @@ Created: 09/2001
 #include "SDL.h"
 #endif
 #include <vector>
-using namespace std;
+
+// dj2022-11 [low prio] we might want to give porters more control over these default keys (some consolde platforms have needed to hardcode oddly specific things like 'j' etc. here, can't recall which right now but I saw it in a Dave Gnukem fork recently) ..
+// Also to think about is that a slightly rude user reported to me that these keys can interfere with default keys for some window managers like MATE etc. apparently for things like desktop switching? Or something like that
+// However, the reason these are the default keys is that these are the default keys on Duke Nukem 1, and though this is neither a clone nor a remake (more like a parody) of DN1 the point is to give some sense of retro familiarity and 'similar look and feel' of gameplay to original - so someone who played the original should feel immediately at home with the same keys.
+// So I feel strongly the normal default keys should be as per below the same as DN1 except in specific 'edge cases' where it should or could maybe differ, i.e.:
+//   Up: Action
+//   Move left: Left
+//   Move right: Right
+//   Jump: Ctrl
+//   Shoot: Alt
+// And on major platforms like Windows these are anyway fine and shouldn't interfere with anything. But perhaps we could add some ability to add more 'default key profiles' (possibly also in e.g. small little config files porters could extend/add),
+// and perhaps do detection if you are on a platform where the default keys may cause issues and make it easier for the user to select different default key profiles.
+// But that's all low priority, I don't have time for that, but is good to think about as we refactor in future.
 
 // Default keys
-int g_anKeys[KEY_NUMKEYS] =
+int g_anKeys[KEY_NUM_MAIN_REDEFINABLE_KEYS] =
 {
 	SDLK_UP,
 	SDLK_LEFT,
@@ -29,7 +41,7 @@ int g_anKeys[KEY_NUMKEYS] =
 // Note here keycode is the SDL one, not the 'DJ' one [dj2016-10]
 bool IsGameKeyAssigned(int nKeyCode)
 {
-	for ( unsigned int i=0; i<KEY_NUMKEYS; ++i )
+	for ( unsigned int i=0; i<KEY_NUM_MAIN_REDEFINABLE_KEYS; ++i )
 	{
 		if ( g_anKeys[i]==nKeyCode )
 			return true;
@@ -38,7 +50,7 @@ bool IsGameKeyAssigned(int nKeyCode)
 }
 
 // Key descriptions
-const char *g_aszKeys[KEY_NUMKEYS] =
+const char *g_aszKeys[KEY_NUM_MAIN_REDEFINABLE_KEYS] =
 {
 	"Action",
 	"Left",
@@ -47,7 +59,8 @@ const char *g_aszKeys[KEY_NUMKEYS] =
 	"Shoot"
 };
 
-vector<int> g_anValidGameKeys;
+// dj2022-11 low priority should probably use set or even better unordered_set for things like this (BUT not important right now it's just for redefining keys so not a bottleneck) but we might get rid of this later (see comments at IsGameKey)
+std::vector<int> g_anValidGameKeys;
 
 // dj: IMPORTANT NOTE FOR ~2022-11 SDL1 TO SDL2 IMPLEMENTATION:
 // Previously the settings file stored the defined keys with keyname "Key" in front; however with SDL2 support this
@@ -57,7 +70,7 @@ vector<int> g_anValidGameKeys;
 
 void StoreGameKeys()
 {
-	for ( int i=0; i<KEY_NUMKEYS; i++ )
+	for ( int i=0; i<KEY_NUM_MAIN_REDEFINABLE_KEYS; i++ )
 	{
 		char szKey[128]={0};
 		snprintf(szKey, sizeof(szKey), "SDL2Key%s", g_aszKeys[i]);
@@ -69,14 +82,14 @@ void InitialiseGameKeySystem()
 {
 	// Set default keys (if not defined in settings already, e.g. if there was no config file)
 	char szKey[128]={0};
-	for ( int i=0; i<KEY_NUMKEYS; i++ )
+	for ( int i=0; i<KEY_NUM_MAIN_REDEFINABLE_KEYS; i++ )
 	{
 		snprintf(szKey, sizeof(szKey), "SDL2Key%s", g_aszKeys[i]);
 		g_Settings.SetDefaultSettingInt(szKey, g_anKeys[i]);
 	}
 
 	// Read key settings from config
-	for ( int i=0; i<KEY_NUMKEYS; i++ )
+	for ( int i=0; i<KEY_NUM_MAIN_REDEFINABLE_KEYS; i++ )
 	{
 		snprintf(szKey, sizeof(szKey), "SDL2Key%s", g_aszKeys[i]);
 		g_anKeys[i] = g_Settings.FindSettingInt(szKey);

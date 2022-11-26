@@ -264,6 +264,12 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		printf("Unable to find data folder '%s'. Please note this is in a separate repo - see the ReadMe.md for details.\n",DATA_DIR);
 		printf("If you have the data folder, then you can generally fix this message by first changing your current\n");
 		printf("directory to the folder in which the 'data' folder is contained, then running the application.\n");
+		// (dj2022-11 Add the below line, hmm, not sure whether it really belongs in the help text here to mention things like git repo cloning (and also maybe the URL may change later) but for now
+		// I think it's better to have 'more possibly helpful info for users' that may help them get up and running and maybe refine this later - dj2022-11)
+		// We could also consider doing 'fancy' things like just exec'ing a git clone if the user wants or something .. and/or add some small little helper scripts to do things like below. Or even auto-downloading data. Anyway. Low priority for now.
+		// Also to consider is doing it generically so this code could support more games (and/or a hypothetical 'DG version 2')
+		// dj2022-11 One additional thought on the below is that the below may fetch a 'bleeding edge' version with unstable stuff in it in future - hmm - maybe this needs more thought. LOW prio though.
+		//printf("You can also get it by running: git clone https://github.com/davidjoffe/gnukem_data.git %s\n", DATA_DIR);
 		return -1;
 	}
 
@@ -337,6 +343,13 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 	djSoundInit();				// Initialize sound
 
+#ifdef djUNICODE_SUPPORT
+	djLOGSTR("djUnicodeFontInit\n");
+	extern void djUnicodeFontInit();
+	djUnicodeFontInit();		// dj2022-11 Unicode/TTF font system
+	djLOGSTR("djUnicodeFontInit ok\n");
+#endif
+
 	g_pImgMain = new djImage;			// Load main skin (title screen)
 	g_pImgMain->Load(DATA_DIR "main.tga");
 	djCreateImageHWSurface( g_pImgMain );
@@ -350,7 +363,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 	//-- Initialize input devices
 	djLOGSTR("DaveStartup(): Initializing keys ..\n");
-	if (!djiInit( pVisMain ))
+	if (!djiInit())
 		return -1;
 
 	InitMainMenu();			// fill the structures and load some stuff
@@ -384,6 +397,12 @@ void DaveCleanup()
 	djLOGSTR( "djiDone() ok\n" );
 	djSoundDone();			// Sound
 	djLOGSTR( "djSoundDone() ok\n" );
+#ifdef djUNICODE_SUPPORT
+	djLOGSTR("djUnicodeFontDone\n");
+	extern void djUnicodeFontDone();
+	djUnicodeFontDone();		// dj2022-11 Unicode/TTF font system
+	djLOGSTR("djUnicodeFontDone ok\n");
+#endif
 	djDestroyImageHWSurface(g_pImgMain);
 	djDEL(g_pImgMain);		// Delete main menu background image (title screen)
 	djLOGSTR( "djDEL(g_pImgMain) ok\n" );
@@ -413,12 +432,12 @@ void SettingsMenu()
 	struct SMenuItem SettingsMenuItems[] =
 	{
 		// this looks very weird; need to fix menu code to handle this better, or wrap setttingsmenu in additional UI stuff
-		//{ false, "                                     " },//(DJ2019-06 low prio, at some stage want to fix up menu code so we can space / layout this thing properly - either that, or change how it draws the background)
-		{ false, " retro user experience settings      " },
+		{ false, " " },//(DJ2019-06 low prio, at some stage want to fix up menu code so we can space / layout this thing properly - either that, or change how it draws the background)
+		{ false, " Retro user experience settings  " },
 		//{ false, "                                     " },
-		{ true,  "   Mild (Default graphics)           " },
-		{ true,  "   Medium (EGA) (simulated 16-color) " },
-		{ true,  "   High (CGA) (simulated 4-color)    " },
+		{ true,  "   Mild (Default graphics)          ", "settings/retro/default" },
+		{ true,  "   Medium (EGA) (simulated 16-color)", "settings/retro/ega" },
+		{ true,  "   High (CGA) (simulated 4-color)   ", "settings/retro/cga" },
 		//{ false, "                                     " },
 		{ false, "                                     " },
 		{ false, NULL }
@@ -434,19 +453,18 @@ void SettingsMenu()
 	Menu.setXOffset(-1); // Calculate menu position for us
 	Menu.setYOffset(-1);
 
+	//dj2022-11 refactoring
 	int nMenuOption = do_menu( &Menu );
-	switch (nMenuOption)
-	{
-	case 1:
+	std::string sSelectedMenuCommand;
+	if (nMenuOption >= 0 && Menu.getItems()[nMenuOption].m_szRetVal != nullptr)
+		sSelectedMenuCommand = Menu.getItems()[nMenuOption].m_szRetVal;
+	
+	if (sSelectedMenuCommand == "settings/retro/default")
 		g_nSimulatedGraphics = 0;
-		break;
-	case 2:
+	else if (sSelectedMenuCommand == "settings/retro/ega")
 		g_nSimulatedGraphics = 1;
-		break;
-	case 3:
+	else if (sSelectedMenuCommand == "settings/retro/cga")
 		g_nSimulatedGraphics = 2;
-		break;
-	}
 }
 
 void DoMainMenu()
@@ -605,7 +623,7 @@ void DialogBoxEffect(int x1, int y1, int w, int h, bool bInverted = false)
 // Helper for RedefineKeys to prevent assigning same key to two actions [dj2016-10]
 bool IsKeyUsed(int* anKeys, int key)
 {
-	for ( unsigned int i=0; i<KEY_NUMKEYS; ++i )
+	for ( unsigned int i=0; i<KEY_NUM_MAIN_REDEFINABLE_KEYS; ++i )
 	{
 		if (anKeys[i] == key)
 			return true;
@@ -614,7 +632,7 @@ bool IsKeyUsed(int* anKeys, int key)
 }
 void RedefineKeys()
 {
-	int anKeys[KEY_NUMKEYS] = {0};
+	int anKeys[KEY_NUM_MAIN_REDEFINABLE_KEYS] = {0};
 	bool bLoop = true;
 	bool bFinished = false;
 	int nCurrent = 0;
@@ -654,7 +672,7 @@ void RedefineKeys()
 							bLoop = false;
 							// Commit changes
 							int j;
-							for ( j=0; j<KEY_NUMKEYS; j++ )
+							for ( j=0; j<KEY_NUM_MAIN_REDEFINABLE_KEYS; j++ )
 							{
 								g_anKeys[j] = anKeys[j];
 							}
@@ -666,7 +684,7 @@ void RedefineKeys()
 					{
 						anKeys[nCurrent] = Event.key.keysym.sym;
 						nCurrent++;
-						if (nCurrent==KEY_NUMKEYS)
+						if (nCurrent==KEY_NUM_MAIN_REDEFINABLE_KEYS)
 						{
 							bFinished = true;
 						}
@@ -684,7 +702,7 @@ void RedefineKeys()
 
 		//DialogBoxEffect(nXLeft-4, 100, nDX+8, 16, true);
 		int i;
-		for ( i=0; i<KEY_NUMKEYS; i++ )
+		for ( i=0; i<KEY_NUM_MAIN_REDEFINABLE_KEYS; i++ )
 		{
 			int j;
 			GraphDrawString( pVisBack, g_pFont8x8, 64, 64+i*16, (unsigned char*)g_aszKeys[i]);
@@ -731,14 +749,23 @@ void RedefineKeys()
 	} while (bLoop);
 }
 
-bool GetHighScoreUserName(char *szBuffer)
+bool GetHighScoreUserName(std::string& sReturnString)
 {
-#define MAX_HIGHSCORE_LEN 22
+	#define MAX_HIGHSCORE_LEN 256
+	#define WIDTH_INPUTBOX 34
+
+	#ifdef djUNICODE_SUPPORT
+	//SDL_EnableUNICODE(1);
+	std::string sInput;
+	#else
+	char szBuffer[2048] = {0};//temp phase out?
+	#endif
+
 	bool bRet = true; // Return false if user selected quit/close or something
 	bool bLoop = true;
 	do
 	{
-		int nDX = MAX_HIGHSCORE_LEN*8;
+		int nDX = WIDTH_INPUTBOX*8;
 		//dj2019-07 for now just stick to 320; genericize better later re CFG_APPLICATION_RENDER_RES_W stuff ..
 		//int nXLeft = (CFG_APPLICATION_RENDER_RES_W/2) - (nDX / 2);
 		int nXLeft = (320/2) - (nDX / 2);
@@ -756,6 +783,72 @@ bool GetHighScoreUserName(char *szBuffer)
 		{
 			switch (Event.type)
 			{
+#ifdef djUNICODE_SUPPORT
+			case SDL_TEXTINPUT://dj2022-11 NB for Unicode input (what platforms are supported here?)
+				sInput += Event.text.text;
+				break;
+			case SDL_KEYDOWN:
+			{
+				if (((ModState & KMOD_SHIFT)==0) && ((ModState & KMOD_CTRL)!=0))
+				{
+					// Ctrl+V paste text?
+					if (Event.key.keysym.sym == SDLK_v && SDL_HasClipboardText())
+					{
+						char* sz = SDL_GetClipboardText();
+						if (sz)
+						{
+							// Hm what if it's crazy long .. put some reasonable limit in case someone pastes GBs of text .. this is a bit arb:
+							if (strlen(sz) > 10000)
+							{
+								std::string s;
+								for (int z = 0; z < 10000; ++z)
+									s += sz[z];
+								sInput += s;
+							}
+							else
+								sInput += sz;
+							SDL_free(sz);
+						}
+					}
+				}
+
+
+				switch (Event.key.keysym.sym)
+				{
+				case SDLK_BACKSPACE: // Backspace is slightly non-trivial to handle if we're dealing with utf8 strings but technically we can probably use 
+					if (!sInput.empty())
+					{
+						/*
+						Code point  UTF - 8 conversion
+						First code point	Last code point	Byte 1	Byte 2	Byte 3	Byte 4
+						U + 0000	U + 007F	0xxxxxxx
+						U + 0080	U + 07FF	110xxxxx	10xxxxxx
+						U + 0800	U + FFFF	1110xxxx	10xxxxxx	10xxxxxx
+						U + 10000[nb 2]U + 10FFFF	11110xxx	10xxxxxx	10xxxxxx	10xxxxxx
+						*/
+						// Basically if:
+						// (1) it's "0xxxxxxx" we can delete just that one char
+						// (2) it starts with "10" in high bits we can delete UNTIL we hit something starting with "11" in high bits
+						// We seriously need to double check this
+						char cLast = sInput.back();
+						if ((cLast & 0x80) == 0)//ascii
+							sInput = sInput.substr(0, sInput.size() - 1);
+						else if ((cLast & 0xC0) == 0x80)
+						{
+							while (!sInput.empty() && (cLast & 0xC0) == 0x80)
+							{
+								sInput = sInput.substr(0, sInput.size() - 1);
+								if (!sInput.empty())
+									cLast = sInput.back();
+							}
+							if (!sInput.empty())
+								sInput = sInput.substr(0, sInput.size() - 1);
+						}
+					}
+				}
+			}
+			break;
+#else
 			case SDL_KEYDOWN:
 				if (Event.key.keysym.sym>=SDLK_a && Event.key.keysym.sym<=SDLK_z)
 				{
@@ -787,12 +880,7 @@ bool GetHighScoreUserName(char *szBuffer)
 				break;
 			case SDL_KEYUP:
 				break;
-				/*
-			case SDL_QUIT:
-				bLoop = false;
-				bRet = false;
-				break;
-				*/
+#endif
 			}
 		}
 		djiPollEnd();
@@ -809,15 +897,28 @@ bool GetHighScoreUserName(char *szBuffer)
 			bLoop = false;
 		}
 
+#ifdef djUNICODE_SUPPORT
+		DialogBoxEffect(nXLeft-4, 100, nDX+8, 22, true);
+#else
 		DialogBoxEffect(nXLeft-4, 100, nDX+8, 16, true);
+#endif
 		GraphDrawString( pVisBack, g_pFont8x8, 100,  72, (unsigned char*)"New high score!");
 		GraphDrawString( pVisBack, g_pFont8x8,  96,  88, (unsigned char*)"Enter your name:" );
+
+#ifdef djUNICODE_SUPPORT
+		extern void DrawUnicodeHelper(djVisual * pVis, int x, int y, SDL_Color Color, const std::string & sText);
+		std::string sFakeCursor;
+		if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
+			sFakeCursor = "|";
+		DrawUnicodeHelper(pVisBack, nXLeft - 2, 104, SDL_Color{ 255, 255, 255, 255 }, sInput + sFakeCursor);
+#else
 		GraphDrawString( pVisBack, g_pFont8x8, nXLeft-2, 104, (unsigned char*)szBuffer );
 		if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
 		{
 			unsigned char szCursor[2] = { 254, 0 };
 			GraphDrawString( pVisBack, g_pFont8x8, (nXLeft-2) + 8*strlen(szBuffer), 104, szCursor );
 		}
+#endif
 
 
 		GraphFlip(true);
@@ -826,6 +927,14 @@ bool GetHighScoreUserName(char *szBuffer)
 		SDL_Delay(20);
 
 	} while (bLoop);
+
+#ifdef djUNICODE_SUPPORT
+	sReturnString = sInput;
+	//SDL_EnableUNICODE(0);
+#else
+	sReturnString = szBuffer;
+#endif
+
 	return bRet;
 }
 
@@ -833,10 +942,10 @@ void CheckHighScores( int score )
 {
 	if (IsNewHighScore(score))
 	{
-		char szUserName[1024] = {0};
-		if (GetHighScoreUserName(szUserName))
+		std::string sUserName;
+		if (GetHighScoreUserName(sUserName))
 		{
-			AddHighScore(szUserName, score);
+			AddHighScore(sUserName.c_str(), score);
 			SaveHighScores(); // Save high scores immediately, in case Windows crashes
 		}
 

@@ -1,7 +1,9 @@
 // Copyright (C) 1998-2022 David Joffe
+//
+// dj2022 want to start trying to add options that give porters a bit more control e.g. some porters/platforms may want to 'force fullscreen always' or something etc.
 /*--------------------------------------------------------------------------*/
-#ifndef _CONFIG_H_
-#define _CONFIG_H_
+#ifndef _DJCONFIG_H_
+#define _DJCONFIG_H_
 /*--------------------------------------------------------------------------*/
 
 #ifdef WIN32
@@ -37,12 +39,15 @@
 #endif
 
 
-//! dj2022-11 experimental live in-game fullscreen toggle (off by default for now, needs some more testing ..
-//#define djEXPERIMENTAL_FULLSCREEN_TOGGLE
+//! dj2022-11 experimental live in-game fullscreen toggle (off by default for now, needs some more testing ..) (dj2022-11 turning on tentatively, but porters may want more control)
+#define djINGAME_FULLSCREEN_TOGGLE
 
-//! dj2018-01 Experimental auto drop shadows in sprites
-#define EXPERIMENTAL_SPRITE_AUTO_DROPSHADOWS
-#define EXPERIMENTAL_MAP_AUTO_DROPSHADOWS
+//! dj2022-11 start adding some simple stress tests (probably not for actual release/production builds? dev testing only? debatable, or maybe some can be some not)
+//#define djDEV_STRESSTESTS
+
+//! dj2018-01 Sprite auto drop shadows in sprites (dj2022-11 This is no longer 'experimental' but should maybe still be configurable off/on')
+#define djSPRITE_AUTO_DROPSHADOWS
+#define djMAP_AUTO_DROPSHADOWS
 
 //! [dj2017-08] Experimental
 #define LARGE_VIEWPORT_TEST
@@ -75,6 +80,8 @@ extern bool g_bBigViewportMode;//dj2019-06. //Can't have both bigviewport and la
 // For triple-buffering, the application's desired 'pixel resolution' eg 320x200 for Dave Gnukem 1 as it should retro-mimic DN1
 // NB: The actual third buffer may well be larger, eg in Windows 3rd buffer may be eg 1600x1000 on a 1920x1080 display, but the DG1 game only renders to a tiny 320x200 corner of it in top-left (then that is scale-blitted up to end up in the window as 1600x1000 or whatever).
 // (Note this is not applicable when looking at eg DG1 level editor, which 'becomes' high-resolution to whatever size screen available, not 320x200)
+// [dj2022-11] Note above behaviour changed very slightly in Matteo Bini's recent SDL2 implementation; the main game backbuffer is (I think more correctly) 320x200 (e.g. see "memory" vistype) but
+// then for the level editor where we need a high resolution in ED_CommonInit() it does some re-set-up of visuals for higher res
 
 //#define CFG_APPLICATION_RENDER_RES_W (1920)
 //#define CFG_APPLICATION_RENDER_RES_H (1080)
@@ -108,6 +115,37 @@ extern bool g_bBigViewportMode;//dj2019-06. //Can't have both bigviewport and la
 //dj2019-07 This stuff should probably change. Currently for DG1 the hero (for collision detection purposes etc.) is 1x2 'game blocks'
 #define HEROW_COLLISION (BLOCKW)
 #define HEROH_COLLISION (BLOCKH*2)
+/*--------------------------------------------------------------------------*/
+
+
+
+/*--------------------------------------------------------------------------*/
+// Allow porters to change some settings here in builds (this could also maybe be driven by a small config file or maybe passed to Makefile with -D but maybe think about all this, not sure I like it)
+/*--------------------------------------------------------------------------*/
+
+// dj2022-11 [This should be OFF by default] Added convenience letter shortcuts very useful for platforms Windows but allow it to be disabled in case it interferes with some console ports or something.
+// [dj2022-11] [MUST BE COMMENTED OUT BY DEFAULT] I recall seeing one of the gnukem forks for some console that had J mapped or something like that to movement keys .. so just adding this 'just in case'
+//#define djCFG_DISABLE_MENU_KEYLETTERSHORTCUTS
+
+//dj2022-11 [MUST BE COMMENTED OUT BY DEFAULT] not sure i like these but to think about .. may change
+//#define djCFG_FORCE_FULLSCREEN_ALWAYS
+//#define djCFG_FORCE_WINDOWED_ALWAYS
+/*--------------------------------------------------------------------------*/
+
+
+
+/*--------------------------------------------------------------------------*/
+// EXPERIMENTAL / BETA [dj2022-11] this is relatively large charnge as means new dependencies
+/*--------------------------------------------------------------------------*/
+// Enable Unicode support [BETA] dj2022-11 (EARLY DEV - NOT ready for production do NOT yet enable in a real release - dj2022-11)
+#ifndef djUNICODE_SUPPORT
+//#define djUNICODE_SUPPORT
+#endif
+#ifdef djUNICODE_SUPPORT
+	#define djUNICODE_TTF
+#endif
+/*--------------------------------------------------------------------------*/
+
 
 /*--------------------------------------------------------------------------*/
 #endif

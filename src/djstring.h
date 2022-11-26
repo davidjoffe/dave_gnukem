@@ -42,4 +42,6 @@ extern bool djEnsureFolderTreeExists(const char* szPath);
 // This doesn't belong in djstring.h[dj2018-03]
 extern std::string djGetFolderUserSettings();
 
+extern std::string djIntToString(int n);
+
 #endif

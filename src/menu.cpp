@@ -3,7 +3,7 @@
 /*
 menu.cpp
 
-Copyright (C) 1995-2018 David Joffe
+Copyright (C) 1995-2022 David Joffe
 */
 
 #include "graph.h"
@@ -19,16 +19,19 @@ Copyright (C) 1995-2018 David Joffe
 
 djImage* g_pImgMenuBackground8x8 = NULL;//dj2016-10 background 'noise' image experiment
 
-void menu_move( CMenu *pMenu, int& option, int diff, unsigned char cCursor )
+void menu_move( CMenu *pMenu, int& option, int diff, unsigned char cCursor, int iFirstSelectable, int iLastSelectable)
 {
 	//djgSetColorFore( pVisBack, pMenu->getClrBack() );
 	//djgDrawBox( pVisBack, pMenu->getXOffset()+8, pMenu->getYOffset()+option*8, 8, 8 );
+	// Clear cursor at current position
 	djgDrawImage( pVisBack, g_pImgMenuBackground8x8, pMenu->getXOffset()+8, pMenu->getYOffset()+option*8, 8, 8 );
 
 	int iOptionPrev = option;
 	option += diff;
-	if (option < 1)                    option = pMenu->getSize() - 2;
-	if (option > (pMenu->getSize() - 2)) option = 1;
+	if (option < iFirstSelectable)
+		option = iLastSelectable;//wrap
+	if (option > iLastSelectable)
+		option = iFirstSelectable;//wrap
 
 	// Play a sound
 	if (option != iOptionPrev)
@@ -45,37 +48,69 @@ void menu_move( CMenu *pMenu, int& option, int diff, unsigned char cCursor )
 /*--------------------------------------------------------------------------*/
 int do_menu( CMenu *pMenu )
 {
-	int i=0;
-	int size=0;
-
 	//dj2016-10-28 trying background image with 'noise' instead of solid background color for menu ..
 	if (g_pImgMenuBackground8x8==NULL)
 	{
 		g_pImgMenuBackground8x8 = new djImage;
 		if (g_pImgMenuBackground8x8->Load( DATA_DIR "menucharbackground.tga" )>=0)
-		{
 			djCreateImageHWSurface( g_pImgMenuBackground8x8 );
-			//bLoaded = true;
-		}
 	}
 
 	// Initialize cursor animation
 	const unsigned char *szCursor = pMenu->getMenuCursor();
 
-	// set default option
-	int option = 1;
-
 	// calculate size of menu
+	int size = 0;
 	for ( size=0; pMenu->getItems()[size].m_szText != NULL; size++ )
 		;
 
 	pMenu->setSize ( size );
 	if (size==0)return -1;//error[dj2018-03]
 
+
+	//dj2022-11 to help make more generic
+	int iFirstSelectable = -1;
+
+	// set default option (should auto-detect first 'valid selectable' item)
+	int i = 0;
+	for (i = 0; i < size; i++)
+	{
+		if (pMenu->getItems()[i].IsSelectable())
+		{
+			iFirstSelectable = i;
+			break;
+		}
+	}
+	if (iFirstSelectable < 0) return -1;//error no selectable items [hm what we should do, still draw?]
+
+	int iLastSelectable = -1;
+	// auto-detect LAST 'valid selectable' item
+	for (int i = pMenu->getSize() - 1; i >= 0; --i)
+	{
+		if (pMenu->getItems()[i].IsSelectable())
+		{
+			iLastSelectable = i;
+			break;
+		}
+	}
+
+	//dj2022-11 add auto-padding to width of widest string (not sure if good/bad idea but anyway for now probably better)
+	size_t lenLongestString = 0;
+	for (i = 0; i < size; i++)
+	{
+		if (pMenu->getItems()[i].m_szText == nullptr) continue;
+		size_t len = strlen(pMenu->getItems()[i].m_szText);
+		if (len > lenLongestString)
+			lenLongestString = len;
+	}
+
+	// default selected option
+	int option = iFirstSelectable;
+
 	// Calculate position of menu on screen, if "asked" to do so (== -1)
-	if ( pMenu->getXOffset() == -1 )
-		pMenu->setXOffset ( 8 * (20 - (strlen(pMenu->getItems()[0].m_szText) / 2)));
-	if ( pMenu->getYOffset() == -1 )
+	if ( pMenu->getXOffset() < 0)
+		pMenu->setXOffset ( 8 * (20 - ((int)lenLongestString / 2)));
+	if ( pMenu->getYOffset() < 0)
 		pMenu->setYOffset( 8 * (12 - (size / 2)) );
 
 	// Draw dropshadows [dj2018-03-30]
@@ -84,69 +119,61 @@ int do_menu( CMenu *pMenu )
 	const unsigned char szBR[2]={(unsigned char)250,0};//bottom right
 	const unsigned char szB [2]={(unsigned char)249,0};//bottom
 	const unsigned char szBL[2]={(unsigned char)248,0};//bottom left
-	unsigned int uWidth = strlen(pMenu->getItems()[0].m_szText);//[dj2018-03] *Assumes* (true for v1) that strlen the same for all items
 	for ( i=0; i<size; ++i )
 	{
 		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+(strlen(pMenu->getItems()[i].m_szText))*8, pMenu->getYOffset()+i*8, i==0?szTR:szR );
 	}
-	for ( unsigned int j=1; j<uWidth; ++j )
+	for (size_t x = 0; x < lenLongestString; ++x)
 	{
-		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+j*8, pMenu->getYOffset()+size*8, szB );
+		GraphDrawString(pVisBack, g_pFont8x8, pMenu->getXOffset() + (int)x * 8, pMenu->getYOffset() + size * 8, szB);
 	}
-	GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+uWidth*8, pMenu->getYOffset()+size*8, szBR );
+	GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+ (int)lenLongestString*8, pMenu->getYOffset()+size*8, szBR );
 	GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset(), pMenu->getYOffset()+size*8, szBL );
 
 	// draw menu
 	for ( i=0; i<size; i++ )
 	{
-		// Draw blank underneath menu (FIXME: Somehow should be able to be image underneath)
+		// Draw blank underneath menu
 
-		//djgSetColorFore( pVisBack, pMenu->getClrBack() );
-		//djgDrawBox( pVisBack, pMenu->getXOffset(), pMenu->getYOffset()+i*8, 8 * strlen(pMenu->getItems()[i].m_szText), 8 );
-		//static bool bLoaded=false;
-		//if (bLoaded)
+		for ( unsigned int j=0; j<(unsigned int)lenLongestString; ++j )
 		{
-			for ( unsigned int j=0; j<strlen(pMenu->getItems()[i].m_szText); ++j )
-			{
-				djgDrawImage( pVisBack, g_pImgMenuBackground8x8, pMenu->getXOffset()+j*8, pMenu->getYOffset()+i*8, 8, 8 );
-			}
-
-			//left+top 'light' lines
-			djgSetColorFore(pVisBack,djColor(80,80,80));
-			djgDrawRectangle( pVisBack,
-				pMenu->getXOffset(),
-				pMenu->getYOffset(),
-				1,
-				size*8);
-			//top
-			djgDrawRectangle( pVisBack,
-				pMenu->getXOffset(),
-				pMenu->getYOffset(),
-				strlen(pMenu->getItems()[0].m_szText)*8,
-				1
-				);
-
-			//bottom+right 'dark' lines
-			djgSetColorFore(pVisBack,djColor(35,35,35));
-			djgDrawRectangle( pVisBack,
-				pMenu->getXOffset()+2,
-				pMenu->getYOffset()+size*8,
-				strlen(pMenu->getItems()[0].m_szText)*8-2,
-				1);
-			//right
-			djgDrawRectangle( pVisBack,
-				pMenu->getXOffset()+strlen(pMenu->getItems()[0].m_szText)*8,
-				pMenu->getYOffset()+2,
-				1,
-				size*8-1
-				);
+			djgDrawImage( pVisBack, g_pImgMenuBackground8x8, pMenu->getXOffset()+j*8, pMenu->getYOffset()+i*8, 8, 8 );
 		}
 
+		//left+top 'light' lines
+		djgSetColorFore(pVisBack,djColor(80,80,80));
+		djgDrawRectangle( pVisBack,
+			pMenu->getXOffset(),
+			pMenu->getYOffset(),
+			1,
+			size*8);
+		//top
+		djgDrawRectangle( pVisBack,
+			pMenu->getXOffset(),
+			pMenu->getYOffset(),
+			(int)lenLongestString*8,
+			1
+			);
+
+		//bottom+right 'dark' lines
+		djgSetColorFore(pVisBack,djColor(35,35,35));
+		djgDrawRectangle( pVisBack,
+			pMenu->getXOffset()+2,
+			pMenu->getYOffset()+size*8,
+			(int)lenLongestString*8-2,
+			1);
+		//right
+		djgDrawRectangle( pVisBack,
+			pMenu->getXOffset()+(int)lenLongestString*8,
+			pMenu->getYOffset()+2,
+			1,
+			size*8-1
+			);
 
 		// Draw menu text
 		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset(), pMenu->getYOffset()+i*8, (unsigned char*)pMenu->getItems()[i].m_szText );
 	}
-	menu_move( pMenu, option, 0, *szCursor );
+	menu_move( pMenu, option, 0, *szCursor, iFirstSelectable, iLastSelectable);
 
 
 
@@ -163,6 +190,12 @@ int do_menu( CMenu *pMenu )
 	float fTimeNow = fTimeNext;
 
 	bool bmenurunning = true;
+
+	// dj2022-11 If an A-Z key pressed, see if we can find a selectable menu item that starts with that letter and select that (Duke Nukem did similar)
+	bool bAllowMenuKeyLetterShortcuts = true;
+#ifdef djCFG_DISABLE_MENU_KEYLETTERSHORTCUTS
+	bAllowMenuKeyLetterShortcuts = false;
+#endif
 
 	do
 	{
@@ -208,19 +241,19 @@ int do_menu( CMenu *pMenu )
 
 				// up arrow
 				else if (Event.key.keysym.sym==SDLK_UP)
-					menu_move( pMenu, option, -1, *szCursor );
+					menu_move( pMenu, option, -1, *szCursor, iFirstSelectable, iLastSelectable);
 
 				// down arrow
 				else if (Event.key.keysym.sym==SDLK_DOWN)
-					menu_move( pMenu, option, 1, *szCursor );
+					menu_move( pMenu, option, 1, *szCursor, iFirstSelectable, iLastSelectable);
 
 				// home key
 				else if (Event.key.keysym.sym==SDLK_HOME)//g_iKeys[DJKEY_HOME])
-					menu_move( pMenu, option, -option + pMenu->getSize() - 1, *szCursor );
+					menu_move( pMenu, option, -option + pMenu->getSize() - 1, *szCursor, iFirstSelectable, iLastSelectable);
 
 				// end key
 				else if (Event.key.keysym.sym==SDLK_END)//if (g_iKeys[DJKEY_END])
-					menu_move( pMenu, option, -option, *szCursor );
+					menu_move( pMenu, option, -option, *szCursor, iFirstSelectable, iLastSelectable);
 
 				// enter
 				else if (Event.key.keysym.sym==SDLK_RETURN)//if (g_iKeys[DJKEY_ENTER])
@@ -233,7 +266,40 @@ int do_menu( CMenu *pMenu )
 					bmenurunning = 0;
 				}
 
+				// dj2022-11 If an A-Z key pressed, see if we can find a selectable menu item that starts with that letter and select that (Duke Nukem did similar)
+				else if (bAllowMenuKeyLetterShortcuts && Event.key.keysym.sym>=SDLK_a && Event.key.keysym.sym<=SDLK_z && option>=0)
+				{
+					const char cPressed = 'a' + (Event.key.keysym.sym - SDLK_a);
+					int nCurPos = option;
+					const SMenuItem* paItems = pMenu->getItems();
+					for (auto i = 0; i < pMenu->getSize(); ++i)
+					{
+						nCurPos = (nCurPos + 1) % pMenu->getSize();//<- mod to wrap around
+						// Find the first/next menu item that starts with the typed character (after whitespace etc.), with wraparound, and jump to it if found (but I think probably not act as if Enter pressed)
+						if (paItems[nCurPos].IsSelectable() && paItems[nCurPos].m_szText!=nullptr)
+						{
+							int nFindFirstAlphChar = 0;
+							char c = 0;
+							do
+							{
+								c = paItems[nCurPos].m_szText[nFindFirstAlphChar];
+								// Make lowercase
+								if ((c >= 'A') && (c <= 'Z')) c += 32;//32 transfers 'A' to e.g. 'a' in ASCII
+
+								if (c < 'a' || c>'z')
+									++nFindFirstAlphChar;
+							} while (c != 0 && (c < 'a' || c>'z'));
+
+							if (c == cPressed)
+							{
+								menu_move(pMenu, option, nCurPos - option, *szCursor, iFirstSelectable, iLastSelectable);
+								break;
+							}
+						}
+					}
+				}
 				break;
+
 			case SDL_KEYUP:
 				break;
 			case SDL_QUIT:
@@ -261,7 +327,7 @@ int do_menu( CMenu *pMenu )
 			if (*szCursor == 0)
 				szCursor = pMenu->getMenuCursor ();
 
-			menu_move( pMenu, option, 0, *szCursor );//Force redraw of cursor for animation purposes
+			menu_move( pMenu, option, 0, *szCursor, iFirstSelectable, iLastSelectable);//Force redraw of cursor for animation purposes
 		}
 
 		GraphFlip(true);

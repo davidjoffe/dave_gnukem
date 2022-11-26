@@ -26,7 +26,7 @@ void DisposeLog ( unsigned long lg_id );
 
 
 
-unsigned long SysLog ();
+//unsigned int SysLog();
 
 
 //dj2022 these are 'risky' names for global namespace :/ .. fix all that

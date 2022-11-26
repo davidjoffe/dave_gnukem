@@ -1,0 +1,26 @@
+Author: Matteo Bini <matteobin@tiepi.it>
+Description: Inject hardening flags
+Forwarded: not-needed
+--- a/Makefile
++++ b/Makefile
+@@ -24,9 +24,9 @@ PREFIX   = /usr/local
+ DATA_DIR = $(PREFIX)/share/games/$(BIN)/# the trailing slash is required for paths in the source
+ 
+ LIBS = `sdl2-config --libs` -lSDL2_mixer
+-LDFLAGS = $(LIBS)
++LDFLAGS += $(LIBS)
+ 
+-CPPFLAGS = -DDATA_DIR=\"$(DATA_DIR)\" -DVERSION=\"'$(VERSION)'\"
++CPPFLAGS += -DDATA_DIR=\"$(DATA_DIR)\" -DVERSION=\"'$(VERSION)'\"
+ 
+ CXX = g++
+ 
+@@ -68,7 +68,7 @@ endif
+ 
+ # debug
+ #CXXFLAGS = -ggdb -DDEBUG -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
+-CXXFLAGS = -O2 -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
++CXXFLAGS += -O2 -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
+ 
+ all: options davegnukem
+ 

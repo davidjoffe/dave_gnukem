@@ -1,0 +1,9 @@
+version=4
+opts=filenamemangle=s/.+\/v?(\d\S+)\.tar\.gz/dave_gnukem-$1\.tar\.gz/ \
+  https://github.com/davidjoffe/dave_gnukem/tags .*/v?(\d\S+)\.tar\.gz
+
+opts=pgpmode=none,component=data,filenamemangle=s/.+\/v?(\d\S+)\.tar\.gz/gnukem_data-$1\.tar\.gz/ \
+  https://github.com/davidjoffe/gnukem_data/tags .*/v?(\d\S+)\.tar\.gz
+
+opts=pgpmode=none,component=datasrc \
+  https://github.com/davidjoffe/gnukem_datasrc/tags .*/v?(\d\S+)\.tar\.gz ignore uupdate

@@ -7,7 +7,7 @@
 #include "sys_error.h"
 #include "graph.h"//pVisMain
 #include <vector>
-using namespace std;
+
 #include <stdio.h>
 
 
@@ -17,7 +17,7 @@ void SetLevel( int x, int y, int a, int b, bool bforeground );
 
 
 int g_iAssignedMacros[9]; // Keys 1 to 9 to place assigned macros
-vector<SMacro*> g_apMacros;
+std::vector<SMacro*> g_apMacros;
 
 
 
@@ -89,7 +89,7 @@ bool LoadMacros()
 
 bool DeleteMacros()
 {
-	vector<SMacro*>::iterator	i;
+	std::vector<SMacro*>::iterator	i;
 
 	for ( i=g_apMacros.begin();
 		i != g_apMacros.end(); )

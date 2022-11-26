@@ -2,21 +2,43 @@
 hiscores.cpp
 
 Copyright (C) 2001-2022 David Joffe
+
+Conceptually should divide this file into more model/view/controller separation? low prio. dj2022-11
 */
 
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
 #include "djstring.h"
-
 #include <vector>
-using namespace std;
-
-
 #include "hiscores.h"
 #include "djtypes.h"
 #include "menu.h"
 #include "graph.h"
 #include "djlog.h"
+#include "djimage.h"
+//------------------------
+#ifdef djUNICODE_TTF
+
+#include "datadir.h"
+
+#ifdef __OS2__
+	#include <SDL/SDL_ttf.h>//TTF_Init
+#else
+	#include <SDL_ttf.h>//TTF_Init
+#endif
+
+#include <utf8proc.h>//<- for 'utf8 to 32-bit' conversion for TTF_GlyphIsProvided32 to help find closest best matching font
+
+// hm to move obcviously not meant to be in hiscores
+#if defined(WIN32) && defined(_MSC_VER)
+// Microsoft compiler stuff .. hmm not sure where best .. unless cmake etc.
+#pragma comment(lib, "SDL2_ttf.lib")
+#pragma comment(lib, "utf8proc.lib")
+#endif
+
+#endif
+//------------------------
 
 SScore::SScore() : nScore(0)
 {
@@ -30,19 +52,17 @@ void SScore::SetName(const char* szNameNew)
 		return;
 	}
 
+	// fixmeUNicode dj2022-11 [low prio] but long names that happen to clip in middle of a utf8 multibyte character may leave invalid partial utf8 chars at end of string
 	snprintf(szName, sizeof(szName), "%s", szNameNew);
 }
 
 // Scores, sorted from highest to lowest
-vector<SScore> g_aScores;
+std::vector<SScore> g_aScores;
 
 djImage *g_pImgHighScores = NULL;
 
 struct SMenuItem instructionsHighScoreItems[] =
 {
-   /*{ false, "{~~~~~~}" },
-   { true,  "|  OK  |" },
-   { false, "[~~~~~~]" },*/
    { false, "        " },
    { true,  "   OK   " },
    { false, "        " },
@@ -62,8 +82,167 @@ void KillHighScores()
 	djDEL(g_pImgHighScores);
 }
 
+#ifdef djUNICODE_TTF
+class djUnicodeFontList
+{
+public:
+	std::vector<TTF_Font*> m_apFonts;
+
+	void LoadFonts()
+	{
+		//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 16);
+		//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 11);
+		const int nPTFONTSIZE = 12;
+		if (m_apFonts.empty())
+		{
+			m_apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/DejaVuSansMono-Bold.ttf", nPTFONTSIZE));
+			m_apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/DejaVuSansMono.ttf", nPTFONTSIZE));
+			m_apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/NotoSans-Regular.ttf", nPTFONTSIZE));
+			m_apFonts.push_back(TTF_OpenFont(DATA_DIR "fonts/chinese-mainland/NotoSansSC-Regular.otf", nPTFONTSIZE));
+
+			TTF_Font* pFont = TTF_OpenFont(DATA_DIR "fonts/DejaVuSans.ttf", nPTFONTSIZE);
+			TTF_Font* pFont2 = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", nPTFONTSIZE);
+			m_apFonts.push_back(pFont);
+			m_apFonts.push_back(pFont2);
+			//m_apFonts.push_back(TTF_OpenFont("C:\\WINDOWS\\fonts\\Arial.ttf", nPTFONTSIZE));
+		}
+	}
+	void CleanupFonts()
+	{
+		for (auto pFont : m_apFonts)
+		{
+			if (pFont)
+				TTF_CloseFont(pFont);
+		}
+		m_apFonts.clear();
+	}
+};
+djUnicodeFontList g_FontList;
+//---------------------------
+void djUnicodeFontInit()
+{
+	// load fonts if not already loaded
+	g_FontList.LoadFonts();
+}
+void djUnicodeFontDone()
+{
+	g_FontList.CleanupFonts();
+}
+//---------------------------
+
+class djUnicodeFontHelpers
+{
+public:
+	// Have two helpers, one for char* one for std::string (as a pip faster if caller already has a std::string as no need to do 'strlen' call) [low - dj2022-11]
+	static TTF_Font* FindBestMatchingFontMostChars(const std::vector<TTF_Font*>& apFonts, const char* szUTFstring)
+	{
+		std::string s;
+		if (szUTFstring)
+			s = szUTFstring;
+		return FindBestMatchingFontMostCharsStr(apFonts, s, s.length());
+	}
+	static TTF_Font* FindBestMatchingFontMostCharsStr(const std::vector<TTF_Font*>& apFonts, const std::string& sText, const size_t uLen)
+	{
+		int nMatchesMost = 0;
+		TTF_Font* pFontMostChars = nullptr;
+		for (auto pFont : apFonts)
+		{
+			if (pFont == nullptr) continue;//safety
+
+			if (pFontMostChars == nullptr)
+			{
+				pFontMostChars = pFont;
+
+				// If string has zero length might as well just return first font we find
+				if (uLen == 0)
+					return pFont;
+			}
+
+			// NB do NOT modify sText while we're iterating over the string
+			const char* szStart = sText.c_str();
+			utf8proc_int32_t cp = -1;//codepoint in 32-bit
+			size_t uOffset = 0;
+			size_t uLen2 = uLen;
+			// [dj2022-11] Must convert utf8 to 32-bit Unicode glyphs and iterate over string
+			// Remember that utf8 is multi-byte and variable-width encoding so a single Unicode codepoint (i.e. one 32-bit value) could be maybe e.g. 1 byte or 2 bytes or 3 bytes or 4 bytes etc. in the utf8 string (but strlen returns the full number of bytes, not "Unicode Characters")
+			//"Reads a single codepoint from the UTF-8 sequence being pointed to by str. The maximum number of bytes read is strlen, unless strlen is negative (in which case up to 4 bytes are read). If a valid codepoint could be read, it is stored in the variable pointed to by codepoint_ref, otherwise that variable will be set to -1. In case of success, the number of bytes read is returned; otherwise, a negative error code is returned."
+			utf8proc_ssize_t ret = utf8proc_iterate((const utf8proc_uint8_t*)(szStart + uOffset), uLen2, &cp);
+			int nMatches = 0;
+			while (ret > 0)
+			{
+				uLen2 -= (size_t)ret;
+				uOffset += (size_t)ret;
+				// [dj2022-11] Hmm SDL documentation says "This is the same as TTF_GlyphIsProvided(), but takes a 32-bit character instead of 16-bit, and thus can query a larger range. If you are sure you'll have an SDL_ttf that's version 2.0.18 or newer, there's no reason not to use this function exclusively."
+				// That means we may have a problem here supporting specifically (just) the Unicode SURROGATE PAIRS range IF (and only if) a platform has SDL older than this .. is that worth worrying about? [seems low prio to me dj2022-11 .. a few days ago we had no Unicode support at all so full Unicode support on 2.0.18+ and everything but surrogate pairs on older SDL's seems OK]
+				// We *definitely* want to use the 32-bit version when and where available as otherwise SURROGATE PAIRS won't work.
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+				if (cp > 0 && TTF_GlyphIsProvided32(pFont, cp))
+#else
+				if (cp > 0 && TTF_GlyphIsProvided(pFont, cp))
+#endif
+				{
+					++nMatches;
+					if (nMatches > nMatchesMost)
+					{
+						nMatchesMost = nMatches;
+						pFontMostChars = pFont;
+					}
+				}
+				ret = utf8proc_iterate((const utf8proc_uint8_t*)(szStart + uOffset), uLen2, &cp);
+			}
+		}
+		return pFontMostChars;
+	}
+};
+
+void DrawUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, const std::string& sText)
+{
+	// Get best matching font [this needs work]
+	TTF_Font* pFontMostChars = djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(g_FontList.m_apFonts, sText, sText.length());
+	if (!pFontMostChars)//<- old fallback for safety in case something went wrong and we have no matching fonts
+	{
+		if (g_pFont8x8)
+			GraphDrawString(pVis, g_pFont8x8, x, y, (unsigned char*)sText.c_str());
+		return;
+	}
+
+	//SDL_Surface* sur = TTF_RenderUNICODE_Blended_Wrapped(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
+	//SDL_Surface* sur = TTF_RenderUNICODE_Blended(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
+	//SDL_Surface* sur = TTF_RenderUTF8_Blended(pFontMostChars, sText.c_str(), SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
+	SDL_Surface* sur = TTF_RenderUTF8_Solid(pFontMostChars, sText.c_str(), SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
+	//SDL_Texture* tex = SDL_CreateTextureFromSurface(pVis->pRenderer, sur);
+	if (sur)
+	{
+		SDL_Rect rcDest{ x + 1, y + 1, pVis->width, pVis->height };
+		CdjRect rcSrc(0, 0, sur->w, sur->h);
+		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		//SDL_FreeSurface(sur);// why does this SDL_FreeSurface crash?SDL_FreeSurface(sur); [dj2022-11 fixme]
+		sur = nullptr;
+	}
+	//sur = TTF_RenderUTF8_Blended(pFontMostChars, sText.c_str(), SDL_Color{ 255, 255, 255, 255 });
+	sur = TTF_RenderUTF8_Blended(pFontMostChars, sText.c_str(), Color);
+	//SDL_Texture* tex = SDL_CreateTextureFromSurface(pVis->pRenderer, sur);
+	if (sur)
+	{
+		SDL_Rect rcDest{ x, y, pVis->width, pVis->height };
+		CdjRect rcSrc(0, 0, sur->w, sur->h);
+		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		//SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		//SDL_FreeSurface(sur);// why does this SDL_FreeSurface crash?SDL_FreeSurface(sur); [dj2022-11 fixme]
+		sur = nullptr;
+	}
+	//SDL_RenderCopy(pVisBack->pRenderer, tex, NULL, &rect);
+}
+
+#endif
+
 void ShowHighScores()
 {
+	const int nYSTART = 20;
+	const int nHEIGHTPERROW = 14;
+
 	HighScoresMenu.setSize(0);
 	HighScoresMenu.setItems(instructionsHighScoreItems);
 	HighScoresMenu.setMenuCursor(instructionsHighScoreCursor);
@@ -78,15 +257,34 @@ void ShowHighScores()
 	}
 	if (g_pImgHighScores)
 	{
-		djgDrawImage( pVisBack, g_pImgHighScores, 0, 0, g_pImgHighScores->Width(), g_pImgHighScores->Height() );
+		djgDrawImage(pVisBack, g_pImgHighScores, 0, 0, g_pImgHighScores->Width(), g_pImgHighScores->Height());
+	}
 
+	{
 		for ( int i=0; i<(int)g_aScores.size(); i++ )
 		{
-			char buf[1024]={0};
-			snprintf(buf, sizeof(buf), "%d  %d", i, g_aScores[i].nScore);
-			GraphDrawString(pVisBack, g_pFont8x8, 24, 24+i*12, (unsigned char*)buf);
-			GraphDrawString(pVisBack, g_pFont8x8, 24+11*8, 24+i*12, (unsigned char*)g_aScores[i].szName);
-		}
+			GraphDrawString(pVisBack, g_pFont8x8, 16,          nYSTART + i * nHEIGHTPERROW, (unsigned char*)djIntToString(i + 1).c_str());//i+1 because i is 0-based index but human 1-based
+			GraphDrawString(pVisBack, g_pFont8x8, 16 + 8 * 3,  nYSTART + i * nHEIGHTPERROW, (unsigned char*)djIntToString(g_aScores[i].nScore).c_str());
+#ifndef djUNICODE_TTF
+			GraphDrawString(pVisBack, g_pFont8x8, 24 + 11 * 8, nYSTART + i * nHEIGHTPERROW, (unsigned char*)g_aScores[i].szName);
+#else
+			// dj2022-11 though it's not so easy to do the same cheesey gradient we have on our 8x8 font, I grabbed the colors from that font to create a sort of a gradient anyway across the list of names that matches the visual color look .. not wonderful but not awful
+			std::vector< SDL_Color > aColorGrad;
+			aColorGrad.push_back(SDL_Color{ 221, 69, 69, 255 });
+			aColorGrad.push_back(SDL_Color{ 223, 90, 81, 255 });
+			aColorGrad.push_back(SDL_Color{ 223, 90, 81, 255 });
+			aColorGrad.push_back(SDL_Color{ 226, 122, 101, 255 });
+			aColorGrad.push_back(SDL_Color{ 226, 122, 101, 255 });
+			aColorGrad.push_back(SDL_Color{ 230, 153, 119, 255 });
+			aColorGrad.push_back(SDL_Color{ 230, 153, 119, 255 });
+			aColorGrad.push_back(SDL_Color{ 233, 185, 139, 255 });
+			aColorGrad.push_back(SDL_Color{ 233, 185, 139, 255 });
+			aColorGrad.push_back(SDL_Color{ 237, 217, 158, 255 });
+			std::string sText = g_aScores[i].szName;
+			const unsigned nXPOS = 24 + 11 * 8;
+			DrawUnicodeHelper(pVisBack, nXPOS, nYSTART + i * nHEIGHTPERROW-6, aColorGrad[i % aColorGrad.size()], sText);
+#endif//#ifndef djUNICODE_TTF
+		}//i
 
 		GraphFlip(true);
 

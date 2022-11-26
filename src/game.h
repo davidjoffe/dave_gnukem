@@ -14,10 +14,9 @@ Copyright (C) 1995-2020 David Joffe
 
 class CBullet;
 
+#include "config.h"
 #include <cstddef>//NULL
 #include <vector>
-using namespace std;
-#include "config.h"
 
 //! Visible 'blocks' on X axis in game viewport
 extern int VIEW_WIDTH;
@@ -33,13 +32,13 @@ extern int g_nViewOffsetY;//Top left of game viewport in pixels (Y)
 
 
 class CThing;
-extern vector<CThing *> g_apThings;
+extern std::vector<CThing *> g_apThings;
 
 //! Add a \ref CThing to the current array of things in the level.
 extern void AddThing(CThing *pThing);
 
 
-#include "djsound.h"
+#include "djsound.h"//SOUND_HANDLE
 enum EdjGameSounds
 {
 	SOUND_PICKUP=0,
@@ -73,7 +72,7 @@ extern int GetCurrentLevel();
 //! Lose a life
 extern void Die();
 //! The main game "tick" routine
-extern void GameHeartBeat();
+extern void GameHeartBeat(float fDT);
 
 //----- Game screen redrawing
 
