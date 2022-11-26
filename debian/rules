@@ -18,5 +18,8 @@ override_dh_auto_install:
 	mkdir -p debian/davegnukem-data/usr/share/doc
 	mv debian/davegnukem/usr/share/doc/davegnukem-data debian/davegnukem-data/usr/share/doc
 	
-override_dh_icons:
+	mkdir -p debian/davegnukem-datasrc/usr/share/games/davegnukem
+	cp -R datasrc debian/davegnukem-datasrc/usr/share/games/davegnukem/src
 	rm debian/davegnukem-datasrc/usr/share/games/davegnukem/src/README.md
+	mkdir -p debian/davegnukem-datasrc/usr/share/doc/davegnukem-datasrc
+	cp datasrc/README.md debian/davegnukem-datasrc/usr/share/doc/davegnukem-datasrc
