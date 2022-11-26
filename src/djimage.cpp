@@ -187,18 +187,18 @@ int djImage::Load( const char * szFilename )
 	if ( strlen( szTemp ) >= 4 )
 	{
 		szExt = szTemp + strlen(szTemp) - 4;
-		if (0 == strncmp( szExt, ".spr", 4 ))      ret = LoadSPR( szFilename );
-		else if (0 == strncmp( szExt, ".tga", 4 )) ret = LoadTGA( szFilename );
+		//if (0 == strncmp( szExt, ".spr", 4 ))      ret = LoadSPR( szFilename );
+		if (0 == strncmp( szExt, ".tga", 4 )) ret = LoadTGA( szFilename );
 		else
 		{
 			// Attempt to load image as dj sprite file
-			ret = LoadSPR( szFilename );
+			ret = -1;// LoadSPR(szFilename);
 		}
 	}
 	else
 	{
 		// Attempt to load image as dj sprite file
-		ret = LoadSPR( szFilename );
+		//ret = LoadSPR( szFilename );
 	}
 
 	djDELV(szTemp);
