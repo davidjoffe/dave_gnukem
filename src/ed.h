@@ -10,9 +10,9 @@ enum switch_e
 	SWITCH_SPRED,
 	//! Level editor:
 	SWITCH_LVLED,
-	SWITCH_EXIT,			// exit edit mode
+	SWITCH_EXIT//,			// exit edit mode
 
-	NUM_SWITCHES
+	//NUM_SWITCHES
 };
 
 
