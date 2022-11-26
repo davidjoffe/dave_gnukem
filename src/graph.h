@@ -18,6 +18,9 @@ Copyright (C) 1998-2022 David Joffe
 #include "djgraph.h"
 #include "djimage.h"
 #include <string>
+#ifdef djUNICODE_TTF
+//#include "djfonts.h"//dj2022-11 may refactor this may move to another file
+#endif
 
 //! Image file to use for font
 #define FILE_IMG_FONT DATA_DIR "font.tga"
@@ -29,9 +32,22 @@ extern djVisual *pVisBack;
 //! View visual - 3rd buffer for game play display
 extern djVisual *pVisView;
 
+// Main game 8x8 font
 extern djImage *g_pFont8x8;
 extern void djFontInit();
 extern void djFontDone();
+/*--------------------------------------------------------------------------*/
+#ifdef djUNICODE_TTF
+
+//dj2022-11 basics of new Unicode TTF/OTF font stuff
+//extern djFontList g_FontList;
+
+//! Initialize [New dj2022-11]
+extern void djFontListInit();
+//! [New dj2022-11]
+extern void djFontListDone();
+#endif
+/*--------------------------------------------------------------------------*/
 
 //! Convenience macro to call the sprite draw function for 16x16 sprite b in sprite set a
 #define DRAW_SPRITE16(vis,a,b,x,y) djgDrawImage( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%SPRITESHEET_NUM_COLS)*BLOCKW,((b)/SPRITESHEET_NUM_COLS)*BLOCKH, (x),(y), BLOCKW,BLOCKH )
@@ -79,6 +95,11 @@ extern void GraphFlipView( int iViewWidth, int iViewHeight, int nXS, int nYS, in
 
 //! Draw a string of characters from a font bitmap
 extern void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const unsigned char *szStr );
+
+#ifdef djUNICODE_TTF
+//dj2022-11 basics of new Unicode TTF/OTF font stuff
+extern void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, const std::string& sTextUTF8);
+#endif
 
 //! Very simple pseudo 'console message' .. not exactly sure where this 'belongs' dependency-wise [dj2016-10]
 extern void SetConsoleMessage( const std::string& sMsg );

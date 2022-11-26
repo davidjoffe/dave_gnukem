@@ -23,6 +23,9 @@ Copyright (C) 1995-2022 David Joffe
 #include "djinput.h"
 #include "djtime.h"
 #include "djstring.h"
+#ifdef djUNICODE_SUPPORT
+#include "djfonts.h"//fixme move to new src/highscores_entername.cpp or something?
+#endif
 
 #include "hiscores.h"
 #include "menu.h"
@@ -344,10 +347,13 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	djSoundInit();				// Initialize sound
 
 #ifdef djUNICODE_SUPPORT
-	djLOGSTR("djUnicodeFontInit\n");
-	extern void djUnicodeFontInit();
-	djUnicodeFontInit();		// dj2022-11 Unicode/TTF font system
-	djLOGSTR("djUnicodeFontInit ok\n");
+	djLOGSTR("djFontListInit (Unicode vector fonts system)\n");
+	//extern void djFontListInit();
+	djFontListInit();		// dj2022-11 Unicode/TTF font system
+	djLOGSTR("djFontListInit (load fonts)\n");
+	extern void djGnukemLoadFonts();
+	djGnukemLoadFonts();
+	djLOGSTR("djVectorFontListInit ok\n");
 #endif
 
 	g_pImgMain = new djImage;			// Load main skin (title screen)
@@ -398,10 +404,10 @@ void DaveCleanup()
 	djSoundDone();			// Sound
 	djLOGSTR( "djSoundDone() ok\n" );
 #ifdef djUNICODE_SUPPORT
-	djLOGSTR("djUnicodeFontDone\n");
-	extern void djUnicodeFontDone();
-	djUnicodeFontDone();		// dj2022-11 Unicode/TTF font system
-	djLOGSTR("djUnicodeFontDone ok\n");
+	djLOGSTR("djFontListDone (Unicode vector fonts)\n");
+	//extern void djFontListDone();
+	djFontListDone();		// dj2022-11 Unicode/TTF font system
+	djLOGSTR("djFontListDone ok\n");
 #endif
 	djDestroyImageHWSurface(g_pImgMain);
 	djDEL(g_pImgMain);		// Delete main menu background image (title screen)
@@ -906,11 +912,10 @@ bool GetHighScoreUserName(std::string& sReturnString)
 		GraphDrawString( pVisBack, g_pFont8x8,  96,  88, (unsigned char*)"Enter your name:" );
 
 #ifdef djUNICODE_SUPPORT
-		extern void DrawUnicodeHelper(djVisual * pVis, int x, int y, SDL_Color Color, const std::string & sText);
 		std::string sFakeCursor;
 		if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
 			sFakeCursor = "|";
-		DrawUnicodeHelper(pVisBack, nXLeft - 2, 104, SDL_Color{ 255, 255, 255, 255 }, sInput + sFakeCursor);
+		DrawStringUnicodeHelper(pVisBack, nXLeft - 2, 104, SDL_Color{ 255, 255, 255, 255 }, sInput + sFakeCursor);
 #else
 		GraphDrawString( pVisBack, g_pFont8x8, nXLeft-2, 104, (unsigned char*)szBuffer );
 		if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor

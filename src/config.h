@@ -143,6 +143,10 @@ extern bool g_bBigViewportMode;//dj2019-06. //Can't have both bigviewport and la
 #endif
 #ifdef djUNICODE_SUPPORT
 	#define djUNICODE_TTF
+	//dj2022-11 for correct Arabic support but possibly not yet supported on all platforms:
+	#ifdef WIN32
+	#define djTTF_HAVE_HARFBUZZ_EXTENSIONS
+	#endif
 #endif
 /*--------------------------------------------------------------------------*/
 

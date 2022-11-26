@@ -17,15 +17,20 @@ Copyright (C) 1998-2022 David Joffe
 #include <stdlib.h>
 #ifdef __OS2__
 #include <SDL/SDL.h>
-#ifdef djUNICODE_TTF
-	#include <SDL/SDL_ttf.h>//TTF_Init
-#endif
 #else
 #include "SDL.h"
+#endif
+
 #ifdef djUNICODE_TTF
+#ifdef __OS2__
 	#include <SDL_ttf.h>//TTF_Init
-#endif
-#endif
+#else// !__OS2__
+	#include <SDL_ttf.h>//TTF_Init
+#endif// __OS2__
+#include "djfonts.h"
+#include "datadir.h"//LoadFont
+#endif//#ifdef djUNICODE_TTF
+
 #include "sys_log.h"//djLog helpers
 #include "djstring.h"//djStrPrintf
 
@@ -42,6 +47,13 @@ djImage *g_pFont8x8=NULL;
 djVisual *pVisMain = NULL;
 djVisual *pVisBack = NULL;
 djVisual *pVisView = NULL;
+
+/*--------------------------------------------------------------------------*/
+#ifdef djUNICODE_TTF
+//dj2022-11 new .. this might move
+djFontList g_FontList;
+#endif
+/*--------------------------------------------------------------------------*/
 
 //Very simple pseudo 'console message' [dj2016-10]
 std::string g_sMsg("");
@@ -377,3 +389,95 @@ void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const unsigne
 	}
 }
 
+#ifdef djUNICODE_TTF
+
+void djGnukemLoadFonts()
+{
+	// dj2022-11 this list below is just a crude starting test list NOT yet the "official" fonts for this game, not chosen yet
+	if (g_FontList.m_apFonts.empty())//<- once-off init
+	{
+		//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 16);
+		//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 11);
+
+		const int nPTFONTSIZE = 12;
+		//g_FontList.LoadFont(DATA_DIR "fonts/supertux/Dekko-Regular.ttf", nPTFONTSIZE);
+		//g_FontList.LoadFont(DATA_DIR "fonts/supertux/MapoBackpacking.ttf", nPTFONTSIZE);
+		//g_FontList.LoadFont(DATA_DIR "fonts/supertux/NotoSansCJKjp-Medium.otf", nPTFONTSIZE);
+		//g_FontList.LoadFont(DATA_DIR "fonts/supertux/Roboto-Regular.ttf", nPTFONTSIZE);
+		//g_FontList.LoadFont(DATA_DIR "fonts/supertux/SuperTux-Medium.ttf", nPTFONTSIZE);
+		//g_FontList.LoadFont(DATA_DIR "fonts/supertux/VarelaRound-Regular.ttf", nPTFONTSIZE);
+
+		g_FontList.LoadFont(DATA_DIR "fonts/DejaVuSansMono-Bold.ttf", nPTFONTSIZE);
+		g_FontList.LoadFont(DATA_DIR "fonts/DejaVuSansMono.ttf", nPTFONTSIZE);
+
+		g_FontList.LoadFont(DATA_DIR "fonts/chinese-mainland/NotoSansSC-Regular.otf", nPTFONTSIZE);
+		g_FontList.LoadFont(DATA_DIR "fonts/NotoSans-Regular.ttf", nPTFONTSIZE);
+
+
+		g_FontList.LoadFont(DATA_DIR "fonts/DejaVuSans.ttf", nPTFONTSIZE);
+		g_FontList.LoadFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", nPTFONTSIZE);
+		// :/ fallback? also look for arialuni.ttf? low
+		//g_FontList.LoadFont(("C:\\WINDOWS\\fonts\\Arial.ttf", nPTFONTSIZE);
+	}
+}
+
+//! [New dj2022-11]
+void djFontListInit()
+{
+}
+//! [New dj2022-11]
+void djFontListDone()
+{
+	g_FontList.CleanupFonts();
+}
+
+void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, const std::string& sTextUTF8)
+{
+	// Get best matching font [this needs work]
+	TTF_Font* pFont = djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(g_FontList.m_apFonts, sTextUTF8, sTextUTF8.length());
+	if (!pFont)//<- old fallback for safety in case something went wrong and we have no matching fonts
+	{
+		if (g_pFont8x8)
+			GraphDrawString(pVis, g_pFont8x8, x, y, (unsigned char*)sTextUTF8.c_str());
+		return;
+	}
+
+#ifdef djTTF_HAVE_HARFBUZZ_EXTENSIONS
+	int nDir = djUnicodeTextHelpers::GuessDirection(sTextUTF8);
+	if (nDir < 0)
+	{
+		TTF_SetFontDirection(pFont, TTF_DIRECTION_RTL);
+		TTF_SetFontScriptName(pFont, "Arab");
+	}
+#endif
+
+	//SDL_Surface* sur = TTF_RenderUNICODE_Blended_Wrapped(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
+	//SDL_Surface* sur = TTF_RenderUNICODE_Blended(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
+	//SDL_Surface* sur = TTF_RenderUTF8_Blended(pFont, sText.c_str(), SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
+	SDL_Surface* sur = TTF_RenderUTF8_Solid(pFont, sTextUTF8.c_str(), SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
+	//SDL_Texture* tex = SDL_CreateTextureFromSurface(pVis->pRenderer, sur);
+	if (sur)
+	{
+		SDL_Rect rcDest{ x + 1, y + 1, pVis->width, pVis->height };
+		CdjRect rcSrc(0, 0, sur->w, sur->h);
+		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		//SDL_FreeSurface(sur);// why does this SDL_FreeSurface crash?SDL_FreeSurface(sur); [dj2022-11 fixme]
+		sur = nullptr;
+	}
+	//sur = TTF_RenderUTF8_Blended(pFont, sText.c_str(), SDL_Color{ 255, 255, 255, 255 });
+	sur = TTF_RenderUTF8_Blended(pFont, sTextUTF8.c_str(), Color);
+	//SDL_Texture* tex = SDL_CreateTextureFromSurface(pVis->pRenderer, sur);
+	if (sur)
+	{
+		SDL_Rect rcDest{ x, y, pVis->width, pVis->height };
+		CdjRect rcSrc(0, 0, sur->w, sur->h);
+		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		//SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
+		//SDL_FreeSurface(sur);// why does this SDL_FreeSurface crash?SDL_FreeSurface(sur); [dj2022-11 fixme]
+		sur = nullptr;
+	}
+	//SDL_RenderCopy(pVisBack->pRenderer, tex, NULL, &rect);
+}
+#endif
