@@ -915,10 +915,10 @@ bool GetHighScoreUserName(std::string& sReturnString)
 		GraphDrawString( pVisBack, g_pFont8x8,  96,  88, (unsigned char*)"Enter your name:" );
 
 #ifdef djUNICODE_SUPPORT
-		std::string sFakeCursor;
+		std::string sText = sInput;;
 		if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
-			sFakeCursor = "|";
-		DrawStringUnicodeHelper(pVisBack, nXLeft - 2, 104, SDL_Color{ 255, 255, 255, 255 }, sInput + sFakeCursor);
+			sText += "|";//<- simple 'fake cursor' (vertical bar/pipe character)
+		DrawStringUnicodeHelper(pVisBack, nXLeft - 2, 104, SDL_Color{ 255, 255, 255, 255 }, sText.c_str(), sText.length());
 #else
 		GraphDrawString( pVisBack, g_pFont8x8, nXLeft-2, 104, (unsigned char*)szBuffer );
 		if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor

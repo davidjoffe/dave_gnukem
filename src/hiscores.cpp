@@ -109,7 +109,7 @@ void ShowHighScores()
 			aColorGrad.push_back(SDL_Color{ 237, 217, 158, 255 });
 			std::string sText = g_aScores[i].szName;
 			const unsigned nXPOS = 24 + 11 * 8;
-			DrawStringUnicodeHelper(pVisBack, nXPOS, nYSTART + i * nHEIGHTPERROW-6, aColorGrad[i % aColorGrad.size()], sText);
+			DrawStringUnicodeHelper(pVisBack, nXPOS, nYSTART + i * nHEIGHTPERROW - 6, aColorGrad[i % aColorGrad.size()], sText.c_str(), sText.length());
 #endif//#ifndef djUNICODE_TTF
 		}//i
 

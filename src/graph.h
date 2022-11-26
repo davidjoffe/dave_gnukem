@@ -17,7 +17,7 @@ Copyright (C) 1998-2022 David Joffe
 #include "datadir.h"
 #include "djgraph.h"
 #include "djimage.h"
-#include <string>
+//#include <string>
 #ifdef djUNICODE_TTF
 //#include "djfonts.h"//dj2022-11 may refactor this may move to another file
 #endif
@@ -98,7 +98,10 @@ extern void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const 
 
 #ifdef djUNICODE_TTF
 //dj2022-11 basics of new Unicode TTF/OTF font stuff
+extern void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, const char* szTextUTF8, const unsigned int uLen);
+/*
 extern void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, const std::string& sTextUTF8);
+*/
 #endif
 
 #endif

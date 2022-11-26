@@ -10,6 +10,7 @@
 
 extern int main( int argc, char ** argv );
 
+// On Windows this is basically the main application entry point; it calls main() which is perhaps slightly unorthodox but seems to be working OK all these years (though decades ago the Intel compiler seemed to not like calling main() from WinMain())
 int WINAPI WinMain(HINSTANCE hInstance,
                         HINSTANCE hPrevInstance,
                         PSTR szCmdLine,

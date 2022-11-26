@@ -9,7 +9,7 @@ Copyright (C) 1998-2022 David Joffe
 
 #include "config.h"//CFG_APPLICATION_RENDER_RES_W //dj2019-06
 #ifdef WIN32
-#include <Windows.h>
+#include <Windows.h>//for workaround
 #endif
 #include <fcntl.h>
 #include <stdio.h>
@@ -33,7 +33,7 @@ Copyright (C) 1998-2022 David Joffe
 
 #include "console.h"//dj2022-11 refactoring
 #include "sys_log.h"//djLog helpers
-#include "djstring.h"//djStrPrintf
+#include "djstring.h"//djStrPrintf for only currenlty framerate display so might move out of here
 
 #include "graph.h"
 
@@ -401,6 +401,12 @@ void djGnukemLoadFonts()
 		g_FontList.LoadFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", nPTFONTSIZE);
 		// :/ fallback? also look for arialuni.ttf? low
 		//g_FontList.LoadFont(("C:\\WINDOWS\\fonts\\Arial.ttf", nPTFONTSIZE);
+//#ifdef WIN32
+//		if (djFileExists("c:\\windows\\fonts\\ArialUni.ttf"))
+//			g_FontList.LoadFont("C:\\WINDOWS\\fonts\\ArialUni.ttf", nPTFONTSIZE);
+//		if (djFileExists("c:\\windows\\fonts\\Arial-Uni.ttf"))
+//			g_FontList.LoadFont("C:\\WINDOWS\\fonts\\Arial-Uni.ttf", nPTFONTSIZE);
+//#endif
 	}
 }
 
@@ -414,30 +420,43 @@ void djFontListDone()
 	g_FontList.CleanupFonts();
 }
 
-void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, const std::string& sTextUTF8)
+//void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, const std::string& sTextUTF8)
+void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, const char* szTextUTF8, const unsigned int uLen)
 {
+	if (szTextUTF8 == nullptr || uLen == 0) return;
+	if (szTextUTF8[0] == 0) return;//non-null but empty string? do nothing
+
 	// Get best matching font [this needs work]
-	TTF_Font* pFont = djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(g_FontList.m_apFonts, sTextUTF8, sTextUTF8.length());
+	//TTF_Font* pFont = djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(g_FontList.m_apFonts, sTextUTF8, sTextUTF8.length());
+	TTF_Font* pFont = djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(g_FontList.m_apFonts, szTextUTF8, uLen);
 	if (!pFont)//<- old fallback for safety in case something went wrong and we have no matching fonts
 	{
 		if (g_pFont8x8)
-			GraphDrawString(pVis, g_pFont8x8, x, y, (unsigned char*)sTextUTF8.c_str());
+			GraphDrawString(pVis, g_pFont8x8, x, y, (unsigned char*)szTextUTF8);
 		return;
 	}
 
 #ifdef djTTF_HAVE_HARFBUZZ_EXTENSIONS
-	int nDir = djUnicodeTextHelpers::GuessDirection(sTextUTF8);
+	int nDir = djUnicodeTextHelpers::GuessDirection(szTextUTF8, uLen);
 	if (nDir < 0)
 	{
 		TTF_SetFontDirection(pFont, TTF_DIRECTION_RTL);
+		// hm could be Hebrew too but if Arabic we need the harfbuzz extensions .. should also detect language
 		TTF_SetFontScriptName(pFont, "Arab");
 	}
+	else
+	{
+		TTF_SetFontDirection(pFont, TTF_DIRECTION_LTR);
+		// hmm what script name to set here?
+	}
 #endif
+
+	// first dropshadow
 
 	//SDL_Surface* sur = TTF_RenderUNICODE_Blended_Wrapped(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
 	//SDL_Surface* sur = TTF_RenderUNICODE_Blended(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
 	//SDL_Surface* sur = TTF_RenderUTF8_Blended(pFont, sText.c_str(), SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
-	SDL_Surface* sur = TTF_RenderUTF8_Solid(pFont, sTextUTF8.c_str(), SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
+	SDL_Surface* sur = TTF_RenderUTF8_Solid(pFont, szTextUTF8, SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
 	//SDL_Texture* tex = SDL_CreateTextureFromSurface(pVis->pRenderer, sur);
 	if (sur)
 	{
@@ -449,7 +468,7 @@ void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, cons
 		sur = nullptr;
 	}
 	//sur = TTF_RenderUTF8_Blended(pFont, sText.c_str(), SDL_Color{ 255, 255, 255, 255 });
-	sur = TTF_RenderUTF8_Blended(pFont, sTextUTF8.c_str(), Color);
+	sur = TTF_RenderUTF8_Blended(pFont, szTextUTF8, Color);
 	//SDL_Texture* tex = SDL_CreateTextureFromSurface(pVis->pRenderer, sur);
 	if (sur)
 	{
