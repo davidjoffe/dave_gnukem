@@ -69,6 +69,9 @@
     <ClCompile Include="..\sdl\djtime.cpp">
       <Filter>Source Files\djGameLib\sdl</Filter>
     </ClCompile>
+    <ClCompile Include="..\djfile.cpp">
+      <Filter>Source Files\djGameLib</Filter>
+    </ClCompile>
     <ClCompile Include="..\djfonts.cpp">
       <Filter>Source Files\djGameLib</Filter>
     </ClCompile>
@@ -177,6 +180,9 @@
       <Filter>Header Files\djGameLibHeaders</Filter>
     </ClInclude>
     <ClInclude Include="..\djgraph.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djfile.h">
       <Filter>Header Files\djGameLibHeaders</Filter>
     </ClInclude>
     <ClInclude Include="..\djfonts.h">
