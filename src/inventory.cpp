@@ -86,8 +86,10 @@ void InvDraw()
 		for ( unsigned int i=0; i<g_apInventory.size(); ++i)
 		{
 			// Bottom right viewport overlay
-			int nX = (g_nViewOffsetX+(VIEW_WIDTH*BLOCKW)) - (i+1)*BLOCKW;
-			int nY = (g_nViewOffsetY+(VIEW_HEIGHT*BLOCKH)) - BLOCKH;
+			extern int g_nViewportPixelW;
+			extern int g_nViewportPixelH;
+			int nX = (g_nViewOffsetX + g_nViewportPixelW) - (i + 1) * BLOCKW;
+			int nY = (g_nViewOffsetY + g_nViewportPixelH) - BLOCKH;
 			// Background block
 			DRAW_SPRITE16(pVisView, 0, 1, nX, nY);
 			CThing *pThing = g_apInventory[i].pThing;

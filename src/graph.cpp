@@ -340,11 +340,11 @@ void djGraphicsSystem::GraphDone()
 	//SDL_Quit();
 }
 
-// FIXME: , view_height?
-void GraphFlipView( int iViewWidth, int iViewHeight, int nXS, int nYS, int nXD, int nYD )
+// FIXME: , view_height? [dj2022-11 change the width/height to pixels instead of logical game blocks so we can have arbitrary viewport size not multiples of BLOCKW/BLOCKH etc. - more generic]
+void GraphFlipView(int iViewWidthPixels, int iViewHeightPixels, int nXS, int nYS, int nXD, int nYD)
 {
 	//djgDrawVisual( pVisBack, pVisView, g_bLargeViewport?0:16, g_bLargeViewport?0:16, g_bLargeViewport?0:16, g_bLargeViewport?0:16, iViewWidth*16, iViewHeight*16 );
-	djgDrawVisual( pVisBack, pVisView, nXD, nYD, nXS, nYS, iViewWidth*BLOCKW, iViewHeight*BLOCKH );
+	djgDrawVisual(pVisBack, pVisView, nXD, nYD, nXS, nYS, iViewWidthPixels, iViewHeightPixels);
 }
 
 // FIXME: Currenetly assumes a 256-char 32x8 character 256x128 pixel alpha-mapped image

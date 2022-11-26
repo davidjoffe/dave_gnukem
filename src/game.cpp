@@ -76,8 +76,11 @@ bool g_bLargeViewport = false;//true;
 // These used to be constants, that's why they're all uppercase, but should be renamed according to normal variable naming conventions [dj2017-08]
 int VIEW_WIDTH = -1;
 int VIEW_HEIGHT = -1;
-int g_nViewOffsetX=0;//Top left of game viewport in pixels (X)
-int g_nViewOffsetY=0;//Top left of game viewport in pixels (Y)
+// Viewport drawing 'rectangle' in pixels (firstly offset in pixels from relative to top left of screen or gameview display buffer, then a width/height in pixels):
+int g_nViewOffsetX = 0;//Top left of game viewport in pixels (X)
+int g_nViewOffsetY = 0;//Top left of game viewport in pixels (Y)
+int g_nViewportPixelW = 0;//dj2022-11
+int g_nViewportPixelH = 0;
 
 
 //[dj2016-10-10]
@@ -904,7 +907,7 @@ void RedrawEverythingHelper()
 	DrawScore();
 	GameDrawFirepower();
 	InvDraw();
-	GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT, g_nViewOffsetX, g_nViewOffsetY, g_nViewOffsetX, g_nViewOffsetY );
+	GraphFlipView(g_nViewportPixelW, g_nViewportPixelH, g_nViewOffsetX, g_nViewOffsetY, g_nViewOffsetX, g_nViewOffsetY);
 	GraphFlip(!g_bBigViewportMode);
 }
 /*-----------------------------------------------------------*/
@@ -963,6 +966,12 @@ void ReInitGameViewport()
 	// If very high resolution then in theory VIEW_WIDTH could be wider than the level, we don't want that or bad things will happen, so clamp to level dimensions:
 	if (VIEW_WIDTH > LEVEL_WIDTH) VIEW_WIDTH = LEVEL_WIDTH;
 	if (VIEW_HEIGHT > LEVEL_HEIGHT) VIEW_HEIGHT = LEVEL_HEIGHT;
+
+	//dj2022-11 experimenting with increasing flexibility of viewport dimensions (changing to pixels from game block units)
+	//g_nViewportPixelW = VIEW_WIDTH * BLOCKW - (BLOCKW - nExtraPartialBlockPixelsX);
+	//g_nViewportPixelH = VIEW_HEIGHT * BLOCKH - (BLOCKH - nExtraPartialBlockPixelsY);
+	g_nViewportPixelW = VIEW_WIDTH * BLOCKW;
+	g_nViewportPixelH = VIEW_HEIGHT * BLOCKH;
 }
 /*-----------------------------------------------------------*/
 
@@ -2242,7 +2251,7 @@ void DrawHealth()
 	}
 	szHealth[MAX_HEALTH] = 0;
 	if (g_bLargeViewport || g_bBigViewportMode)
-		GraphDrawString( pVisView, g_pFont8x8, g_nViewOffsetX+(VIEW_WIDTH*BLOCKW)-MAX_HEALTH*8, g_nViewOffsetY, (unsigned char*)szHealth );
+		GraphDrawString( pVisView, g_pFont8x8, g_nViewOffsetX+g_nViewportPixelW-MAX_HEALTH*8, g_nViewOffsetY, (unsigned char*)szHealth );
 	else
 		GraphDrawString( pVisBack, g_pFont8x8, HEALTH_X, HEALTH_Y, (unsigned char*)szHealth );
 }
@@ -2297,7 +2306,7 @@ void DrawScore()
 	if (g_bLargeViewport || g_bBigViewportMode)
 	{
 		// Don't need to clear behind as the game viewport is redrawn every frame underneath us
-		GraphDrawString( pVisView, g_pFont8x8, (g_nViewOffsetX+(VIEW_WIDTH*BLOCKW)) - 10*8, g_nViewOffsetY + 8/* +8 is to put it below health */, (unsigned char*)score_buf );
+		GraphDrawString( pVisView, g_pFont8x8, (g_nViewOffsetX+g_nViewportPixelW) - 10*8, g_nViewOffsetY + 8/* +8 is to put it below health */, (unsigned char*)score_buf );
 	}
 	else
 	{
@@ -2342,7 +2351,7 @@ void GameDrawView()
 
 	// Draw view background
 	if (pBackground)
-		djgDrawImage(pVisView, pBackground, 0, 0, g_nViewOffsetX, g_nViewOffsetY, VIEW_WIDTH*BLOCKW, VIEW_HEIGHT*BLOCKH);
+		djgDrawImage(pVisView, pBackground, 0, 0, g_nViewOffsetX, g_nViewOffsetY, g_nViewportPixelW, g_nViewportPixelH);
 
 	// Clear viewport background before starting to draw game view in there
 	// (If we don't, then the background doesn't clear where there are 'bg' (background) sprites)
@@ -2352,8 +2361,8 @@ void GameDrawView()
 		SDL_Rect rect;
 		rect.x = g_nViewOffsetX;
 		rect.y = g_nViewOffsetY;
-		rect.w = VIEW_WIDTH*BLOCKW;
-		rect.h = VIEW_HEIGHT*BLOCKH;
+		rect.w = g_nViewportPixelW;
+		rect.h = g_nViewportPixelH;
 		SDL_FillRect(pVisView->pSurface, &rect, SDL_MapRGB(pVisView->pSurface->format, 0, 0, 0));
 		//djgClear(pVisView);
 	}
@@ -2644,7 +2653,7 @@ void GameDrawView()
 	}
 
 	// Flip the off-screen world viewport onto the backbuffer
-	GraphFlipView( VIEW_WIDTH, VIEW_HEIGHT, g_nViewOffsetX, g_nViewOffsetY, g_nViewOffsetX, g_nViewOffsetY );
+	GraphFlipView(g_nViewportPixelW, g_nViewportPixelH, g_nViewOffsetX, g_nViewOffsetY, g_nViewOffsetX, g_nViewOffsetY);
 }
 
 // [dj2016-10] [fixme don't like these globals just floating here]
@@ -3101,7 +3110,7 @@ void GameDrawFirepower()
 	{
 		// Draw firepower
 		int nX = g_nViewOffsetX;
-		int nY = (g_nViewOffsetY+(VIEW_HEIGHT*BLOCKH)) - BLOCKH;
+		int nY = (g_nViewOffsetY+g_nViewportPixelH) - BLOCKH;
 
 		for ( int i=0; i<g_nFirepower; ++i )
 		{
