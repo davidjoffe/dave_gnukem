@@ -390,9 +390,9 @@ public:
 	CSpikeBall();
 	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int Tick(float fDeltaTime_ms) override;
-	virtual int HeroOverlaps();
-	virtual void OnAdded();
-	virtual void Initialize(int b0, int b1);
+	virtual int HeroOverlaps() override;
+	virtual void OnAdded() override;
+	virtual void Initialize(int b0, int b1) override;
 protected:
 	int m_nYOffset;
 	int m_nBounceIndex;
@@ -414,8 +414,8 @@ public:
 	void SetContents( int iContentsA, int iContentsB );
 
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual void Initialize(int b0, int b1);
-	virtual int OnHeroShot();
+	virtual void Initialize(int b0, int b1) override;
+	virtual int OnHeroShot() override;
 
 	int  m_iContentsA;   // sprite object inside box (a==spriteset)
 	int  m_iContentsB;   // sprite object inside box (b==sprite)
@@ -433,8 +433,8 @@ public:
 	CLetter();
 
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual void Initialize(int b0, int b1);
-	virtual int HeroOverlaps();
+	virtual void Initialize(int b0, int b1) override;
+	virtual int HeroOverlaps() override;
 protected:
 	int m_iNumber;       // which letter is this? (ie from 0 to 5)
 	friend void CLetterPerLevelInit();
@@ -451,11 +451,11 @@ class CPickup : public CThing
 {
 public:
 	CPickup();
-	virtual int  HeroOverlaps();
+	virtual int HeroOverlaps() override;
 	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int  Tick(float fDeltaTime_ms) override;
-	virtual void Initialize(int b0, int b1);
-	virtual bool OnInventoryClear() { return !m_bPersistent; }
+	virtual void Initialize(int b0, int b1) override;
+	virtual bool OnInventoryClear() override { return !m_bPersistent; }
 protected:
 	int m_nScoreDiff;
 	int m_nHealthDiff;
@@ -478,8 +478,8 @@ public:
 
 	virtual int Tick(float fDeltaTime_ms) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual int  Action();
-	virtual void HeroLeave();
+	virtual int Action() override;
+	virtual void HeroLeave() override;
 protected:
 	bool m_bBusy;
 };
@@ -514,7 +514,7 @@ class CExit : public CThing
 public:
 	CExit();
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual int  Action();
+	virtual int Action() override;
 	virtual int Tick(float fDeltaTime_ms) override;
 protected:
 	int m_nActivated; // -1. Becomes 0 when activated, then increments from 1 - 5, then exit occurs
@@ -534,8 +534,8 @@ class CTeleporter : public CThing
 {
 public:
 	CTeleporter();
-	virtual void Initialize(int b0, int b1);
-	virtual int  Action();
+	virtual void Initialize(int b0, int b1) override;
+	virtual int Action() override;
 	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int Tick(float fDeltaTime_ms) override;
 protected:
@@ -581,7 +581,7 @@ class CDoorRelatedType : public CThing
 public:
 	CDoorRelatedType();
 
-	virtual void Initialize(int b0, int b1);
+	virtual void Initialize(int b0, int b1) override;
 	int GetID() const { return m_nID; }
 protected:
 	int m_nID;
@@ -614,7 +614,7 @@ class CKey : public CDoorRelatedType
 {
 public:
 	CKey();
-	virtual int HeroOverlaps();
+	virtual int HeroOverlaps() override;
 	virtual void Draw(float fDeltaTime_ms) override;
 };
 /*-----------------------------------------------------------*/
@@ -649,9 +649,11 @@ class CDoorActivator : public CDoorRelatedType
 {
 public:
 	CDoorActivator();
-	virtual int  Action();
+	virtual int Action() override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual void OnActivated(){};
+
+	// hm door thing? or what
+	virtual void OnDoorActivated() {};
 };
 /*-----------------------------------------------------------*/
 /*!
@@ -666,7 +668,9 @@ public:
 	CMasterComputer();
 	virtual int Tick(float fDeltaTime_ms) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual void OnActivated();
+
+
+	virtual void OnDoorActivated() override;
 protected:
 	int m_nAnimationCount=0; // -1 if non-animated, otherwise [0, 3]
 };
@@ -682,7 +686,7 @@ class CSoftBlock : public CThing
 public:
 	CSoftBlock();
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual int OnHeroShot();
+	virtual int OnHeroShot() override;
 };
 /*-----------------------------------------------------------*/
 /*!
@@ -697,7 +701,7 @@ class CCamera : public CThing
 public:
 	CCamera();
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual int  OnHeroShot();
+	virtual int OnHeroShot() override;
 protected:
 	friend void CCameraPerLevelInit();
 	static int c_nNumCameras; // Number of cameras in the level
@@ -715,8 +719,8 @@ class CBanana : public CThing
 public:
 	CBanana();
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual int  OnHeroShot();
-	virtual int HeroOverlaps();
+	virtual int OnHeroShot() override;
+	virtual int HeroOverlaps() override;
 protected:
 	int m_nState; // 0 = single banana, 1 = bunch
 };
@@ -732,8 +736,8 @@ class CSoda : public CPickup
 public:
 	CSoda();
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual int OnHeroShot();
-	virtual int HeroOverlaps();
+	virtual int OnHeroShot() override;
+	virtual int HeroOverlaps() override;
 	virtual int Tick(float fDeltaTime_ms) override;
 protected:
 	bool IsShot() const { return m_nShotHeight!=-1; }
@@ -751,7 +755,7 @@ class CFullHealth : public CPickup
 {
 public:
 	CFullHealth();
-	virtual int HeroOverlaps();
+	virtual int HeroOverlaps() override;
 };
 /*-----------------------------------------------------------*/
 /*!
@@ -764,10 +768,10 @@ class CBalloon : public CThing
 {
 public:
 	CBalloon();
-	virtual int  HeroOverlaps();
+	virtual int HeroOverlaps() override;
 	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int Tick(float fDeltaTime_ms) override;
-	virtual int  OnHeroShot();
+	virtual int OnHeroShot() override;
 protected:
 	int m_nHeight; // Starts at 0, increases
 };
@@ -782,10 +786,10 @@ class CAcme : public CThing
 {
 public:
 	CAcme();
-	virtual int  HeroOverlaps();
+	virtual int HeroOverlaps() override;
 	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int Tick(float fDeltaTime_ms) override;
-	virtual int  OnHeroShot();
+	virtual int OnHeroShot() override;
 protected:
 	int m_nState;
 	int m_nCounter;
@@ -802,9 +806,9 @@ class CBoots : public CPickup
 {
 public:
 	CBoots();
-	virtual int HeroOverlaps();
-	virtual void OnInventoryLoad();
-	virtual void Initialize(int b0, int b1);
+	virtual int HeroOverlaps() override;
+	virtual void OnInventoryLoad() override;
+	virtual void Initialize(int b0, int b1) override;
 };
 /*-----------------------------------------------------------*/
 /*!
@@ -819,7 +823,7 @@ public:
 	CCrumblingFloor();
 	virtual int Tick(float fDeltaTime_ms) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual void Initialize(int b0, int b1);
+	virtual void Initialize(int b0, int b1) override;
 protected:
 	int m_nStrength;//Starts at e.g. 2, each time hero walks on us we decrement the counter, when counter hits 0, we self-terminate
 	bool m_bHeroTouchingPrev;
@@ -838,7 +842,7 @@ public:
 	CConveyor();
 	virtual int Tick(float fDeltaTime_ms) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual void Initialize(int b0, int b1);
+	virtual void Initialize(int b0, int b1) override;
 protected:
 	int m_nDir; // Direction, either -1 or 1
 };
@@ -855,8 +859,8 @@ public:
 	CFlameThrow();
 	virtual int Tick(float fDeltaTime_ms) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual void Initialize(int b0, int b1);
-	virtual int HeroOverlaps();
+	virtual void Initialize(int b0, int b1) override;
+	virtual int HeroOverlaps() override;
 protected:
 	int m_nDir; // Direction, either -1 or 1
 	int m_nCount; // This determines what phase of the flameblast we're in
@@ -874,9 +878,9 @@ public:
 	CDynamite();
 	virtual int Tick(float fDeltaTime_ms) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual int HeroOverlaps();
-	virtual bool OverlapsBounds(int x, int y);
-	virtual void DrawActionBounds(const djColor &Color);
+	virtual int HeroOverlaps() override;
+	virtual bool OverlapsBounds(int x, int y) override;
+	virtual void DrawActionBounds(const djColor &Color) override;
 protected:
 	int m_nCount; // This determines what phase of the flameblast we're in
 	int m_nX1Right;
@@ -898,8 +902,8 @@ public:
 	CFan();
 	virtual int Tick(float fDeltaTime_ms) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual void Initialize(int b0, int b1);
-	virtual int OnHeroShot();
+	virtual void Initialize(int b0, int b1) override;
+	virtual int OnHeroShot() override;
 protected:
 	int m_nAnim;
 	int m_nSpeed;
@@ -919,7 +923,7 @@ class CFirepower : public CThing
 public:
 	CFirepower();
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual int HeroOverlaps();
+	virtual int HeroOverlaps() override;
 };
 /*-----------------------------------------------------------*/
 /*!
@@ -934,8 +938,8 @@ public:
 	CRocket();
 	virtual int Tick(float fDeltaTime_ms) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual void Initialize(int a, int b);
-	virtual int OnHeroShot();
+	virtual void Initialize(int a, int b) override;
+	virtual int OnHeroShot() override;
 protected:
 	int m_nStrength;
 	bool m_bTakingOff;
@@ -959,7 +963,7 @@ public:
 	CWater();
 	virtual int Tick(float fDeltaTime_ms) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual void Initialize(int a, int b);
+	virtual void Initialize(int a, int b) override;
 protected:
 	int m_nAnimationCount;
 };
@@ -977,7 +981,7 @@ class CBlock : public CThing
 public:
 	CBlock();
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual void Initialize(int a, int b);
+	virtual void Initialize(int a, int b) override;
 };
 /*-----------------------------------------------------------*/
 /*!

@@ -795,7 +795,7 @@ int CDoorActivator::Action()
 					}
 				}
 
-				OnActivated();
+				OnDoorActivated();
 
 				delete pThing; // Delete key
 				return 0;
@@ -824,14 +824,16 @@ CMasterComputer::CMasterComputer()
 	SetActionBounds(-HALFBLOCKW,-BLOCKH,(BLOCKW*2-1)+HALFBLOCKW,BLOCKH-1);
 	SetVisibleBounds(0,-BLOCKH,BLOCKW*2-1,BLOCKH-1);
 }
-void CMasterComputer::OnActivated()
+void CMasterComputer::OnDoorActivated()
 {
 	// The parent class is used to check if activated, meaning, if hero inserted antivirus
-	// floppy into drive. When this happens, the OnActivated() virtual function is called,
+	// floppy into drive. When this happens, the OnDoorActivated() virtual function is called,
 	// so we can do special handling here not relevant to other types of 'activated' key/door type stuff.
 
 	// OK, right here, you've more or less 'won the game' (at least that's the idea),
 	// you've just saved the world. Should do something here slightly less unspectacular.
+	
+	// (Well, almost won the game but it just opens a door still to go to the main bad guy)
 
 	// [TODO] What exactly to do over here? You've just saved the world.
 	update_score(10000, m_x, m_y - 1);

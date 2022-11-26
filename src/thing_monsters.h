@@ -18,10 +18,11 @@ class CMonster : public CThing
 {
 public:
 	CMonster();
-	virtual void Initialize(int a, int b);
+	virtual void Initialize(int a, int b) override;
 	virtual int Tick(float fDeltaTime_ms) override;
-	virtual int OnHeroShot();
+	virtual int OnHeroShot() override;
 
+	// hmm this is a monster thing? or should all things have a 'killable' flag? so we don't ahve override flag here [yet] unless in future we add to CThing
 	virtual int OnKilled();
 protected:
 	int m_nStrength;//"Health" of the monster
@@ -42,11 +43,11 @@ class CRobot : public CMonster
 {
 public:
 	CRobot();
-	virtual int HeroOverlaps();
+	virtual int HeroOverlaps() override;
 	virtual void Draw(float fDeltaTime) override;
 	virtual int Tick(float fDeltaTime) override;
-	virtual void Initialize(int a, int b);
-	virtual int OnKilled();
+	virtual void Initialize(int a, int b) override;
+	virtual int OnKilled() override;
 protected:
 	int m_nType; // Currently 0=normal robot, 1=fireball thingy
 	int m_nHeightOffset; // 0 for robot, -15 for fireball
@@ -56,11 +57,11 @@ class CFlyingRobot : public CRobot
 {
 public:
 	CFlyingRobot();
-	virtual int HeroOverlaps();
+	virtual int HeroOverlaps() override;
 	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int Tick(float fDeltaTime) override;
-	virtual int OnKilled();
-	void Initialize(int a, int b);
+	virtual int OnKilled() override;
+	virtual void Initialize(int a, int b) override;
 protected:
 	int m_nDieAnim;
 	//int m_nDir;//Direction (-1 or 1)
@@ -80,11 +81,11 @@ class CRabbit : public CMonster
 {
 public:
 	CRabbit();
-	virtual void Initialize(int a, int b);
+	virtual void Initialize(int a, int b) override;
 	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int Tick(float fDeltaTime) override;
-	virtual int HeroOverlaps();
-	virtual int OnHeroShot();
+	virtual int HeroOverlaps() override;
+	virtual int OnHeroShot() override;
 protected:
 	int m_nWalkAnimOffset;
 	int m_nWalkAnimOffsetUpdateCounter;
@@ -100,11 +101,11 @@ class CHighVoltage : public CMonster
 {
 public:
 	CHighVoltage();
-	virtual void Initialize(int a, int b);
+	virtual void Initialize(int a, int b) override;
 	virtual void Draw(float fDeltaTime_ms) override;
 	virtual int Tick(float fDeltaTime) override;
-	virtual int HeroOverlaps();
-	virtual int OnHeroShot();
+	virtual int HeroOverlaps() override;
+	virtual int OnHeroShot() override;
 protected:
 	int m_nHeight;//Height (in game blocks) - this is comparable to the width of the crumbling floors (same principle, just vertical instead)
 };
@@ -113,12 +114,12 @@ class CCannon : public CMonster
 {
 public:
 	CCannon();
-	virtual void Initialize(int a, int b);
+	virtual void Initialize(int a, int b) override;
 	virtual int Tick(float fDeltaTime) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual int HeroOverlaps();
-	virtual int OnHeroShot();
-	virtual int OnKilled();
+	virtual int HeroOverlaps() override;
+	virtual int OnHeroShot() override;
+	virtual int OnKilled() override;
 };
 /*-----------------------------------------------------------*/
 /*!
@@ -133,9 +134,9 @@ public:
 	CCrawler();
 	virtual int Tick(float fDeltaTime) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual int  OnHeroShot();
-	virtual int HeroOverlaps();
-	virtual void Initialize(int b0, int b1);
+	virtual int OnHeroShot() override;
+	virtual int HeroOverlaps() override;
+	virtual void Initialize(int b0, int b1) override;
 protected:
 	int m_nDir; // direction
 	int m_nXDir; // -1=face left, 1=face right
@@ -155,8 +156,8 @@ public:
 	CSpike();
 	virtual int Tick(float fDeltaTime_ms) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual int  HeroOverlaps();
-	virtual void Initialize(int b0, int b1);
+	virtual int HeroOverlaps() override;
+	virtual void Initialize(int b0, int b1) override;
 protected:
 	int m_nType;
 	int m_nSpikePopupCount;
@@ -168,9 +169,9 @@ public:
 	CJumpingMonster();
 	virtual int Tick(float fDeltaTime_ms) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual void Initialize(int a, int b);
-	virtual int HeroOverlaps();
-	virtual int OnKilled();
+	virtual void Initialize(int a, int b) override;
+	virtual int HeroOverlaps() override;
+	virtual int OnKilled() override;
 protected:
 	int m_nJumpingIndex;
 	bool m_bFalling;
@@ -193,9 +194,9 @@ public:
 	virtual ~CDrProton();
 	virtual int Tick(float fDeltaTime_ms) override;
 	virtual void Draw(float fDeltaTime_ms) override;
-	virtual void Initialize(int a, int b);
-	virtual int HeroOverlaps();
-	virtual int OnHeroShot();
+	virtual void Initialize(int a, int b) override;
+	virtual int HeroOverlaps() override;
+	virtual int OnHeroShot() override;
 
 	static bool GameEnding() { return (g_pGameEnding!=NULL); }
 	static CDrProton* GetDrProton() { return g_pGameEnding; }
