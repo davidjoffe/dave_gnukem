@@ -7,3 +7,27 @@
 #include "config.h"
 #include "console.h"
 
+//Very simple pseudo 'console message' [dj2016-10]
+//dj2022-11 some small refactoring
+
+std::string djConsoleMessage::m_sMsg;
+float djConsoleMessage::m_fTimer = 0.f;
+
+void djConsoleMessage::SetConsoleMessage(const std::string& sMsg)
+{
+	m_sMsg = sMsg;
+	m_fTimer = 0.f;// Reset timer
+}
+
+void djConsoleMessage::Update(float fDeltaTime)
+{
+	if (m_sMsg.empty()) return;
+
+	//Display message for about ~2s then it disappears
+	m_fTimer += fDeltaTime;
+	if (m_fTimer >= 2200.f)
+	{
+		m_sMsg.clear();
+		m_fTimer = 0.f;
+	}
+}

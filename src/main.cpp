@@ -18,6 +18,7 @@ Copyright (C) 1995-2022 David Joffe
 
 #include "config.h"
 #include "version.h"//dj2022-11 for new VERSION
+#include "console.h"//SetConsoleMessage
 #include <time.h>   // for srand()
 
 #include "graph.h"
@@ -292,7 +293,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	if (szValue!=NULL && std::string(szValue)=="OFF")//on by default unless specifically turned off
 	{
 		djSoundDisable();
-		SetConsoleMessage("Sounds OFF (Ins)");
+		djConsoleMessage::SetConsoleMessage("Sounds OFF (Ins)");
 	}
 
 	srand((unsigned int)time(NULL));				// Seed the random number generator

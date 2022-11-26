@@ -101,7 +101,4 @@ extern void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const 
 extern void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, const std::string& sTextUTF8);
 #endif
 
-//! Very simple pseudo 'console message' .. not exactly sure where this 'belongs' dependency-wise [dj2016-10]
-extern void SetConsoleMessage( const std::string& sMsg );
-
 #endif

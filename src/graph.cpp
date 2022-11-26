@@ -31,6 +31,7 @@ Copyright (C) 1998-2022 David Joffe
 #include "datadir.h"//LoadFont
 #endif//#ifdef djUNICODE_TTF
 
+#include "console.h"//dj2022-11 refactoring
 #include "sys_log.h"//djLog helpers
 #include "djstring.h"//djStrPrintf
 
@@ -55,16 +56,6 @@ djFontList g_FontList;
 #endif
 /*--------------------------------------------------------------------------*/
 
-//Very simple pseudo 'console message' [dj2016-10]
-std::string g_sMsg("");
-unsigned int g_nConsoleMsgTimer=0;//[milliseconds]
-unsigned int g_uConsoleMsgTimeStart = 0;
-void SetConsoleMessage( const std::string& sMsg )
-{
-	g_sMsg = sMsg;
-	g_nConsoleMsgTimer = 2000;//Display message for ~2s then it disappears
-	g_uConsoleMsgTimeStart = SDL_GetTicks();//'Reset' timer
-}
 
 //dj2022-11 new helpers refactoring to try fullscreen toggle. Load the image but not yet the hardware surface cache item (do that after GraphInit) so we can do fullscreen toggle (semi-experimental this stuff may change)
 void djFontInit()
@@ -93,7 +84,7 @@ void GraphFlip(bool bScaleView)
 	// what's 'behind' the console message and immediately restore it after, otherwise e.g. say subsequent
 	// volume changes cause the console message to draw over its previous self in a sort of 'additive' way
 	// leaving text looking messed up [dj2016-10]
-	if (pVisBack!=NULL && g_pFont8x8!=NULL && (!g_sMsg.empty() || bShowFrameRate))
+	if (pVisBack!=NULL && g_pFont8x8!=NULL && (!djConsoleMessage::m_sMsg.empty() || bShowFrameRate))
 	{
 		pVisTemp = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, 8, pVisBack->pSurface->format->BitsPerPixel,
 			pVisBack->pSurface->format->Rmask,
@@ -111,17 +102,9 @@ void GraphFlip(bool bScaleView)
 		}
 
 		// crude 'console message' stuff .. should make this nicer someday
-		if (!g_sMsg.empty())
+		if (!djConsoleMessage::m_sMsg.empty())
 		{
-			GraphDrawString(pVisBack, g_pFont8x8, 0, 0, (const unsigned char*)g_sMsg.c_str());
-
-			// Clear console message after a certain time
-			unsigned int uTimeNow = SDL_GetTicks();
-			if ((uTimeNow - g_uConsoleMsgTimeStart) > g_nConsoleMsgTimer)
-			{
-				g_sMsg.clear();
-				g_nConsoleMsgTimer = -1;
-			}
+			GraphDrawString(pVisBack, g_pFont8x8, 0, 0, (const unsigned char*)djConsoleMessage::m_sMsg.c_str());
 		}
 
 

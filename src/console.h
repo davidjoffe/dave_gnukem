@@ -9,4 +9,21 @@
 
 #include "config.h"
 
+//dj todo low - const char* rather? hmm debatable
+#include <string>
+
+//Very simple pseudo 'console message' [dj2016-10]
+//dj2022-11 some small refactoring
+
+class djConsoleMessage
+{
+public:
+	static void SetConsoleMessage(const std::string& sMsg);
+	// fDT = floating point deltatime [milliseconds]
+	static void Update(float fDeltaTime);
+
+	static float m_fTimer;
+	static std::string m_sMsg;
+};
+
 #endif

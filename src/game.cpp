@@ -29,6 +29,7 @@
 #include <math.h>//sqrtf
 #endif
 
+#include "console.h"//SetConsoleMessage [dj2022-11 refactoring]
 #include "mission.h"
 #include "hero.h"
 #include "inventory.h"
@@ -1611,12 +1612,12 @@ int game_startup(bool bLoadGame)
 					if (Event.key.keysym.sym==SDLK_7)//SDLK_PAGEUP)
 					{
 						djSoundAdjustVolume(4);
-						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+						djConsoleMessage::SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
 					}
 					else if (Event.key.keysym.sym==SDLK_6)//SDLK_PAGEDOWN)
 					{
 						djSoundAdjustVolume(-4);
-						SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+						djConsoleMessage::SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
 					}
 					else if (Event.key.keysym.sym==SDLK_INSERT)
 					{
@@ -1624,7 +1625,7 @@ int game_startup(bool bLoadGame)
 							djSoundDisable();
 						else
 							djSoundEnable();
-						SetConsoleMessage( djSoundEnabled() ? "Sounds ON (Ins)" : "Sounds OFF (Ins)" );
+						djConsoleMessage::SetConsoleMessage( djSoundEnabled() ? "Sounds ON (Ins)" : "Sounds OFF (Ins)" );
 					}
 					break;
 				case SDL_KEYUP:
@@ -1867,14 +1868,15 @@ int game_startup(bool bLoadGame)
 			djgDrawImage( pVisBack, pSkinGame, 0, 8, 0, 8, 196, 8 );
 		GraphDrawString( pVisBack, g_pFont8x8, 0, 8, (unsigned char*)sbuf );
 
-		// update
-		static float fTLast = -1.f;
-		float fT1 = djTimeGetTime();
-		if (fTLast < 0.f)
-			fTLast = fT1;//<-  hm first tick will be 0.f a bit odd .. but for DN1 should be ~18Hz [dj2022-11 LWO prio as this stuff isn't even used yet]
-		// [dj2022-11] Simple calculate of delta-time since last frame at this point (not currently used for anything but in theory a lot of game update stuff 'should' be driven more by something like this .. should perhaps in future be passed to CThing::Tick or something like that)
-		const float fDT = fT1 - fTLast;//delta-time since last update [new dj2022-11 not yet used for anything really]
-		fTLast = fT1;
+		/////////////////////////////
+		// UPDATE
+
+		// [dj2022-11] Simple calculate of delta-time since last frame at this point (not currently used for much but in theory a lot of game update stuff 'should' be driven more by something like this .. should perhaps in future be passed to CThing::Tick or something like that)
+		static uint64_t uTicksLast = 0;
+		uint64_t uTicksNow = djTimeGetTicks64();
+		if (uTicksLast == 0) uTicksLast = uTicksNow;//<- hmm .. better idea? first tick will be a bit odd [dj2022-11 low prio]
+		const float fDT = (float)(uTicksNow - uTicksLast);//<- delatime (milliseconds) since last frame ... to think about - double?
+		uTicksLast = uTicksNow;//<- save for next frame to calculate delmtatime
 
 		//dj2022-11 add quick n dirty stress-tester to help test in-game fullscreen toggle robustness
 #if defined(djINGAME_FULLSCREEN_TOGGLE) && defined(djDEV_STRESSTESTS)
@@ -1885,6 +1887,7 @@ int game_startup(bool bLoadGame)
 			bForceUpdate = true;
 		}
 #endif
+		djConsoleMessage::Update(fDT);//dj2022-11 refactoring message stuff
 
 		GameHeartBeat(fDT);
 		
@@ -1904,8 +1907,9 @@ int game_startup(bool bLoadGame)
 			//nFrameCounter++;
 		}
 
-		float fT2 = djTimeGetTime();
-		afTimeTaken.push_back((fT2 - fT1)*1000.0f);
+		// to see this frame timing graph currently do firstly Ctrl+Shift+G, then press D to enable onscreen debug info
+		uint64_t uTicksAfterHeartbeat = djTimeGetTicks64();
+		afTimeTaken.push_back(float(uTicksAfterHeartbeat - uTicksNow));
 		if (afTimeTaken.size()>MAX_DEBUGGRAPH)
 			afTimeTaken.erase(afTimeTaken.begin());
 
@@ -3302,7 +3306,7 @@ void IngameMenu()
 		if (g_Effect.m_nEnabledIntensity == 0) sMsg += "OFF";
 		else
 			sMsg += djStrPrintf("%d", (int)g_Effect.m_nEnabledIntensity);
-		SetConsoleMessage(sMsg);
+		djConsoleMessage::SetConsoleMessage(sMsg);
 		return;
 	}
 #endif
@@ -3313,7 +3317,7 @@ void IngameMenu()
 		g_bAutoShadows = !g_bAutoShadows;
 		std::string sMsg = "Auto shadow effect setting turned ";
 		if (g_bAutoShadows) sMsg += "OFF"; else sMsg += "ON";
-		SetConsoleMessage(sMsg);
+		djConsoleMessage::SetConsoleMessage(sMsg);
 		return;
 	}
 
@@ -3324,7 +3328,7 @@ void IngameMenu()
 		g_bSpriteDropShadows = !g_bSpriteDropShadows;
 		std::string sMsg = "Sprite shadow effect setting turned ";
 		if (g_bSpriteDropShadows) sMsg += "OFF"; else sMsg += "ON";
-		SetConsoleMessage(sMsg);
+		djConsoleMessage::SetConsoleMessage(sMsg);
 		return;
 	}
 #endif

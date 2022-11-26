@@ -7,6 +7,7 @@ Copyright (C) 1995-2022 David Joffe
 */
 
 #include "graph.h"
+#include "console.h"//SetConsoleMessage
 
 #include <string.h>
 
@@ -223,12 +224,12 @@ int do_menu( CMenu *pMenu )
 				if (Event.key.keysym.sym==SDLK_7)//SDLK_PAGEUP)
 				{
 					djSoundAdjustVolume(4);
-					SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+					djConsoleMessage::SetConsoleMessage(djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
 				}
 				else if (Event.key.keysym.sym==SDLK_6)//SDLK_PAGEDOWN)
 				{
 					djSoundAdjustVolume(-4);
-					SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+					djConsoleMessage::SetConsoleMessage(djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
 				}
 				else if (Event.key.keysym.sym==SDLK_INSERT)
 				{
@@ -236,7 +237,7 @@ int do_menu( CMenu *pMenu )
 						djSoundDisable();
 					else
 						djSoundEnable();
-					SetConsoleMessage( djSoundEnabled() ? "Sounds ON (Ins)" : "Sounds OFF (Ins)" );
+					djConsoleMessage::SetConsoleMessage(djSoundEnabled() ? "Sounds ON (Ins)" : "Sounds OFF (Ins)" );
 				}
 
 				// up arrow
