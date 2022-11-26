@@ -104,6 +104,6 @@ void EditorMainLoop()
 void SwitchMode ( switch_e new_mode )
 {
 	switch_to = new_mode;
-	DBC_SwitchMode ( new_mode );
+	DBC_OnSwitchMode ( new_mode );
 }
 
