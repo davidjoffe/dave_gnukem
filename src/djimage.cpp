@@ -19,18 +19,18 @@ dj2022-11 Note that since we're now on SDL2 we could potentially use e.g. SDLima
 #include <fcntl.h>
 
 #ifdef WIN32
-#include "io.h"
+#include <io.h>//open, read etc. (this should maybe change in future)
 #else
 #include <unistd.h>
 #endif
 /*--------------------------------------------------------------------------*/
 #ifdef WIN32
-#define FILECREATE_FLAGS (O_CREAT | O_TRUNC | O_BINARY | O_RDWR)
-#define FILECREATE_PERM  (S_IWRITE | S_IREAD)
+//#define FILECREATE_FLAGS (O_CREAT | O_TRUNC | O_BINARY | O_RDWR)
+//#define FILECREATE_PERM  (S_IWRITE | S_IREAD)
 #define FILEOPEN_FLAGS   (O_RDONLY | O_BINARY)
 #else
-#define FILECREATE_FLAGS (O_CREAT | O_TRUNC | O_RDWR)
-#define FILECREATE_PERM  (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
+//#define FILECREATE_FLAGS (O_CREAT | O_TRUNC | O_RDWR)
+//#define FILECREATE_PERM  (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
 #define FILEOPEN_FLAGS   (O_RDONLY)
 #endif
 /*--------------------------------------------------------------------------*/
@@ -350,13 +350,8 @@ int djImage::LoadTGA( const char * szFilename )
 	return iRet;
 }
 
-int djImage::LoadSPR( const char * szFilename )
-{
-	if ( szFilename == NULL )
-		return -1;
-	return 0;
-}
-
+/*
+//dj2022-11 for now comment out SaveRAW as not using it for anything and it's causing warnings, but maybe might use it in future so leaving it in for now, but should maybe be refactored differently (probably shouldn't be *in* the image class, image loaders/savers should conceptually be a layer above and 'outside' the core image class)
 int djImage::SaveRAW( const char * szFilename )
 {
 	if ( m_pData == NULL )
@@ -380,3 +375,4 @@ int djImage::SaveRAW( const char * szFilename )
 	return 0;
 }
 
+*/

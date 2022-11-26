@@ -47,9 +47,9 @@ public:
 	int Load( const char * szFilename );
 	
 	int LoadTGA( const char * szFilename );
-	int LoadSPR( const char * szFilename );
 	
-	int SaveRAW( const char * szFilename );
+	//dj2022-11 for now comment out SaveRAW as not using it for anything, but maybe might use it in future so leaving it in for now, but should maybe be refactored differently (probably shouldn't be *in* the image class, image loaders/savers should conceptually be a layer above and 'outside' the core image class)
+	//int SaveRAW( const char * szFilename );
 protected:	
 	unsigned char * m_pData;
 	int             m_iWidth;
