@@ -21,11 +21,13 @@
 #include <cstring>//strlen,strcpy etc. [dj2022-11 refactoring and cleanups]
 #include "sys_defs.h"
 
+/*
 #ifdef WIN32
 #include <direct.h> // getcwd etc
 #else
 #include <unistd.h>//getcwd
 #endif
+*/
 
 
 /*
@@ -604,7 +606,6 @@ char* M_GetFirstPathDirAlloc ( char *filename )
 
 	return dir;
 }
-*/
 
 
 
@@ -618,3 +619,4 @@ void M_getwd ( char *out )
 #endif
 }
 
+*/

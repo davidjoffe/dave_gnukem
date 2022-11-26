@@ -65,7 +65,7 @@ void M_ForceFileExtension ( char* filename, const char* extension );
 void M_StripFileExtension ( char *filename );
 void M_StripFilePath ( char *filename );
 
-void M_getwd ( char *out );
+//void M_getwd ( char *out );
 
 
 #endif 		// #ifndef M_MISC_H_KRANKLYS__
