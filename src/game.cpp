@@ -3198,17 +3198,17 @@ bool LoadGame()
 		if (dj_fscanf_line(pIn, szLine) <= 0) { SYS_Error("Error loading game"); return false; }
 
 		// Fileversion 2
-		char szFilename[4096]={0};//gross
+		//char szFilename[4096]={0};//gross
 		//[LOW] Wonder if we might have cross-platform issues here? E.g. savegame on Windows with CR+LF & try load on e.g. a LF-only platform say?
 
 		//if (djFSCANF(pIn,"mission=%s\n",szFilename, 4096) <= 0) { SYS_Error("Error loading game"); return false; }
 		if (strncmp(szLine, "mission=", 8) == 0)
 		{
-			strncat(szFilename, szLine+8, sizeof(szLine)-10);
-			if (szFilename[0] != 0)
-			{
-				sMissionFilename = szFilename;
-			}
+			//strncat(szFilename, szLine+8, sizeof(szLine)-10);
+			//if (szFilename[0] != 0)
+			//{
+				sMissionFilename = (szLine + 8);
+			//}
 		}
 		else
 		{
