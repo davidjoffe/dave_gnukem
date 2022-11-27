@@ -130,6 +130,7 @@ extern bool g_bBigViewportMode;//dj2019-06. //Can't have both bigviewport and la
 //dj2022-11 [MUST BE COMMENTED OUT BY DEFAULT] not sure i like these but to think about .. may change
 //#define djCFG_FORCE_FULLSCREEN_ALWAYS
 //#define djCFG_FORCE_WINDOWED_ALWAYS
+#define djCFG_ALLOW_COMMANDLINE_DATADIR
 /*--------------------------------------------------------------------------*/
 
 

@@ -218,6 +218,9 @@ int main ( int argc, char** argv )
 				if (0 == strncmp( argv[i], "-f", 2 )) bfullscreen = true;
 				if (0 == strncmp( argv[i], "-640", 4 )) b640 = true;
 				if (0 == strncmp( argv[i], "-scale", 6 )) sNextParamGetValue = "scale";
+#ifdef djCFG_ALLOW_COMMANDLINE_DATADIR
+				if (0 == strncmp( argv[i], "-datadir", 8 )) sNextParamGetValue = "datadir";
+#endif
 			}
 		}
 	}
@@ -229,6 +232,9 @@ int main ( int argc, char** argv )
 		printf( "   -f    Fullscreen mode\n" );
 		printf( "   -640  640x480 mode\n" );
 		printf( "   -scale N [Optional] Force window size multiple of base resolution (1=320x200)\n" );
+#ifdef djCFG_ALLOW_COMMANDLINE_DATADIR
+		printf( "   -datadir DIR [Optional] Specify preferred default data path (may be absolute or relative)\n" );
+#endif
 		printf( "---------------------------------------------------------\n" );
 	}
 
@@ -269,8 +275,27 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 #endif//#ifdef WIN32
 
 
+	// dj2022-11 See if commandline datapath specific and try to use if it's present. Else try "DATA_DIR" as next option etc. as usual.
+	bool bUseCustomDataDir = false;
+#ifdef djCFG_ALLOW_COMMANDLINE_DATADIR
+	// Check if data directory override was passed on commandline, and try that first (if it exists)
+	auto iter1 = Parameters.find("datadir");
+	if (iter1 != Parameters.cend())
+	{
+		//nForceScale = atoi(iter->second.c_str());
+		std::string sTryDataDir = iter1->second;
+		if (djFolderExists(sTryDataDir.c_str()))
+		{
+			bUseCustomDataDir = true;
+			djSetDataDir(sTryDataDir.c_str());
+		}
+		else
+			printf("WARNING: Specified datadir commandline option not found\n");
+	}
+#endif
 	//dj2022 DATA_DIR / datapath initialization ... custom ports could maybe add patches things here if need be
-	djSetDataDir(DATA_DIR);
+	if (!bUseCustomDataDir)
+		djSetDataDir(DATA_DIR);
 
 #ifdef __APPLE__
 
@@ -349,7 +374,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	// This is pretty 'critical' in that we can't recover from it, but not really critical in that the cause is
 	// likely simply that the data subfolder is either missing, or in a different path.
 	// Better to offer the user a little guidance rather than just exiting with no clue at all, e.g. [dj2018-05] cf. https://github.com/davidjoffe/dave_gnukem/issues/114
-	if (!djFolderExists( DATA_DIR ))
+	if (!djFolderExists( djDataDir() ))
 	{
 		// dj2019-06 This whole business should be improved on Linux
 		printf("Unable to find data folder '%s'. Please note this is in a separate repo - see the ReadMe.md for details.\n",DATA_DIR);
