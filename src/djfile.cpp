@@ -45,17 +45,19 @@ int djFile::dj_fopen_s(FILE** ppFile, const char* szFilename, const char* szMode
 	if (errRet != 0)
 	{
 		*ppFile = nullptr;
-		printf("fopen_s error %s %d\n", szFilename, (int)errRet);
+		printf("fopen_s error %s (errno=%d)\n", szFilename, (int)errRet);
 		return (int)errRet;
 	}
 	return ((*ppFile)==NULL ? -1 : 0);
 #else
 	*ppFile = fopen(szFilename, szMode);
-	if (((int)errno)!=0)
+	if ((*ppFile)==nullptr)
 	{
-		printf("fopen error %s %d\n", szFilename, (int)errno);
+		//if (((int)errno)!=0)
+		printf("fopen error %s (errno=%d)\n", szFilename, (int)errno);
+		return (int)errno;
 	}
-	return (int)errno;
+	return 0;//success
 #endif
 }
 
