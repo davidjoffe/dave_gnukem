@@ -1596,10 +1596,9 @@ int game_startup(bool bLoadGame)
 						do
 						{
 							++n;
-							char szBuf[8192]={0};//fixLOW MAX_PATH? Some issue with MAX_PATH I can't remember what right now [dj2017-08]
-							snprintf(szBuf, sizeof(szBuf), "gnukem_screenshot_%03d.bmp", n);
+							std::string sBuf = djStrPrintf("gnukem_screenshot_%03d.bmp", n);
 
-							sFilenameWithPath = djAppendPathStr(sPath.c_str(),szBuf);
+							sFilenameWithPath = djAppendPathStr(sPath.c_str(),sBuf.c_str());
 						} while (djFileExists(sFilenameWithPath.c_str()));
 						SDL_SaveBMP(pVisMain->pSurface, sFilenameWithPath.c_str());
 						ShowGameMessage("Screenshot saved", 7);
@@ -1912,9 +1911,8 @@ int game_startup(bool bLoadGame)
 		
 		if (!g_sAutoScreenshotFolder.empty())
 		{
-			char szFilename[4096]={0};
-			snprintf(szFilename,sizeof(szFilename),"gnukem_%08d.bmp",g_nScreenshotNumber);
-			std::string sPath = djAppendPathStr(g_sAutoScreenshotFolder.c_str(),szFilename);
+			std::string sFilename = djStrPrintf("gnukem_%08d.bmp",g_nScreenshotNumber);
+			std::string sPath = djAppendPathStr(g_sAutoScreenshotFolder.c_str(), sFilename.c_str());
 			SDL_SaveBMP(pVisMain->pSurface, sPath.c_str());//"c:\\dj\\DelmeTestMain.bmp");
 			++g_nScreenshotNumber;
 			//SDL_SaveBMP(pVisMain->pSurface, szFilename);//"c:\\dj\\DelmeTestMain.bmp");
