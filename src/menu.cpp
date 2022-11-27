@@ -53,8 +53,10 @@ int do_menu( CMenu *pMenu )
 	if (g_pImgMenuBackground8x8==NULL)
 	{
 		g_pImgMenuBackground8x8 = new djImage;
-		if (g_pImgMenuBackground8x8->Load( DATA_DIR "menucharbackground.tga" )>=0)
-			djCreateImageHWSurface( g_pImgMenuBackground8x8 );
+		if (g_pImgMenuBackground8x8->Load(djDATAPATHc("menucharbackground.tga")) >= 0)
+			djCreateImageHWSurface(g_pImgMenuBackground8x8);
+		else
+			printf("Warning: Menu failed to load charbackground\n");
 	}
 
 	// Initialize cursor animation

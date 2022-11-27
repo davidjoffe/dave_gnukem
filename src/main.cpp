@@ -1099,7 +1099,7 @@ void InitMainMenu()
 	//dj2018-04-01 make the Y position sightly higher by 4 pixel than the default, looks slightly better with new city background
 	mainMenu.setYOffset( 8 * (12 - (13 / 2)) - 4 );//13 = num items
 
-	mainMenu.setSoundMove ( djSoundLoad( DATA_DIR "sounds/cardflip.wav" ) );
+	mainMenu.setSoundMove(djSoundLoad(djDATAPATHc("sounds/cardflip.wav")));
 }
 
 void KillMainMenu()

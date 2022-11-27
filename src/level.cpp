@@ -33,32 +33,30 @@ void KillLevelSystem()
 // returns NULL on failure
 unsigned char * level_load( int i, const char * szfilename )
 {
-	unsigned char* pRet = NULL;
-	unsigned char * buffer=nullptr;
-
 	printf( "level_load( %s ): loading at slot %d.\n", szfilename, i );
 
 	// if a level is already loaded at position i, delete it
 	level_delete( i );
 
-	char filename[4096]={0};
-
-	snprintf( filename, sizeof(filename), "%s%s", DATA_DIR, szfilename );
+	std::string sFilename = djDATAPATHs(szfilename);
 
 	// open level file
 	FILE* pIn = NULL;
-	pIn = djFile::dj_fopen(filename, "rb");// NB! MUST BE BINARY MODE (on Windows anyway; Linux it does nothing) and for reading
+	pIn = djFile::dj_fopen(sFilename.c_str(), "rb");// NB! MUST BE BINARY MODE (on Windows anyway; Linux it does nothing) and for reading
 	if (pIn == NULL)
 	{
-		printf( "level_load( %s ): failed to open file.\n", filename );
+		printf( "level_load( %s ): failed to open file.\n", sFilename.c_str());
 		//return NULL;
 	}
+
+	unsigned char* pRet = NULL;
+	unsigned char* buffer = nullptr;
 
 	// allocate memory for level
 	unsigned int uMemSize = LEVEL_SIZE;
 	if (NULL == (buffer = new unsigned char[uMemSize]))
 	{
-		printf( "level_load( %s ): failed to allocate level buffer.\n", szfilename );
+		printf( "level_load( %s ): failed to allocate level buffer.\n", sFilename.c_str());
 		return NULL;
 	}
 	// Initialize level to blank block by default (in case it doesn't load e.g. bad filename passed or whatever, don't want to sit with random memory contents) [dj2017-07]
@@ -69,7 +67,7 @@ unsigned char * level_load( int i, const char * szfilename )
 		size_t sizeRead = fread(buffer, 1, uMemSize, pIn);
 		if (sizeRead < uMemSize)
 		{
-			printf("level_load( %s ): ERROR partial level read only. Read: %d bytes.\n", szfilename, (int)sizeRead);
+			printf("level_load( %s ): ERROR partial level read only. Read: %d bytes.\n", sFilename.c_str(), (int)sizeRead);
 			//todo  add onscreen messages?
 		}
 		// close file
@@ -87,32 +85,29 @@ unsigned char * level_load( int i, const char * szfilename )
 
 int level_save( int i, const char * szfilename )
 {
-	unsigned char * level=NULL;
-	char filename[4096]={0};
+	std::string sFilename = djDATAPATHs(szfilename);
 
-	snprintf( filename, sizeof(filename), "%s%s", DATA_DIR, szfilename );
-
-	level = apLevels[i];
+	unsigned char* level = apLevels[i];
 	if ( level == NULL )
 	{
-		djMSG( "level_save( %d, %s ): NULL level!\n", i, filename );
+		djMSG( "level_save( %d, %s ): NULL level!\n", i, sFilename.c_str());
 		return -1;
 	}
 
-	printf(" level_save( %s ): saving.\n", filename );
+	printf(" level_save( %s ): saving.\n", sFilename.c_str());
 
 	// make sure level i is not NULL
 	if (level == NULL)
 	{
-		printf( "level_save( %s ): levels[%d] is NULL.\n", filename, i );
+		printf( "level_save( %s ): levels[%d] is NULL.\n", sFilename.c_str(), i );
 		return -1;
 	}
 
 	// open level file (FIXME: TEST THIS STILL WORKS, I'VE AHCNAGEAD FLAGS)
-	FILE* pFile = djFile::dj_fopen(filename, "wb");// NB! MUST BE BINARY MODE (on Windows anyway; Linux it does nothing) and for reading
+	FILE* pFile = djFile::dj_fopen(sFilename.c_str(), "wb");// NB! MUST BE BINARY MODE (on Windows anyway; Linux it does nothing) and for reading
 	if (pFile == NULL)
 	{
-		printf( "level_save( %s ): failed to open file.\n", filename );
+		printf( "level_save( %s ): failed to open file.\n", sFilename.c_str());
 		return -2;
 	}
 
@@ -120,7 +115,7 @@ int level_save( int i, const char * szfilename )
 	size_t sizeRet = fwrite(level, 1, LEVEL_SIZE, pFile);
 	if (sizeRet < LEVEL_SIZE)
 	{
-		printf("level_save( %s ): ERROR partial level save: Only %d bytes.\n", filename, (int)sizeRet);
+		printf("level_save( %s ): ERROR partial level save: Only %d bytes.\n", sFilename.c_str(), (int)sizeRet);
 	}
 
 	fclose(pFile);

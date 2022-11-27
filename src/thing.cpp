@@ -554,7 +554,7 @@ CTeleporter::CTeleporter()
 
 	if (c_iSoundTeleport==SOUNDHANDLE_INVALID)
 	{
-		c_iSoundTeleport = djSoundLoad( DATA_DIR "sounds/lightmag.wav" );
+		c_iSoundTeleport = djSoundLoad( djDATAPATHc("sounds/lightmag.wav") );
 	}
 	m_bActivated = false;
 	m_nTeleportX = 5;

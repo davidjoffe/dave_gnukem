@@ -95,7 +95,7 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 	djImage* pImgFont = NULL;
 	djImage* pImgFontS = NULL;//shadow
 	pImgFont = new djImage;
-	if (pImgFont->Load( DATA_DIR "fonts/simple_6x8.tga" )>=0)
+	if (pImgFont->Load(djDATAPATHc("fonts/simple_6x8.tga")) >= 0)
 	{
 		djCreateImageHWSurface( pImgFont );
 		FW=6;
@@ -103,16 +103,18 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 	}
 	else
 	{
+		printf("Warning failed to load font\n");
 		djDEL(pImgFont);
 	}
 	if (!pImgFont)return;
 	pImgFontS = new djImage;
-	if (pImgFontS->Load( DATA_DIR "fonts/simple_6x8_shadow.tga" )>=0)
+	if (pImgFontS->Load(djDATAPATHc("fonts/simple_6x8_shadow.tga")) >= 0)
 	{
 		djCreateImageHWSurface( pImgFontS );
 	}
 	else
 	{
+		printf("Warning failed to load fontshadow\n");
 		djDEL(pImgFontS);
 	}
 	//CBSU[could be sped up'- fixFUtureMaybe]: Pre-build "map" of characters to their indexes in the fontsprite: std::map<char,unsigned int> mapFontChars;

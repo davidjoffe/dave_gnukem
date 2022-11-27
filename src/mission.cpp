@@ -290,7 +290,12 @@ int CMission::LoadSprites()
 			pSpriteData->LoadSpriteImage();
 
 			// Load data (flags etc associated with sprites)
-			pSpriteData->LoadData( pSpriteData->m_szFilenameData );
+			std::string sFilename = djDATAPATHs(pSpriteData->m_szFilenameData);
+			if (pSpriteData->LoadData(sFilename.c_str()) < 0)
+			{
+				printf("WARNING: Error loading sprite data: %s\n", sFilename.c_str());
+				SYS_Debug("WARNING: Error loading sprite data: ");
+			}
 
 		} // if
 	} // i
@@ -311,6 +316,9 @@ int CMission::SaveSprites()
 		pSpriteData = g_pCurMission->GetSpriteData( i );
 		if ( pSpriteData != NULL ) // It *can* be NULL
 		{
+			// Save sprite data file
+			std::string sFilename = djDATAPATHs(pSpriteData->m_szFilenameData);
+			/*
 			char szFilename[4096]={0};
 			// Save sprite data file
 #ifdef DATA_DIR
@@ -318,8 +326,16 @@ int CMission::SaveSprites()
 #else
 			snprintf( szFilename, sizeof(szFilename), "%s", pSpriteData->m_szFilenameData );
 #endif
-			if (nRet>=0)
-				nRet = pSpriteData->SaveData( szFilename );
+			*/
+			// dj2022-11 Re this "if (nRet>=0)" I don't quite see the logic of why if saving fails for a spriteset it should seemingly stop saving further ones? I can't recall if that makes sense but commenting it out for now but keep an eye here if side effects
+			//if (nRet>=0)
+				nRet = pSpriteData->SaveData( sFilename.c_str() );
+				if (nRet < 0)
+				{
+					printf("WARNING: Error saving sprite data: %s\n", sFilename.c_str());
+					SYS_Debug("WARNING: Error saving sprite data: ");
+					//SYS_Debug("%s", sFilename.c_str());
+				}
 
 		} // if
 	}
@@ -406,12 +422,15 @@ int CSpriteData::LoadData( const char *szFilename )
 	// [dj2022-11 hm this seems to first try without DATA_DIR which fails then tries with DATA_DIR ..simplify?]
 	if ((!djFileExists(szFilename)) || (NULL == (fin = djFile::dj_fopen( szFilename, "r" ))))
 	{
+		//dj2022-11 moving this DATA_DIR prepend to the CALLER .. not quite which is more 'correct' but I think probably the caller
+		/*
 #ifdef DATA_DIR
 		// safety? we want to be able to handle VERY long paths elegantly all over the code (and also Unicode filenames) .. maybe make some file helpers etc.
 		char buf[8192]={0};
 		snprintf(buf,sizeof(buf), "%s%s", DATA_DIR, szFilename );
 		if (NULL == (fin = djFile::dj_fopen( buf, "r" )))
 #endif
+		*/
 		{
 			SYS_Error ( "CSpriteData::LoadData( %s ): Error opening file\n", szFilename );
 			return -1;
@@ -481,11 +500,12 @@ error:
 
 int CSpriteData::SaveData( const char *szFilename )
 {
-	FILE * fout;
-	int    i, j;
+	if (szFilename == nullptr) return -1;
+	//assert(
 
 	TRACE( "CSpriteData::SaveData( %s ): Saving ...\n", szFilename );
 
+	FILE* fout = nullptr;
 	if (NULL == (fout = djFile::dj_fopen( szFilename, "w" )))
 	{
 		djMSG( "CSpriteData::SaveData( %s ): unable to open file.\n", szFilename );
@@ -495,13 +515,13 @@ int CSpriteData::SaveData( const char *szFilename )
 	// Print the number of images in the file. Not used yet, but maybe in
 	// the future.
 	fprintf( fout, "%d\n", SPRITES_PER_SPRITESHEET );
-	for ( i=0; i<SPRITES_PER_SPRITESHEET; i++ )
+	for ( int i=0; i<SPRITES_PER_SPRITESHEET; i++ )
 	{
 		// output block type
 		fprintf( fout, "%d\n", m_type[i] );
 
 		// output "extras" values
-		for ( j=0; j<12; j++ )
+		for (int j=0; j<12; j++ )
 		{
 			if ( j<11 )
 				fprintf( fout, "%d,", m_extras[i][j] );
