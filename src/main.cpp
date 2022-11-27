@@ -273,6 +273,9 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	djSetDataDir(DATA_DIR);
 
 #ifdef __APPLE__
+
+	//fixme todo! also set path correctly if we're running out of a .app?
+
 	// Basically what we want to do here is:
 	// If the 'cwd' does NOT have a data folder under it, but
 	// the 'executable path' does, then we want to *change* the
@@ -283,18 +286,20 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	char cwd[8192]={0};//current working directory (not to be confused with the path the executable is in, though often they're the same, depending)
 	if(getcwd(cwd,sizeof(cwd)))
 	{
+		printf("cwd:%s\n", cwd);
+
 		//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever .. just want to check if present to do some fallback-checking
-		std::string sSomeDataFile = djDATAPATHs("missions.txt");//E.g. 'data/missions.txt'
 
 		//debug//printf("Current working directory:%s\n",cwd);
 		// Check if data folder is present relative to cwd
-		char szDataFile[8192]={0};
-		strcpy(szDataFile,cwd);
-		djAppendPath(szDataFile, sSomeDataFile.c_str());//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever
-		//debug//printf("Checking for:%s\n",szDataFile);fflush(NULL);
-		if (djFileExists(szDataFile))
+		std::string sTryDataPath = djAppendPathStr(cwd, "data");
+		std::string sTryDataFile = djAppendPathStr(sTryDataPath.c_str(), "missions.txt");
+
+		printf("Checking for:%s\n",sTryDataFile.c_str());fflush(NULL);
+		if (djFileExists(sTryDataFile.c_str()))
 		{
-			//printf("Data folder found\n");
+			printf("Data folder found cwd+data %s/\n", sTryDataPath.c_str());
+			djSetDataDir(sTryDataPath.c_str());
 		}
 		else// if (!djFileExists(szDataFile))
 		{
@@ -304,6 +309,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 			if (_NSGetExecutablePath(execpath, &size) == 0)
 			{
 				printf("Executable path is %s\n", execpath);fflush(NULL);
+				// NOTE executable path includes the "davegnukem" URG that won't work
 
 				// This path is e.g. /Blah/Foo/davegnukem
 				// the last part is the executable, we want just the
@@ -312,21 +318,22 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 				char *szLast = strrchr(execpath,'/');
 				if (szLast)
 					*(szLast+1) = 0; // NULL-terminate
+				printf("Executable path corrected is %s\n", execpath);fflush(NULL);
 
-				strcpy(szDataFile, execpath);
-				djAppendPath(szDataFile, sSomeDataFile.c_str());
-				if (djFileExists(szDataFile))
+				sTryDataPath = djAppendPathStr(execpath, "data/");
+				sTryDataFile = djAppendPathStr(sTryDataPath.c_str(), "missions.txt");
+				if (djFileExists(sTryDataFile.c_str()))
 				{
 					printf("Successfully found the data path :)\n");fflush(NULL);
 					// Yay, we found the data folder by the executable -
 					// change the 'working directory' to 'path'
-					chdir(execpath);
+					//chdir(execpath);
 
 					// dj2022-11 Hmm not mad about changing the working directory .. app should work regardless of working directory? And should just store/save the paths we need at application initialize ..
 
 					//dj2022-11 Make this full path the datadir .. this needs to be tested on Mac
 					// THIS IS NOT NECESSARILY RIGHT?
-					djSetDataDir("data/");
+					djSetDataDir(sTryDataPath.c_str());
 				}
 			}
 //else
