@@ -16,6 +16,10 @@ Copyright (C) 1995-2022 David Joffe
 
 /*--------------------------------------------------------------------------*/
 
+// hmm [dj2022-11] random design thoughts - it's maybe slightly debatable whether main menu 'calls' game or main returns control to some 'game state controller' which launches game -
+// I'm inclined to think the latter is more correct .. tho for simple game overkill but keep moving design in more 'correct' direction .. more flexible, just think in terms of generic state
+// and also just hypothetically e.g. just imagine from a resources management perspective, imagine we had a really fancy main menu that loaded tonnes of fancy graphics, it's not efficient either if all that would stay loaded while we play the game
+
 #include "config.h"
 #include "version.h"//dj2022-11 for new VERSION
 #include "console.h"//SetConsoleMessage
@@ -23,6 +27,7 @@ Copyright (C) 1995-2022 David Joffe
 
 #include "graph.h"
 
+#include "djimage.h"
 #include "djinput.h"
 #include "djtime.h"
 #include "djstring.h"
@@ -43,7 +48,7 @@ Copyright (C) 1995-2022 David Joffe
 #include "instructions.h"
 #include "sys_log.h"
 #include "sys_error.h"
-#include "datadir.h"//DATA_DIR [might move later - dj2018-05]
+#include "datadir.h"
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__linux__) || defined(__unix__)
 #include <unistd.h>//getcwd, chdir
@@ -71,6 +76,7 @@ Copyright (C) 1995-2022 David Joffe
 #include <string>
 
 /*--------------------------------------------------------------------------*/
+#define DATAFILE_MAINMENUBACKGROUND "main.tga"
 djImage *g_pImgMain = NULL;
 
 int  DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::string >& Parameters);	// Application initialization
@@ -139,8 +145,8 @@ void djGnukemLoadFonts()
 	// dj2022-11 this list below is just a crude starting test list NOT yet the "official" fonts for this game, not chosen yet
 	if (g_FontList.m_apFonts.empty())//<- once-off init
 	{
-		//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 16);
-		//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 11);
+		//TTF_Font* kosugi = TTF_OpenFont(djDATAPATHc("fonts/KosugiMaru-Regular.ttf"), 16);
+		//TTF_Font* kosugi = TTF_OpenFont(djDATAPATHc("fonts/KosugiMaru-Regular.ttf"), 11);
 
 		const int nPTFONTSIZE = 12;
 
@@ -262,6 +268,10 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	djSetProcessDPIAwareHelper();
 #endif//#ifdef WIN32
 
+
+	//dj2022 DATA_DIR / datapath initialization ... custom ports could maybe add patches things here if need be
+	djSetDataDir(DATA_DIR);
+
 #ifdef __APPLE__
 	// Basically what we want to do here is:
 	// If the 'cwd' does NOT have a data folder under it, but
@@ -273,37 +283,50 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	char cwd[8192]={0};//current working directory (not to be confused with the path the executable is in, though often they're the same, depending)
 	if(getcwd(cwd,sizeof(cwd)))
 	{
+		//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever .. just want to check if present to do some fallback-checking
+		std::string sSomeDataFile = djDATAPATHs("missions.txt");//E.g. 'data/missions.txt'
+
 		//debug//printf("Current working directory:%s\n",cwd);
 		// Check if data folder is present relative to cwd
 		char szDataFile[8192]={0};
 		strcpy(szDataFile,cwd);
-		djAppendPath(szDataFile, DATA_DIR "missions.txt");//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever
+		djAppendPath(szDataFile, sSomeDataFile.c_str());//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever
 		//debug//printf("Checking for:%s\n",szDataFile);fflush(NULL);
-		if (!djFileExists(szDataFile))
+		if (djFileExists(szDataFile))
+		{
+			//printf("Data folder found\n");
+		}
+		else// if (!djFileExists(szDataFile))
 		{
 			printf("Warning: Data folder not found, trying executable path fallback ...\n");fflush(NULL);
-			char path[4096]={0};
-			uint32_t size = sizeof(path);
-			if (_NSGetExecutablePath(path, &size) == 0)
+			char execpath[8192]={0};
+			uint32_t size = sizeof(execpath);
+			if (_NSGetExecutablePath(execpath, &size) == 0)
 			{
-				printf("Executable path is %s\n", path);fflush(NULL);
+				printf("Executable path is %s\n", execpath);fflush(NULL);
 
 				// This path is e.g. /Blah/Foo/davegnukem
 				// the last part is the executable, we want just the
 				// folder, so find the last '/' and set the char
 				// after it to 0 to NULL-terminate.
-				char *szLast = strrchr(path,'/');
+				char *szLast = strrchr(execpath,'/');
 				if (szLast)
 					*(szLast+1) = 0; // NULL-terminate
 
-				strcpy(szDataFile,path);
-				djAppendPath(szDataFile, DATA_DIR "missions.txt");
+				strcpy(szDataFile, execpath);
+				djAppendPath(szDataFile, sSomeDataFile.c_str());
 				if (djFileExists(szDataFile))
 				{
 					printf("Successfully found the data path :)\n");fflush(NULL);
 					// Yay, we found the data folder by the executable -
 					// change the 'working directory' to 'path'
-					chdir(path);
+					chdir(execpath);
+
+					// dj2022-11 Hmm not mad about changing the working directory .. app should work regardless of working directory? And should just store/save the paths we need at application initialize ..
+
+					//dj2022-11 Make this full path the datadir .. this needs to be tested on Mac
+					// THIS IS NOT NECESSARILY RIGHT?
+					djSetDataDir("data/");
 				}
 			}
 //else
@@ -314,8 +337,6 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 	djLOGSTR( "\n================[ Starting Application Init ]===============\n" );
 
-	//dj2022
-	djSetDataDir(DATA_DIR);
 
 	// Check the data folder is present, and if not, try give the user some basic guidance as to how to address this. [dj2018-05]
 	// This is pretty 'critical' in that we can't recover from it, but not really critical in that the cause is
@@ -328,12 +349,15 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		printf("If you have the data folder, then you can generally fix this message by first changing your current\n");
 		printf("directory to the folder in which the 'data' folder is contained, then running the application.\n");
 
+		// hmm .. dj2022-11 this stuff a bit quick n crude - rethink:
+		printf("Trying fallback(s) for data folder\n");
 		djSetDataDir("data/");
-		if (!djFolderExists(DATA_DIR))
+		if (!djFolderExists("data/"))
 		{
 			printf("Fallback failed: data/");
 			return -1;
 		}
+		printf("Successfully found fallback data folder: data/\n");
 
 
 		// (dj2022-11 Add the below line, hmm, not sure whether it really belongs in the help text here to mention things like git repo cloning (and also maybe the URL may change later) but for now
@@ -341,12 +365,12 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		// We could also consider doing 'fancy' things like just exec'ing a git clone if the user wants or something .. and/or add some small little helper scripts to do things like below. Or even auto-downloading data. Anyway. Low priority for now.
 		// Also to consider is doing it generically so this code could support more games (and/or a hypothetical 'DG version 2')
 		// dj2022-11 One additional thought on the below is that the below may fetch a 'bleeding edge' version with unstable stuff in it in future - hmm - maybe this needs more thought. LOW prio though.
-		//printf("You can also get it by running: git clone https://github.com/davidjoffe/gnukem_data.git %s\n", DATA_DIR);
+		//printf("You can also get it by running: git clone https://github.com/davidjoffe/gnukem_data.git %s\n", djDataDir());
 		//return -1;
 	}
 
 	g_Settings.Load(
-		djAppendPathStr(djGetFolderUserSettings().c_str(), CONFIG_FILE).c_str()
+		djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_CONFIG_FILE).c_str()
 		);	// Load saved settings
 	// We need to first check the setting is *actually there*, not just call e.g. FindSettingInt(), otherwise
 	// if volume setting has never been set/saved before, it will return a value of 0 which will set the volume to 0.
@@ -426,15 +450,18 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	djLOGSTR("djVectorFontListInit ok\n");
 #endif
 
-	g_pImgMain = new djImage;			// Load main skin (title screen)
-	g_pImgMain->Load(DATA_DIR "main.tga");
+	// Main menu background image
+	g_pImgMain = new djImage();
+	if (g_pImgMain->Load(djDATAPATHc(DATAFILE_MAINMENUBACKGROUND)) < 0)
+	{
+		printf("Error: Image load failed: %s\n", DATAFILE_MAINMENUBACKGROUND);
+	}
 	djCreateImageHWSurface( g_pImgMain );
 
 	InitMissionSystem();
 
 	// Load missions
-	if (0 != LoadMissions(djDATAPATHc("missions.txt")))
-	//if (0 != LoadMissions(DATA_DIR "missions.txt"))
+	if (0 != LoadMissions(djDATAPATHc("missions.txt")))//if (0 != LoadMissions(DATA_DIR "missions.txt"))
 	{
 		djLOGSTR("Error loading missions.txt list\n");
 		return -1;
@@ -496,9 +523,9 @@ void DaveCleanup()
 	djLOGSTR( "djTimeDone() ok\n" );
 
 	g_Settings.Save(
-		djAppendPathStr(djGetFolderUserSettings().c_str(), CONFIG_FILE).c_str()
+		djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_CONFIG_FILE).c_str()
 	);	// Save settings
-	djLOGSTR( "g_Settings.Save(CONFIG_FILE) ok\n" );
+	djLOGSTR( "g_Settings.Save(USERFILE_CONFIG_FILE) ok\n" );
 
 	djSDLDone();
 
@@ -556,9 +583,14 @@ void DoMainMenu()
 #ifndef NOSOUND
 	//dj2016-10 adding background music to main menu, though have not put any real thought into what would
 	// be the best track here so fixme todo maybe dig a bit more and find better choice here etc. [also for levels]
-	Mix_Music* pMusic = Mix_LoadMUS(DATA_DIR "music/eric_matyas/8-Bit-Mayhem.ogg");
+	Mix_Music* pMusic = Mix_LoadMUS(djDATAPATHc("music/eric_matyas/8-Bit-Mayhem.ogg"));
 	if (pMusic!=NULL)
 		Mix_FadeInMusic(pMusic, -1, 800);
+	else
+	{
+		//'debugassert' / trap / exception type of thing?
+		printf("Warning: Failed to load main menu music\n");
+	}
 #endif
 
 	do
@@ -1102,6 +1134,8 @@ void InitMainMenu()
 	mainMenu.setSoundMove(djSoundLoad(djDATAPATHc("sounds/cardflip.wav")));
 }
 
+// hmm [dj2022-11] it's maybe sligtly debatable whether main menu 'calls' game or main returns control to some 'game state controller' which launches game -
+// I'm inclined to think the latter is more correct .. tho for simple game overkill but keep moving design in more 'correct' direction..
 void KillMainMenu()
 {
 	// TODO

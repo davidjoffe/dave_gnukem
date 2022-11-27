@@ -10,7 +10,7 @@ Copyright (C) 2000-2022 David Joffe
 #define _HISCORES_H_
 
 //! Default high score list file
-#define FILE_HIGHSCORES "hiscores.dat"
+#define USERFILE_HIGHSCORES "hiscores.dat"
 
 //! Maximum size of high score list
 #define MAX_HIGHSCORES 12
@@ -49,9 +49,9 @@ extern void KillHighScores();
 extern void ShowHighScores();
 
 //! Load high scores from given file
-extern bool LoadHighScores(const char *szFilename=FILE_HIGHSCORES);
+extern bool LoadHighScores(const char *szFilename=USERFILE_HIGHSCORES);
 //! Save high scores to given file
-extern bool SaveHighScores(const char *szFilename=FILE_HIGHSCORES);
+extern bool SaveHighScores(const char *szFilename=USERFILE_HIGHSCORES);
 
 //! Test if the given score will make the high score list
 extern bool IsNewHighScore(int nScore);

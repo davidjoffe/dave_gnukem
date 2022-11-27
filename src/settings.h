@@ -63,6 +63,6 @@ protected:
 //! Global game settings
 extern CSettings g_Settings;
 
-#define CONFIG_FILE "davegnukem.cfg"
+#define USERFILE_CONFIG_FILE "davegnukem.cfg"
 
 #endif

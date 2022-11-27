@@ -17,7 +17,7 @@ Copyright (C) 1995-2018 David Joffe
 void ShowEndGameSequence()
 {
 	//unsigned int FW=8;//fontwidth
-	unsigned int FH=8;//fontheight
+	const unsigned int FH=8;//fontheight
 	/*
 	std::string sALPHABET=
 		" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}";
@@ -25,7 +25,7 @@ void ShowEndGameSequence()
 	if (pImgFont==NULL)
 	{
 		pImgFont = new djImage;
-		if (pImgFont->Load( DATA_DIR "fonts/simple_6x8.tga" )>=0)
+		if (pImgFont->Load( djDATAPATHc("fonts/simple_6x8.tga") )>=0)
 		{
 			djCreateImageHWSurface( pImgFont );
 			FW=6;
@@ -171,6 +171,4 @@ void ShowEndGameSequence()
 		djDEL(pImgFont);
 	}
 	*/
-
-	return;
 }

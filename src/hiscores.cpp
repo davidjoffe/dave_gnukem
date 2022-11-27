@@ -33,7 +33,7 @@ void SScore::SetName(const char* szNameNew)
 {
 	if (szNameNew == nullptr)
 	{
-		strcpy(szName, "");
+		szName[0] = 0; //<- Make the buffer an empty string
 		return;
 	}
 
@@ -243,7 +243,7 @@ void GetHighScore(int nIndex, SScore &Score)
 {
 	if (nIndex>=(int)g_aScores.size())
 	{
-		strcpy(Score.szName, "");
+		Score.szName[0] = 0;//<- Invalid index so return an empty string
 		Score.nScore = 0;
 		return;
 	}

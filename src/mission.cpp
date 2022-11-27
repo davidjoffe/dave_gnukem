@@ -35,7 +35,6 @@ int LoadMissions( const char * szfilename )
 	char buf[4096]={0};
 
 	// open file
-	// FIXME: We need a consistent way to handle "DATA_DIR"
 	if ( NULL == ( fin = djFile::dj_fopen( szfilename, "r" ) ) )
 	{
 		djMSG("ERROR: LoadMissions(%s): Unable to open file.\n", szfilename);
@@ -113,16 +112,17 @@ int CMission::Load( const char * szfilename )
 	std::ifstream	fin;
 	std::string		line;
 	int			state=0;
-	char		filename[4096]={0};
+	std::string sFilename;
 
 	SYS_Debug ( "CMission::Load( %s ): Loading ...\n", szfilename );
 
-	snprintf( filename, sizeof(filename), "%s%s", DATA_DIR, szfilename );
+	sFilename = djDATAPATHs(szfilename);
+	//snprintf( filename, sizeof(filename), "%s%s", DATA_DIR, szfilename );
 	// open file
-	fin.open ( filename );
+	fin.open (sFilename.c_str());
 	if ( !fin.is_open() )
 	{
-		SYS_Error ( "CMission::Load( %s ) Unable to open file.\n", szfilename );
+		SYS_Error ( "CMission::Load( %s ) Unable to open file.\n", sFilename.c_str());
 		return -3;
 	}
 
@@ -230,10 +230,12 @@ int CMission::Load( const char * szfilename )
 
 	if ( 4 != state )
 	{
-		SYS_Error( "CMission::Load( %s ): Bad end state %d\n", szfilename, state );
+		SYS_Error( "CMission::Load( %s ): Bad end state %d\n", sFilename.c_str(), state );
 	}
 
 	// Remember the filename for load/save game purposes (to know which 'mission' to load/save) [dj2016-10]
+	// NOTE this must is stored without the "data/" prepended as that may be user or port- configurable and gets prepended during load
+	// fixme test this!
 	m_sFilename = szfilename;
 
 	fin.close ();
@@ -540,6 +542,21 @@ int CSpriteData::SaveData( const char *szFilename )
 
 int CSpriteData::LoadSpriteImage()
 {
+	if (m_szImgFilename == nullptr)
+	{
+		SYS_Debug("CSpriteData::LoadSpriteImage failed: NULL image");
+		return -1;
+	}
+	if (m_szImgFilename[0] == 0)
+	{
+		// Hm can this happen?
+		SYS_Debug("CSpriteData::LoadSpriteImage failed: empty image filename");
+#ifdef _DEBUG
+		//assert(m_szImgFilename[0] != 0);
+#endif
+		return -1;
+	}
+
 	SYS_Debug ( "CSpriteData::LoadSpriteImage( %s ): Loading ...\n", m_szImgFilename );
 
 	// If image already exists, delete it
@@ -562,9 +579,11 @@ int CSpriteData::LoadSpriteImage()
 	m_pImage = new djImage;
 	if (m_pImage==NULL)
 	{
+		SYS_Debug("CSpriteData::LoadSpriteImage failed: Alloc image failed");// This is pretty unlikely to happen .. 'new' rarely fails
+		return -1;
 	}
-	else
-	{
+
+		/*
 		char buf[4096]={0};
 #ifdef DATA_DIR
 		snprintf(buf,sizeof(buf), "%s%s", DATA_DIR, m_szImgFilename );
@@ -572,56 +591,56 @@ int CSpriteData::LoadSpriteImage()
 		snprintf(buf,sizeof(buf), "%s", m_szImgFilename );
 #endif
 		iRet = m_pImage->Load( buf );
+		*/
+	iRet = m_pImage->Load(djDATAPATHc(m_szImgFilename));
 
-		//dj2019-07 shrink/resize sprites .. quick n dirty test .. to 'make as if' DG1 use 8x8 blocks instead of 16x16, for testing unhardcoded BLOCKW etc. ..
-		/*
-		if (BLOCKW==8 && m_pImage->Width()==256)
+	//dj2019-07 shrink/resize sprites .. quick n dirty test .. to 'make as if' DG1 use 8x8 blocks instead of 16x16, for testing unhardcoded BLOCKW etc. ..
+	/*
+	if (BLOCKW==8 && m_pImage->Width()==256)
+	{
+		for (int y = 0; y < m_pImage->Height() / 2; ++y)
 		{
-			for (int y = 0; y < m_pImage->Height() / 2; ++y)
+			for (int x = 0; x < m_pImage->Width() / 2; ++x)
 			{
-				for (int x = 0; x < m_pImage->Width() / 2; ++x)
-				{
-					// Do quick 'n dirty nearest neighbor downsampling
-					int pixel = m_pImage->GetPixel(x * 2, y * 2);
-					m_pImage->PutPixel(x, y, pixel);
-				}
+				// Do quick 'n dirty nearest neighbor downsampling
+				int pixel = m_pImage->GetPixel(x * 2, y * 2);
+				m_pImage->PutPixel(x, y, pixel);
 			}
 		}
-		//*/
+	}
+	//*/
 
-		djCreateImageHWSurface( m_pImage );
+	djCreateImageHWSurface( m_pImage );
 
 #ifdef djSPRITE_AUTO_DROPSHADOWS
-		// dj2018-01 SUPER-EXPERIMENTALY EXPERIMENT [see livestreams of 12/13 Jan 2018]
-		// Basically what we're doing here is, we examine the sprite image, and create
-		// a second corresponding sprite image that looks like a 'shadow' (black image
-		// with alpha mask in shape of image), and then in specific contexts, we can
-		// render that under the sprite at a 1x1 offset from the main sprite, to draw
-		// a simple drop-shadow effect 'under the sprite', e.g. see DRAW_SPRITEA_SHADOW
-		// helper and g_bSpriteDropShadows setting.
-		// [low]In theory later we can make this 'nicer' e.g. slightly smooth the dropshadow image somewhat
-		m_pImageAutoShadow = new djImage;//( m_pImage->Width(), m_pImage->Height(), m_pImage->BPP() );
-		// Create image of exact same width/height/pitch and pixel format.
-		// Note using the djImage constructor didn't seem to work (fixmeFuture some issue there), maybe pitch issues or bpp issues, not sure,
-		// but we had to use CreateImage() rather here (LOW prio but should look into why at
-		// some stage, not a prio unless we want to make this whole thing more generic 'engine') [dj2018-01-12]
-		m_pImageAutoShadow->CreateImage(m_pImage->Width(), m_pImage->Height(), m_pImage->BPP(), m_pImage->Pitch());
-		for (int y=0;y<m_pImage->Height();++y)
+	// dj2018-01 SUPER-EXPERIMENTALY EXPERIMENT [see livestreams of 12/13 Jan 2018]
+	// Basically what we're doing here is, we examine the sprite image, and create
+	// a second corresponding sprite image that looks like a 'shadow' (black image
+	// with alpha mask in shape of image), and then in specific contexts, we can
+	// render that under the sprite at a 1x1 offset from the main sprite, to draw
+	// a simple drop-shadow effect 'under the sprite', e.g. see DRAW_SPRITEA_SHADOW
+	// helper and g_bSpriteDropShadows setting.
+	// [low]In theory later we can make this 'nicer' e.g. slightly smooth the dropshadow image somewhat
+	m_pImageAutoShadow = new djImage;//( m_pImage->Width(), m_pImage->Height(), m_pImage->BPP() );
+	// Create image of exact same width/height/pitch and pixel format.
+	// Note using the djImage constructor didn't seem to work (fixmeFuture some issue there), maybe pitch issues or bpp issues, not sure,
+	// but we had to use CreateImage() rather here (LOW prio but should look into why at
+	// some stage, not a prio unless we want to make this whole thing more generic 'engine') [dj2018-01-12]
+	m_pImageAutoShadow->CreateImage(m_pImage->Width(), m_pImage->Height(), m_pImage->BPP(), m_pImage->Pitch());
+	for (int y=0;y<m_pImage->Height();++y)
+	{
+		for (int x=0;x<m_pImage->Width();++x)
 		{
-			for (int x=0;x<m_pImage->Width();++x)
-			{
-				const djColor c = m_pImage->GetPixelColor(x,y);
-				// PutPixel: 32-bit hex value containing alpha red green blue 0xAARRGGBB
-				if (c.a!=0)
-					m_pImageAutoShadow->PutPixel(x,y,0x90000000);// <- Highest two hex digits adjust intensity/darkness of dropshadow
-				else
-					m_pImageAutoShadow->PutPixel(x,y,0x00000000);
-			}
+			const djColor c = m_pImage->GetPixelColor(x,y);
+			// PutPixel: 32-bit hex value containing alpha red green blue 0xAARRGGBB
+			if (c.a!=0)
+				m_pImageAutoShadow->PutPixel(x,y,0x90000000);// <- Highest two hex digits adjust intensity/darkness of dropshadow
+			else
+				m_pImageAutoShadow->PutPixel(x,y,0x00000000);
 		}
-		djCreateImageHWSurface( m_pImageAutoShadow );
-#endif
-
 	}
+	djCreateImageHWSurface( m_pImageAutoShadow );
+#endif
 
 	return iRet;
 }

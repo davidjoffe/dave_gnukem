@@ -59,7 +59,7 @@
 #else
 #include <SDL_mixer.h>//For background music stuff
 #endif
-Mix_Music* g_pGameMusic=NULL;
+Mix_Music* g_pInGameMusic=NULL;
 #endif
 
 // See comments at viewport vertical auto-scrolling. DN1 vertical viewport auto-re-centering has this subtle feel of almost taking a frame or three to start 'catching up' to jumping upwards etc. ... this variable helps implement that effect. [dj2017-06-29]
@@ -1110,16 +1110,16 @@ void PerLevelSetup()
 #ifndef NOSOUND
 	// This is somewhat gross quick n dirty simplistic for now - should rather have ability to assign music file in the level file format [dj2016-10]
 	int nMusicFile = (g_nLevel % asMusicFiles.size());
-	std::string sBasePath = DATA_DIR "music/eric_matyas/";
-	if (g_pGameMusic!=NULL)
+	std::string sBasePath = djDATAPATH("music/eric_matyas/");
+	if (g_pInGameMusic!=NULL)
 	{
-		Mix_FreeMusic(g_pGameMusic);
-		g_pGameMusic = NULL;
+		Mix_FreeMusic(g_pInGameMusic);
+		g_pInGameMusic = NULL;
 	}
-	g_pGameMusic = Mix_LoadMUS((sBasePath + asMusicFiles[nMusicFile]).c_str());
-	if (g_pGameMusic!=NULL)
+	g_pInGameMusic = Mix_LoadMUS((sBasePath + asMusicFiles[nMusicFile]).c_str());
+	if (g_pInGameMusic!=NULL)
 	{
-		Mix_FadeInMusic(g_pGameMusic, -1, 500);
+		Mix_FadeInMusic(g_pInGameMusic, -1, 500);
 	}
 #endif
 
@@ -1332,10 +1332,10 @@ void PerLevelCleanup()
 	DestroyAllBullets();//Make sure no bullets, for good measure [dj2018-03]
 
 #ifndef NOSOUND
-	if (g_pGameMusic!=NULL)
+	if (g_pInGameMusic!=NULL)
 	{
-		Mix_FreeMusic(g_pGameMusic);
-		g_pGameMusic = NULL;
+		Mix_FreeMusic(g_pInGameMusic);
+		g_pInGameMusic = NULL;
 	}
 #endif
 
@@ -3159,7 +3159,7 @@ void HeroSetFirepower(int nFirepower)
 
 bool SaveGame()
 {
-	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), FILE_SAVEGAME);
+	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_SAVEGAME);
 	FILE *pOut = djFile::dj_fopen(s.c_str(), "w");
 	if (pOut==NULL)
 		return false;
@@ -3184,7 +3184,7 @@ bool SaveGame()
 
 bool LoadGame()
 {
-	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), FILE_SAVEGAME);
+	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_SAVEGAME);
 	FILE *pIn = djFile::dj_fopen(s.c_str(), "r");
 	if (pIn==NULL)
 		return false;

@@ -79,7 +79,7 @@ void InitLog ()
 	num_logs = 0;
 
 	std::string sPath = djAppendPathStr(djGetFolderUserSettings().c_str(), "logs");
-	sPath = djAppendPathStr(sPath.c_str(), "DaveGnukem.log");
+	sPath = djAppendPathStr(sPath.c_str(), USERFILE_LOGFILE);
 	sys_log = CreateLog ( sPath.c_str(), "System" );
 }
 

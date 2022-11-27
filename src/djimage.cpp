@@ -155,8 +155,8 @@ void djImage::PutPixel( int x, int y, uint32_t pixel )
 
 int djImage::Load( const char * szFilename )
 {
-	if ( szFilename == NULL )
-		return -1;
+	if (szFilename == NULL) return -1; // NULL string
+	if (szFilename[0] == 0) return -1; // empty string
 
 	//char * szTemp = NULL;
 	//char * szExt = NULL;
@@ -164,6 +164,12 @@ int djImage::Load( const char * szFilename )
 
 	 // fixme why are we bothering with all this? we only load TGA
 	ret = LoadTGA(szFilename);
+	if (ret < 0)
+	{
+		//dj2022-11 hm this is maybe slightly gross must rethink where all the various logs "should" go etc. and clean up logging system
+		printf("Warning: Image load failed: %s\n", szFilename);
+		//fixme add some sort of 'debugassert' stuff here to help with testign?
+	}
 	/*
 	szTemp = djStrDeepCopy( szFilename );
 	djStrToLower( szTemp );

@@ -72,7 +72,7 @@ extern bool g_bBigViewportMode;//dj2019-06. //Can't have both bigviewport and la
 //dj2018-03 Start making a (forward-looking) #define if we want to genericize this and make other games off it, then wrap 'very DN1-specific stuff' in a #define - for Dave Gnukem 1 it's always on
 #define tBUILD_DAVEGNUKEM1
 
-#define FILE_SAVEGAME "savegame.dat"
+#define USERFILE_SAVEGAME "savegame.dat"
 
 //---------------------------------------------------------------------------
 // [dj2019-06 start trying to make the 320x200 less hardcoded so the engine can handle other resolution games.]

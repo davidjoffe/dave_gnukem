@@ -18,6 +18,8 @@ void InitLog ();
 void KillLog ();
 
 
+#define USERFILE_LOGFILE "DaveGnukem.log"
+//#define USERFILE_ERRORLOGFILE "DaveGnukemError.log"
 
 // creates log file and returns log id
 // Filename parameter may be NULL. Then defaults to `game.log'
