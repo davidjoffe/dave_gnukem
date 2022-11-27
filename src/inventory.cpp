@@ -5,6 +5,7 @@ Copyright (C) 2001-2019 David Joffe
 */
 
 #include "config.h"
+#include "djfile.h"
 #include "inventory.h"
 #include "mission.h"
 #include "graph.h"
@@ -165,20 +166,28 @@ void InvSave(FILE *pOut)
 	}
 }
 
-void InvLoad(FILE *pIn)
+bool InvLoad(FILE *pIn)
 {
-	int i;
 	// Clear existing
 	InvEmpty();
-	// Read number of items
+	// Read number of inventory items
 	int nItems=0;
-	fscanf(pIn, "%d\n", &nItems);
+	if (dj_fscanf_intline(pIn, nItems) <= 0)
+	{
+		SYS_Error("Error loading inventory");
+		return false;
+	}
 	djMSG("LOADGAME: InvLoad: %d items\n", nItems);
 	// Use object factory to load items
-	for ( i=0; i<nItems; i++ )
+	for ( int i=0; i<nItems; i++ )
 	{
 		int nTypeID=-1, a=0, b=0;
-		fscanf(pIn, "%d %d %d\n", &nTypeID, &a, &b);
+		if (dj_fscanf(pIn, "%d %d %d\n", &nTypeID, &a, &b) <= 0)
+		{
+			SYS_Error("Error loading inventory");
+			return false;
+		}
+
 		CThing *pThing = g_ThingFactory.Allocate(nTypeID);
 		if (pThing==NULL)
 		{
@@ -194,4 +203,5 @@ void InvLoad(FILE *pIn)
 	}
 	// Make all loaded items "persistent"
 	InvMakeAllPersistent();
+	return true;
 }

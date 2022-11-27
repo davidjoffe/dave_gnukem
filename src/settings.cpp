@@ -7,6 +7,7 @@ Copyright (C) 2001-2022 David Joffe
 */
 
 #include "settings.h"
+#include "djfile.h"
 #include <stdio.h>
 #include "djtypes.h"
 
@@ -24,34 +25,39 @@ CSettings::~CSettings()
 bool CSettings::Load(const char *szFilename)
 {
 	DeleteAllSettings();
-	FILE *pInput = fopen(szFilename, "r");
-	if (pInput==NULL)
+	FILE *pIn = djFile::dj_fopen(szFilename, "r");
+	if (pIn==NULL)
 		return false;
-	char szBuf[1024]={0};
+	char buf[2048]={0};
 
-	fgets(szBuf, sizeof(szBuf), pInput);
-	szBuf[strlen(szBuf)-1] = 0;
-	while (!feof(pInput))
+	//" If the End-of-File is encountered and no characters have been read, the contents of str remain unchanged and a null pointer is returned."
+	#define djREADLINE() buf[0]=0; if ((fgets(buf, sizeof(buf), pIn) == NULL) && ferror(pIn)) goto error; djStripCRLF(buf)
+
+	while (!feof(pIn))
 	{
-		char *pEquals;
-		pEquals = strchr(szBuf, '=');
+		djREADLINE();
+		// Skip empty lines (or possible read of last line if empty string)
+		if (buf[0] == 0) continue;
+
+		char *pEquals = strchr(buf, '=');
 		if (pEquals)
 		{
 			*pEquals = 0;
 			pEquals++;
-			SetSetting(szBuf, pEquals);
+			SetSetting(buf, pEquals);
 		}
-		fgets(szBuf, sizeof(szBuf), pInput);
-		szBuf[strlen(szBuf)-1] = 0;
 	}
-	fclose(pInput);
+	fclose(pIn);
 	return true;
+error:
+	fclose(pIn);
+	return false;
 }
 
 bool CSettings::Save(const char *szFilename)
 {
 	unsigned int i;
-	FILE *pOutput = fopen(szFilename, "w");
+	FILE *pOutput = djFile::dj_fopen(szFilename, "w");
 	if (pOutput==NULL)
 		return false;
 	for ( i=0; i<m_aSettings.size(); i++ )

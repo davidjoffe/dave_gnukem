@@ -5,34 +5,15 @@ Copyright (C) 1995-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "level.h"
+#include "djfile.h"
 #include "datadir.h"
 #include "djtypes.h"
 #include "djlog.h"
 #include "sys_log.h"
 #include <stdio.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <stdio.h>
 #ifdef _DEBUG
 #include <assert.h>
-#endif
-/*--------------------------------------------------------------------------*/
-#ifdef WIN32
-#include "io.h"
-#else
-#include <unistd.h>
-#endif
-
-#ifdef WIN32
-#define FILECREATE_FLAGS (O_CREAT | O_TRUNC | O_BINARY | O_RDWR)
-#define FILECREATE_PERM  (S_IWRITE | S_IREAD)
-#define FILEOPEN_FLAGS   (O_RDONLY | O_BINARY)
-#else
-#define FILECREATE_FLAGS (O_CREAT | O_TRUNC | O_RDWR)
-#define FILECREATE_PERM  (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
-#define FILEOPEN_FLAGS   (O_RDONLY)
 #endif
 /*--------------------------------------------------------------------------*/
 std::vector<unsigned char *> apLevels;
@@ -65,8 +46,9 @@ unsigned char * level_load( int i, const char * szfilename )
 	snprintf( filename, sizeof(filename), "%s%s", DATA_DIR, szfilename );
 
 	// open level file
-	int file_handle = -1;
-	if ((file_handle = open( filename, FILEOPEN_FLAGS )) == -1)
+	FILE* pIn = NULL;
+	pIn = djFile::dj_fopen(filename, "rb");// NB! MUST BE BINARY MODE (on Windows anyway; Linux it does nothing) and for reading
+	if (pIn == NULL)
 	{
 		printf( "level_load( %s ): failed to open file.\n", filename );
 		//return NULL;
@@ -81,12 +63,18 @@ unsigned char * level_load( int i, const char * szfilename )
 	}
 	// Initialize level to blank block by default (in case it doesn't load e.g. bad filename passed or whatever, don't want to sit with random memory contents) [dj2017-07]
 	memset(buffer, 0, uMemSize);
-	if (file_handle != -1)
+	if (pIn)
 	{
 		// read level into buffer
-		read( file_handle, buffer, uMemSize );
+		size_t sizeRead = fread(buffer, 1, uMemSize, pIn);
+		if (sizeRead < uMemSize)
+		{
+			printf("level_load( %s ): ERROR partial level read only. Read: %d bytes.\n", szfilename, (int)sizeRead);
+			//todo  add onscreen messages?
+		}
 		// close file
-		close( file_handle );
+		fclose(pIn);
+		pIn = NULL;
 
 		pRet = buffer;
 	}
@@ -121,17 +109,21 @@ int level_save( int i, const char * szfilename )
 	}
 
 	// open level file (FIXME: TEST THIS STILL WORKS, I'VE AHCNAGEAD FLAGS)
-	int file_handle=-1;
-	if ((file_handle = open( filename, FILECREATE_FLAGS, FILECREATE_PERM )) == -1)
+	FILE* pFile = djFile::dj_fopen(filename, "wb");// NB! MUST BE BINARY MODE (on Windows anyway; Linux it does nothing) and for reading
+	if (pFile == NULL)
 	{
 		printf( "level_save( %s ): failed to open file.\n", filename );
 		return -2;
 	}
 
 	// write level to file
-	write( file_handle, level, LEVEL_SIZE );
+	size_t sizeRet = fwrite(level, 1, LEVEL_SIZE, pFile);
+	if (sizeRet < LEVEL_SIZE)
+	{
+		printf("level_save( %s ): ERROR partial level save: Only %d bytes.\n", filename, (int)sizeRet);
+	}
 
-	close( file_handle );
+	fclose(pFile);
 
 	return 0;
 }
@@ -139,7 +131,7 @@ int level_save( int i, const char * szfilename )
 unsigned char * level_pointer( int i, int x, int y )
 {
 #ifdef _DEBUG
-	assert(i<apLevels.size() && i>=0);// Debug-mode only for speed reasons .. this 
+	assert(i<(int)apLevels.size() && i>=0);// Debug-mode only for speed reasons .. this 
 #endif
 	unsigned char * level = apLevels[i];
 	if (level == NULL)

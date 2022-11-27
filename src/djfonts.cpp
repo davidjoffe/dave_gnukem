@@ -136,8 +136,8 @@ int djUnicodeTextHelpers::GuessDirection(const char* szTextUTF8, const unsigned 
 {
 	if (szTextUTF8 == nullptr || uLen == 0) return 0;
 
-	int nNumChars = 0;
-	int nNumCharsRTL = 0;
+	size_t nNumChars = 0;
+	size_t nNumCharsRTL = 0;
 	//int nNumCharsLTR = 0;
 	//int nNumCharsDirectionAgnostic = 0;// E.g. things like space are direction-agnostic
 

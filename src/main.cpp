@@ -367,7 +367,10 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 	// Load missions
 	if (0 != LoadMissions(DATA_DIR "missions.txt"))
+	{
+		djLOGSTR("Error loading missions.txt list\n");
 		return -1;
+	}
 	djLog::LogFormatStr( "DaveStartup(): %d missions(s) found.\n", (int)g_apMissions.size() );//NB must convert .size() to int due to risk of 64-bit vs 32-bit mismatch on some platforms! very subtle bug/risk
 
 	//-- Initialize input devices

@@ -29,7 +29,7 @@ public:
 		void SetName(const char* szNameNew);
 
 		//! Person's name for high score list entry (dj2022-11 note: if we assume later we try globalized Unicode support then perhaps this would become utf8, so 'effective length' may be shorter than this length of a person's name in that case as it's multibyte so just keep that in mind, but as of 2022/11 we don't support Unicode)
-		char szName[512] = { 0 };
+		char szName[1024] = { 0 };
 		//! Score achieved
 		int nScore = 0;
 	};

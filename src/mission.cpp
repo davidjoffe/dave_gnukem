@@ -9,6 +9,7 @@ Copyright (C) 1999-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "config.h"
+#include "djfile.h"
 #include "datadir.h"
 #include "mission.h"
 #include "djlog.h"
@@ -35,29 +36,32 @@ int LoadMissions( const char * szfilename )
 
 	// open file
 	// FIXME: We need a consistent way to handle "DATA_DIR"
-	if ( NULL == ( fin = fopen( szfilename, "r" ) ) )
+	if ( NULL == ( fin = djFile::dj_fopen( szfilename, "r" ) ) )
 	{
 		djMSG("ERROR: LoadMissions(%s): Unable to open file.\n", szfilename);
 		return -3;
 	}
 
+	//" If the End-of-File is encountered and no characters have been read, the contents of str remain unchanged and a null pointer is returned."
+	#define djREADLINE() buf[0]=0; if ((fgets(buf, sizeof(buf), fin) == NULL) && ferror(fin)) goto error; djStripCRLF(buf)
+
 	// Read the list of available mission filenames from the "mission registry"
-	fgets( buf, sizeof(buf), fin );
-	djStripCRLF(buf); // strip CR/LF characters
-	while (!feof( fin ))
+	//djREADLINE();
+	while (!feof(fin))
 	{
-		CMission * pMission;
+		djREADLINE();
 		if ( strlen(buf) > 1 )
 		{
-			pMission = new CMission;
+			CMission* pMission = new CMission;
 
 			// Load this mission and add to list (FIXME: ERROR CHECK)
-			pMission->Load( buf );
+			if (pMission->Load(buf) < 0)
+			{
+				djMSG("ERROR: Error loading mission\n");
+			}
+			// Maybe it partially loaded so maybe go on anyway
 			g_apMissions.push_back(pMission);
 		}
-
-		fgets( buf, sizeof(buf), fin );
-		djStripCRLF(buf); // strip CR/LF characters
 	}
 
 	fclose( fin );
@@ -71,6 +75,11 @@ int LoadMissions( const char * szfilename )
 	// Set current mission by default to the first one in the list
 	g_pCurMission = g_apMissions[0];
 	return 0;
+
+error:
+	djMSG("ERROR: LoadMissions(%s): File loading error.\n", szfilename);
+	fclose(fin);
+	return -1;
 }
 /*--------------------------------------------------------------------------*/
 CMission::CMission()
@@ -394,13 +403,14 @@ int CSpriteData::LoadData( const char *szFilename )
 	SYS_Debug ( "CSpriteData::LoadData( %s ): Loading ...\n", szFilename );
 
 	// open the file
-	if (NULL == (fin = fopen( szFilename, "r" )))
+	// [dj2022-11 hm this seems to first try without DATA_DIR which fails then tries with DATA_DIR ..simplify?]
+	if ((!djFileExists(szFilename)) || (NULL == (fin = djFile::dj_fopen( szFilename, "r" ))))
 	{
 #ifdef DATA_DIR
 		// safety? we want to be able to handle VERY long paths elegantly all over the code (and also Unicode filenames) .. maybe make some file helpers etc.
 		char buf[8192]={0};
 		snprintf(buf,sizeof(buf), "%s%s", DATA_DIR, szFilename );
-		if (NULL == (fin = fopen( buf, "r" )))
+		if (NULL == (fin = djFile::dj_fopen( buf, "r" )))
 #endif
 		{
 			SYS_Error ( "CSpriteData::LoadData( %s ): Error opening file\n", szFilename );
@@ -409,12 +419,12 @@ int CSpriteData::LoadData( const char *szFilename )
 	}
 
 	// Read "128"
-	fscanf ( fin, "%i", &temp );
+	if (dj_fscanf_int(fin, temp) <= 0) goto error;
 
 	for ( i=0; i<SPRITES_PER_SPRITESHEET; i++ )
 	{
 		// Read type
-		fscanf ( fin, "%i", &temp );
+		if (dj_fscanf_int(fin, temp) <= 0) goto error;
 		if (feof(fin))
 			goto error;
 
@@ -423,15 +433,15 @@ int CSpriteData::LoadData( const char *szFilename )
 		// Read extras
 		for ( j=0; j<11; j++ )
 		{
-			fscanf ( fin, "%i,", &temp );
+			if (dj_fscanf(fin, "%i,", &temp) <= 0) goto error;
 			m_extras[i][j] = temp;
 		}
-		fscanf ( fin, "%i", &temp );
+		if (dj_fscanf_int(fin, temp) <= 0) goto error;
 		m_extras[i][11] = temp;
 
 		// FIXME: FOLLOWING OLD COLOR OBSOLETE
 		// Read block color (2019-06 THIS IS NOW DEPRECATED/OBSOLETE, this was for the old m_color variable, but we still load/save a dummy value to keep compatibility with existing sprite files.)
-		fscanf ( fin, "%i", &temp );
+		if (dj_fscanf_int(fin, temp) <= 0) goto error;
 		if (feof(fin))
 			goto error;
 		//(deprecated)m_color[i] = temp;
@@ -476,7 +486,7 @@ int CSpriteData::SaveData( const char *szFilename )
 
 	TRACE( "CSpriteData::SaveData( %s ): Saving ...\n", szFilename );
 
-	if (NULL == (fout = fopen( szFilename, "w" )))
+	if (NULL == (fout = djFile::dj_fopen( szFilename, "w" )))
 	{
 		djMSG( "CSpriteData::SaveData( %s ): unable to open file.\n", szFilename );
 		return -1;

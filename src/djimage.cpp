@@ -8,31 +8,13 @@ dj2022-11 Note that since we're now on SDL2 we could potentially use e.g. SDLima
 
 #include "config.h"
 #include "djimage.h"
+#include "djfile.h"
 #include "djstring.h"
 #include "djtypes.h"
 #include "djlog.h"
 #include "djgraph.h"
 #include "sys_error.h"
 #include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-#ifdef WIN32
-#include <io.h>//open, read etc. (this should maybe change in future)
-#else
-#include <unistd.h>
-#endif
-/*--------------------------------------------------------------------------*/
-#ifdef WIN32
-//#define FILECREATE_FLAGS (O_CREAT | O_TRUNC | O_BINARY | O_RDWR)
-//#define FILECREATE_PERM  (S_IWRITE | S_IREAD)
-#define FILEOPEN_FLAGS   (O_RDONLY | O_BINARY)
-#else
-//#define FILECREATE_FLAGS (O_CREAT | O_TRUNC | O_RDWR)
-//#define FILECREATE_PERM  (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
-#define FILEOPEN_FLAGS   (O_RDONLY)
-#endif
 /*--------------------------------------------------------------------------*/
 // TGA types
 enum EfdTGAType
@@ -215,10 +197,9 @@ int djImage::LoadTGA( const char * szFilename )
 
 	SYS_Debug ( "djImage::LoadTGA(%s)\n", szFilename );
 
-	int fin=0;
-
 	// Open the file
-	if (0 > (fin = open( szFilename, FILEOPEN_FLAGS )))
+	FILE* pFile = djFile::dj_fopen(szFilename, "rb");// NB! MUST BE BINARY MODE (on Windows anyway; Linux it does nothing) and for reading
+	if (pFile==nullptr)
 	{
 		SYS_Error ( "djImage::LoadTGA(%s): Couldn't open file\n", szFilename );
 		return -1;
@@ -226,14 +207,16 @@ int djImage::LoadTGA( const char * szFilename )
 
 	SdjHeaderTGA Header;
 
+	size_t uRead = 0;
+	#define djREADBYTES(pBuf, uSize) uRead = fread(pBuf, 1, uSize, pFile); if (uRead<(size_t)(uSize)) { SYS_Error ( "djImage::LoadTGA(%s): ERROR/WARNING reading TGA\n", szFilename ); }
 	// Read the TGA header
-	read( fin, &Header, sizeof(Header) );
+	djREADBYTES(&Header, sizeof(Header));
 
 	// Skip past the comment field
 	if (Header.m_idLength!=0)
 	{
-		char szComments[256]={0};
-		read( fin, szComments, Header.m_idLength);
+		char szComments[512]={0};
+		djREADBYTES(szComments, Header.m_idLength);
 	}
 
 	unsigned int nWidth  = MAKEINT16(Header.m_iWidthLo,Header.m_iWidthHi);
@@ -260,7 +243,7 @@ int djImage::LoadTGA( const char * szFilename )
 				for ( unsigned int i=0; i<nHeight; ++i )
 				{
 					// Read a row of pixels and copy it into the image buffer
-					read( fin, pBuf, nWidth*2 );
+					djREADBYTES(pBuf, nWidth * 2);
 					int iOffset = (bFlipY?(nHeight-i-1):i)*Pitch();
 					for ( unsigned int j=0; j<nWidth; ++j )
 					{
@@ -281,7 +264,7 @@ int djImage::LoadTGA( const char * szFilename )
 				for ( unsigned int i=0; i<nHeight; i++ )
 				{
 					// Read a row of pixels and copy it into the image buffer
-					read( fin, pBuf, nWidth*3 );
+					djREADBYTES(pBuf, nWidth * 3);
 					int iOffset = (bFlipY?(nHeight-i-1):i)*Pitch();
 					for ( unsigned int j=0; j<nWidth; j++ )
 					{
@@ -303,7 +286,7 @@ int djImage::LoadTGA( const char * szFilename )
 				for ( unsigned int i=0; i<nHeight; i++ )
 				{
 					// Read a row of pixels and copy it into the image buffer
-					read( fin, pBuf, nWidth*4 );
+					djREADBYTES(pBuf, nWidth * 4);
 					int iOffset = (bFlipY?(nHeight-i-1):i)*Pitch();
 					for ( unsigned int j=0; j<nWidth; j++ )
 					{
@@ -346,7 +329,7 @@ int djImage::LoadTGA( const char * szFilename )
 		SYS_Error ( "Invalid TGA type!\n" );
 	}
 
-	close( fin );
+	fclose( pFile );
 	return iRet;
 }
 

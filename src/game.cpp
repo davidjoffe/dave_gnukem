@@ -8,6 +8,7 @@
 /*--------------------------------------------------------------------------*/
 
 #include "config.h"
+#include "djfile.h"//dj2022-11
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -1809,6 +1810,9 @@ int game_startup(bool bLoadGame)
 							}
 						}
 
+						//dj2022-11
+						InvMakeAllPersistent();
+
 						// Full firepower
 						HeroSetFirepower(MAX_FIREPOWER);
 					}
@@ -3152,7 +3156,7 @@ void HeroSetFirepower(int nFirepower)
 bool SaveGame()
 {
 	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), FILE_SAVEGAME);
-	FILE *pOut = fopen(s.c_str(), "w");
+	FILE *pOut = djFile::dj_fopen(s.c_str(), "w");
 	if (pOut==NULL)
 		return false;
 
@@ -3177,7 +3181,7 @@ bool SaveGame()
 bool LoadGame()
 {
 	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), FILE_SAVEGAME);
-	FILE *pIn = fopen(s.c_str(), "r");
+	FILE *pIn = djFile::dj_fopen(s.c_str(), "r");
 	if (pIn==NULL)
 		return false;
 	int nLevel=0, nScore=0, nFirepower=0, nHealth=0;
@@ -3187,35 +3191,57 @@ bool LoadGame()
 	std::string sMissionFilename = "default.gam";
 
 	// Check for 'fileversion=', which was only added 2016-10-28 .. if not present, then the first line is the level number.
-	char szFirstLine[1024]={0};
-	fscanf(pIn,"%s\n",szFirstLine);
-	if (strncmp(szFirstLine,"fileversion=",12)==0)
+	char szLine[4096]={0};
+	if (dj_fscanf_line(pIn, szLine) <= 0) { SYS_Error("Error loading game"); return false; }
+	if (strncmp(szLine,"fileversion=",12)==0)
 	{
+		if (dj_fscanf_line(pIn, szLine) <= 0) { SYS_Error("Error loading game"); return false; }
+
 		// Fileversion 2
 		char szFilename[4096]={0};//gross
-		fscanf(pIn,"mission=%s\n",szFilename);//[LOW] Wonder if we might have cross-platform issues here? E.g. savegame on Windows with CR+LF & try load on e.g. a LF-only platform say?
-		if (szFilename[0]!=0)
+		//[LOW] Wonder if we might have cross-platform issues here? E.g. savegame on Windows with CR+LF & try load on e.g. a LF-only platform say?
+
+		//if (djFSCANF(pIn,"mission=%s\n",szFilename, 4096) <= 0) { SYS_Error("Error loading game"); return false; }
+		if (strncmp(szLine, "mission=", 8) == 0)
 		{
-			sMissionFilename = szFilename;
+			strncat(szFilename, szLine+8, sizeof(szLine)-10);
+			if (szFilename[0] != 0)
+			{
+				sMissionFilename = szFilename;
+			}
+		}
+		else
+		{
+			SYS_Error("Error loading game");
+			return false;
 		}
 
-		fscanf(pIn, "%d\n", &nLevel);
+		if (dj_fscanf_intline(pIn, nLevel) <= 0) { SYS_Error("Error loading game"); return false; }
 	}
 	else
 	{
 		// Fileversion 1
-		nLevel = atoi(szFirstLine);
+		nLevel = atoi(szLine);
 	}
 	djMSG("LOADGAME: Mission=%s\n", sMissionFilename.c_str());
 	// Find the mission from the list of missions
 	CMission* pMission = g_apMissions[0];//<-Default to the first one
+	bool bFound = false;
 	for ( std::vector<CMission * >::const_iterator iter=g_apMissions.begin(); iter!=g_apMissions.end(); ++iter )
 	{
 		if (sMissionFilename==(*iter)->GetFilename())
 		{
 			pMission = *iter;
+			bFound = true;
 			break;
 		}
+	}
+	if (!bFound)
+	{
+		// warning ? failed to find mission, falling back to default one
+		//SYS_Warn("Error loading game [unknown mission]");
+		//PerGameCleanup();
+		//return false;
 	}
 	if (pMission != g_pCurMission)
 	{
@@ -3227,16 +3253,21 @@ bool LoadGame()
 	}
 
 	//fscanf(pIn, "%d\n", &nLevel);
-	fscanf(pIn, "%d\n", &nScore);
-	fscanf(pIn, "%d\n", &nFirepower);
-	fscanf(pIn, "%d\n", &nHealth);
+	if (dj_fscanf_intline(pIn, nScore) <= 0) { SYS_Error("Error loading game [score]"); return false; }
+	if (dj_fscanf_intline(pIn, nFirepower) <= 0) { SYS_Error("Error loading game [firepower]"); return false; }
+	if (dj_fscanf_intline(pIn, nHealth) <= 0) { SYS_Error("Error loading game [health]"); return false; }
 	djMSG("LOADGAME: Level=%d Score=%d Firepower=%d Health=%d\n", nLevel, nScore, nFirepower, nHealth);
 	SetLevel(nLevel);
 	SetScore(nScore);
 	SetHealth(nHealth);
 	g_nFirepower = nFirepower;
 	// Load inventory. We do this after level setup stuff, otherwise it gets cleared in per-level setup..
-	InvLoad(pIn);
+	if (!InvLoad(pIn))
+	{
+		SYS_Error("Error loading game inventory");
+		//fclose(pIn);
+		//return false;
+	}
 
 	fclose(pIn);
 	// Set current "old" values, otherwise if save a game immediately after loading one, the existing

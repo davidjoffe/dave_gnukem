@@ -20,6 +20,7 @@
 #include "sys_error.h"
 #include "m_misc.h"
 #include "m_aliases.h"
+#include "djfile.h"
 
 #include <time.h>
 #include "sys_defs.h"
@@ -53,7 +54,7 @@
 static bool	log2screen = false;
 static bool	log2console = false;
 static bool	g_bLogInitialized = false;
-static int	log_backup_level = 5;
+//static int	log_backup_level = 5;
 static char	log_filename_base[SYS_MAX_FILE] = { 0 };
 static gnukemlogsdword	sys_log = 0;
 
@@ -63,7 +64,7 @@ static unsigned int	num_logs = 0;
 
 
 void BackupAndCreate ( FILE **f, const char *filename, int bklevel );
-void PushBackup ( const char *filename, int bklevel );
+//void PushBackup ( const char *filename, int bklevel );
 
 
 
@@ -249,7 +250,7 @@ void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 	// later (and fix the 'littering' issue) IF it seems in future like it's worth it to have rotating logs.
 	//PushBackup ( file, bklevel );
 
-	*f = fopen ( file, "w" );
+	*f = djFile::dj_fopen( file, "w" );
 
 	if ( NULL == *f )
 	{
@@ -269,7 +270,7 @@ void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 
 	strcpy ( oldname, filename );
 
-	ff = fopen ( oldname, "r" );
+	ff = djFile::dj_fopen ( oldname, "r" );
 	if ( ff )
 		fclose ( ff );
 
@@ -285,7 +286,7 @@ void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 			M_ParseErrno ( errno );
 		}
 		strcpy ( oldname, newname );
-		ff = fopen ( oldname, "r" );
+		ff = djFile::dj_fopen ( oldname, "r" );
 		if ( ff )
 			fclose ( ff );
 		bklevel++;
@@ -302,15 +303,19 @@ void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 // I don't really feel it's worth rotating logs; I seldom if ever go look at old logs. We can maybe add it
 // later (and fix the 'littering' issue) IF it seems in future like it's worth it to have rotating logs.
 // Otherwise, later maybe just delete this function (that's my recommendation, to simplify this code)
+/*
 void PushBackup ( const char *filename, int bklevel )
 {
 	char		newname[SYS_MAX_FILE]={0};
 	char		appendix[SYS_MAX_EXT]={0};
 	FILE		*ff=nullptr;
 
-	ff = fopen ( filename, "r" );
-	if ( ff )
-		fclose ( ff );
+	ff = djFile::dj_fopen( filename, "r" );
+	if (ff)
+	{
+		fclose(ff);
+		ff = nullptr;
+	}
 
 	if ( !ff )
 	{
@@ -331,7 +336,7 @@ void PushBackup ( const char *filename, int bklevel )
 	PushBackup ( newname, bklevel+1 );
 	rename ( filename, newname );
 }
-
+*/
 
 
 /*//dj2022 commenting this out for now as doesn't seem to be used anywhere in code [anymore]

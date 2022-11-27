@@ -1,5 +1,6 @@
 
 #include "config.h"
+#include "djfile.h"
 #include "djstring.h"
 #include "ed_macros.h"
 #include "ed_common.h"
@@ -25,40 +26,45 @@ std::vector<SMacro*> g_apMacros;
 bool LoadMacros()
 {
 	FILE *fin=NULL;
-	char buf[1024]={0};
-	if (NULL == (fin = fopen( DATA_DIR "editor/macros.txt", "r" )))
+	char buf[2048]={0};
+	if (NULL == (fin = djFile::dj_fopen( DATA_DIR "editor/macros.txt", "r" )))
 		return false;
 
+	#define djREADLINE() buf[0]=0; if ((fgets(buf, sizeof(buf), fin) == NULL) && ferror(fin)) goto error; djStripCRLF(buf)
+
 	SMacro* pMacro=NULL;
-	fgets( buf, sizeof(buf), fin );
-	buf[strlen(buf)-1] = 0; // strip trailing newline
+	//djREADLINE();
+	//dj2022-11 hmm can't recall why this "$" strcmp should be there .. maybe it should be removed .. why should a dollar suddenly indicate eof? can't remember
 	while (strcmp(buf, "$") && !feof(fin))
 	{
+		djREADLINE();
+		// Skip empty lines (or possible read of last line if empty string)
+		if (buf[0] == 0) continue;
+
 		pMacro = new SMacro;
 
 		pMacro->szName = djStrDeepCopy( buf );
 		if (pMacro->szName[strlen(pMacro->szName)-1] == '\r')
 			pMacro->szName[strlen(pMacro->szName)-1] = 0;
 
-		fgets( buf, sizeof(buf), fin );
-		buf[strlen(buf)-1] = 0; // strip trailing newline
+		//djREADLINE();
 		while (strcmp(buf, "~") && strcmp(buf, "~\r") && !feof(fin))
 		{
-			int ix, iy, a, b;
-			sscanf( buf, "%d %d %d %d", &ix, &iy, &a, &b );
-			pMacro->m_aiBlocks[0].push_back(ix);
-			pMacro->m_aiBlocks[1].push_back(iy);
-			pMacro->m_aiBlocks[2].push_back(a);
-			pMacro->m_aiBlocks[3].push_back(b);
+			djREADLINE();
+			if (buf[0]!='~' && buf[0]!=0)
+			{
+				int ix, iy, a, b;
+				if (dj_sscanf(buf, "%d %d %d %d", &ix, &iy, &a, &b) <= 0)
+					goto error;
+				pMacro->m_aiBlocks[0].push_back(ix);
+				pMacro->m_aiBlocks[1].push_back(iy);
+				pMacro->m_aiBlocks[2].push_back(a);
+				pMacro->m_aiBlocks[3].push_back(b);
 
-			fgets( buf, sizeof(buf), fin );
-			buf[strlen(buf)-1] = 0; // strip trailing newline
+				//djREADLINE();
+			}
 		}
-
 		g_apMacros.push_back(pMacro);
-
-		fgets( buf, sizeof(buf), fin );
-		buf[strlen(buf)-1] = 0; // strip trailing newline
 	}
 
 	int i;
@@ -82,8 +88,12 @@ bool LoadMacros()
 	}
 
 	fclose(fin);
-
 	return true;
+
+error:
+	//djLOGSTR("EDITOR: ERROR loading macros\n");
+	fclose(fin);
+	return false;
 }
 
 

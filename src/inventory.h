@@ -38,7 +38,7 @@ extern void InvRemove(CThing *pThing);
 //! Save inventory to file for save-game (only saves items marked as persistent)
 extern void InvSave(FILE *pOut);
 //! Load game: load inventory
-extern void InvLoad(FILE *pIn);
+extern bool InvLoad(FILE *pIn);
 
 
 //@}

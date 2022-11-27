@@ -7,6 +7,7 @@ Conceptually should divide this file into more model/view/controller separation?
 */
 
 #include "config.h"
+#include "djfile.h"
 #include <stdio.h>
 #include <string.h>
 #include "djstring.h"
@@ -37,6 +38,13 @@ void SScore::SetName(const char* szNameNew)
 
 	// fixmeUNicode dj2022-11 [low prio] but long names that happen to clip in middle of a utf8 multibyte character may leave invalid partial utf8 chars at end of string
 	snprintf(szName, sizeof(szName), "%s", szNameNew);
+
+	// Remove any newlines so it doesn't mess with our loading/saving etc.
+	for (size_t i = 0; i < strlen(szName); ++i)
+	{
+		if (szName[i] == '\r' || szName[i] == '\n')
+			szName[i] = ' ';//replace with space
+	}
 }
 
 // Scores, sorted from highest to lowest
@@ -125,7 +133,7 @@ bool LoadHighScores(const char *szFilename)
 	g_aScores.clear();
 
 	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), szFilename);
-	FILE *pIn = fopen(s.c_str(), "r");
+	FILE *pIn = djFile::dj_fopen(s.c_str(), "r");
 	if (pIn==NULL)
 	{
 		djMSG("LoadHighScores: Failed to open file (%s): Creating default list\n", szFilename);
@@ -140,24 +148,25 @@ bool LoadHighScores(const char *szFilename)
 		return false;
 	}
 
-	char buf[2048]={0};
-
-	fgets(buf, sizeof(buf), pIn);
-	djStripCRLF(buf); // strip CR/LF characters
+	char buf[4096]={0};
 	int nEntries = 0;
-	sscanf(buf, "%d", &nEntries);
+	
+	#define djREADLINE() buf[0]=0; if ((fgets(buf, sizeof(buf), pIn) == NULL) && ferror(pIn)) goto error; djStripCRLF(buf)
+
+	djREADLINE();
+	if (dj_sscanf(buf, "%d", &nEntries) <= 0) goto error;
 	for ( int i=0; i<nEntries; i++ )
 	{
 		SScore Score;
 
-		fgets(buf, sizeof(buf), pIn);
-		djStripCRLF(buf); // strip CR/LF characters
+		djREADLINE();
 		//fixme dj2022 small bug here still in loading high scores if very long name in file .. we make it safer but it might not load correct because of newlines still
 		Score.SetName(buf);
 
-		fgets(buf, sizeof(buf), pIn);
-		djStripCRLF(buf); // strip CR/LF characters
-		sscanf(buf, "%d", &Score.nScore);
+		// NB if we don't have an extra trailing newline on last line I think the last score may not read ..dj2022-11 that's very low prio
+		djREADLINE();
+		if (buf[0] == 0) goto error;
+		if (dj_sscanf(buf, "%d", &Score.nScore) <= 0) goto error;
 
 		AddHighScore(Score.szName, Score.nScore);
 	}
@@ -165,12 +174,16 @@ bool LoadHighScores(const char *szFilename)
 	fclose(pIn);
 
 	return true;
+
+error:
+	fclose(pIn);
+	return false;
 }
 
 bool SaveHighScores(const char *szFilename)
 {
 	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), szFilename);
-	FILE *pOut = fopen(s.c_str(), "w");
+	FILE *pOut = djFile::dj_fopen(s.c_str(), "w");
 	if (pOut==NULL)
 	{
 		djMSG("SaveHighScores(%s): Failed to create file\n", szFilename);

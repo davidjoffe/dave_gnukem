@@ -1,5 +1,6 @@
 
 #include "config.h"
+#include "djfile.h"//djFile::dj_fopen
 #include "ed_lvled.h"
 #include "ed_common.h"
 #include "ed_macros.h"
@@ -689,11 +690,12 @@ void DoCreateNewLevel()
 	g_pCurMission->AddLevel(pLevel);
 
 	//Mode wb = Write file in binary mode, MUST BE BINARY MODE, very important
-	FILE* pOut = fopen(sFilenameWithPath.c_str(), "wb");
+	FILE* pOut = djFile::dj_fopen(sFilenameWithPath.c_str(), "wb");
 	if (pOut)
 	{
 		fwrite(szNewLevel, LEVEL_SIZE, 1, pOut);
 		fclose(pOut);
+		pOut = NULL;
 	}
 	delete[] szNewLevel;
 
