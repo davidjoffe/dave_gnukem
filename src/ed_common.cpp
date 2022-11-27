@@ -3,6 +3,7 @@
 #include "ed_common.h"
 #include "djinput.h"
 #include "djimage.h"
+#include "djstring.h"//djStrPrintf
 #include "graph.h"
 #include "block.h"		// TYPE_LASTONE is here
 #include "mission.h"
@@ -220,23 +221,22 @@ void ED_SpriteShowType( bool bClear )
 
 void ED_SpriteShowExtra( int i )
 {
-	char buf[256]={0};
-	snprintf(buf,sizeof(buf), "%2d:[%4d]", i, ED_GetSpriteExtra( g_iSpriteset, g_iSprite, i ) );
+	std::string s = djStrPrintf("%2d:[%4d]", i, ED_GetSpriteExtra( g_iSpriteset, g_iSprite, i ) );
 	switch (i)
 	{
-	case 4: strcat(buf, "flags");break;
-	case 10: strcat(buf, "box-contents-spriteset");break;
-	case 11: strcat(buf, "box-contents-sprite");break;//or letter-ID
+	case 4: s += "flags"; break;
+	case 10: s += "box-contents-spriteset"; break;
+	case 11: s += "box-contents-sprite"; break;//or letter-ID
 	}
 
 	ED_DrawStringClear(
 	POS_EXTRAS_X,
 	POS_EXTRAS_Y + i * 8,
-	buf );
+	s.c_str());
 	ED_DrawString(
 	POS_EXTRAS_X,
 	POS_EXTRAS_Y + i * 8,
-	buf );
+	s.c_str());
 }
 
 

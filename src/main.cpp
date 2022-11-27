@@ -125,6 +125,60 @@ unsigned char mainMenuCursorSkull[] = { 161, 162, 163, 164, 0 };
 CMenu mainMenu ( "main.cpp:mainMenu" );
 
 
+/*--------------------------------------------------------------------------*/
+#ifdef djUNICODE_TTF
+// NEW 2022 VECTOR FONTS EG TTF (not to be confused with old raster font system from 1990s)
+//dj2022-11 new .. this might move [again]
+djFontList g_FontList;
+#endif
+#ifdef djUNICODE_SUPPORT
+/*--------------------------------------------------------------------------*/
+
+void djGnukemLoadFonts()
+{
+	// dj2022-11 this list below is just a crude starting test list NOT yet the "official" fonts for this game, not chosen yet
+	if (g_FontList.m_apFonts.empty())//<- once-off init
+	{
+		//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 16);
+		//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 11);
+
+		const int nPTFONTSIZE = 12;
+
+		std::vector<djFontDescriptor> aFonts;
+		//std::string sBasePath = "fonts/";
+
+		// arabic
+		aFonts.push_back(djFontDescriptor(djDATAPATHs("fonts/ar/NotoSansArabic_ExtraCondensed-Regular.ttf"), nPTFONTSIZE, true, "ar"));
+		//aFonts.push_back(djFontDescriptor(djDATAPATHs("fonts/ar/NotoSansArabic_ExtraCondensed-Thin.ttf"), nPTFONTSIZE, true, "ar"));
+		//NotoSansArabic-VariableFont_wdth,wght.ttf
+
+		///*
+		aFonts.push_back(djFontDescriptor(djDATAPATHs("fonts/DejaVuSansMono-Bold.ttf"), nPTFONTSIZE));
+		aFonts.push_back(djFontDescriptor(djDATAPATHs("fonts/DejaVuSansMono.ttf"), nPTFONTSIZE));
+
+		aFonts.push_back(djFontDescriptor(djDATAPATHs("fonts/chinese-mainland/NotoSansSC-Regular.otf"), nPTFONTSIZE));
+		aFonts.push_back(djFontDescriptor(djDATAPATHs("fonts/NotoSans-Regular.ttf"), nPTFONTSIZE));
+
+		aFonts.push_back(djFontDescriptor(djDATAPATHs("fonts/DejaVuSans.ttf"), nPTFONTSIZE));
+		aFonts.push_back(djFontDescriptor(djDATAPATHs("fonts/KosugiMaru-Regular.ttf"), nPTFONTSIZE));
+		//*/
+
+		for (auto f : aFonts)
+		{
+			g_FontList.LoadFont(f);
+		}
+		// :/ fallback? also look for arialuni.ttf? low
+		//g_FontList.LoadFont(("C:\\WINDOWS\\fonts\\Arial.ttf", nPTFONTSIZE);
+//#ifdef WIN32
+//		if (djFileExists("c:\\windows\\fonts\\ArialUni.ttf"))
+//			g_FontList.LoadFont("C:\\WINDOWS\\fonts\\ArialUni.ttf", nPTFONTSIZE);
+//		if (djFileExists("c:\\windows\\fonts\\Arial-Uni.ttf"))
+//			g_FontList.LoadFont("C:\\WINDOWS\\fonts\\Arial-Uni.ttf", nPTFONTSIZE);
+//#endif
+	}
+}
+#endif
+
 
 /*--------------------------------------------------------------------------*/
 // This is the 'main' function. The big cheese.
@@ -260,6 +314,9 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 	djLOGSTR( "\n================[ Starting Application Init ]===============\n" );
 
+	//dj2022
+	djSetDataDir(DATA_DIR);
+
 	// Check the data folder is present, and if not, try give the user some basic guidance as to how to address this. [dj2018-05]
 	// This is pretty 'critical' in that we can't recover from it, but not really critical in that the cause is
 	// likely simply that the data subfolder is either missing, or in a different path.
@@ -270,13 +327,22 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		printf("Unable to find data folder '%s'. Please note this is in a separate repo - see the ReadMe.md for details.\n",DATA_DIR);
 		printf("If you have the data folder, then you can generally fix this message by first changing your current\n");
 		printf("directory to the folder in which the 'data' folder is contained, then running the application.\n");
+
+		djSetDataDir("data/");
+		if (!djFolderExists(DATA_DIR))
+		{
+			printf("Fallback failed: data/");
+			return -1;
+		}
+
+
 		// (dj2022-11 Add the below line, hmm, not sure whether it really belongs in the help text here to mention things like git repo cloning (and also maybe the URL may change later) but for now
 		// I think it's better to have 'more possibly helpful info for users' that may help them get up and running and maybe refine this later - dj2022-11)
 		// We could also consider doing 'fancy' things like just exec'ing a git clone if the user wants or something .. and/or add some small little helper scripts to do things like below. Or even auto-downloading data. Anyway. Low priority for now.
 		// Also to consider is doing it generically so this code could support more games (and/or a hypothetical 'DG version 2')
 		// dj2022-11 One additional thought on the below is that the below may fetch a 'bleeding edge' version with unstable stuff in it in future - hmm - maybe this needs more thought. LOW prio though.
 		//printf("You can also get it by running: git clone https://github.com/davidjoffe/gnukem_data.git %s\n", DATA_DIR);
-		return -1;
+		//return -1;
 	}
 
 	g_Settings.Load(
@@ -349,12 +415,13 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 	djSoundInit();				// Initialize sound
 
-#ifdef djUNICODE_SUPPORT
+#ifdef djUNICODE_TTF
+	// NEW 2022 VECTOR FONTS EG TTF (not to be confused with old raster font system from 1990s)
 	djLOGSTR("djFontListInit (Unicode vector fonts system)\n");
 	//extern void djFontListInit();
 	djFontListInit();		// dj2022-11 Unicode/TTF font system
 	djLOGSTR("djFontListInit (load fonts)\n");
-	extern void djGnukemLoadFonts();
+	//extern void djGnukemLoadFonts();
 	djGnukemLoadFonts();
 	djLOGSTR("djVectorFontListInit ok\n");
 #endif
@@ -366,7 +433,8 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	InitMissionSystem();
 
 	// Load missions
-	if (0 != LoadMissions(DATA_DIR "missions.txt"))
+	if (0 != LoadMissions(djDATAPATHc("missions.txt")))
+	//if (0 != LoadMissions(DATA_DIR "missions.txt"))
 	{
 		djLOGSTR("Error loading missions.txt list\n");
 		return -1;
@@ -409,9 +477,11 @@ void DaveCleanup()
 	djLOGSTR( "djiDone() ok\n" );
 	djSoundDone();			// Sound
 	djLOGSTR( "djSoundDone() ok\n" );
-#ifdef djUNICODE_SUPPORT
+#ifdef djUNICODE_TTF
+	// NEW 2022 VECTOR FONTS EG TTF (not to be confused with old raster font system from 1990s)
 	djLOGSTR("djFontListDone (Unicode vector fonts)\n");
 	//extern void djFontListDone();
+	g_FontList.CleanupFonts();
 	djFontListDone();		// dj2022-11 Unicode/TTF font system
 	djLOGSTR("djFontListDone ok\n");
 #endif

@@ -21,10 +21,40 @@ const char* djDataDir()
 	return g_sDataDir.c_str();
 }
 
+const std::string& djDataDirS()
+{
+	return g_sDataDir;
+}
+
 void djSetDataDir(const char* szDataDir)
 {
 	if (szDataDir==nullptr)
 		g_sDataDir.clear();
 	else
 		g_sDataDir = szDataDir;
+
+	if (!g_sDataDir.empty() && g_sDataDir.back() != '/')
+		g_sDataDir += '/'; // add trailing slash if not present?
+}
+
+void djDATAPATH(std::string& sStr, const char* szPathToAppend)
+{
+	sStr = g_sDataDir;
+	// todo append trailing slash if not present
+	if (szPathToAppend != nullptr)
+		sStr += szPathToAppend;
+}
+
+std::string djDATAPATH(const char* szPathToAppend)
+{
+	std::string sStr = g_sDataDir;
+	// todo append trailing slash if not present
+	if (szPathToAppend != nullptr)
+		sStr += szPathToAppend;
+	return sStr;
+}
+
+std::string djDATAPATH(const std::string& sPathToAppend)
+{
+	return g_sDataDir + sPathToAppend;
 }

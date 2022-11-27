@@ -23,7 +23,8 @@ Copyright (C) 1998-2022 David Joffe
 #endif
 
 //! Image file to use for font
-#define FILE_IMG_FONT DATA_DIR "font.tga"
+//#define FILE_IMG_FONT DATA_DIR "font.tga"
+#define DATAFILE_IMG_FONT "font.tga"
 
 //! Main visual
 extern djVisual *pVisMain;

@@ -12,6 +12,7 @@
 
 djImage *pImageCredits = NULL;
 
+// todo this should just be a generic "DoOK" or "DoDialog" or something?
 const struct SMenuItem creditsMenuItems[] =
 {
    { false, "        " },
@@ -26,7 +27,7 @@ void InitCredits()
 {
 	// Load credits bitmap
 	pImageCredits = new djImage;
-	pImageCredits->Load( FILE_IMG_CREDITS );
+	pImageCredits->Load(djDATAPATHc(DATAFILE_IMG_CREDITS));
 	djCreateImageHWSurface( pImageCredits );
 
 	creditsMenu.setSize ( 0 );

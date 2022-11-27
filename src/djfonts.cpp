@@ -32,13 +32,61 @@ djFontList::~djFontList()
 	//CleanupFonts();
 }
 
-TTF_Font* djFontList::LoadFont(const char* szFilename, int nPTSize)
+TTF_Font* djFontList::LoadFont(const char* szFilename, int nPTSize, bool bRTL, const std::string& sLangCodeInit)
 {
 	if (szFilename == nullptr || szFilename[0] == 0) return nullptr;
 
 	TTF_Font* pFont = TTF_OpenFont(szFilename, nPTSize);
 	if (pFont)
+	{
 		m_apFonts.push_back(pFont);
+		djFontDescriptor FontDescriptor;
+		//FontDescriptor.
+		FontDescriptor.m_pFont = pFont;
+		FontDescriptor.m_sFilename = szFilename;
+		FontDescriptor.m_nFontSizePt = nPTSize;
+		FontDescriptor.m_bRTL = bRTL;
+		FontDescriptor.m_sLang = sLangCodeInit;
+		m_aFonts.push_back(FontDescriptor);
+
+#ifdef djTTF_HAVE_HARFBUZZ_EXTENSIONS
+		if (FontDescriptor.m_bRTL)
+		{
+			TTF_SetFontDirection(pFont, TTF_DIRECTION_RTL);
+			// hm could be Hebrew too but if Arabic we need the harfbuzz extensions .. should also detect language
+			if (FontDescriptor.m_sLang == "ar")
+				TTF_SetFontScriptName(pFont, "Arab");
+		}
+#endif
+	}
+	else
+	{
+		//todo log a warning here or something? or caller logs warning?
+	}
+	return pFont;
+}
+TTF_Font* djFontList::LoadFont(djFontDescriptor& FontDescriptor)
+{
+	if (FontDescriptor.m_sFilename.empty()) return nullptr;
+	// What if already loaded on descriptor? hm
+
+	TTF_Font* pFont = TTF_OpenFont(FontDescriptor.m_sFilename.c_str(), FontDescriptor.m_nFontSizePt);
+	if (pFont)
+	{
+		m_apFonts.push_back(pFont);
+		m_aFonts.push_back(FontDescriptor);
+		FontDescriptor.m_pFont = pFont;
+	
+#ifdef djTTF_HAVE_HARFBUZZ_EXTENSIONS
+		if (FontDescriptor.m_bRTL)
+		{
+			TTF_SetFontDirection(pFont, TTF_DIRECTION_RTL);
+			// hm could be Hebrew too but if Arabic we need the harfbuzz extensions .. should also detect language
+			if (FontDescriptor.m_sLang=="ar")
+				TTF_SetFontScriptName(pFont, "Arab");
+		}
+#endif
+	}
 	else
 	{
 		//todo log a warning here or something? or caller logs warning?
@@ -65,6 +113,17 @@ void djFontList::CleanupFonts()
 /*--------------------------------------------------------------------------*/
 // djUnicodeFontHelpers
 /*--------------------------------------------------------------------------*/
+
+// abstract base class .. dj2022-11 just thinking
+/*
+class djFontSelector
+{
+public:
+	virtual TTF_Font* SelectFont() { return nullptr; }
+	virtual djFontDescriptor* SelectFontDesc() { return nullptr; }
+};
+*/
+
 // Have two helpers, one for char* one for std::string (as a pip faster if caller already has a std::string as no need to do 'strlen' call) [low - dj2022-11]
 /*TTF_Font* djUnicodeFontHelpers::FindBestMatchingFontMostChars(const std::vector<TTF_Font*>& apFonts, const char* szUTF8string)
 {
@@ -74,7 +133,7 @@ void djFontList::CleanupFonts()
 	return FindBestMatchingFontMostCharsStr(apFonts, s.c_str(), s.length());
 }*/
 //TTF_Font* djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(const std::vector<TTF_Font*>& apFonts, const std::string& sTextUTF8, const size_t uLen)
-TTF_Font* djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(const std::vector<TTF_Font*>& apFonts, const char* szTextUTF8, const unsigned int uLen)
+TTF_Font* djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(const djFontList* pFontList, const std::vector<TTF_Font*>& apFonts, const char* szTextUTF8, const unsigned int uLen, int nDir)
 {
 	int nMatchesMost = 0;
 	TTF_Font* pFontMostChars = nullptr;
@@ -132,6 +191,7 @@ TTF_Font* djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(const std::vect
 }
 /*--------------------------------------------------------------------------*/
 //int djUnicodeTextHelpers::GuessDirection(const std::string& sTextUTF8)
+// Return value negative means right to left language e.g. Hebrew or Arabic
 int djUnicodeTextHelpers::GuessDirection(const char* szTextUTF8, const unsigned int uLen)
 {
 	if (szTextUTF8 == nullptr || uLen == 0) return 0;

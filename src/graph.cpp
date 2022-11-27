@@ -50,11 +50,6 @@ djVisual *pVisBack = NULL;
 djVisual *pVisView = NULL;
 
 /*--------------------------------------------------------------------------*/
-#ifdef djUNICODE_TTF
-//dj2022-11 new .. this might move
-djFontList g_FontList;
-#endif
-/*--------------------------------------------------------------------------*/
 
 
 //dj2022-11 new helpers refactoring to try fullscreen toggle. Load the image but not yet the hardware surface cache item (do that after GraphInit) so we can do fullscreen toggle (semi-experimental this stuff may change)
@@ -65,7 +60,7 @@ void djFontInit()
 	//--- Load 8x8 font bitmap (FIXME error check)
 	if (NULL != (g_pFont8x8 = new djImage))
 	{
-		g_pFont8x8->Load(FILE_IMG_FONT);
+		g_pFont8x8->Load(djDATAPATHc(DATAFILE_IMG_FONT));// FILE_IMG_FONT);
 	}
 }
 void djFontDone()
@@ -374,42 +369,6 @@ void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const unsigne
 
 #ifdef djUNICODE_TTF
 
-void djGnukemLoadFonts()
-{
-	// dj2022-11 this list below is just a crude starting test list NOT yet the "official" fonts for this game, not chosen yet
-	if (g_FontList.m_apFonts.empty())//<- once-off init
-	{
-		//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 16);
-		//TTF_Font* kosugi = TTF_OpenFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", 11);
-
-		const int nPTFONTSIZE = 12;
-		//g_FontList.LoadFont(DATA_DIR "fonts/supertux/Dekko-Regular.ttf", nPTFONTSIZE);
-		//g_FontList.LoadFont(DATA_DIR "fonts/supertux/MapoBackpacking.ttf", nPTFONTSIZE);
-		//g_FontList.LoadFont(DATA_DIR "fonts/supertux/NotoSansCJKjp-Medium.otf", nPTFONTSIZE);
-		//g_FontList.LoadFont(DATA_DIR "fonts/supertux/Roboto-Regular.ttf", nPTFONTSIZE);
-		//g_FontList.LoadFont(DATA_DIR "fonts/supertux/SuperTux-Medium.ttf", nPTFONTSIZE);
-		//g_FontList.LoadFont(DATA_DIR "fonts/supertux/VarelaRound-Regular.ttf", nPTFONTSIZE);
-
-		g_FontList.LoadFont(DATA_DIR "fonts/DejaVuSansMono-Bold.ttf", nPTFONTSIZE);
-		g_FontList.LoadFont(DATA_DIR "fonts/DejaVuSansMono.ttf", nPTFONTSIZE);
-
-		g_FontList.LoadFont(DATA_DIR "fonts/chinese-mainland/NotoSansSC-Regular.otf", nPTFONTSIZE);
-		g_FontList.LoadFont(DATA_DIR "fonts/NotoSans-Regular.ttf", nPTFONTSIZE);
-
-
-		g_FontList.LoadFont(DATA_DIR "fonts/DejaVuSans.ttf", nPTFONTSIZE);
-		g_FontList.LoadFont(DATA_DIR "fonts/KosugiMaru-Regular.ttf", nPTFONTSIZE);
-		// :/ fallback? also look for arialuni.ttf? low
-		//g_FontList.LoadFont(("C:\\WINDOWS\\fonts\\Arial.ttf", nPTFONTSIZE);
-//#ifdef WIN32
-//		if (djFileExists("c:\\windows\\fonts\\ArialUni.ttf"))
-//			g_FontList.LoadFont("C:\\WINDOWS\\fonts\\ArialUni.ttf", nPTFONTSIZE);
-//		if (djFileExists("c:\\windows\\fonts\\Arial-Uni.ttf"))
-//			g_FontList.LoadFont("C:\\WINDOWS\\fonts\\Arial-Uni.ttf", nPTFONTSIZE);
-//#endif
-	}
-}
-
 //! [New dj2022-11]
 void djFontListInit()
 {
@@ -417,7 +376,7 @@ void djFontListInit()
 //! [New dj2022-11]
 void djFontListDone()
 {
-	g_FontList.CleanupFonts();
+	///g_FontList.CleanupFonts();
 }
 
 //void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, const std::string& sTextUTF8)
@@ -426,9 +385,16 @@ void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, cons
 	if (szTextUTF8 == nullptr || uLen == 0) return;
 	if (szTextUTF8[0] == 0) return;//non-null but empty string? do nothing
 
+//#ifdef djTTF_HAVE_HARFBUZZ_EXTENSIONS
+	// negative means right to left
+	int nDir = djUnicodeTextHelpers::GuessDirection(szTextUTF8, uLen);
+//#endif
+
+	//fixme
+	extern djFontList g_FontList;
 	// Get best matching font [this needs work]
 	//TTF_Font* pFont = djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(g_FontList.m_apFonts, sTextUTF8, sTextUTF8.length());
-	TTF_Font* pFont = djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(g_FontList.m_apFonts, szTextUTF8, uLen);
+	TTF_Font* pFont = djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(&g_FontList, g_FontList.m_apFonts, szTextUTF8, uLen, nDir);
 	if (!pFont)//<- old fallback for safety in case something went wrong and we have no matching fonts
 	{
 		if (g_pFont8x8)
@@ -437,18 +403,19 @@ void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, cons
 	}
 
 #ifdef djTTF_HAVE_HARFBUZZ_EXTENSIONS
-	int nDir = djUnicodeTextHelpers::GuessDirection(szTextUTF8, uLen);
+	//*
 	if (nDir < 0)
 	{
 		TTF_SetFontDirection(pFont, TTF_DIRECTION_RTL);
 		// hm could be Hebrew too but if Arabic we need the harfbuzz extensions .. should also detect language
-		TTF_SetFontScriptName(pFont, "Arab");
+		//TTF_SetFontScriptName(pFont, "Arab");
 	}
 	else
 	{
 		TTF_SetFontDirection(pFont, TTF_DIRECTION_LTR);
 		// hmm what script name to set here?
 	}
+	//*/
 #endif
 
 	// first dropshadow

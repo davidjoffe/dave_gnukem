@@ -230,7 +230,7 @@ int CountHeroBullets()
 std::vector<float> afTimeTaken;
 #define MAX_DEBUGGRAPH 128
 
-const char *FILE_GAMESKIN = DATA_DIR "gameskin.tga";
+const char *DATAFILE_GAMESKIN = "gameskin.tga";
 djImage *pSkinGame        = NULL; // Main game view skin (while playing)
 djImage *pBackground      = NULL; // Level background image
 
@@ -1003,7 +1003,7 @@ void GameInitialSetup()
 	if (!pSkinGame)
 	{
 		pSkinGame = new djImage;
-		pSkinGame->Load( FILE_GAMESKIN );
+		pSkinGame->Load(djDATAPATHc(DATAFILE_GAMESKIN));
 		djCreateImageHWSurface( pSkinGame );
 	}
 

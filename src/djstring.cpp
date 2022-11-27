@@ -108,8 +108,11 @@ std::string djStrPrintf( const char* szFormat, ... )
 	if ( szFormat == NULL )
 		return "";
 
+	// fixme handle larger / arbitrary lengths? this is gross but you can auto-detect the required length with some effort
+
+
 	// Print the formatted string onto buf
-	char buf[4096]={0};
+	static thread_local char buf[16384]={0};
 	va_list args;
 	va_start(args, szFormat);
 	vsnprintf(buf, 4096, szFormat, args);

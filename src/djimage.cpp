@@ -158,10 +158,13 @@ int djImage::Load( const char * szFilename )
 	if ( szFilename == NULL )
 		return -1;
 
-	char * szTemp = NULL;
-	char * szExt = NULL;
+	//char * szTemp = NULL;
+	//char * szExt = NULL;
 	int    ret = -1;
 
+	 // fixme why are we bothering with all this? we only load TGA
+	ret = LoadTGA(szFilename);
+	/*
 	szTemp = djStrDeepCopy( szFilename );
 	djStrToLower( szTemp );
 
@@ -184,7 +187,7 @@ int djImage::Load( const char * szFilename )
 	}
 
 	djDELV(szTemp);
-
+	*/
 	return ret;
 }
 

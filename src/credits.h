@@ -13,6 +13,6 @@ extern void ShowCredits();
 extern void KillCredits();
 
 //! Credits "skin" (image file)
-#define FILE_IMG_CREDITS DATA_DIR "credits.tga"
+#define DATAFILE_IMG_CREDITS "credits.tga"
 
 #endif
