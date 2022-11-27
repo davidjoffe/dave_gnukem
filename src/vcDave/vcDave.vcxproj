@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\console.cpp" />
+    <ClCompile Include="..\datadir.cpp" />
     <ClCompile Include="..\gameending.cpp" />
     <ClCompile Include="..\thing_monsters.cpp" />
     <ClCompile Include="..\win32\dpiscaling.cpp" />
