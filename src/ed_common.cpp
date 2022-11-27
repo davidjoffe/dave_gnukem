@@ -1,5 +1,7 @@
+// Level editor
 
 #include "config.h"
+#include "datadir.h"
 #include "ed_common.h"
 #include "djinput.h"
 #include "djimage.h"
@@ -38,7 +40,7 @@ int	g_iSprite = 0;		// current sprite. looks like it's a good idea to embed it i
 
 
 
-static djImage		*pFont = NULL;
+static djImage		*g_pEdFont = NULL;
 
 
 
@@ -62,28 +64,25 @@ void ED_CommonInit ()
 	if (!LoadMacros())
 		SYS_Warning ( "Failed to load macros!\n" );
 
-	pFont = new djImage;
-	pFont->Load( DATA_DIR "simplefont.tga" );
-	djCreateImageHWSurface(pFont);
+	g_pEdFont = new djImage;
+	g_pEdFont->Load( djDATAPATHc( "simplefont.tga" ));
+	djCreateImageHWSurface(g_pEdFont);
 
 	SDL_ShowCursor ( 1 );
 
-	if (!djiInit())
-	{
-		printf("failed init input stuff\n");
-	}
+	djiInit();
 }
-
-
-
 
 void ED_CommonKill ()
 {
 	djiInit();
 	SDL_ShowCursor(0);
-	djDestroyImageHWSurface(pFont);
-	delete pFont;
-	pFont = NULL;
+	djDestroyImageHWSurface(g_pEdFont);
+	if (g_pEdFont)
+	{
+		delete g_pEdFont;
+		g_pEdFont = NULL;
+	}
 	DeleteMacros ();
 	djiClearBuffer ();
 
@@ -174,14 +173,14 @@ void ED_SetSprite( int ispritenew, int ox, int oy )
 
 void ED_DrawString( int x, int y, const char *szStr )
 {
-	if (!pFont) return;
+	if (!g_pEdFont) return;
 	for ( int i=0; i<(int)strlen(szStr); i++ )
 	{
 		int iChar = (int)((unsigned char*)szStr)[i];
 		int iX, iY;
 		iX = (iChar%32)*8;
 		iY = (iChar/32)*8;
-		djgDrawImageAlpha( pVisMain, pFont, iX, iY, x+i*8, y, 8, 8 );
+		djgDrawImageAlpha( pVisMain, g_pEdFont, iX, iY, x+i*8, y, 8, 8 );
 	}
 }
 
@@ -189,7 +188,7 @@ void ED_DrawString( int x, int y, const char *szStr )
 
 void ED_DrawStringClear( int x, int y, const char *szStr )
 {
-	if (!pFont) return;
+	if (!g_pEdFont) return;
 	djgSetColorFore( pVisMain, djColor(0,0,0) );
 	for ( int i=0; i<(int)strlen(szStr); i++ )
 	{

@@ -246,9 +246,9 @@ bool djGraphicsSystem::GraphInit( bool bFullScreen, int iWidth, int iHeight, int
 
 	//--- (1) - Front buffer
 	djLog::LogFormatStr( "GraphInit(): djgOpenVisual(w,h=%d,%d).\n", iWidth, iHeight );
-	if (NULL == (pVisMain = djgOpenVisual( bFullScreen?"fullscreen":NULL, iWidth, iHeight, 32 )))
+	if (NULL == (pVisMain = djgOpenVisual( bFullScreen?"fullscreen":NULL, iWidth, iHeight, 32, false, "Dave Gnukem", djDATAPATHc("icon.bmp"))))
 	{
-		printf( "GraphInit(): COULDN'T OPEN GMAIN\n" );
+		printf( "GraphInit(): COULDN'T CREATE MAIN WINDOW\n" );
 		return false;
 	}
 	djLog::LogFormatStr( "GraphInit(): Display bytes per pixel %d\n", (int)pVisMain->bpp) ;

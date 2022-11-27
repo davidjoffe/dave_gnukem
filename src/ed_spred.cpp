@@ -1,3 +1,4 @@
+// Level editor
 /*
 TODO:
 	(-) Find out what's the buzz with `isprite'. If it is

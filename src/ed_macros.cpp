@@ -1,3 +1,4 @@
+// Level editor
 
 #include "config.h"
 #include "djfile.h"
@@ -27,8 +28,11 @@ bool LoadMacros()
 {
 	FILE *fin=NULL;
 	char buf[2048]={0};
-	if (NULL == (fin = djFile::dj_fopen( DATA_DIR "editor/macros.txt", "r" )))
+	if (NULL == (fin = djFile::dj_fopen(djDATAPATHc("editor/macros.txt"), "r")))
+	{
+		printf("Warning: Editor: Failed to load macros (this is not critical but may suggest a datapath config problem)\n");
 		return false;
+	}
 
 	#define djREADLINE() buf[0]=0; if ((fgets(buf, sizeof(buf), fin) == NULL) && ferror(fin)) goto error; djStripCRLF(buf)
 

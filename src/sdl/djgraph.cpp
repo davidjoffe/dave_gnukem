@@ -16,7 +16,6 @@ Copyright (C) 1997-2022 David Joffe
 #include "../config.h"//[For CFG_APPLICATION_RENDER_RES_W etc. dj2019-06 slightly ugly dependency direction, conceptually, but not the biggest thing in the world to worry about now, maybe later.]
 #include "../djgraph.h"
 #include "../sys_log.h"
-#include "../datadir.h"
 #ifdef __OS2__
 #include <SDL/SDL.h>
 #else
@@ -79,7 +78,7 @@ const djColor djPALETTE_EGA[16] = {
 	djColor(0xFF,0xFF,0xFF)//bright white
 };
 
-djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackbuffer )
+djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackbuffer, const char* szWindowTitle, const char* szWindowIconFile)
 {
 	// Create a djVisual
 	djVisual * pVis;
@@ -94,10 +93,12 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 	//static SDL_Surface *p = NULL;
 	if (NULL == vistype || pVis->m_bFullscreen)
 	{
-		SDL_Window *win = SDL_CreateWindow("Dave Gnukem", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h,
+		// dj2022-11 slightly changing Matteo Bini's recent SDL2 code changes here to pass in the window title and bitmap as parameters (so this codebase could be more generically used for other games)
+		SDL_Window* win = SDL_CreateWindow(szWindowTitle == nullptr ? "Window" : szWindowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h,
 			pVis->m_bFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_RESIZABLE);
 		pVis->pWindow = win;//<- dj2022-11 added storing this pWindow pointer so we can cleanup with corresponding SDL_DestroyWindow (for in-game fullscreen toggle etc.)
-		SDL_SetWindowIcon(win, SDL_LoadBMP(DATA_DIR "icon.bmp"));
+		if (szWindowIconFile != nullptr)
+			SDL_SetWindowIcon(win, SDL_LoadBMP(szWindowIconFile));
 		pVis->pRenderer = SDL_CreateRenderer(win, -1, 0);
 		SDL_RenderSetLogicalSize(pVis->pRenderer, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H);
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");

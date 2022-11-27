@@ -7,6 +7,7 @@ Conceptually should divide this file into more model/view/controller separation?
 */
 
 #include "config.h"
+#include "datadir.h"
 #include "djfile.h"
 #include <stdio.h>
 #include <string.h>
@@ -87,7 +88,7 @@ void ShowHighScores()
 	if (g_pImgHighScores==NULL)
 	{
 		g_pImgHighScores = new djImage;
-		g_pImgHighScores->Load(FILE_IMG_HIGHSCORES);
+		g_pImgHighScores->Load(djDATAPATHc(DATAFILE_IMG_HIGHSCORES));
 		djCreateImageHWSurface( g_pImgHighScores );
 	}
 	if (g_pImgHighScores)

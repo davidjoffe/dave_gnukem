@@ -78,8 +78,8 @@ extern bool djSDLDone();
 /*--------------------------------------------------------------------------*/
 // Visual management
 
-//! Create a visual
-extern djVisual *djgOpenVisual( const char * vistype, int w, int h, int bpp = 0, bool bBackbuffer=false);
+//! Create a visual (if vistype is null or if fullscreen this creates a main window, if "memory" it creates on offscreen buffer e.g. extra game backbuffer or viewbuffer)
+extern djVisual *djgOpenVisual( const char * vistype, int w, int h, int bpp = 0, bool bBackbuffer=false, const char* szWindowTitle="", const char* szWindowIconFile = nullptr);
 //! Destroy a visual
 extern void      djgCloseVisual( djVisual * pVis );
 //! Lock a visual for surface buffer drawing

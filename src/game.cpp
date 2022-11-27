@@ -127,18 +127,19 @@ void IngameMenu();
 // Sound files
 //
 
+// These live under DATA_DIR but [dj2022-11] that's now prepended with djDATAPATHc at load time .. so removng the DATA_DIR prefixes again from here ..
 const char *g_szSoundFiles[SOUND_MAX] =
 {
-	DATA_DIR "sounds/pickup.wav",
-	DATA_DIR "sounds/shoot_cg1_modified.wav",//<- Hero shoot sound
-	DATA_DIR "sounds/exit.ogg",//<-dj2016-10-28 New proper exit sound (is "PowerUp13.mp3" by Eric Matyas http://soundimage.org/)
-	DATA_DIR "sounds/wooeep.wav",
-	DATA_DIR "sounds/explode.wav",
-	DATA_DIR "sounds/sfx_weapon_singleshot7.wav"//<- Monster shoot sound
-	,DATA_DIR "sounds/jump.wav"//dj2016-10-30
-	,DATA_DIR "sounds/jump_landing.wav"//dj2016-10-30
-	,DATA_DIR "sounds/soft_explode.wav"//dj2016-10-30
-	,DATA_DIR "sounds/key_pickup.wav"//dj2016-10-30
+	"sounds/pickup.wav",
+	"sounds/shoot_cg1_modified.wav",//<- Hero shoot sound
+	"sounds/exit.ogg",//<-dj2016-10-28 New proper exit sound (is "PowerUp13.mp3" by Eric Matyas http://soundimage.org/)
+	"sounds/wooeep.wav",
+	"sounds/explode.wav",
+	"sounds/sfx_weapon_singleshot7.wav"//<- Monster shoot sound
+	,"sounds/jump.wav"//dj2016-10-30
+	,"sounds/jump_landing.wav"//dj2016-10-30
+	,"sounds/soft_explode.wav"//dj2016-10-30
+	,"sounds/key_pickup.wav"//dj2016-10-30
 };
 SOUND_HANDLE g_iSounds[SOUND_MAX]={0};
 
@@ -236,7 +237,7 @@ djImage *pBackground      = NULL; // Level background image
 
 // Game effects [dj2018-01]
 // 'Map auto-shadows' [dj2018-01]
-const char* FILE_SHADOWS = DATA_DIR "shadows.tga";
+const char* DATAFILE_SHADOWS = "shadows.tga";
 djImage* g_pImgShadows = NULL;
 
 #ifdef djBETA_SHADOWFOLLOWEFFECT2020
@@ -996,7 +997,7 @@ void GameInitialSetup()
 	int i;
 	for ( i=0; i<SOUND_MAX; i++ )
 	{
-		g_iSounds[i] = djSoundLoad( g_szSoundFiles[i] );
+		g_iSounds[i] = djSoundLoad(djDATAPATHc(g_szSoundFiles[i]) );
 	}
 
 	// Load main game skin
@@ -1011,7 +1012,7 @@ void GameInitialSetup()
 	if (!g_pImgShadows)
 	{
 		g_pImgShadows = new djImage;
-		g_pImgShadows->Load( FILE_SHADOWS );
+		g_pImgShadows->Load(djDATAPATHc(DATAFILE_SHADOWS));
 		djCreateImageHWSurface( g_pImgShadows );
 	}
 
@@ -1283,13 +1284,18 @@ void PerLevelSetup()
 	}
 #endif
 
+	//dj2022-11 changing this from DATA_DIR to djDataDir() .. should keep an eye here to make sure no problems introduced ..
 	// Load map background image
 	pBackground = new djImage;
-	char *bg = (char *) malloc((strlen(DATA_DIR) + strlen(g_pCurMission->GetLevel(g_nLevel)->m_szBackground) + 1) * sizeof(char));
-	strcpy(bg, DATA_DIR);
+	char *bg = (char *) malloc((strlen(djDataDir()) + strlen(g_pCurMission->GetLevel(g_nLevel)->m_szBackground) + 1) * sizeof(char));
+	strcpy(bg, djDataDir());
 	strcat(bg, g_pCurMission->GetLevel(g_nLevel)->m_szBackground);
 	if (0!=pBackground->Load(bg))
 	{
+		// [dj2022-11] not quite sure myself even anymore these 'what log helpers to use when' .. should consolidate and simplify the log maybe slightly ..
+		printf("Warning: Background load failed: %s\n", bg);
+		djLOGSTR("Warning: Background load failed: ");djLOGSTR(bg);
+		djConsoleMessage::SetConsoleMessage("Warning: Background load failed");
 		djDEL(pBackground);
 	}
 	free(bg);
@@ -3288,7 +3294,8 @@ void IngameMenu()
 {
 	//dj2022-11 Just made gameMenuItems stuff non-global and function scope so I can more easily add 'on/off' info .. but should think about all that
 	/*--------------------------------------------------------------------------*/
-	const std::string sAutoShadows = (g_bAutoShadows ? "   Auto shadows: on    " : "   Auto shadows: off   ");
+	const std::string sViewportShadows = (g_Effect.m_nEnabledIntensity==0 ? "   Viewport shadow: off" : djStrPrintf("   Viewport shadows: %d  ", g_Effect.m_nEnabledIntensity));
+	const std::string sAutoShadows = (g_bAutoShadows ? "   Map auto shadows: on   " : "   Map auto shadows: off  ");
 #ifdef djSPRITE_AUTO_DROPSHADOWS
 	const std::string sSpriteShadows = (g_bSpriteDropShadows ? "   Sprite shadows: on  " : "   Sprite shadows: off ");
 #endif
@@ -3301,7 +3308,7 @@ void IngameMenu()
 		{ true,  "   Instructions        " },
 		{ true,  "   Retro Settings      ", "show_retrosettings_menu" },//dj2019-06 new
 		#ifdef djBETA_SHADOWFOLLOWEFFECT2020
-		{ true,  "   Viewport shadow     ", "setting/betashadoweffect" },
+		{ true,  sViewportShadows.c_str(), "setting/betashadoweffect" },
 		#endif
 		{ true,  sAutoShadows.c_str(), "setting/autoshadows" },
 		#ifdef djSPRITE_AUTO_DROPSHADOWS

@@ -1,3 +1,4 @@
+// Level editor
 
 #include "config.h"
 #include "djfile.h"//djFile::dj_fopen
@@ -7,7 +8,7 @@
 #include "djinput.h"
 #include "graph.h"
 #include "djstring.h"//djAppendPathS
-#include "datadir.h"//DATA_DIR
+#include "datadir.h"
 #include "djtime.h"//djTimeGetTime() (for frame rate control in instructions screen loop)
 #include "mission.h"		// g_pCurMission comes from here.
 				// TODO: think of something to get
@@ -660,7 +661,10 @@ void DoCreateNewLevel()
 
 	//Generate a unique filename (using counter - if file exists, increment counter and try again)
 	//fixLOW handle unicode in paths? Future? [dj2017-08]
-	std::string sPath = DATA_DIR;
+
+	// hmm fixme if we're using e.g. "/usr/..." as datadir we'll have issues here?
+
+	std::string sPath = djDataDirS();
 	djAppendPathS(sPath, "levels");
 	std::string sFilenameWithPath;
 	std::string sFilenameWithoutPath;
@@ -685,7 +689,7 @@ void DoCreateNewLevel()
 	djAppendPathS(sLevelRelativePath, sFilenameWithoutPath.c_str());
 	pLevel->SetFilename(sLevelRelativePath.c_str());
 	pLevel->m_szName		= djStrDeepCopy("");
-	pLevel->m_szBackground	= djStrDeepCopy(DATA_DIR "levels/bg1.tga");//fixme for now hardcoded
+	pLevel->m_szBackground	= djStrDeepCopy("levels/bg1.tga");//fixme for now hardcoded
 	pLevel->m_szAuthor		= djStrDeepCopy("");
 	g_pCurMission->AddLevel(pLevel);
 
