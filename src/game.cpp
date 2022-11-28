@@ -9,6 +9,7 @@
 
 #include "config.h"
 #include "djfile.h"//dj2022-11
+#include "effect_viewportshadow.h"//dj2022
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -22,12 +23,6 @@
 
 #ifdef djMAP_AUTO_DROPSHADOWS
 #include <map>//For map auto-shadows' [dj2018-01]
-#endif
-
-//dj2022-11 adding this into official but still off by default for now as is a bit a bit beta and needs more testing and not sure if i like it yet .. dj2022-11:
-#define djBETA_SHADOWFOLLOWEFFECT2020
-#ifdef djBETA_SHADOWFOLLOWEFFECT2020
-#include <math.h>//sqrtf
 #endif
 
 #include "console.h"//SetConsoleMessage [dj2022-11 refactoring]
@@ -241,123 +236,6 @@ djImage *pBackground      = NULL; // Level background image
 const char* DATAFILE_SHADOWS = "shadows.tga";
 djImage* g_pImgShadows = NULL;
 
-#ifdef djBETA_SHADOWFOLLOWEFFECT2020
-// EXPERIMENTAL 'faux shadowing around hero' shadowing effect - not quite sure if I like this or not.
-// Sometimes, sometimes not, some things about it I like, some things maybe not .. could maybe be tweaked and improved .. [dj2022-11]
-// [Ideally at some stage want to try experimental more 'proper' lightmap effect also across level - someday - low prior - dj2022]
-// 
-// THESE EFFECTS SHOULD LIVE IN SEPARATE CPP/H FILES
-// dj2020-07 Playing around with a new visual effect to try improve the graphics slightly ...
-// subtle 'shadowing' that is focused around hero as he moves around viewport .. so walls behind
-// hero aren't perfectly uniform, and get slightly darker toward corners, given a crude 'pretend effect'
-// of lighting in the room. Not sure if this sucks? Will maybe add it as an option and let users decide.
-// I think I overall prefer it on, to off. But it needs more testing before I add it to the real game.
-class djEffectFauxShadowingAroundHero
-{
-public:
-	djImage* m_pImgShadows = nullptr;
-	
-	// NOT OUR POINTER WE DON'T DELETE IT (CACHE DOES) we just want a copy but it can change sometimes maybe [dj2022 ingame fullscreen toggle? not sure]
-	SDL_Surface* m_pShadows = nullptr;
-	void OnDrawFrameStart()
-	{
-		// NB even if we already have m_pShadows non-null the point is to re-get it (in case the 'cache' HW surface 'manager' thing flushed the surface and we need a new one) [dj2022-11 see notes around ingame fullscreen toggle etc.]
-		// Get from cache
-		if (m_pImgShadows)
-		{
-			// This name djCreate.. is now misleading most the time (if not all) it's not creating it just getting it from cache
-			m_pShadows = (SDL_Surface*)djCreateImageHWSurface(m_pImgShadows);
-		}
-	}
-	// we shouldn't keep a pointer to the surface if it can change on fullscreentoggle? hm SDL_Surface* m_pShadows = nullptr;
-	// either we must get again after fullscreen toggle or get before using [via map] but that's not ideal speedwise ..
-	//void OnFullscreenToggle();
-	//void OnStartDraw();
-
-	// USER SETTING. 0=off, or 1, 2, 3 (currently .. this is very beta-ish) [or fo rnow just off/on .. later add more]
-	unsigned int m_nEnabledIntensity = 1;// 0;
-
-
-	int nHIGH = 180;
-	float fFADEOVERNUMBLOCKS = 7.2f;
-	float fLOWRANGEEXTENT = 130.0f;
-	//unsigned int SHADSIZE = 4;// 4;2//should be an even number .. low numbers like 2 look good and smooth, 4 looks blocky but probably is faster for slow computer .. not sure what would be best as on my computer it's all fast enough [dj2022-11]
-	const unsigned int SHADSIZE = 2;// 4;2//should be an even number .. low numbers like 2 look good and smooth, 4 looks blocky but probably is faster for slow computer .. not sure what would be best as on my computer it's all fast enough .. should maybe be a setting and/or have graphics 'profiles' e.g. fast or 'highest qualty' [dj2022-11]
-
-	/*
-	//dj2022-11 some quick n crude subjective values from quick testing .. needs more thought and testing but let's run with this for now:
-	// DARK effect: nHIGH=180, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 130.0f
-	// SUBTLE, light effect:  nHIGH=262, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 110.0f
-	// ALSO OK, light effect: nHIGH=262, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 160.0f
-
-	const float fLOWRANGEEXTENT = 130.0f; // Higher numbers toward 250 make for very dark 'corners' .. lower numbers around 100 etc. make for more subtle effect
-	*/
-	void SetIntensity(unsigned int nIntensity)
-	{
-		m_nEnabledIntensity = (nIntensity % 5);
-
-		// MORE TESTING NEEDED on these values this is beta stuff .. dj2022-11
-		switch (m_nEnabledIntensity)
-		{
-		case 1://SUBTLE, light effect
-			nHIGH = 272; fFADEOVERNUMBLOCKS = 7.3f; fLOWRANGEEXTENT = 100.0f;
-			break;
-		case 2://SUBTLE, light effect
-			nHIGH = 262; fFADEOVERNUMBLOCKS = 7.2f; fLOWRANGEEXTENT = 110.0f;
-			break;
-		case 3://ALSO OK, light effect
-			nHIGH = 262; fFADEOVERNUMBLOCKS = 7.2f; fLOWRANGEEXTENT = 160.0f;
-			break;
-		case 4:// DARK effect
-			nHIGH = 180; fFADEOVERNUMBLOCKS = 7.2f; fLOWRANGEEXTENT = 130.0f;
-			break;
-		}
-	}
-
-	// Once-off setup during game init
-	void InitEffect()
-	{
-		if (m_pImgShadows != nullptr) return;
-
-		// [Re]apply setting values [dj2022-11]
-		SetIntensity(m_nEnabledIntensity);
-
-		// Basically a black image with 0-255 'shades' of alpha transparency
-		m_pImgShadows = new djImage(SHADSIZE * 16, SHADSIZE * 16, 32);
-		int nAlpha = 255;//start with darkness at top left
-		for (int y = 0; y < 16; ++y)
-		{
-			for (int x = 0; x < 16; ++x)
-			{
-				// Black pixel, with different alpha
-				int nPixel = ((unsigned int)(nAlpha & 0xFF) << 24); //fixme which bits should be alpha?
-				for (unsigned int i = 0; i < SHADSIZE; ++i)
-				{
-					for (unsigned int j = 0; j < SHADSIZE; ++j)
-					{
-						m_pImgShadows->PutPixel(x * SHADSIZE + i, y * SHADSIZE + j, nPixel);
-					}
-				}
-				--nAlpha;
-			}
-		}
-		// Create corresponding hardware surface image
-		m_pShadows = (SDL_Surface*)djCreateImageHWSurface(m_pImgShadows);
-	}
-	void CleanupEffect()
-	{
-		if (m_pImgShadows)
-		{
-			djDestroyImageHWSurface(m_pImgShadows);// Remove from cache we don't need anymore
-			djDEL(m_pImgShadows);
-		}
-		m_pShadows = nullptr;
-	}
-};
-//gross global
-djEffectFauxShadowingAroundHero g_Effect;
-#endif
-
 // Use config options to turn on/off specific effects if need be or desired (ideally these shouldn't be ugly globals, should have some sort of generic properties type thing - LOW prio - dj2018)
 bool g_bAutoShadows = true;
 bool g_bSpriteDropShadows = true;
@@ -366,6 +244,7 @@ bool g_bSpriteDropShadows = true;
 
 //global 4-block sprite animation offset counter for various things
 int anim4_count = 0;
+// ^ dj2022-11 this slightly gross global stems from the earliest earliest code .. it should be slightly compartmentalized into 'DG1 specific' stuff as this is one of the reasons we can't switch meaningfully to smooth scrolling and fast frame rates right this second.
 
 
 
@@ -1024,7 +903,7 @@ void GameInitialSetup()
 		djCreateImageHWSurface( g_pImgShadows );
 	}
 
-#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+#ifdef djEFFECT_VIEWPORTSHADOW
 	g_Effect.InitEffect();
 #endif
 
@@ -1037,7 +916,7 @@ void GameFinalCleanup()
 {
 	SYS_Debug( "GameFinalCleanup()\n" );
 
-#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+#ifdef djEFFECT_VIEWPORTSHADOW
 	g_Effect.CleanupEffect();
 #endif
 
@@ -2360,7 +2239,7 @@ void GameDrawView(float fDeltaTime_ms)
 	int anim_offset = 0;
 	unsigned char *pLevelBlockPointer=NULL;
 
-#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+#ifdef djEFFECT_VIEWPORTSHADOW
 	// dj2022-11 This function OnDrawFrameStart() for issue of e.g. hardware surface correspodnign to our image possibly needing to be re-fetched etc.
 	g_Effect.OnDrawFrameStart();
 #endif
@@ -2387,6 +2266,15 @@ void GameDrawView(float fDeltaTime_ms)
 	//dj2019-MMtest//xo=0;
 	//dj2019-MMtest//yo=0;
 	//dj2019-MMtest//xo_small=0;
+
+
+#ifdef djEFFECT_VIEWPORTSHADOW
+	// dj2022-11 These new values currently only used for this effectg but could maybe in future be used for more things if need be
+	// It looks a bit complex but isn't really, it's just the position in world space of top left of viewport (in pixels) (doesn't change over drawing a single frame for all blocks)
+
+	const int nViewportOriginX = g_Viewport.xo * BLOCKW + (g_Viewport.xo_small == 0 ? 0 : BLOCKW / 2);
+	const int nViewportOriginY = g_Viewport.yo * BLOCKH;
+#endif
 
 	//dj2019-07 Re this "10 seconds got to just after coke can, purple lab" comment: I don't know anymore what I meant with that (possibly something timing/benchmark-related),
 	// but that comment was written in the 1990s, as the 'purple lab' was a computer lab at University of Pretoria where I studied .. for some reason I think of this comment often still when I think about this game so I want to leave this here:
@@ -2441,75 +2329,21 @@ void GameDrawView(float fDeltaTime_ms)
 						}
 					}
 
-#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+#ifdef djEFFECT_VIEWPORTSHADOW
 					// These shadowings look crap in simulated EGA/CGA retro so don't do if g_nSimulatedGraphics!=0
 					//const bool bBackgroundSolid = CHECK_SOLID( a, b );
 					extern int g_nSimulatedGraphics;
 					if (g_Effect.m_nEnabledIntensity!=0 && g_nSimulatedGraphics==0 && g_Effect.m_pShadows!=nullptr && CHECK_SOLID(a, b)==0)//<-only non-solid blocks
 					{
-						// DARK effect: nHIGH=180, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 130.0f
-						// SUBTLE, light effect:  nHIGH=262, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 110.0f
-						// ALSO OK, light effect: nHIGH=262, fFADEOVERNUMBLOCKS = 7.2f, fLOWRANGEEXTENT = 160.0f
+//dj2022-11 hm this is maybe not the most efficient .. could probably improve efficiency here slightly
+						// [in pixels] hmm these values precise meaning etc. anmd how they're passed in could maybe use a re-think if/when we start abstracting away for more different games .. ideally we don't want *generic* effect code to "know about" crufty stuff like Dave Gnukem 1 specific "xo_small" viewport scrolling stuff (which itself is specifically meant to be there for the Duke Nukem 1 retro vibe)
+						const float fBlockWorldXStart = (float)(j + g_Viewport.xo) * (float)BLOCKW;
+		//					- (g_Viewport.xo_small ? ((float)BLOCKW / 2.f) : 0.f); //<- must compensate for extra 8-pixel viewport offset or the whole effect kinda looks like it 'wobbles' positionally slightly on the x axis as we walk left/right (this is purely an effect of DN1 scroling behaviour)
+						const float fBlockWorldYStart = (float)(i + g_Viewport.yo) * (float)BLOCKH;
 
-						const int nHIGH = g_Effect.nHIGH;// 180;
-						const float fFADEOVERNUMBLOCKS = g_Effect.fFADEOVERNUMBLOCKS;// 7.2f;
-						//const float fLOWRANGEEXTENT = 160.0f; // Higher numbers toward 250 make for very dark 'corners' .. lower numbers around 100 etc. make for more subtle effect
-						const float fLOWRANGEEXTENT = g_Effect.fLOWRANGEEXTENT;// 130.0f; // Higher numbers toward 250 make for very dark 'corners' .. lower numbers around 100 etc. make for more subtle effect
-						const int SHADSIZE = g_Effect.SHADSIZE;
-
-						// SUBTLE, light effect:  const int nHIGH = 262; const float fFADEOVERNUMBLOCKS = 7.2f; const float fLOWRANGEEXTENT = 110.0f;
-
-						float fBlockWorldXStart = (float)(j + g_Viewport.xo) * (float)BLOCKW
-							- (g_Viewport.xo_small ? ((float)BLOCKW / 2.f) : 0.f) //<- must compensate for extra 8-pixel viewport offset or the whole effect kinda looks like it 'wobbles' positionally slightly on the x axis as we walk left/right (this is purely an effect of DN1 scroling behaviour)
-							;
-						float fBlockWorldY = (float)(i + g_Viewport.yo) * (float)BLOCKH;
-						//const float fHeroWorldX = (float)(HERO_PIXELX) + ((float)BLOCKW/2.0f);
-						//const float fHeroWorldY = (float)(HERO_PIXELY) + (float)BLOCKH;
-						const float fHeroWorldX = ( (float)(g_Viewport.xo) + ((float)VIEW_WIDTH)/2.0f ) * (float)BLOCKW;
-						const float fHeroWorldY = ( (float)(g_Viewport.yo) + ((float)VIEW_HEIGHT)/2.0f ) * (float)BLOCKH;
-
-						int nIntensity = 0;//0-255, 0 is darkness, 255 is fully lit (or rather, no darkness)
-						float fDistance = 0.0f;
-
-						SDL_Rect rectSrc;
-						//rectSrc.x = (nIntensity % 16) * SHADSIZE;
-						//rectSrc.y = (nIntensity / 16) * SHADSIZE;
-						rectSrc.w = SHADSIZE;
-						rectSrc.h = SHADSIZE;
-						SDL_Rect rectDest;
-						//rectDest.x = nXOffset;
-						rectDest.y = nYOffset;
-						rectDest.w = SHADSIZE;
-						rectDest.h = SHADSIZE;
-						//const float fFACTOR = 1.0f;
-						///// dj2022-11 TODO could should this factor stuff should what, be table-driven for speed reasons? or is the blitting the slow part? etc.
-						const float fFACTOR = 0.9f;//dj2022-11 added this 0.9f factor but can't remember exactly why, basically in my original  tests on the effect this was 1 then I changed it to 0.9 maybe later just try see if i can remember why and what value it should be
-						for (int nY = 0; nY < BLOCKH; nY += SHADSIZE)
-						{
-							rectDest.x = nXOffset;
-							float fBlockWorldX = fBlockWorldXStart;
-
-							for (int nX = 0; nX < BLOCKW; nX += SHADSIZE)
-							{
-								fDistance = sqrtf((fBlockWorldY - fHeroWorldY) * (fBlockWorldY - fHeroWorldY) + fFACTOR * (fBlockWorldX - fHeroWorldX) * fFACTOR * (fBlockWorldX - fHeroWorldX));
-								nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
-								if (nIntensity < 0)nIntensity = 0;
-								if (nIntensity < 255)
-								{
-									rectSrc.x = (nIntensity % 16) * SHADSIZE;
-									rectSrc.y = (nIntensity / 16) * SHADSIZE;
-									SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
-								}
-
-								rectDest.x += SHADSIZE;
-								fBlockWorldX += (float)SHADSIZE;
-							}
-								
-							rectDest.y += SHADSIZE;
-							fBlockWorldY += (float)SHADSIZE;
-						}
+						g_Effect.DrawEffect(pVisView, j, i, nXOffset, nYOffset, nViewportOriginX, nViewportOriginY, fBlockWorldXStart, fBlockWorldYStart);
 					}
-#endif//#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+#endif//#ifdef djEFFECT_VIEWPORTSHADOW
 				}
 
 				// BLOCK[0,1] -> foreground block
@@ -3266,7 +3100,9 @@ void IngameMenu()
 {
 	//dj2022-11 Just made gameMenuItems stuff non-global and function scope so I can more easily add 'on/off' info .. but should think about all that
 	/*--------------------------------------------------------------------------*/
+#ifdef djEFFECT_VIEWPORTSHADOW
 	const std::string sViewportShadows = (g_Effect.m_nEnabledIntensity==0 ? "   Viewport shadow: off" : djStrPrintf("   Viewport shadows: %d  ", g_Effect.m_nEnabledIntensity));
+#endif
 	const std::string sAutoShadows = (g_bAutoShadows ? "   Map auto shadows: on   " : "   Map auto shadows: off  ");
 #ifdef djSPRITE_AUTO_DROPSHADOWS
 	const std::string sSpriteShadows = (g_bSpriteDropShadows ? "   Sprite shadows: on  " : "   Sprite shadows: off ");
@@ -3279,7 +3115,7 @@ void IngameMenu()
 		{ true,  "   Restore Game        " },
 		{ true,  "   Instructions        " },
 		{ true,  "   Retro Settings      ", "show_retrosettings_menu" },//dj2019-06 new
-		#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+		#ifdef djEFFECT_VIEWPORTSHADOW
 		{ true,  sViewportShadows.c_str(), "setting/betashadoweffect" },
 		#endif
 		{ true,  sAutoShadows.c_str(), "setting/autoshadows" },
@@ -3316,7 +3152,7 @@ void IngameMenu()
 	std::string sSelectedMenuCommand;
 	if (nMenuOption >= 0 && gameMenu.getItems()[nMenuOption].m_szRetVal != nullptr)
 		sSelectedMenuCommand = gameMenu.getItems()[nMenuOption].m_szRetVal;
-#ifdef djBETA_SHADOWFOLLOWEFFECT2020
+#ifdef djEFFECT_VIEWPORTSHADOW
 	//dj2022-11 testing new beta shadow effect
 	if (sSelectedMenuCommand == "setting/betashadoweffect")
 	{
