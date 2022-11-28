@@ -32,14 +32,14 @@ CXX = g++
 
 OBJ != find src -iname *.cpp -type f | sed --posix 's/\.cpp$$/.o/'
 
-ifeq ($(OS),Windows_NT)
-else
+ifneq ($(OS),Windows_NT)
     UNAME_S := $(shell uname -s)
     ifeq ($(UNAME_S),Darwin)
         # dj2022-11 getting Mac to compile here .. Matteo Bini to double-check ..
-        OBJ1 = $(shell find src -iname "*.cpp" -type f)
-        OBJ = $(patsubst %.cpp,%.o,$(OBJ1))
-	# in theory the find and sed should be able to get working on Mac too .
+	OBJ = $(shell find src -iname "*.cpp" -type f | sed 's/\.cpp$$/.o/')
+	# dj2022-11 the shell assignment operator "!=" seems to not work on Mac (or at least on my recentish M1 MacBook Air I tested on)
+	# I had to make the exact above changes i.e. add "" around *.cpp and remove --posix from sed and use shell instead of != (dj2022)
+	# in theory the find and sed should be able to get working on Mac too
     endif
 endif
 
