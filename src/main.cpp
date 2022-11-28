@@ -386,7 +386,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		djSetDataDir("data/");
 		if (!djFolderExists("data/"))
 		{
-			printf("Fallback failed: data/");
+			printf("Fallback failed: data/\n");
 			return -1;
 		}
 		printf("Successfully found fallback data folder: data/\n");
