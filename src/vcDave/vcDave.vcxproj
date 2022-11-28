@@ -152,6 +152,7 @@
     <ClCompile Include="..\block.cpp" />
     <ClCompile Include="..\bullet.cpp" />
     <ClCompile Include="..\credits.cpp" />
+    <ClCompile Include="..\effect_viewportshadow.cpp" />
     <ClCompile Include="..\game.cpp" />
     <ClCompile Include="..\graph.cpp" />
     <ClCompile Include="..\hero.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="..\bullet.h" />
     <ClInclude Include="..\credits.h" />
     <ClInclude Include="..\datadir.h" />
+    <ClInclude Include="..\effect_viewportshadow.h" />
     <ClInclude Include="..\game.h" />
     <ClInclude Include="..\graph.h" />
     <ClInclude Include="..\hero.h" />

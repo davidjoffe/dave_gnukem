@@ -178,8 +178,14 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClInclude Include="..\datadir.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files</Filter>
     </ClInclude>
+    <ClCompile Include="..\effect_viewportshadow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effect_viewportshadow.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\djgamelib.h">
