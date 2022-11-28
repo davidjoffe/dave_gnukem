@@ -23,25 +23,14 @@ VERSION  = v$(V_NUM) - $(V_DATE)
 PREFIX   = /usr/local
 DATA_DIR = $(PREFIX)/share/games/$(BIN)/# the trailing slash is required for paths in the source
 
-LIBS = `sdl2-config --libs` -lSDL2_mixer
+LIBS    = `sdl2-config --libs` -lSDL2_mixer
 LDFLAGS = $(LIBS)
 
 CPPFLAGS = -DDATA_DIR=\"$(DATA_DIR)\" -DVERSION=\"'$(VERSION)'\"
 
 CXX = g++
 
-OBJ != find src -iname *.cpp -type f | sed --posix 's/\.cpp$$/.o/'
-
-ifneq ($(OS),Windows_NT)
-    UNAME_S := $(shell uname -s)
-    ifeq ($(UNAME_S),Darwin)
-        # dj2022-11 getting Mac to compile here .. Matteo Bini to double-check ..
-	OBJ = $(shell find src -iname "*.cpp" -type f | sed 's/\.cpp$$/.o/')
-	# dj2022-11 the shell assignment operator "!=" seems to not work on Mac (or at least on my recentish M1 MacBook Air I tested on)
-	# I had to make the exact above changes i.e. add "" around *.cpp and remove --posix from sed and use shell instead of != (dj2022)
-	# in theory the find and sed should be able to get working on Mac too
-    endif
-endif
+OBJ != find src -iname *.cpp -type f | sed 's/\.cpp$$/.o/'
 
 # debug
 #CXXFLAGS = -ggdb -DDEBUG -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
@@ -67,7 +56,7 @@ clean:
 
 dist: clean
 	mkdir $(BIN)-$(V_NUM)
-	ls | sed --posix '/data/d; /$(BIN)-$(V_NUM)/d' | xargs -I {} cp -R {} $(BIN)-$(V_NUM)
+	ls | sed '/data/d; /$(BIN)-$(V_NUM)/d' | xargs -I {} cp -R {} $(BIN)-$(V_NUM)
 	tar cf $(BIN)-$(V_NUM).tar $(BIN)-$(V_NUM)
 	gzip $(BIN)-$(V_NUM).tar
 	rm -fr $(BIN)-$(V_NUM)
@@ -102,7 +91,7 @@ install:
 	chmod 644 $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps/$(BIN).png
 	# manual page
 	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man6
-	sed --posix 's/VERSION/$(VERSION)/' < debian/$(BIN).6 > $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
+	sed 's/VERSION/$(VERSION)/' < debian/$(BIN).6 > $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
 	chmod 644 $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
 
 uninstall:
