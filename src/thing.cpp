@@ -91,6 +91,7 @@ void CCameraPerLevelInit()
 }
 
 /*-----------------------------------------------------------*/
+// Object factory initiliaziation/registration
 REGISTER_THING(CSpikeBall,     TYPE_SPIKEBALL, NULL);
 REGISTER_THING(CExit,          TYPE_EXIT, NULL);
 REGISTER_THING(CLetter,        TYPE_LETTER, CLetterPerLevelInit);
@@ -101,7 +102,7 @@ REGISTER_THING(CDoor,          TYPE_DOOR, NULL);
 REGISTER_THING(CKey,           TYPE_KEY, NULL);
 REGISTER_THING(CAccessCard,    TYPE_ACCESSCARD, NULL);
 REGISTER_THING(CAntivirus,     TYPE_ANTIVIRUS, NULL);
-REGISTER_THING(CMasterComputer,TYPE_MASTERCOMPUTER, NULL);
+REGISTER_THING(CMainComputer,  TYPE_MAINCOMPUTER, NULL);
 REGISTER_THING(CDoorActivator, TYPE_DOORACTIVATOR, NULL);
 REGISTER_THING(CSoftBlock,     TYPE_SOFTBLOCK, NULL);
 REGISTER_THING(CCamera,        TYPE_CAMERA, CCameraPerLevelInit);
@@ -819,12 +820,12 @@ void CDoorActivator::Draw(float fDeltaTime_ms)
 	}
 }
 /*-----------------------------------------------------------*/
-CMasterComputer::CMasterComputer()
+CMainComputer::CMainComputer()
 {
 	SetActionBounds(-HALFBLOCKW,-BLOCKH,(BLOCKW*2-1)+HALFBLOCKW,BLOCKH-1);
 	SetVisibleBounds(0,-BLOCKH,BLOCKW*2-1,BLOCKH-1);
 }
-void CMasterComputer::OnDoorActivated()
+void CMainComputer::OnDoorActivated()
 {
 	// The parent class is used to check if activated, meaning, if hero inserted antivirus
 	// floppy into drive. When this happens, the OnDoorActivated() virtual function is called,
@@ -838,14 +839,14 @@ void CMasterComputer::OnDoorActivated()
 	// [TODO] What exactly to do over here? You've just saved the world.
 	update_score(10000, m_x, m_y - 1);
 }
-int CMasterComputer::Tick(float fDeltaTime_ms)
+int CMainComputer::Tick(float fDeltaTime_ms)
 {
 	//dj2022-11 adding basic animation effect for main computer
 	++m_nAnimationCount;
 	m_nAnimationCount = (m_nAnimationCount % 4);
 	return CDoorActivator::Tick(fDeltaTime_ms);
 }
-void CMasterComputer::Draw(float fDeltaTime_ms)
+void CMainComputer::Draw(float fDeltaTime_ms)
 {
 	// This is not to be confused with BLOCKW also being 16 (it's a bit confusing but "m_b" means "Nth sprite in bitmap" but the bitmap currently contains 16 sprites along X axis and 8 along Y axis .. all that's very hardcoded and should change in future - dj2022
 	const int uSPRITES_PER_SPRITE_BITMAP_ON_XAXIS = 16;

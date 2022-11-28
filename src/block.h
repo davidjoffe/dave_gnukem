@@ -70,7 +70,7 @@ enum EBlockType
 	//! 32 Hero starting position
 	TYPE_HEROSTART,
 	//! 33 Main Computer
-	TYPE_MASTERCOMPUTER,
+	TYPE_MAINCOMPUTER,
 	TYPE_34,
 	//! 35 Acme falling block
 	TYPE_ACME,

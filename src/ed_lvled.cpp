@@ -427,7 +427,7 @@ void DoAllLevelsOverview()
 					if (nType==TYPE_FIREPOWER) mapTypes[TYPE_FIREPOWER] = std::make_pair( a,b );
 					if (nType==TYPE_ACCESSCARD) mapTypes[TYPE_ACCESSCARD] = std::make_pair( a,b );
 					if (nType==TYPE_POWERBOOTS) mapTypes[TYPE_POWERBOOTS] = std::make_pair( a,b );
-					if (nType==TYPE_MASTERCOMPUTER) mapTypes[TYPE_MASTERCOMPUTER] = std::make_pair( a,b );
+					if (nType==TYPE_MAINCOMPUTER) mapTypes[TYPE_MAINCOMPUTER] = std::make_pair( a,b );
 				}
 			}
 		}
@@ -563,7 +563,7 @@ void DoAllLevelsOverview()
 				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
-				nType = TYPE_MASTERCOMPUTER;
+				nType = TYPE_MAINCOMPUTER;
 				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
 				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
 				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );

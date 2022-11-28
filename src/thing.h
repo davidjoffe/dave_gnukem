@@ -657,15 +657,15 @@ public:
 };
 /*-----------------------------------------------------------*/
 /*!
-\class CMasterComputer
+\class CMainComputer
 \nosubgrouping
 
 This is what you put antivirus disk in. The 'index'/type is 6, corresponding to CAntivirus.
 */
-class CMasterComputer : public CDoorActivator
+class CMainComputer : public CDoorActivator
 {
 public:
-	CMasterComputer();
+	CMainComputer();
 	virtual int Tick(float fDeltaTime_ms) override;
 	virtual void Draw(float fDeltaTime_ms) override;
 
