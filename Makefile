@@ -33,41 +33,13 @@ CXX = g++
 OBJ != find src -iname *.cpp -type f | sed --posix 's/\.cpp$$/.o/'
 
 ifeq ($(OS),Windows_NT)
-    #CPPFLAGS += -D WIN32
-    ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
-        #CPPFLAGS += -D AMD64
-    else
-        ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
-            #CPPFLAGS += -D AMD64
-        endif
-        ifeq ($(PROCESSOR_ARCHITECTURE),x86)
-            #CPPFLAGS += -D IA32
-        endif
-    endif
 else
     UNAME_S := $(shell uname -s)
-    ifeq ($(UNAME_S),Linux)
-        #CPPFLAGS += -D LINUX
-    endif
     ifeq ($(UNAME_S),Darwin)
-        LDFLAGS += -framework Cocoa 
-
         # dj2022-11 getting Mac to compile here .. Matteo Bini to double-check ..
         OBJ1 = $(shell find src -iname "*.cpp" -type f)
         OBJ = $(patsubst %.cpp,%.o,$(OBJ1))
-
-	# dj2022-11 add c++17 min here for Mac (might change this later to c++17)
-	CXXFLAGS += -std=c++17
-    endif
-    UNAME_P := $(shell uname -p)
-    ifeq ($(UNAME_P),x86_64)
-        #CPPFLAGS += -D AMD64
-    endif
-    ifneq ($(filter %86,$(UNAME_P)),)
-        #CPPFLAGS += -D IA32
-    endif
-    ifneq ($(filter arm%,$(UNAME_P)),)
-        #CPPFLAGS += -D ARM
+	# in theory the find and sed should be able to get working on Mac too .
     endif
 endif
 
