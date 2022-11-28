@@ -170,6 +170,7 @@ float g_fFrameRate=18.0f;
 //float g_fFrameRate=18.2f;
 //float g_fFrameRate = 36.f;
 // Hmm https://retrocomputing.stackexchange.com/questions/1428/why-is-the-8254s-default-rate-18-2-hz should it be 18.2 not 18?
+// [low history/background info: See also https://github.com/davidjoffe/dave_gnukem/discussions/161 "Notes on the 18Hz framerate"]
 
 #define MAX_HEALTH (10)
 #define HEALTH_INITIAL MAX_HEALTH
@@ -274,13 +275,14 @@ public:
 	//void OnStartDraw();
 
 	// USER SETTING. 0=off, or 1, 2, 3 (currently .. this is very beta-ish) [or fo rnow just off/on .. later add more]
-	unsigned int m_nEnabledIntensity = 0;
+	unsigned int m_nEnabledIntensity = 1;// 0;
 
 
 	int nHIGH = 180;
 	float fFADEOVERNUMBLOCKS = 7.2f;
 	float fLOWRANGEEXTENT = 130.0f;
-	const unsigned int SHADSIZE = 4;
+	//unsigned int SHADSIZE = 4;// 4;2//should be an even number .. low numbers like 2 look good and smooth, 4 looks blocky but probably is faster for slow computer .. not sure what would be best as on my computer it's all fast enough [dj2022-11]
+	const unsigned int SHADSIZE = 2;// 4;2//should be an even number .. low numbers like 2 look good and smooth, 4 looks blocky but probably is faster for slow computer .. not sure what would be best as on my computer it's all fast enough .. should maybe be a setting and/or have graphics 'profiles' e.g. fast or 'highest qualty' [dj2022-11]
 
 	/*
 	//dj2022-11 some quick n crude subjective values from quick testing .. needs more thought and testing but let's run with this for now:
@@ -292,18 +294,21 @@ public:
 	*/
 	void SetIntensity(unsigned int nIntensity)
 	{
-		m_nEnabledIntensity = (nIntensity % 4);
+		m_nEnabledIntensity = (nIntensity % 5);
 
 		// MORE TESTING NEEDED on these values this is beta stuff .. dj2022-11
 		switch (m_nEnabledIntensity)
 		{
 		case 1://SUBTLE, light effect
+			nHIGH = 272; fFADEOVERNUMBLOCKS = 7.3f; fLOWRANGEEXTENT = 100.0f;
+			break;
+		case 2://SUBTLE, light effect
 			nHIGH = 262; fFADEOVERNUMBLOCKS = 7.2f; fLOWRANGEEXTENT = 110.0f;
 			break;
-		case 2://ALSO OK, light effect
+		case 3://ALSO OK, light effect
 			nHIGH = 262; fFADEOVERNUMBLOCKS = 7.2f; fLOWRANGEEXTENT = 160.0f;
 			break;
-		case 3:// DARK effect
+		case 4:// DARK effect
 			nHIGH = 180; fFADEOVERNUMBLOCKS = 7.2f; fLOWRANGEEXTENT = 130.0f;
 			break;
 		}
@@ -313,6 +318,9 @@ public:
 	void InitEffect()
 	{
 		if (m_pImgShadows != nullptr) return;
+
+		// [Re]apply setting values [dj2022-11]
+		SetIntensity(m_nEnabledIntensity);
 
 		// Basically a black image with 0-255 'shades' of alpha transparency
 		m_pImgShadows = new djImage(SHADSIZE * 16, SHADSIZE * 16, 32);
@@ -2451,7 +2459,9 @@ void GameDrawView(float fDeltaTime_ms)
 
 						// SUBTLE, light effect:  const int nHIGH = 262; const float fFADEOVERNUMBLOCKS = 7.2f; const float fLOWRANGEEXTENT = 110.0f;
 
-						float fBlockWorldXStart = (float)(j + g_Viewport.xo) * (float)BLOCKW;
+						float fBlockWorldXStart = (float)(j + g_Viewport.xo) * (float)BLOCKW
+							- (g_Viewport.xo_small ? ((float)BLOCKW / 2.f) : 0.f) //<- must compensate for extra 8-pixel viewport offset or the whole effect kinda looks like it 'wobbles' positionally slightly on the x axis as we walk left/right (this is purely an effect of DN1 scroling behaviour)
+							;
 						float fBlockWorldY = (float)(i + g_Viewport.yo) * (float)BLOCKH;
 						//const float fHeroWorldX = (float)(HERO_PIXELX) + ((float)BLOCKW/2.0f);
 						//const float fHeroWorldY = (float)(HERO_PIXELY) + (float)BLOCKH;
@@ -2472,19 +2482,19 @@ void GameDrawView(float fDeltaTime_ms)
 						rectDest.w = SHADSIZE;
 						rectDest.h = SHADSIZE;
 						//const float fFACTOR = 1.0f;
-						///// dj2022-11 TODO could should this factor stuff should what, be table-driven for speed reasons?
+						///// dj2022-11 TODO could should this factor stuff should what, be table-driven for speed reasons? or is the blitting the slow part? etc.
 						const float fFACTOR = 0.9f;//dj2022-11 added this 0.9f factor but can't remember exactly why, basically in my original  tests on the effect this was 1 then I changed it to 0.9 maybe later just try see if i can remember why and what value it should be
 						for (int nY = 0; nY < BLOCKH; nY += SHADSIZE)
 						{
 							rectDest.x = nXOffset;
 							float fBlockWorldX = fBlockWorldXStart;
 
-							//for (int nX = 0; nX < BLOCKW; nX += SHADSIZE)
+							for (int nX = 0; nX < BLOCKW; nX += SHADSIZE)
 							{
-								fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
+								fDistance = sqrtf((fBlockWorldY - fHeroWorldY) * (fBlockWorldY - fHeroWorldY) + fFACTOR * (fBlockWorldX - fHeroWorldX) * fFACTOR * (fBlockWorldX - fHeroWorldX));
 								nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
-								if (nIntensity<0)nIntensity=0;
-								if (nIntensity<255)
+								if (nIntensity < 0)nIntensity = 0;
+								if (nIntensity < 255)
 								{
 									rectSrc.x = (nIntensity % 16) * SHADSIZE;
 									rectSrc.y = (nIntensity / 16) * SHADSIZE;
@@ -2493,42 +2503,6 @@ void GameDrawView(float fDeltaTime_ms)
 
 								rectDest.x += SHADSIZE;
 								fBlockWorldX += (float)SHADSIZE;
-
-								fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
-								nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
-								if (nIntensity<0)nIntensity=0;
-								if (nIntensity<255)
-								{
-									rectSrc.x = (nIntensity % 16) * SHADSIZE;
-									rectSrc.y = (nIntensity / 16) * SHADSIZE;
-									SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
-								}
-
-								rectDest.x += SHADSIZE;
-								fBlockWorldX += (float)SHADSIZE;
-
-								fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
-								nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
-								if (nIntensity<0)nIntensity=0;
-								if (nIntensity<255)
-								{
-									rectSrc.x = (nIntensity % 16) * SHADSIZE;
-									rectSrc.y = (nIntensity / 16) * SHADSIZE;
-									SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
-								}
-
-								rectDest.x += SHADSIZE;
-								fBlockWorldX += (float)SHADSIZE;
-
-								fDistance = sqrtf( (fBlockWorldY-fHeroWorldY)*(fBlockWorldY-fHeroWorldY) + fFACTOR*(fBlockWorldX-fHeroWorldX)*fFACTOR*(fBlockWorldX-fHeroWorldX) );
-								nIntensity = nHIGH - (unsigned int)(((fDistance / (float)BLOCKW) / fFADEOVERNUMBLOCKS) * fLOWRANGEEXTENT);
-								if (nIntensity<0)nIntensity=0;
-								if (nIntensity<255)
-								{
-									rectSrc.x = (nIntensity % 16) * SHADSIZE;
-									rectSrc.y = (nIntensity / 16) * SHADSIZE;
-									SDL_BlitSurface(g_Effect.m_pShadows, &rectSrc, pVisView->pSurface, &rectDest);
-								}
 							}
 								
 							rectDest.y += SHADSIZE;
