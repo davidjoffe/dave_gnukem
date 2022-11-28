@@ -1,6 +1,12 @@
 NB: See README.md for most up-to-date history as of October 2016, this file is not always updated.
 
-2022/11/19 - Version 1.0.3
+2022/11/29 - Version 1.0.3 First official stable SDL2-based version, with new Debian package files
+
+* New improved Debian package files by Matteo Bini
+* First official stable SDL2-based version with Matteo Bini's updates to SDL2
+* New in-game fullscreen toggle
+
+2022/11/19 - Version 1.0.3 (dev)
 
 * [19 Nov 2022] Integrating Matteo Bini's implementation of updating the source from SDL1 to SDL2
 

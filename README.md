@@ -1,6 +1,8 @@
 # Dave Gnukem
 Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'. It is kind of a parody of the original. Please note it is not a 'clone', and not a 're-make'.)
 
+**29 Nov 2022:** Version 1.0.3 released: First official stable SDL2-based version, with new 'formally maintained' Debian package files (both SDL2 support and Debian packages done by Matteo Bini)
+
 **News Apr 2018: Version 1.0 released.** Apr 2019 OpenBSD port. (Apr 2020: Version 1.0.1 released.) (19 Nov 2022: 1.0.2 and 1.0.3 update to SDL2! Also adding OS/2 port)
 
 **Release Downloads:** https://sourceforge.net/projects/gnukem/
@@ -171,9 +173,15 @@ Then follow the same instructions as for Linux, e.g. git clone the src, cd into 
 
 Recent:
 
-~2022 - Work on Debian support and Debian packaging - user contributions by Matteo Bini, https://github.com/enigma9o7, https://github.com/bgermann, Craig Langman
+2022/11/29 - Version 1.0.3 First official stable SDL2-based version, with new formally maintained Debian package files
 
-2022/11/19 - Version 1.0.3
+* New improved Debian package files by Matteo Bini
+* First official stable SDL2-based version with Matteo Bini's updates to SDL2
+* New in-game fullscreen toggle
+
+2022/11/19 - Version 1.0.3-dev
+
+~2022 - Work on Debian support and Debian packaging - user contributions by Matteo Bini, https://github.com/enigma9o7, https://github.com/bgermann, Craig Langman
 
 * [19 Nov 2022] Integrating Matteo Bini's implementation of updating the source from SDL1 to SDL2
 * [19 Nov 2022] Integrating Andreas Peters OS/2 port!
@@ -456,8 +464,6 @@ To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add 
 
 * [med] Level Editor is hogging CPU [check sprite editor, does it also?]
 * Check for all possible hardcoded keys that may be interfering with redefined keys (e.g. Ctrl, H, backspace+G etc.)
-* [After redefine keys] Ctrl *both* shoot and jump
-* CREDITS: Add Vytautas Shaltenis, a.k.a. rtfb, EMH, etc. [who else?]
 * Some better graphics
 * Signed executables in binary release?
 * [check] Dying seems to reset score to 0 - is that right? Cf. DN1 behavior
@@ -510,4 +516,4 @@ Additional game data credits: Apart from the abovementioned, most the sprites we
 	Matteo Bini
 	https://github.com/enigma9o7
 	https://github.com/bgermann
-	Craig Langman (New ~2022 Debian package files work in progress e.g. )
+	Craig Langman
