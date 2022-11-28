@@ -16,6 +16,8 @@ echo
 echo "This is a small convenience helper script to get or update data subfolder. You need git for this."
 echo "The data subfolder is necessary for the game to run."
 echo "The datasrc subfolder is NOT necessary for the game to run but is intended only if you want to do tasks like edit sprites."
+echo "This helper script itself is not necessary for the game to run and is not used by the game at all so does not need to be included with releases."
+echo 
 echo "NB this gets latest cloned git repo with .git folder. If you're distributing a RELEASE you may want to delete the .git subfolders."
 echo 
 echo "This script will do:"
