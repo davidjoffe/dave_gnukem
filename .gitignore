@@ -2,6 +2,8 @@
 
 #The data subfolder is just a separate git project ie https://github.com/davidjoffe/gnukem_data - don't try commit etc. here
 /data
+#Same with datasrc if you have it
+/datasrc
 
 # Temporary Visual Studio build products that should not be committed:
 /src/vcDave/Debug
