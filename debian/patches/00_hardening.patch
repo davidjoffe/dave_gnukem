@@ -6,7 +6,7 @@ Forwarded: not-needed
 @@ -24,9 +24,9 @@ PREFIX   = /usr/local
  DATA_DIR = $(PREFIX)/share/games/$(BIN)/# the trailing slash is required for paths in the source
  
- LIBS = `sdl2-config --libs` -lSDL2_mixer
+ LIBS    = `sdl2-config --libs` -lSDL2_mixer
 -LDFLAGS = $(LIBS)
 +LDFLAGS += $(LIBS)
  
