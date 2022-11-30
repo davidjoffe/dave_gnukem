@@ -6,15 +6,13 @@
 /*--------------------------------------------------------------------------*/
 #include "config.h"
 #include "djfonts.h"
+#include "djutf8.h" // <- for 'utf8 to 32-bit' conversion for TTF_GlyphIsProvided32 to help find closest best matching font
 #ifdef djUNICODE_TTF
-
-#include <utf8proc.h>//<- for 'utf8 to 32-bit' conversion for TTF_GlyphIsProvided32 to help find closest best matching font
 
 // hm to move obcviously not meant to be in hiscores
 #if defined(WIN32) && defined(_MSC_VER)
 // Microsoft compiler stuff .. hmm not sure where best .. unless cmake etc.
 #pragma comment(lib, "SDL2_ttf.lib")
-#pragma comment(lib, "utf8proc.lib")
 #endif
 
 /*--------------------------------------------------------------------------*/
@@ -150,19 +148,19 @@ TTF_Font* djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(const djFontLis
 				return pFont;
 		}
 
-		// NB! If someone passes in NULL string we do NOT want to utf8proc_iterate etc.
+		// NB! If someone passes in NULL string we do NOT want to utf8iterate etc.
 		if (szTextUTF8 == nullptr)
 			continue;
 
 		// NB do NOT modify sText while we're iterating over the string
 		const char* szStart = szTextUTF8;
-		utf8proc_int32_t cp = -1;//codepoint in 32-bit
+		int c = -1;//codepoint in 32-bit
 		size_t uOffset = 0;
 		size_t uLen2 = uLen;
 		// [dj2022-11] Must convert utf8 to 32-bit Unicode glyphs and iterate over string
 		// Remember that utf8 is multi-byte and variable-width encoding so a single Unicode codepoint (i.e. one 32-bit value) could be maybe e.g. 1 byte or 2 bytes or 3 bytes or 4 bytes etc. in the utf8 string (but strlen returns the full number of bytes, not "Unicode Characters")
 		//"Reads a single codepoint from the UTF-8 sequence being pointed to by str. The maximum number of bytes read is strlen, unless strlen is negative (in which case up to 4 bytes are read). If a valid codepoint could be read, it is stored in the variable pointed to by codepoint_ref, otherwise that variable will be set to -1. In case of success, the number of bytes read is returned; otherwise, a negative error code is returned."
-		utf8proc_ssize_t ret = utf8proc_iterate((const utf8proc_uint8_t*)(szStart + uOffset), uLen2, &cp);
+		int ret = djutf8iterate(szStart + uOffset, uLen2, c);
 		int nMatches = 0;
 		while (ret > 0)
 		{
@@ -172,9 +170,9 @@ TTF_Font* djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(const djFontLis
 			// That means we may have a problem here supporting specifically (just) the Unicode SURROGATE PAIRS range IF (and only if) a platform has SDL older than this .. is that worth worrying about? [seems low prio to me dj2022-11 .. a few days ago we had no Unicode support at all so full Unicode support on 2.0.18+ and everything but surrogate pairs on older SDL's seems OK]
 			// We *definitely* want to use the 32-bit version when and where available as otherwise SURROGATE PAIRS won't work.
 #if SDL_VERSION_ATLEAST(2, 0, 18)
-			if (cp > 0 && TTF_GlyphIsProvided32(pFont, cp))
+			if (c > 0 && TTF_GlyphIsProvided32(pFont, c))
 #else
-			if (cp > 0 && TTF_GlyphIsProvided(pFont, cp))
+			if (c > 0 && TTF_GlyphIsProvided(pFont, c))
 #endif
 			{
 				++nMatches;
@@ -184,7 +182,7 @@ TTF_Font* djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(const djFontLis
 					pFontMostChars = pFont;
 				}
 			}
-			ret = utf8proc_iterate((const utf8proc_uint8_t*)(szStart + uOffset), uLen2, &cp);
+			ret = djutf8iterate(szStart + uOffset, uLen2, c);
 		}
 	}
 	return pFontMostChars;
@@ -207,8 +205,8 @@ int djUnicodeTextHelpers::GuessDirection(const char* szTextUTF8, const unsigned 
 	const char* szStart = szTextUTF8;// sTextUTF8.c_str();
 	size_t uOffset = 0;
 	size_t uLen2 = (size_t)uLen;
-	utf8proc_int32_t c = -1;//character codepoint in 32-bit
-	utf8proc_ssize_t ret = utf8proc_iterate((const utf8proc_uint8_t*)(szStart + uOffset), uLen2, &c);
+	int c = -1;//character codepoint in 32-bit
+	int ret = djutf8iterate(szStart + uOffset, uLen2, c);
 	// For guessing, let's stop somewhere for speed reasons e.g. if someone passes a 100MB text string let's maybe not check the entire thing
 	const size_t uMAXCHARSTOCHECK = 512;
 	while (ret > 0 && nNumChars < uMAXCHARSTOCHECK)
@@ -228,7 +226,7 @@ int djUnicodeTextHelpers::GuessDirection(const char* szTextUTF8, const unsigned 
 		//else if (c == U' ' || c == U'\t' || c == U'\r' || c == U'\n' || c == U'(' || c == U')')
 			//nNumCharsDirectionAgnostic++;
 
-		ret = utf8proc_iterate((const utf8proc_uint8_t*)(szStart + uOffset), uLen2, &c);
+		ret = djutf8iterate(szStart + uOffset, uLen2, c);
 	}
 	// if more than half are RTL (this is very crude and quick n dirty guess)
 	if (nNumCharsRTL > nNumChars / 2)

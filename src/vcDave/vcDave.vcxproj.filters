@@ -87,6 +87,9 @@
     <ClCompile Include="..\djtypes.cpp">
       <Filter>Source Files\djGameLib</Filter>
     </ClCompile>
+    <ClCompile Include="..\djutf8.cpp">
+      <Filter>Source Files\djGameLib</Filter>
+    </ClCompile>
     <ClCompile Include="..\ed.cpp">
       <Filter>Source Files\Editor</Filter>
     </ClCompile>
@@ -219,6 +222,9 @@
       <Filter>Header Files\djGameLibHeaders</Filter>
     </ClInclude>
     <ClInclude Include="..\djtypes.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djutf8.h">
       <Filter>Header Files\djGameLibHeaders</Filter>
     </ClInclude>
     <ClInclude Include="..\ed.h">
