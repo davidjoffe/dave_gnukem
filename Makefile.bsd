@@ -1,63 +1,108 @@
+
+# [dj2022-12] See src/docs/openbsd/BUILD.md for rough instructions
+
 #
 # David Joffe
-# Copyright 1998-2017 David Joffe
+# Copyright 1998-2022 David Joffe
 # Created 1998/12
 # Makefile for Dave Gnukem
 #
 # 2016-10: Get this working on Mac OS X [dj]
 # 2017-07-29: Remove obsolete standalone-editor-related stuff, and add new thing_monsters.o
+# 2022-11-25: Cleanup and fix targets for new debian dir (dist, install and uninstall)
 #
 
-CPP = c++
-CC = c++
-
-
-# dj2016-10 Add L -I/usr/local/include/SDL in process of getting this working on Mac OS X - not sure if this is 'bad' to just have both /usr/include and /usr/local/include??
-INCLUDEDIRS= -I/usr/include/SDL -I/usr/local/include/SDL 
-
-#CCFLAGS = -O -Wall $(INCLUDEDIRS)
-
-# Un/recomment as needed for removing sound support, optimizations etc
-# If you don't -DDATA_DIR to a valid dir, then data files will be assumed
-# to be in current directory
-#CCFLAGS = -Wall -I/usr/local/include -DHAVE_SOUND -DDEBUG -O -m486
-CCFLAGS = -Wall -Wno-switch -DDEBUG $(INCLUDEDIRS)
-#Release version:
-#CCFLAGS = -O -Wall -I/usr/local/include -DHAVE_SOUND $(INCLUDEDIRS)
-
-LIBS = -L/usr/local/lib -lSDL -lSDLmain -lSDL_mixer -lpthread 
 BIN = davegnukem
+# 'version string history' here:
+# "v1.0 - 3 Apr 2018" [version 1]
+# "v1.0.1 - 25 Apr 2020"
+# "v1.0.2 - 19 Nov 2022" [<- last version on SDL1 - about to update to SDL2]
+# "v1.0.3 - 19 Nov 2022" [New version number for SDL2 version with Matteo Bini SDL2 commit merged in] (1.0.3-dev, working towards official new 1.0.3 stable)
+# "v1.0.3 - 29 Nov 2022" First official stable version with Matteo Bini's updates to SDL2, and new improved Debian packaging files by Matteo Bini
+V_NUM    = 1.0.3
+V_DATE   = 29 Nov 2022
+VERSION  = v$(V_NUM) - $(V_DATE)
 
-OBJFILES = src/main.o     src/graph.o   src/game.o         src/menu.o\
-           src/block.o    src/credits.o src/instructions.o src/djstring.o \
-           src/djfonts.o src/djimage.o  src/djlog.o   src/inventory.o    src/mission.o\
-           src/hiscores.o src/mixins.o  src/thing.o        src/hero.o \
-           src/thing_monsters.o src/gameending.o \
-           src/level.o    src/settings.o src/keys.o \
-           src/djtypes.o  src/bullet.o \
-           src/ed.o src/ed_DrawBoxContents.o src/ed_common.o src/ed_lvled.o \
-           src/ed_macros.o src/ed_spred.o \
-           src/sdl/djgraph.o src/sdl/djinput.o src/sdl/djsound.o \
-           src/sdl/djtime.o \
-           src/sys_error.o src/sys_log.o src/m_misc.o
-SRCFILES=${OBJFILES:.o=.cpp}
+# paths
+PREFIX   = /usr/local
+DATA_DIR = $(PREFIX)/share/games/$(BIN)/# the trailing slash is required for paths in the source
 
-default: gnukem
+LIBS    = `sdl2-config --libs` -lSDL2_mixer
+LDFLAGS = $(LIBS)
 
-gnukem: $(OBJFILES)
-	$(CPP) -o $(BIN) $(OBJFILES) $(LIBS)
+CPPFLAGS = -DDATA_DIR=\"$(DATA_DIR)\" -DVERSION=\"'$(VERSION)'\"
+
+CXX = c++
+
+OBJ != find src -iname '*.cpp' -type f | sed 's/\.cpp$$/.o/'
+
+# debug
+#CXXFLAGS = -ggdb -DDEBUG -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
+CXXFLAGS = -O2 -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
+
+all: options davegnukem
+
+options:
+	@echo davegnukem build options:
+	@echo "CXXFLAGS = $(CXXFLAGS)"
+	@echo "LDFLAGS  = $(LDFLAGS)"
+	@echo "CXX      = $(CXX)"
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+davegnukem: $(OBJ)
+	$(CXX) -o $(BIN) $(OBJ) $(LDFLAGS)
 
 clean:
-	rm -f $(BIN) *~ core \#*
+	rm -f $(BIN) $(BIN)-$(V_NUM).tar.gz
 	find src -name '*.o' | xargs rm -f
 
-dist:
-	rm -f core *~ \#*
-	find src -name '*.o' | xargs rm -f
+dist: clean
+	mkdir $(BIN)-$(V_NUM)
+	ls | sed '/data/d; /$(BIN)-$(V_NUM)/d' | xargs -I {} cp -R {} $(BIN)-$(V_NUM)
+	tar cf $(BIN)-$(V_NUM).tar $(BIN)-$(V_NUM)
+	gzip $(BIN)-$(V_NUM).tar
+	rm -fr $(BIN)-$(V_NUM)
 
-.cpp.o:
-	@echo CC $<
-	$(CPP) $(CCFLAGS) -c $< -o $@
+install: 
+	# binary
+	mkdir -p $(DESTDIR)$(PREFIX)/games
+	cp -f $(BIN) $(DESTDIR)$(PREFIX)/games
+	chmod 755 $(DESTDIR)$(PREFIX)/games/$(BIN)
+	# data
+	mkdir -p $(DESTDIR)$(DATA_DIR)
+	cp -fR data/* $(DESTDIR)$(DATA_DIR)
+	rm -f $(DESTDIR)$(DATA_DIR)README.md
+	find $(DESTDIR)$(DATA_DIR) -type d | xargs chmod 755
+	find $(DESTDIR)$(DATA_DIR) -type f | xargs chmod 644
+	# data doc
+	mkdir -p $(DESTDIR)$(PREFIX)/share/doc/$(BIN)-data
+	cp -f data/README.md $(DESTDIR)$(PREFIX)/share/doc/$(BIN)-data
+	chmod 644 $(DESTDIR)$(PREFIX)/share/doc/$(BIN)-data/README.md
+	# desktop file
+	mkdir -p $(DESTDIR)$(PREFIX)/share/applications
+	cp -f debian/desktop/$(BIN).desktop $(DESTDIR)$(PREFIX)/share/applications
+	chmod 644 $(DESTDIR)$(PREFIX)/share/applications/$(BIN).desktop
+	# doc
+	mkdir -p $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
+	cp -f HISTORY.txt README.md $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
+	chmod 644 $(DESTDIR)$(PREFIX)/share/doc/$(BIN)/HISTORY.txt \
+		$(DESTDIR)$(PREFIX)/share/doc/$(BIN)/README.md
+	# icon
+	mkdir -p $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps
+	cp -f debian/icons/hicolor/32x32/apps/$(BIN).png $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps
+	chmod 644 $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps/$(BIN).png
+	# manual page
+	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man6
+	sed 's/VERSION/$(VERSION)/' < debian/$(BIN).6 > $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
+	chmod 644 $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
 
-#%.o: %.cpp
-#	dklfjlsdkjflds $(CPP) -DFOO1 $(CCFLAGS) -c $< -o $@
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/games/$(BIN) 
+	rm -fr $(DESTDIR)$(PREFIX)/share/games/$(BIN) 
+	rm -fr $(DESTDIR)$(PREFIX)/share/doc/$(BIN)-data
+	rm -f $(DESTDIR)$(PREFIX)/share/applications/$(BIN).desktop
+	rm -fr $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
+	rm -f $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps/$(BIN).png	
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
