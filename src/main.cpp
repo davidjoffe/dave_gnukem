@@ -388,9 +388,22 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		if (!djFolderExists("data/"))
 		{
 			printf("Fallback failed: data/\n");
-			return -1;
+
+			//dj2022-12 add 'gnukem_data' also as fallback in case someone did a plain git clone without a datadir .. I suppose this is slightly debatable but we can tweak this behaviour and make it more customizable .. could even make it OOP-y ..
+			//djSetDataDir("gnukem_data/");
+			printf("[datadir] datadir: Trying gnukem_data/\n");
+			if (!djFolderExists("gnukem_data/"))
+			{
+				printf("[datadir] Fallback failed: gnukem_data/\n");
+				return -1;
+			}
+			printf("Successfully found fallback data folder: gnukem_data/\n");
+			djSetDataDir("gnukem_data/");
+
+			//return -1;
 		}
-		printf("Successfully found fallback data folder: data/\n");
+		else
+			printf("Successfully found fallback data folder: data/\n");
 
 
 		// (dj2022-11 Add the below line, hmm, not sure whether it really belongs in the help text here to mention things like git repo cloning (and also maybe the URL may change later) but for now
