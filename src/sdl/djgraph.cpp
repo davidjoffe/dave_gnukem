@@ -15,6 +15,7 @@ Copyright (C) 1997-2022 David Joffe
 
 #include "../config.h"//[For CFG_APPLICATION_RENDER_RES_W etc. dj2019-06 slightly ugly dependency direction, conceptually, but not the biggest thing in the world to worry about now, maybe later.]
 #include "../djgraph.h"
+#include "../djtypes.h"
 #include "../sys_log.h"
 #ifdef __OS2__
 #include <SDL/SDL.h>
@@ -228,9 +229,9 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 						for (unsigned int z=0;z<NUMCOLORS;++z)
 						{
 							nDistance =
-								(int)ABS((int)Color.r - (int)(pPalette[z]).r) + 
-								(int)ABS((int)Color.g - (int)(pPalette[z]).g) +
-								(int)ABS((int)Color.b - (int)(pPalette[z]).b);
+								(int)djABS((int)Color.r - (int)(pPalette[z]).r) +
+								(int)djABS((int)Color.g - (int)(pPalette[z]).g) +
+								(int)djABS((int)Color.b - (int)(pPalette[z]).b);
 							if (nDistanceMin==-1 || nDistance<nDistanceMin)
 							{
 								nDistanceMin = nDistance;

@@ -39,6 +39,7 @@
 ////#include <Windows.h>//For OutputDebugString
 //#endif
 
+//fixme dj2022-12 to check i think game.log isn't used anywhere [anymore]? phase out and cleanup/simplify this logging stuff a bit so it's less confusing ..
 #define DEFAULT_LOG_FILE	"game.log"
 
 #define MAX_LOGS		32

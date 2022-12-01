@@ -192,10 +192,10 @@ void relocate_hero( int xnew, int ynew )
 	g_Player.x_small = 0;
 	g_Player.y_offset = 0;
 	// Snap viewpoint to where hero has moved and do bounds-checking on level dimensions:
-	g_Viewport.xo = MAX( g_Player.x - int(VIEW_WIDTH / 2), 0 );
-	g_Viewport.yo = MAX( g_Player.y - 6, 0 );
-	g_Viewport.xo = MIN( g_Viewport.xo, LEVEL_WIDTH - VIEW_WIDTH );
-	g_Viewport.yo = MIN( g_Viewport.yo, LEVEL_HEIGHT - VIEW_HEIGHT );
+	g_Viewport.xo = djMAX( g_Player.x - int(VIEW_WIDTH / 2), 0 );
+	g_Viewport.yo = djMAX( g_Player.y - 6, 0 );
+	g_Viewport.xo = djMIN( g_Viewport.xo, LEVEL_WIDTH - VIEW_WIDTH );
+	g_Viewport.yo = djMIN( g_Viewport.yo, LEVEL_HEIGHT - VIEW_HEIGHT );
 }
 
 

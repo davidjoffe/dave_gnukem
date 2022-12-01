@@ -27,6 +27,7 @@ Copyright (C) 1995-2022 David Joffe
 
 #include "graph.h"
 
+#include "djfile.h"//djFileExists etc.
 #include "djimage.h"
 #include "djinput.h"
 #include "djtime.h"
@@ -401,9 +402,8 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		//return -1;
 	}
 
-	g_Settings.Load(
-		djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_CONFIG_FILE).c_str()
-		);	// Load saved settings
+	std::string sUserConfigFile = djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_CONFIG_FILE).c_str();
+	g_Settings.Load(sUserConfigFile.c_str());	// Load saved settings
 	// We need to first check the setting is *actually there*, not just call e.g. FindSettingInt(), otherwise
 	// if volume setting has never been set/saved before, it will return a value of 0 which will set the volume to 0.
 	// We need to distinguish between 'never been set', and 'actually set to 0'. [dj2016-10]

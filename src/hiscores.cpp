@@ -9,6 +9,7 @@ Conceptually should divide this file into more model/view/controller separation?
 #include "config.h"
 #include "datadir.h"
 #include "djfile.h"
+#include "djtypes.h"
 #include <stdio.h>
 #include <string.h>
 #include "djstring.h"
@@ -135,9 +136,11 @@ bool LoadHighScores(const char *szFilename)
 
 	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), szFilename);
 	FILE *pIn = djFile::dj_fopen(s.c_str(), "r");
-	if (pIn==NULL)
+	// It's normal on first run of application for this file not to exist yet so check so we don't give slightly scary-sounding messages to log about file not found .. [dj2022-12]
+	if ( !djFileExists(s.c_str())
+		|| ((pIn = djFile::dj_fopen(s.c_str(), "r")) == NULL) )
 	{
-		djMSG("LoadHighScores: Failed to open file (%s): Creating default list\n", szFilename);
+		djMSG("LoadHighScores: Failed to open file (%s): Creating default list (this is normal on first run)\n", szFilename);
 		// The default high scores in DN1 had firstnames of the DN1 developers, so we add that exactly the same here as a sort of 'hat tip' to them (with the same original default scores). And add myself. [dj2020-07]
 		// If we turn this into a generic little game engine this part should not be directly in the core but separated as Gnukem-specific stuff (maybe via derived class or lambda or something)
 		AddHighScore("Todd", 40000);//Todd Replogle
@@ -190,8 +193,8 @@ bool SaveHighScores(const char *szFilename)
 		djMSG("SaveHighScores(%s): Failed to create file\n", szFilename);
 		return false;
 	}
-	fprintf(pOut, "%d\n", MIN((int)g_aScores.size(), (int)MAX_HIGHSCORES));
-	for ( int i=0; i<(int)(MIN(g_aScores.size(), MAX_HIGHSCORES)); i++ )
+	fprintf(pOut, "%d\n", djMIN((int)g_aScores.size(), (int)MAX_HIGHSCORES));
+	for ( int i=0; i<(int)(djMIN(g_aScores.size(), MAX_HIGHSCORES)); i++ )
 	{
 		fprintf(pOut, "%s\n", g_aScores[i].szName);
 		fprintf(pOut, "%d\n", g_aScores[i].nScore);

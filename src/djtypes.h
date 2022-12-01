@@ -3,7 +3,10 @@
 \brief   Basic types and macros
 \author  David Joffe
 
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2022 David Joffe
+
+Try keep this file as 'small and light as possible' with few includes a reasonably pragmatically possible..
+Also some of these names are just itching to clash with other projects in global namespace .. starting to change some of them to reduce risk .. dj2022-11
 */
 
 #ifndef _DJTYPES_H_
@@ -67,16 +70,6 @@ public:
 //! Test if rectangle (x0, y0, x1, y1) overlaps rectangle (x2, y2, x3, y3)
 #define OVERLAPS(x0,y0,x1,y1,x2,y2,x3,y3) (	(!(   ((x0)<(x2) && (x1)<(x2)) || ((x0)>(x3) && (x1)>(x3)) || ((y0)<(y2) && (y1)<(y2)) || ((y0)>(y3) && (y1)>(y3))   ))	)
 
-#ifndef MIN
-//! Return smaller of (a, b)
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
-
-#ifndef MAX
-//! Return larger of (a, b)
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif
-
 //! Return smaller of (a, b)
 #define djMIN(a,b) ((a) < (b) ? (a) : (b))
 
@@ -87,13 +80,15 @@ public:
 #define djCLAMP(val,a,b) ( (val) < (a) ? (a) : ( (val) > (b) ? (b) : (val) ) )
 
 
-#ifndef ABS
+#ifndef djABS
 //! Return absolute value of (a)
-#define ABS(a) ((a) < 0 ? -(a) : (a))
+#define djABS(a) ((a) < 0 ? -(a) : (a))
 #endif
 
+// [dj2022-11] is 'SGN' useful enough to be herre? probaby not ..
+
 //! Return -1 if (a) is negative or 1 if a is positive
-#define SGN(a) ((a) < 0 ? -1 : 1)
+#define djSGN(a) ((a) < 0 ? -1 : 1)
 
 #ifndef NULL
 #ifdef __cplusplus
@@ -103,12 +98,4 @@ public:
 #endif
 #endif
 
-//
-// Utility functions
-//
-
-//! Strip newline character from string (to handle both UNIX and stupid DOS text file formats)
-extern void djStripCRLF(char *buf);
-
 #endif
-

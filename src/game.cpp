@@ -9,6 +9,7 @@
 
 #include "config.h"
 #include "djfile.h"//dj2022-11
+#include "djtypes.h"
 #include "effect_viewportshadow.h"//dj2022
 #include <stdio.h>
 #include <stdlib.h>
@@ -620,7 +621,7 @@ void UpdateBullets(float fDeltaTime_ms)
 		// (that last case would probably resemble a 'line algorithm') [dj2018-01]
 		int nXPixelDelta = pBullet->dx < 0 ? -1 : 1;
 		int nY = pBullet->y;
-		int nXNumPixelsToMove = ABS(pBullet->dx);
+		int nXNumPixelsToMove = djABS(pBullet->dx);
 		for ( int n=0; n<nXNumPixelsToMove; ++n )
 		{
 			// [dj2018-01]
@@ -1834,8 +1835,8 @@ int game_startup(bool bLoadGame)
 
 		// ensure we don't leave the borders of the level
 		// fixme; is this still necessary what with the (other functions)
-		g_Player.x = MAX( MIN(g_Player.x,126), 1 );
-		g_Player.y = MAX( MIN(g_Player.y, 99), 2 );
+		g_Player.x = djMAX( djMIN(g_Player.x,126), 1 );
+		g_Player.y = djMAX( djMIN(g_Player.y, 99), 2 );
 		//debug//printf("}");
 
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
@@ -2993,6 +2994,10 @@ bool SaveGame()
 bool LoadGame()
 {
 	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_SAVEGAME);
+
+	if (!djFileExists(s.c_str()))// [dj2022-11]
+		return false;
+
 	FILE *pIn = djFile::dj_fopen(s.c_str(), "r");
 	if (pIn==NULL)
 		return false;
