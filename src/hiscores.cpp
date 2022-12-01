@@ -134,11 +134,12 @@ bool LoadHighScores(const char *szFilename)
 {
 	g_aScores.clear();
 
-	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), szFilename);
-	FILE *pIn = djFile::dj_fopen(s.c_str(), "r");
+	if (szFilename == nullptr || szFilename[0] == 0) return false;//sanitychecks
+
+	FILE* pIn = nullptr;// djFile::dj_fopen(s.c_str(), "r");
 	// It's normal on first run of application for this file not to exist yet so check so we don't give slightly scary-sounding messages to log about file not found .. [dj2022-12]
-	if ( !djFileExists(s.c_str())
-		|| ((pIn = djFile::dj_fopen(s.c_str(), "r")) == NULL) )
+	if ( (!djFileExists(szFilename))
+		|| ((pIn = djFile::dj_fopen(szFilename, "r")) == NULL) )
 	{
 		djMSG("LoadHighScores: Failed to open file (%s): Creating default list (this is normal on first run)\n", szFilename);
 		// The default high scores in DN1 had firstnames of the DN1 developers, so we add that exactly the same here as a sort of 'hat tip' to them (with the same original default scores). And add myself. [dj2020-07]
@@ -186,8 +187,10 @@ error:
 
 bool SaveHighScores(const char *szFilename)
 {
-	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), szFilename);
-	FILE *pOut = djFile::dj_fopen(s.c_str(), "w");
+	if (szFilename == nullptr || szFilename[0] == 0) return false;//sanitychecks
+
+	// [dj2022] we can hopefully soon start treating this as utf8
+	FILE *pOut = djFile::dj_fopen(szFilename, "w");
 	if (pOut==NULL)
 	{
 		djMSG("SaveHighScores(%s): Failed to create file\n", szFilename);

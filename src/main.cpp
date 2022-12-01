@@ -528,7 +528,8 @@ void DaveCleanup()
 	djLOGSTR( "KillMissionSystem() ok\n" );
 	KillCredits();
 	djLOGSTR( "KillCredits() ok\n" );
-	SaveHighScores();		// Save high scores
+	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_HIGHSCORES);
+	SaveHighScores(s.c_str());		// Save high scores
 	djLOGSTR( "SaveHighScores() ok\n" );
 	GameFinalCleanup();		// Game
 	djLOGSTR( "GameFinalCleanup() ok\n" );
@@ -1091,7 +1092,9 @@ void CheckHighScores( int score )
 		if (GetHighScoreUserName(sUserName))
 		{
 			AddHighScore(sUserName.c_str(), score);
-			SaveHighScores(); // Save high scores immediately, in case Windows crashes
+
+			std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_HIGHSCORES);
+			SaveHighScores(s.c_str()); // Save high scores immediately, in case Windows crashes
 		}
 
 		ShowHighScores();

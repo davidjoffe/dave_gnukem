@@ -878,7 +878,9 @@ void GameInitialSetup()
 	ReInitGameViewport();
 
 	InitHighScores();
-	LoadHighScores();		// Load high scores
+	// Prepend usersettings folder
+	std::string sFilenameHighScores = djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_HIGHSCORES);
+	LoadHighScores(sFilenameHighScores.c_str());		// Load high scores
 
 	SYS_Debug ( "GameInitialSetup(): loading sounds\n" );
 	// Load the game sounds
