@@ -43,6 +43,13 @@ public:
 };
 
 
+// these globals should probably not be globals [low]
+
+extern bool djFolderExists(const char* szPath);
+extern bool djFileExists(const char* szPath);
+extern bool djEnsureFolderTreeExists(const char* szPath);
+
+
 // some of these feel a little gross and arbitrary, rethink a little some of these 'helpers' .. it's a start though
 
 // [dj2022-11] This feels slightly dodgy to me like I feel like on some platforms this might just not compile ..
