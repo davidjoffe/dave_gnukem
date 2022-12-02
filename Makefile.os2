@@ -54,3 +54,4 @@ dist:
 %.o: %.cpp
 	$(CPP) $(CFLAGS) -c $< -o $@
 
+.PHONY: clean dist
