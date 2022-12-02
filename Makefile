@@ -103,3 +103,5 @@ uninstall:
 	rm -fr $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
 	rm -f $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps/$(BIN).png	
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
+
+.PHONY: all options clean dist install uninstall
