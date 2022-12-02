@@ -164,6 +164,7 @@
     <ClCompile Include="..\level.cpp" />
     <ClCompile Include="..\m_misc.cpp" />
     <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\mainmenu.cpp" />
     <ClCompile Include="..\menu.cpp" />
     <ClCompile Include="..\mission.cpp" />
     <ClCompile Include="..\mixins.cpp" />
@@ -208,6 +209,7 @@
     <ClInclude Include="..\level.h" />
     <ClInclude Include="..\m_aliases.h" />
     <ClInclude Include="..\m_misc.h" />
+    <ClInclude Include="..\mainmenu.h" />
     <ClInclude Include="..\menu.h" />
     <ClInclude Include="..\mission.h" />
     <ClInclude Include="..\mixins.h" />
