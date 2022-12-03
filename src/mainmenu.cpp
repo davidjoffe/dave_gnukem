@@ -68,7 +68,22 @@ CMenu mainMenu ( "main.cpp:mainMenu" );
 // 'controller' ?
 
 //fixmerefaxtor:
-extern bool GetHighScoreUserName(std::string& sReturnString);
+extern bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixelW, const char* szLabel);
+
+bool GetHighScoreUserName(std::string& sReturnString)
+{
+	#define MAX_HIGHSCORE_LEN 256
+	#define WIDTH_INPUTBOX 34
+
+	//fixmelocalize:
+	std::string s = "New high score!";
+	s += (char)10;//linefeed
+	s += (char)10;//linefeed
+	s += "Enter your name:";
+
+	return djGetTextInput(sReturnString, MAX_HIGHSCORE_LEN, WIDTH_INPUTBOX*8, s.c_str());
+}
+
 
 // check if high score table is beaten,
 // let user enter his name

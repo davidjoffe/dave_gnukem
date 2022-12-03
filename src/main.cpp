@@ -751,23 +751,23 @@ void RedefineKeys()
 	} while (bLoop);
 }
 
-bool GetHighScoreUserName(std::string& sReturnString)
+bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixelW, const char* szLabel)
 {
-	#define MAX_HIGHSCORE_LEN 256
-	#define WIDTH_INPUTBOX 34
+	//#define MAX_HIGHSCORE_LEN 256
+	//#define WIDTH_INPUTBOX 34
 
 	#ifdef djUNICODE_SUPPORT
 	//SDL_EnableUNICODE(1);
 	std::string sInput;
 	#else
-	char szBuffer[2048] = {0};//temp phase out?
+	char szBuffer[8192] = {0};//temp phase out?
 	#endif
 
 	bool bRet = true; // Return false if user selected quit/close or something
 	bool bLoop = true;
 	do
 	{
-		int nDX = WIDTH_INPUTBOX*8;
+		int nDX = (int)uPixelW;
 		//dj2019-07 for now just stick to 320; genericize better later re CFG_APPLICATION_RENDER_RES_W stuff ..
 		//int nXLeft = (CFG_APPLICATION_RENDER_RES_W/2) - (nDX / 2);
 		int nXLeft = (320/2) - (nDX / 2);
@@ -855,24 +855,24 @@ bool GetHighScoreUserName(std::string& sReturnString)
 				if (Event.key.keysym.sym>=SDLK_a && Event.key.keysym.sym<=SDLK_z)
 				{
 					// I'm assuming these constants are linearly increasing, hopefully they are
-					AppendCharacter(szBuffer, ((char)Event.key.keysym.sym - SDLK_a) + ((ModState & KMOD_SHIFT) ? 'A' : 'a'), MAX_HIGHSCORE_LEN);
+					AppendCharacter(szBuffer, ((char)Event.key.keysym.sym - SDLK_a) + ((ModState & KMOD_SHIFT) ? 'A' : 'a'), nMaxLen);
 				}
 				else if (Event.key.keysym.sym>=SDLK_0 && Event.key.keysym.sym<=SDLK_9)
 				{
 					const char* acShifted = ")!@#$%^&*(";
 					if (ModState & KMOD_SHIFT)
-						AppendCharacter(szBuffer, acShifted[(char)Event.key.keysym.sym - SDLK_0], MAX_HIGHSCORE_LEN);
+						AppendCharacter(szBuffer, acShifted[(char)Event.key.keysym.sym - SDLK_0], nMaxLen);
 					else
-						AppendCharacter(szBuffer, ((char)Event.key.keysym.sym - SDLK_0) + '0', MAX_HIGHSCORE_LEN);
+						AppendCharacter(szBuffer, ((char)Event.key.keysym.sym - SDLK_0) + '0', nMaxLen);
 				}
 				else
 				{
 					switch (Event.key.keysym.sym)
 					{
-					case SDLK_SPACE:	AppendCharacter(szBuffer, ' ', MAX_HIGHSCORE_LEN); break;
-					case SDLK_PLUS:		AppendCharacter(szBuffer, '+', MAX_HIGHSCORE_LEN); break;
-					case SDLK_MINUS:	AppendCharacter(szBuffer, '-', MAX_HIGHSCORE_LEN); break;
-					case SDLK_COMMA:	AppendCharacter(szBuffer, ',', MAX_HIGHSCORE_LEN); break;
+					case SDLK_SPACE:	AppendCharacter(szBuffer, ' ', nMaxLen); break;
+					case SDLK_PLUS:		AppendCharacter(szBuffer, '+', nMaxLen); break;
+					case SDLK_MINUS:	AppendCharacter(szBuffer, '-', nMaxLen); break;
+					case SDLK_COMMA:	AppendCharacter(szBuffer, ',', nMaxLen); break;
 					case SDLK_BACKSPACE:
 						if (strlen(szBuffer)>0)
 							szBuffer[strlen(szBuffer) - 1] = 0;
@@ -904,8 +904,11 @@ bool GetHighScoreUserName(std::string& sReturnString)
 #else
 		DialogBoxEffect(nXLeft-4, 100, nDX+8, 16, true);
 #endif
+		/*
 		GraphDrawString( pVisBack, g_pFont8x8, 100,  72, (unsigned char*)"New high score!");
 		GraphDrawString( pVisBack, g_pFont8x8,  96,  88, (unsigned char*)"Enter your name:" );
+		*/
+		GraphDrawString( pVisBack, g_pFont8x8, 100,  72, (unsigned char*)szLabel );
 
 #ifdef djUNICODE_SUPPORT
 		std::string sText = sInput;;

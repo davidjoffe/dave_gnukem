@@ -349,20 +349,26 @@ void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const unsigne
 	// FIXME: bounds check properyl
 	if (x<0 || y<0) return;
 
+	const unsigned int W=8;
+	const unsigned int H=8;
+
 	// Draw each character in the string
-	int xoffset=0;
-	for ( unsigned int i=0; i<strlen((char*)szStr); ++i )
+	int x_=x;
+	unsigned int uLen=strlen((char*)szStr);
+	for ( unsigned int i=0; i<uLen; ++i )
 	{
-		int iIndex = (int)szStr[i];
+		// so um the idea is we want to start making this utf8-able-ish
+		const int iIndex = (int)szStr[i];
+		// \n is 10, \r is 13 .. 
 		if (szStr[i]=='\n')//Newline? [dj2016-10-28]
 		{
-			y+=8;
-			xoffset=0;
+			y += H;
+			x_ = x;
 		}
 		else
 		{
-			djgDrawImageAlpha( pVis, pImg, 8*(iIndex%32), 8*(iIndex/32), x+xoffset*8, y, 8, 8 );
-			++xoffset;
+			djgDrawImageAlpha( pVis, pImg, W*(iIndex%32), H*(iIndex/32), x_, y, W, H);
+			x_ += W;
 		}
 	}
 }
