@@ -8,5 +8,8 @@
 
 #include "config.h"
 
+extern void DoMainMenu();					// Start main menu
+extern void InitMainMenu();
+extern void KillMainMenu();
 
 #endif//_djMAINMENU_H_
