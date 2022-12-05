@@ -4,6 +4,7 @@
 
 /*--------------------------------------------------------------------------*/
 #include "config.h"
+#include "version.h"//dj2022-11 for new VERSION
 #include "mainmenu.h"
 #include "djimage.h"
 #include "djgraph.h"
