@@ -137,13 +137,13 @@
     <ClCompile Include="..\sdl\djinput.cpp" />
     <ClCompile Include="..\sdl\djsound.cpp" />
     <ClCompile Include="..\sdl\djtime.cpp" />
-    <ClCompile Include="..\sdl\djutf8.cpp" />
     <ClCompile Include="..\djfile.cpp" />
     <ClCompile Include="..\djfonts.cpp" />
     <ClCompile Include="..\djimage.cpp" />
     <ClCompile Include="..\djlog.cpp" />
     <ClCompile Include="..\djstring.cpp" />
     <ClCompile Include="..\djtypes.cpp" />
+    <ClCompile Include="..\djutf8.cpp" />
     <ClCompile Include="..\ed.cpp" />
     <ClCompile Include="..\ed_common.cpp" />
     <ClCompile Include="..\ed_DrawBoxContents.cpp" />
