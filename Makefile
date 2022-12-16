@@ -81,6 +81,10 @@ install:
 	mkdir -p $(DESTDIR)$(PREFIX)/share/applications
 	cp -f debian/desktop/$(BIN).desktop $(DESTDIR)$(PREFIX)/share/applications
 	chmod 644 $(DESTDIR)$(PREFIX)/share/applications/$(BIN).desktop
+	# appstream file
+	mkdir -p $(DESTDIR)$(PREFIX)/share/metainfo
+	cp -f debian/appstream/com.djoffe.gnukem.metainfo.xml $(DESTDIR)$(PREFIX)/share/metainfo
+	chmod 644 $(DESTDIR)$(PREFIX)/share/metainfo/com.djoffe.gnukem.metainfo.xml
 	# doc
 	mkdir -p $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
 	cp -f HISTORY.txt README.md $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
