@@ -86,10 +86,13 @@ install:
 	cp -f HISTORY.txt README.md $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
 	chmod 644 $(DESTDIR)$(PREFIX)/share/doc/$(BIN)/HISTORY.txt \
 		$(DESTDIR)$(PREFIX)/share/doc/$(BIN)/README.md
-	# icon
+	# icons
 	mkdir -p $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps
 	cp -f debian/icons/hicolor/32x32/apps/$(BIN).png $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps
 	chmod 644 $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps/$(BIN).png
+	mkdir -p $(DESTDIR)$(PREFIX)/share/icons/hicolor/128x128/apps
+	cp -f debian/icons/hicolor/128x128/apps/$(BIN).png $(DESTDIR)$(PREFIX)/share/icons/hicolor/128x128/apps
+	chmod 644 $(DESTDIR)$(PREFIX)/share/icons/hicolor/128x128/apps/$(BIN).png
 	# manual page
 	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man6
 	sed 's/VERSION/$(VERSION)/' < debian/$(BIN).6 > $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
