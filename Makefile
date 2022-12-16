@@ -21,8 +21,9 @@ V_DATE   = 29 Nov 2022
 VERSION  = v$(V_NUM) - $(V_DATE)
 
 # paths
-PREFIX   = /usr/local
-DATA_DIR = $(PREFIX)/share/games/$(BIN)/# the trailing slash is required for paths in the source
+PREFIX   ?= /usr/local
+BIN_DIR  ?= $(PREFIX)/games
+DATA_DIR ?= $(PREFIX)/share/games/$(BIN)/# the trailing slash is required for paths in the source
 
 LIBS    = `sdl2-config --libs` -lSDL2_mixer
 LDFLAGS = $(LIBS)
@@ -64,9 +65,9 @@ dist: clean
 
 install: 
 	# binary
-	mkdir -p $(DESTDIR)$(PREFIX)/games
-	cp -f $(BIN) $(DESTDIR)$(PREFIX)/games
-	chmod 755 $(DESTDIR)$(PREFIX)/games/$(BIN)
+	mkdir -p $(DESTDIR)$(BIN_DIR)
+	cp -f $(BIN) $(DESTDIR)$(BIN_DIR)
+	chmod 755 $(DESTDIR)$(BIN_DIR)/$(BIN)
 	# data
 	mkdir -p $(DESTDIR)$(DATA_DIR)
 	cp -fR data/* $(DESTDIR)$(DATA_DIR)
