@@ -35,7 +35,7 @@ OBJ = $(shell find src -iname '*.cpp' -type f | sed 's/\.cpp$$/.o/')
 
 # debug
 #CXXFLAGS = -ggdb -DDEBUG -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
-CXXFLAGS = -O2 -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
+CXXFLAGS = -Os -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
 
 all: options davegnukem
 
