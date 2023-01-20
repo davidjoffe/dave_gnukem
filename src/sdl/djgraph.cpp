@@ -183,7 +183,7 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 		//fixme this won't work bigendian
 		#if SDL_BYTEORDER==SDL_BIG_ENDIAN
 		// Not yet supported for big-endian platforms (dj2019-06)
-		if (false)
+		if (false);
 		#else
 		if (g_nSimulatedGraphics>0) //'Simulate' CGA/EGA
 		{
