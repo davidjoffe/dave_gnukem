@@ -21,9 +21,9 @@ V_DATE   = 29 Nov 2022
 VERSION  = v$(V_NUM) - $(V_DATE)
 
 # paths
-PREFIX   ?= /usr/local
-BIN_DIR  ?= $(PREFIX)/games
-DATA_DIR ?= $(PREFIX)/share/games/$(BIN)/# the trailing slash is required for paths in the source
+PREFIX   = /usr/local
+BIN_DIR  = $(PREFIX)/games
+DATA_DIR = $(PREFIX)/share/games/$(BIN)/# the trailing slash is required for paths in the source
 
 LIBS    = `sdl2-config --libs` -lSDL2_mixer
 LDFLAGS = $(LIBS)
@@ -64,6 +64,10 @@ dist: clean
 	rm -fr $(BIN)-$(V_NUM)
 
 install: 
+	# appstream file
+	mkdir -p $(DESTDIR)$(PREFIX)/share/metainfo
+	cp -f debian/appstream/com.djoffe.$(BIN).metainfo.xml $(DESTDIR)$(PREFIX)/share/metainfo
+	chmod 644 $(DESTDIR)$(PREFIX)/share/metainfo/com.djoffe.$(BIN).metainfo.xml
 	# binary
 	mkdir -p $(DESTDIR)$(BIN_DIR)
 	cp -f $(BIN) $(DESTDIR)$(BIN_DIR)
@@ -82,10 +86,6 @@ install:
 	mkdir -p $(DESTDIR)$(PREFIX)/share/applications
 	cp -f debian/desktop/$(BIN).desktop $(DESTDIR)$(PREFIX)/share/applications
 	chmod 644 $(DESTDIR)$(PREFIX)/share/applications/$(BIN).desktop
-	# appstream file
-	mkdir -p $(DESTDIR)$(PREFIX)/share/metainfo
-	cp -f debian/appstream/com.djoffe.gnukem.metainfo.xml $(DESTDIR)$(PREFIX)/share/metainfo
-	chmod 644 $(DESTDIR)$(PREFIX)/share/metainfo/com.djoffe.gnukem.metainfo.xml
 	# doc
 	mkdir -p $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
 	cp -f HISTORY.txt README.md $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
@@ -104,12 +104,14 @@ install:
 	chmod 644 $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
 
 uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/share/metainfo/com.djoffe.$(BIN).metainfo.xml
 	rm -f $(DESTDIR)$(PREFIX)/games/$(BIN) 
 	rm -fr $(DESTDIR)$(PREFIX)/share/games/$(BIN) 
 	rm -fr $(DESTDIR)$(PREFIX)/share/doc/$(BIN)-data
 	rm -f $(DESTDIR)$(PREFIX)/share/applications/$(BIN).desktop
 	rm -fr $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
 	rm -f $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps/$(BIN).png	
+	rm -f $(DESTDIR)$(PREFIX)/share/icons/hicolor/128x128/apps/$(BIN).png
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
 
 .PHONY: all options clean dist install uninstall
