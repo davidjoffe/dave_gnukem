@@ -20,7 +20,7 @@
 		<keyword>Retro</keyword>
 	</keywords>
 	<launchable type="desktop-id">davegnukem.desktop</launchable>
-	<metadata_license>CC0-1.0</metadata_license>
+	<metadata_license>MIT</metadata_license>
 	<name>Dave Gnukem</name>
 	<project_license>GPL-2.0-only OR GPL-3.0-only OR MIT</project_license>
 	<provides>
