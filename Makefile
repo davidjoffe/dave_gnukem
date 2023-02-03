@@ -105,8 +105,8 @@ install:
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/share/metainfo/com.djoffe.$(BIN).metainfo.xml
-	rm -f $(DESTDIR)$(PREFIX)/games/$(BIN) 
-	rm -fr $(DESTDIR)$(PREFIX)/share/games/$(BIN) 
+	rm -f $(DESTDIR)$(BIN_DIR)/$(BIN)
+	rm -fr $(DESTDIR)$(DATA_DIR)
 	rm -fr $(DESTDIR)$(PREFIX)/share/doc/$(BIN)-data
 	rm -f $(DESTDIR)$(PREFIX)/share/applications/$(BIN).desktop
 	rm -fr $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
