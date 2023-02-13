@@ -144,6 +144,7 @@
     <ClCompile Include="..\djlog.cpp" />
     <ClCompile Include="..\djstring.cpp" />
     <ClCompile Include="..\djtypes.cpp" />
+    <ClCompile Include="..\djutf8.cpp" />
     <ClCompile Include="..\ed.cpp" />
     <ClCompile Include="..\ed_common.cpp" />
     <ClCompile Include="..\ed_DrawBoxContents.cpp" />
@@ -187,6 +188,7 @@
     <ClInclude Include="..\djstring.h" />
     <ClInclude Include="..\djtime.h" />
     <ClInclude Include="..\djtypes.h" />
+    <ClInclude Include="..\djutf8.h" />
     <ClInclude Include="..\ed.h" />
     <ClInclude Include="..\ed_common.h" />
     <ClInclude Include="..\ed_DrawBoxContents.h" />

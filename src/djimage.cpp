@@ -109,15 +109,15 @@ void djImage::CreateImage( int x, int y, int nBitsPerPixel, int pitch/*=-1*/, vo
 	// if pitch negative auto-calculate it by multiplying horizontal pixels by bytes-per-pixel
 	if (pitch<=0) pitch = m_ipixwidth * x;
 	// error-check: logically pitch must be a minimum of 'm_ipixwidth * x' (but it may be higher, that's the point of pitch/stride)
-	if (ipitch<m_ipixwidth * x) pitch = m_ipixwidth * x;
+	if (pitch<m_ipixwidth * x) pitch = m_ipixwidth * x;
 
-	m_ipitch = ipitch;
+	m_ipitch = pitch;
 
 	// dj2023-02 this code that was here for ages looks wrong but then it's always been wrong how can nobody have noticed until now?
-	// "ipitch*y*m_ipixwidth" seems to alloc too much ..? the pitch is already the 'bytes per row' so we should only have to multiply 'bytes per row * rows' I think?
-	//m_pData = new unsigned char[ipitch*y*m_ipixwidth];
+	// "pitch*y*m_ipixwidth" seems to alloc too much ..? the pitch is already the 'bytes per row' so we should only have to multiply 'bytes per row * rows' I think?
+	//m_pData = new unsigned char[pitch*y*m_ipixwidth];
 	// if thing suddenly start crashing here though, this is probably the culprit .. dj2023-02 .. as I'm changing what appears to be an over-alloc of memory in this image data
-	const size_t uMemSize = ipitch*y;
+	const size_t uMemSize = pitch*y;
 	m_pData = new unsigned char[uMemSize];
 	if (m_pData != NULL)
 	{
