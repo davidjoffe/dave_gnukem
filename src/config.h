@@ -136,7 +136,7 @@ extern bool g_bBigViewportMode;//dj2019-06. //Can't have both bigviewport and la
 
 
 /*--------------------------------------------------------------------------*/
-// EXPERIMENTAL / BETA [dj2022-11] this is relatively large charnge as means new dependencies
+// EXPERIMENTAL / BETA [dj2022-11] this is relatively "large" change as means new dependencies (not that big but just want to make sure packages etc. may be updated correctly etc. if we add new deps ..)
 /*--------------------------------------------------------------------------*/
 // Enable Unicode support [BETA] dj2022-11 (EARLY DEV - NOT ready for production do NOT yet enable in a real release - dj2022-11)
 #ifndef djUNICODE_SUPPORT
@@ -149,6 +149,11 @@ extern bool g_bBigViewportMode;//dj2019-06. //Can't have both bigviewport and la
 	#define djTTF_HAVE_HARFBUZZ_EXTENSIONS
 	#endif
 #endif
+/*--------------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------------*/
+// [dj2023-02] Tentative new libpng support (not yet enabled by default as it's not yet used in the actual Dave Gnukem currently, at least yet - but since we updated to SDL2 this now becomes an easier possibility to use SDL2 png loading)
+//#define djUSE_SDLIMAGE
 /*--------------------------------------------------------------------------*/
 
 

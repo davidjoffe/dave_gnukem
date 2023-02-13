@@ -11,7 +11,7 @@
 // ~2022 : Matteo Bini migration from SDL1 to SDL2
 
 /*
-Copyright (C) 1995-2022 David Joffe
+Copyright (C) 1995-2023 David Joffe
 */
 
 /*--------------------------------------------------------------------------*/
@@ -29,6 +29,7 @@ Copyright (C) 1995-2022 David Joffe
 
 #include "djfile.h"//djFileExists etc.
 #include "djimage.h"
+#include "djimageload.h"
 #include "djinput.h"
 #include "djtime.h"
 #include "djstring.h"
@@ -78,6 +79,9 @@ Copyright (C) 1995-2022 David Joffe
 
 /*--------------------------------------------------------------------------*/
 #define DATAFILE_MAINMENUBACKGROUND "main.tga"
+//#define DATAFILE_MAINMENUBACKGROUND "backgrounds/00007-3069072574.png"
+//#define DATAFILE_MAINMENUBACKGROUND "backgrounds/00009-617832866.png"
+
 djImage *g_pImgMain = NULL;
 
 int  DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::string >& Parameters);	// Application initialization
@@ -497,7 +501,10 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 	// Main menu background image
 	g_pImgMain = new djImage();
-	if (g_pImgMain->Load(djDATAPATHc(DATAFILE_MAINMENUBACKGROUND)) < 0)
+	int nRet = djImageLoad::LoadImage(g_pImgMain, djDATAPATHc(DATAFILE_MAINMENUBACKGROUND));
+	if (nRet<0)
+	//g_pImgMain = djImageLoader::LoadImage(djDATAPATHc(DATAFILE_MAINMENUBACKGROUND));
+	//if (g_pImgMain->Load(djDATAPATHc(DATAFILE_MAINMENUBACKGROUND)) < 0)
 	{
 		printf("Error: Image load failed: %s\n", DATAFILE_MAINMENUBACKGROUND);
 	}
@@ -648,8 +655,8 @@ void DoMainMenu()
 		// Load main menu background image
 		if (g_pImgMain)
 		{
-			// Simple 1 to 1 blit .. later it might be worthwhile doing a stretch blit if size doesn't match resolution? [LOW - dj2019]
-			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
+			//dj2023-02 change to new stretchblit helper to support high-res backgrounds for hi-res games:
+			djgDrawImageStretchBlit( pVisBack, g_pImgMain, 0, 0, 0, 0, g_pImgMain->Width(), g_pImgMain->Height(), CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H );
 		}
 		GraphDrawString(pVisBack, g_pFont8x8, 0, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)VERSION);
 		const char* szURL = "djoffe.com";

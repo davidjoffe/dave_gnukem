@@ -123,6 +123,7 @@ extern void       djgDrawVLine( djVisual * pVis, int x, int y, int n );
 extern void       djgDrawImage( djVisual *pVis, djImage *pImage, int x, int y, int w, int h );
 //! Draw (w,h) pixels of an image at (xD,yD) from (xS,yS) on image
 extern void       djgDrawImage( djVisual *pVis, djImage *pImage, int xS, int yS, int xD, int yD, int w, int h );
+extern void       djgDrawImageStretchBlit( djVisual *pVis, djImage *pImage, int xS, int yS, int xD, int yD, int wS, int hS, int wD, int hD );
 //! Draw (w,h) pixels of an image at (xD,yD) from (xS,yS) on image with transparency
 extern void       djgDrawImageAlpha( djVisual *pVis, djImage *pImage, int xS, int yS, int xD, int yD, int w, int h );
 //! Draw (w,h) pixels from a visual at (xD,yD) from (xS,yS)

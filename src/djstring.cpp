@@ -88,7 +88,7 @@ char* djStrPart( const char *str, int i, const char *delim )
 
 void djStrToLower( char * str )
 {
-	for ( unsigned int i=0; i<strlen(str); i++ )
+	for ( unsigned int i=0; i<strlen(str); ++i )
 	{
 		if ((str[i] >= 'A') && (str[i] <= 'Z')) str[i] += 32;
 	}

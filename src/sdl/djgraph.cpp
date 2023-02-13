@@ -2,7 +2,7 @@
 /*
 djgraph.cpp
 
-Copyright (C) 1997-2022 David Joffe
+Copyright (C) 1997-2023 David Joffe
 */
 
 
@@ -377,6 +377,42 @@ void djgDrawImage( djVisual *pVis, djImage *pImage, int x, int y, int w, int h )
 	djgDrawImage( pVis, pImage, 0, 0, x, y, w, h );
 }
 
+ void djgDrawImageStretchBlit( djVisual *pVis, djImage *pImage, int xS, int yS, int xD, int yD, int wS, int hS, int wD, int hD )
+ {
+	if (pImage==NULL) return;
+
+	if (xS<0 || yS<0) return;
+
+	// IF HARDWARE SURFACE FOR THIS IMAGE, USE IT
+	SDL_Surface* pHWSurface = NULL;
+	std::map< djImage*, SDL_Surface * >::const_iterator iter = g_SurfaceMap.find( pImage );
+	if (iter != g_SurfaceMap.end())
+	{
+		pHWSurface = iter->second;
+	}
+	if (pHWSurface)
+	{
+		//BLIT
+		SDL_Rect rectSrc;
+		rectSrc.x = xS;
+		rectSrc.y = yS;
+		rectSrc.w = wS;
+		rectSrc.h = hS;
+		SDL_Rect rectDest;
+		rectDest.x = xD;
+		rectDest.y = yD;
+		rectDest.w = wD;
+		rectDest.h = hD;
+		// if dimensions are the same shouldn't use scaled blit for speed ..
+		if (wS==wD && hS==hD)
+			SDL_BlitSurface(pHWSurface, &rectSrc, pVis->pSurface, &rectDest);
+		else
+			SDL_BlitScaled(pHWSurface, &rectSrc, pVis->pSurface, &rectDest);
+		return;
+	}
+
+
+ }
 void djgDrawImage( djVisual *pVis, djImage *pImage, int xS, int yS, int xD, int yD, int w, int h )
 {
 	if (pImage==NULL) return;
@@ -751,6 +787,30 @@ void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 	https://wiki.libsdl.org/SDL_CreateRGBSurface
 	*/
 
+	// dj2023-02 our loaded PNGs may ahve different byte order it seems .. this now all needs more testing .. either we must convert image files on load,
+	// or generically handle more cases here .. or both I suppose, to help make sure this stuff works on all platforms etc.
+	#ifdef djUSE_SDLIMAGE
+	//pImage->
+	pSurfaceHardware = ::SDL_CreateRGBSurfaceFrom(
+		pImage->Data(),
+		pImage->Width(),
+		pImage->Height(),
+		pImage->BPP(),
+		pImage->Pitch(),
+		// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
+		#if SDL_BYTEORDER==SDL_BIG_ENDIAN
+		pImage->m_Rmask,
+		pImage->m_Gmask,
+		pImage->m_Bmask,
+		pImage->m_Amask
+		#else
+		pImage->m_Rmask,
+		pImage->m_Gmask,
+		pImage->m_Bmask,
+		pImage->m_Amask
+		#endif
+	);
+	#else
 	pSurfaceHardware = ::SDL_CreateRGBSurfaceFrom(
 		pImage->Data(),
 		pImage->Width(),
@@ -767,6 +827,7 @@ void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 		0xFF000000
 		#endif
 	);
+	#endif
 	//fixme should be sped up:
 	// 1. A map is not really the most efficient way to do this as it must do a lookup for every blit
 	// 2. std::map is probably not the fastest map for this either .. unordered_map may be (we don't need correct sorting and we're happy with slower inserts for faster lookups)

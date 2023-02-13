@@ -3,7 +3,7 @@
 \brief   Image manipulation class
 \author  David Joffe
 
-Copyright (C) 1998-2022 David Joffe
+Copyright (C) 1998-2023 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _DJIMAGE_H_
@@ -28,9 +28,45 @@ public:
 	//! Destructor
 	~djImage();
 	
-	int CalculatePixelWidth( int ibpp );
+	int CalculatePixelWidthBytesPerPixel( int nBitsPerPixel );
 	//! Create a blank image of given size, bit depth and pitch (pitch is total actual in-memory width in bytes. Pitch is effective total actual in-memory width of a single row of image (including any hypothetical optional padding, if any)
-	void CreateImage( int x, int y, int ibpp, int ipitch=-1 );
+	void CreateImage( int x, int y, int nBitsPerPixel, int ipitch=-1, void* pOptionalCopyDataFrom=nullptr
+    //#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+//	, unsigned int Rmask=0x0000FF00
+//	, unsigned int Gmask=0x00FF0000
+//	, unsigned int Bmask=0xFF000000
+//	, unsigned int Amask=0x000000FF
+    //rmask = 0xff000000;
+    //gmask = 0x00ff0000;
+    //bmask = 0x0000ff00;
+    //amask = 0x000000ff;
+//    #else
+	, unsigned int Rmask=0x00FF0000
+	, unsigned int Gmask=0x0000FF00
+	, unsigned int Bmask=0x000000FF
+	, unsigned int Amask=0xFF000000
+    //rmask = 0x000000ff;
+    //gmask = 0x0000ff00;
+    //bmask = 0x00ff0000;
+    //amask = 0xff000000;
+  //  #endif
+/*
+	// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
+	#if SDL_BYTEORDER==SDL_BIG_ENDIAN
+	0x0000FF00, 0X00FF0000, 0xFF000000, 0x000000FF
+	#else
+	0xFF0000,
+	0xFF00,
+	0xFF,
+	0xFF000000
+	#endif
+*/
+
+	//unsigned int m_Rmask=0x00FF0000;
+	//unsigned int m_Gmask=0x0000FF00;
+	//unsigned int m_Bmask=0x000000FF;
+	//unsigned int m_Amask=0xFF000000;
+);
 
 	djColor GetPixelColor( int x, int y ) const;
 	uint32_t     GetPixel( int x, int y ) const;
@@ -40,7 +76,7 @@ public:
 	
 	int Height() const { return m_iHeight; } //!< height in pixels
 	int Width()  const { return m_iWidth; }  //!< width in pixels
-	int Pitch()  const { return m_ipitch; }  //!< total width in bytes [dj2022-11 to double-check is this bytes or was it something else e.g. pixels?]
+	int Pitch()  const { return m_ipitch; }  //!< total width in bytes (which may potentially be greater than 'width * bytes-per-pixel') [dj2022-11 to double-check is this bytes or was it something else e.g. pixels?]
 	int BPP()    const { return m_ibpp; }    //!< bits per pixel
 	
 	//! Load an image from disk. Only TGA (24/32-bit) filetype is supported.
@@ -51,23 +87,20 @@ public:
 	//dj2022-11 for now comment out SaveRAW as not using it for anything, but maybe might use it in future so leaving it in for now, but should maybe be refactored differently (probably shouldn't be *in* the image class, image loaders/savers should conceptually be a layer above and 'outside' the core image class)
 	//int SaveRAW( const char * szFilename );
 
+
+	unsigned int m_Rmask=0x00FF0000;
+	unsigned int m_Gmask=0x0000FF00;
+	unsigned int m_Bmask=0x000000FF;
+	unsigned int m_Amask=0xFF000000;
+
 protected:
 	unsigned char*	m_pData = nullptr;
 	int             m_iWidth = 0;
 	int             m_iHeight = 0;
-	int             m_ibpp = 0;
-	int             m_ipixwidth = 0;
-	int             m_ipitch = 0;		//!< pitch is effectively total actual in-memory width of a single row of image (including any hypothetical padding, if any)
+	int             m_ibpp = 0;			//!< bits per pixel
+	int             m_ipixwidth = 0;	//!< bytes per pixel
+	int             m_ipitch = 0;		//!< pitch is effectively total actual in-memory width in of a single row of image (including any hypothetical padding, if any) (I think this should probably be in bytes but not 100% sure all old code in this codebase treats it that way or sets it up correctly)
 };
 
-/*
-// loaders/savers - should be separate file? tho needs access to procected members - either a friend class, or e.g. maybe rather just expose protected members with set variables etc.
-// should we bother or just transition to sdl_image etc.? 
-// (dj2022 note: Our TGA image loading code literally harkens from the 90s and was some of the earliest game code, and also because we were on LibSDL1 for a long time we just stuck with it .. I felt for a long time maybe once we're on SDL2 we could start maybe using e.g. libsdl_image to load more modern formats like .png which offer mainly compression)
-class djImageLoad
-{
-public:
-};
-*/
 
 #endif
