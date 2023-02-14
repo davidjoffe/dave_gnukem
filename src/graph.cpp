@@ -287,7 +287,8 @@ bool djGraphicsSystem::GraphInit( bool bFullScreen, int iWidth, int iHeight, int
 	}
 
 	//--- (5) Create hardware surface for main 8x8 font bitmap (FIXME error check)
-	SDL_Surface *pSurface = (SDL_Surface *)djCreateImageHWSurface(g_pFont8x8);
+	djCreateImageHWSurface(g_pFont8x8);
+	//SDL_Surface *pSurface = (SDL_Surface *)djCreateImageHWSurface(g_pFont8x8);
 	//SDL_SetColorKey(pSurface, SDL_TRUE, SDL_MapRGB(pSurface->format, 0, 0, 0));
 
 #ifdef WIN32
