@@ -1,4 +1,4 @@
-//Copyright (C) 2022 David Joffe / Dave Gnukem project
+//Copyright (C) 2022-2023 David Joffe / Dave Gnukem project
 //
 //dj2022-11-25 new vector-based font stuff (TTF/OTF) and Unicode font helper stuff
 //NB Design-wise this is conceptually part of the generic reusable code so shouldn't have dependencies to any Dave Gnukem specific parts of the codebase
@@ -235,5 +235,86 @@ int djUnicodeTextHelpers::GuessDirection(const char* szTextUTF8, const unsigned 
 }
 /*--------------------------------------------------------------------------*/
 
+
+//---------------------------------------------------------------------------
+#ifdef djUNICODE_TTF
+
+#define FONT_SIZE 8
+#define SPRITE_MAP_WIDTH 256
+#define SPRITE_MAP_HEIGHT 256
+#define NUM_CHARS 1024
+//#define SPRITE_MAP_WIDTH 1024
+//#define SPRITE_MAP_HEIGHT 1024
+//#define NUM_CHARS (128*128)
+
+//[dj2023-02]This helper not currently used directly by game, just to help pre-generate ... but conceivably could be used directly
+void djRasterizeTTFFontHelper(const std::string& sFilename)//, const std::string& sFilenameOut)
+{
+	TTF_Font *font = TTF_OpenFont(sFilename.c_str(), FONT_SIZE);
+	if (!font)
+	{
+		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		return;
+	}
+
+	SDL_Surface *sprite_map = SDL_CreateRGBSurface(0, SPRITE_MAP_WIDTH, SPRITE_MAP_HEIGHT, 32, 0, 0, 0, 0);
+	if (!sprite_map)
+	{	
+		printf("SDL_CreateRGBSurface: %s\n", SDL_GetError());
+		return;
+	}
+
+	int utf8_len = 0;
+	char utf8_buf[64] = {0};//<- Slightly oversize buffer for 'just in case' safety
+	SDL_Color color = {255, 255, 255, 255};
+	for (int i = 1; i < NUM_CHARS; i++)
+	{
+		if (i == 0)	continue;
+
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+		if (!TTF_GlyphIsProvided32(font, i))
+			continue;
+#else
+		if (!TTF_GlyphIsProvided(font, i))
+			continue;
+#endif
+
+		utf8_len = 0;
+		utf8_buf[0] = 0;
+		djutf8_encode(i, &utf8_buf[0], utf8_len);
+		utf8_buf[utf8_len] = 0;
+
+		if (utf8_len == 0)
+			continue;
+
+		SDL_Surface *character = TTF_RenderUTF8_Solid(font, utf8_buf, color);
+		if (!character)
+		{
+			printf("TTF_RenderUTF8_Solid: %s\n", TTF_GetError());
+			// return;
+		}
+		if (character)
+		{
+			int x = (i % (SPRITE_MAP_WIDTH / FONT_SIZE)) * FONT_SIZE;
+			int y = (i / (SPRITE_MAP_WIDTH / FONT_SIZE)) * FONT_SIZE;
+			SDL_Rect dst_rect = {x, y, FONT_SIZE, FONT_SIZE};
+			SDL_BlitSurface(character, NULL, sprite_map, &dst_rect);
+
+			SDL_FreeSurface(character);
+		}
+	}
+
+	SDL_SaveBMP(sprite_map, (sFilename + ".bmp").c_str());
+	if (SDL_SaveBMP(sprite_map, (sFilename + ".png").c_str()) != 0)
+	{
+		printf("SDL_SaveBMP: %s\n", SDL_GetError());
+		return;
+	}
+
+	SDL_FreeSurface(sprite_map);
+	TTF_CloseFont(font);
+}
+#endif
+//---------------------------------------------------------------------------
 
 #endif//#ifdef djUNICODE_TTF

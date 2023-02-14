@@ -629,9 +629,26 @@ void SettingsMenu()
 		g_nSimulatedGraphics = 2;
 }
 
+/*
+void djHelperGenerateRasterizeTTFFonts()
+{
+	//[dj2023-02]This helper not currently used directly by game, just to help pre-generate ... but conceivably could be used directly
+	extern void djRasterizeTTFFontHelper(const std::string& sFilename);
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperator8.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperator8-Bold.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperatorMono8.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperatorMono8-Bold.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperatorMonoHB8.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/arial.ttf"));
+}
+*/
+
 void DoMainMenu()
 {
 	bool bRunning = true;
+
+	//extern void djHelperGenerateRasterizeTTFFonts();//dj2023-02 internal helper to rasterize ttf font
+	//djHelperGenerateRasterizeTTFFonts();
 
 #ifndef NOSOUND
 	//dj2016-10 adding background music to main menu, though have not put any real thought into what would

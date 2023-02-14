@@ -25,29 +25,36 @@ void djStrToLowerTmpHelper( std::string& s )//urgh
 
 int djImageLoad::LoadImage(djImage* pImg, const char *szFilename)
 {
+    if (pImg==nullptr) return -1;
+    //debug//printf("Load %s\n", szFilename);
     if (szFilename==nullptr||szFilename[0]==0) return -1;// empty string for filename?
+    //debug//printf("Load %s\n", szFilename);
 
-#ifndef djUSE_SDLIMAGE
-    // Just pass through to our own ancient TGA loader as that's all we previously supported
-    return pImg->Load(szFilename);
-#else
     // Get file type from extension [yes that's not perfect but I think will do]
     std::string filename = szFilename;
     std::string extension = filename.substr(filename.find_last_of(".") + 1);
     //std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
     djStrToLowerTmpHelper(extension);
 
-    //djStrToLower(s.c_str());
-    // For TGA files pass back to our own ancient TGA loader
+    // For TGA files pass back to our own old TGA loader
     if (extension=="tga")
     {
-        return pImg->Load(szFilename);
+		int ret = pImg->LoadTGA(szFilename);
+		if (ret < 0)
+		{
+			// dj2022-11 hm this is maybe slightly gross must rethink where all the various logs "should" go etc. and clean up logging system
+			printf("Warning: Image load failed: %s\n", szFilename);
+			// fixme add some sort of 'debugassert' stuff here to help with testign?
+		}
+        return ret;
     }
 
+#ifdef djUSE_SDLIMAGE
     // extra redundant copy ...
     SDL_Surface* surface = IMG_Load(filename.c_str());
     if (!surface) {
         // << "IMG_Load Error: " << IMG_GetError() << std::endl;
+        printf("IMG_Load failed\n");
         return -1;
     }
     // if small endian am i supposed to reverse the masks here? not sure ..
@@ -67,5 +74,7 @@ int djImageLoad::LoadImage(djImage* pImg, const char *szFilename)
     // Clean up
     SDL_FreeSurface(surface);
     return 0;
+#else
+    return -1;//unhandled format
 #endif
 }

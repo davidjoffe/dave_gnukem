@@ -8,6 +8,7 @@ dj2022-11 Note that since we're now on SDL2 we could potentially use e.g. SDLima
 
 #include "config.h"
 #include "djimage.h"
+#include "djimageload.h"
 #include "djfile.h"
 #include "djstring.h"
 #include "djtypes.h"
@@ -183,43 +184,25 @@ int djImage::Load( const char * szFilename )
 	if (szFilename == NULL) return -1; // NULL string
 	if (szFilename[0] == 0) return -1; // empty string
 
-	//char * szTemp = NULL;
-	//char * szExt = NULL;
-	int    ret = -1;
+    std::string filename = szFilename;
+    std::string extension = filename.substr(filename.find_last_of(".") + 1);
+	extern void djStrToLowerTmpHelper( std::string& s );
+    djStrToLowerTmpHelper(extension);
 
-	 // fixme why are we bothering with all this? we only load TGA
-	ret = LoadTGA(szFilename);
-	if (ret < 0)
+    // For TGA files pass to our own old TGA loader
+	if (extension == "tga")
 	{
-		//dj2022-11 hm this is maybe slightly gross must rethink where all the various logs "should" go etc. and clean up logging system
-		printf("Warning: Image load failed: %s\n", szFilename);
-		//fixme add some sort of 'debugassert' stuff here to help with testign?
-	}
-	/*
-	szTemp = djStrDeepCopy( szFilename );
-	djStrToLower( szTemp );
-
-	// Attempt to determine file type from extension
-	if ( strlen( szTemp ) >= 4 )
-	{
-		szExt = szTemp + strlen(szTemp) - 4;
-		//if (0 == strncmp( szExt, ".spr", 4 ))      ret = LoadSPR( szFilename );
-		if (0 == strncmp( szExt, ".tga", 4 )) ret = LoadTGA( szFilename );
-		else
+		// fixme why are we bothering with all this? we only load TGA
+		int ret = LoadTGA(szFilename);
+		if (ret < 0)
 		{
-			// Attempt to load image as dj sprite file
-			ret = -1;// LoadSPR(szFilename);
+			// dj2022-11 hm this is maybe slightly gross must rethink where all the various logs "should" go etc. and clean up logging system
+			printf("Warning: Image load failed: %s\n", szFilename);
+			// fixme add some sort of 'debugassert' stuff here to help with testign?
 		}
+		return ret;
 	}
-	else
-	{
-		// Attempt to load image as dj sprite file
-		//ret = LoadSPR( szFilename );
-	}
-
-	djDELV(szTemp);
-	*/
-	return ret;
+	return djImageLoad::LoadImage(this, szFilename);
 }
 
 int djImage::LoadTGA( const char * szFilename )
