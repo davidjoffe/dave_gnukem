@@ -32,7 +32,7 @@ CPPFLAGS = -DDATA_DIR=\"$(DATA_DIR)\" -DVERSION=\"'$(VERSION)'\"
 
 CXX = g++
 
-OBJ = $(shell find src -iname '*.cpp' -type f | sed 's/\.cpp$$/.o/')
+OBJ = $(shell find src -iname '*.cpp' -type f | sed 's/\.cpp$$/.o/' | sort)
 
 # debug
 #CXXFLAGS = -ggdb -DDEBUG -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
