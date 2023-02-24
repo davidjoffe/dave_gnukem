@@ -25,32 +25,30 @@ PREFIX   = /usr/local
 BIN_DIR  = $(PREFIX)/games
 DATA_DIR = $(PREFIX)/share/games/$(BIN)/# the trailing slash is required for paths in the source
 
-LIBS    = `sdl2-config --libs` -lSDL2_mixer
-LDFLAGS = $(LIBS)
+LIBS               = `sdl2-config --libs` -lSDL2_mixer
+LDFLAGS_DAVEGNUKEM = $(LIBS) $(LDFLAGS)
 
-CPPFLAGS = -DDATA_DIR=\"$(DATA_DIR)\" -DVERSION=\"'$(VERSION)'\"
-
-CXX = g++
+CPPFLAGS_DAVEGNUKEM = -DDATA_DIR=\"$(DATA_DIR)\" -DVERSION=\"'$(VERSION)'\" $(CPPFLAGS)
 
 OBJ = $(shell find src -iname '*.cpp' -type f | sed 's/\.cpp$$/.o/' | sort)
 
 # debug
-#CXXFLAGS = -ggdb -DDEBUG -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
-CXXFLAGS = -Os -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
+#CXXFLAGS_DAVEGNUKEM = -ggdb -DDEBUG -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS_DAVEGNUKEM) $(CXXFLAGS)
+CXXFLAGS_DAVEGNUKEM = -Os -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS_DAVEGNUKEM) $(CXXFLAGS)
 
 all: options davegnukem
 
 options:
 	@echo davegnukem build options:
-	@echo "CXXFLAGS = $(CXXFLAGS)"
-	@echo "LDFLAGS  = $(LDFLAGS)"
+	@echo "CXXFLAGS = $(CXXFLAGS_DAVEGNUKEM)"
+	@echo "LDFLAGS  = $(LDFLAGS_DAVEGNUKEM)"
 	@echo "CXX      = $(CXX)"
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS_DAVEGNUKEM) -c $< -o $@
 
 davegnukem: $(OBJ)
-	$(CXX) -o $(BIN) $(OBJ) $(LDFLAGS)
+	$(CXX) -o $(BIN) $(OBJ) $(LDFLAGS_DAVEGNUKEM)
 
 clean:
 	rm -f $(BIN) $(BIN)-$(V_NUM).tar.gz
