@@ -304,8 +304,6 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 #ifdef __APPLE__
 
-	//fixme todo! also set path correctly if we're running out of a .app?
-
 	// Basically what we want to do here is:
 	// If the 'cwd' does NOT have a data folder under it, but
 	// the 'executable path' does, then we want to *change* the
@@ -319,6 +317,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		printf("cwd:%s\n", cwd);
 
 		//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever .. just want to check if present to do some fallback-checking
+		//const std::string sArbFileToCheck = "missions.txt";
 
 		//debug//printf("Current working directory:%s\n",cwd);
 		// Check if data folder is present relative to cwd
@@ -356,14 +355,22 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 				{
 					printf("Successfully found the data path :)\n");fflush(NULL);
 					// Yay, we found the data folder by the executable -
-					// change the 'working directory' to 'path'
-					//chdir(execpath);
-
-					// dj2022-11 Hmm not mad about changing the working directory .. app should work regardless of working directory? And should just store/save the paths we need at application initialize ..
-
+					// NB note: Changing the working directory is bad practice and causes problems (we used to do that here but I changed it to not anymore)
+					// Now we rather just set the datadir path and look for data files relative to that when we need them using helpers
+					// App should work regardless of working directory.
 					//dj2022-11 Make this full path the datadir .. this needs to be tested on Mac
-					// THIS IS NOT NECESSARILY RIGHT?
 					djSetDataDir(sTryDataPath.c_str());
+				}
+				else 
+				{
+					// Are we running out of a .app?
+					sTryDataPath = djAppendPathStr(execpath, "../Resources/data/");
+					sTryDataFile = djAppendPathStr(sTryDataPath.c_str(), "missions.txt");
+					if (djFileExists(sTryDataFile.c_str()))
+					{
+						printf("Successfully found the data path :)\n");fflush(NULL);
+						djSetDataDir(sTryDataPath.c_str());
+					}
 				}
 			}
 //else
