@@ -85,7 +85,7 @@ copy_and_fix_dylibs() {
         local dep_name=$(basename "$dep")
 
         # Change the install name for the dependency within the dylib
-        install_name_tool -change "$dep" "@executable_path/../Frameworks/$dep_name" "$dest_dir/$dylib_name"
+        install_name_tool -change "$dep" "@executable_path/$dep_name" "$dest_dir/$dylib_name"
 
         # Check if the dependency is already processed
         if [ ! -f "$dest_dir/$dep_name" ]; then
