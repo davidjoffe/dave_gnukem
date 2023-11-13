@@ -9,7 +9,14 @@
 # 2022-11-25: Cleanup and fix targets for new debian dir (dist, install and uninstall)
 #
 
-BIN = davegnukem
+CPP = em++
+CC = emcc
+# todo - reconcile Makefile changes for emsdk
+#CXX = ...
+#FLAGS=-s WASM=1 -s USE_SDL_MIXER=1 --preload-file ./data -s ALLOW_MEMORY_GROWTH=1 --use-preload-plugins -s STB_IMAGE=1
+CXXFLAGS=-s WASM=1 -s USE_SDL_MIXER=1 --preload-file ./data -s ALLOW_MEMORY_GROWTH=1 --use-preload-plugins -s STB_IMAGE=1
+
+BIN = davegnukem.html
 # 'version string history' here:
 # "v1.0 - 3 Apr 2018" [version 1]
 # "v1.0.1 - 25 Apr 2020"

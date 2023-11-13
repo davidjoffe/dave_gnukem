@@ -12,7 +12,8 @@ Copyright (C) 1998-2022 David Joffe
 #ifdef __OS2__
 #include <SDL/SDL.h>
 #else
-#include "SDL.h"
+//emsdk ..
+#include <SDL/SDL.h>
 #endif
 
 #include "djimage.h"

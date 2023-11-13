@@ -254,11 +254,19 @@ int main ( int argc, char** argv )
 	DoMainMenu();
 
 	// Cleanup
+	//DaveCleanup();
+
+	//SYS_Debug ( "\n" );
+
+	return 0;
+}
+
+void mainCleanup()
+{
+	// Cleanup
 	DaveCleanup();
 
 	SYS_Debug ( "\n" );
-
-	return 0;
 }
 
 int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::string >& Parameters)
@@ -655,7 +663,7 @@ void DoMainMenu()
 	// be the best track here so fixme todo maybe dig a bit more and find better choice here etc. [also for levels]
 	Mix_Music* pMusic = Mix_LoadMUS(djDATAPATHc("music/eric_matyas/8-Bit-Mayhem.ogg"));
 	if (pMusic!=NULL)
-		Mix_FadeInMusic(pMusic, -1, 800);
+		Mix_FadeInMusicPos(pMusic, -1, 800, 0);
 	else
 	{
 		//'debugassert' / trap / exception type of thing?
@@ -696,7 +704,7 @@ void DoMainMenu()
 #ifndef NOSOUND
 			// Game levels start their own music, so when come out of game and back to main menu, restart main menu music
 			if (pMusic!=NULL)
-				Mix_FadeInMusic(pMusic, -1, 800);
+				Mix_FadeInMusicPos(pMusic, -1, 800, 0);
 #endif
 			break;
 		}
@@ -707,7 +715,7 @@ void DoMainMenu()
 #ifndef NOSOUND
 				// Game levels start their own music, so when come out of game and back to main menu, restart main menu music
 				if (pMusic!=NULL)
-					Mix_FadeInMusic(pMusic, -1, 800);
+					Mix_FadeInMusicPos(pMusic, -1, 800, 0);
 #endif
 			}
 			break;
@@ -929,7 +937,7 @@ void RedefineKeys()
 		GraphFlip(true);
 
 		//Prevent CPU hogging or it eats up a full core here [dj2016-10]
-		SDL_Delay(20);
+		/*SDL_Delay(20);*/
 	} while (bLoop);
 }
 
@@ -1107,7 +1115,7 @@ bool GetHighScoreUserName(std::string& sReturnString)
 		GraphFlip(true);
 
 		//Prevent CPU hogging or it eats up a full core here [dj2019-07] (A little simplistic but it'll do)
-		SDL_Delay(20);
+		/*SDL_Delay(20);*/
 
 	} while (bLoop);
 

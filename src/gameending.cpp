@@ -126,7 +126,7 @@ void ShowEndGameSequence()
 		// Sleep a little to not hog CPU to cap menu update (frame rate) at approx 10Hz
 		while (fTimeNow<fTimeNext)
 		{
-			SDL_Delay(1);
+			/*SDL_Delay(1);*/
 			fTimeNow = djTimeGetTime();
 		}
 
