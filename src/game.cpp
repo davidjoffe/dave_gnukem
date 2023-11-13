@@ -1316,7 +1316,12 @@ int game_startup(bool bLoadGame)
 		while (fTimeNow<fTimeNext || bForceUpdate) // until we reach next frames time
 		{
 			// Try to prevent this from hogging the CPU, which can adversely affect other processes
+			//dj this #ifdef etc. a bit gross/clunky should we wrap 'SDL_delay' in a simple wrapper functino to deal with emscripted in there in one place application-wide, or what better way? Hm
+			#ifdef __EMSCRIPTEN__
 			/*SDL_Delay(1);*/
+			#else
+			SDL_Delay(1);
+			#endif
 
 			// poll keys
 			djiPollBegin();

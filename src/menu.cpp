@@ -18,7 +18,9 @@ Copyright (C) 1995-2022 David Joffe
 #include "djtime.h"
 #include "sys_error.h"
 
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#endif
 
 djImage* g_pImgMenuBackground8x8 = NULL;//dj2016-10 background 'noise' image experiment
 
@@ -46,7 +48,7 @@ void menu_move( CMenu *pMenu, int& option, int diff, unsigned char cCursor, int 
 	djgDrawImageAlpha( pVisBack, g_pFont8x8, ((int)cCursor%32)*8, ((int)cCursor/32)*8, pMenu->getXOffset()+8, pMenu->getYOffset()+8*option, 8, 8 );
 }
 /*--------------------------------------------------------------------------*/
-
+#ifdef __EMSCRIPTEN__
 struct MenuPumpInfo
 {
 	CMenu *pMenu;
@@ -164,8 +166,7 @@ void do_menu_pump()
 	GraphFlip(true);
 }
 
-
-
+#endif//__EMSCRIPTEN__
 
 /*--------------------------------------------------------------------------*/
 int do_menu( CMenu *pMenu )
@@ -308,7 +309,8 @@ int do_menu( CMenu *pMenu )
 	menuPumpInfo.bmenurunning = true;
 	menuPumpInfo.szCursor = szCursor;
 
-	/*
+
+	#ifndef __EMSCRIPTEN__
 	// Wait for user to let go of escape, if he is pressing it
 	djiWaitForKeyUp( DJKEY_ESC );
 
@@ -464,9 +466,9 @@ int do_menu( CMenu *pMenu )
 
 		GraphFlip(true);
 	} while (bmenurunning);
-	*/
-
+	#else//#ifndef __EMSCRIPTEN__
 	emscripten_set_main_loop(do_menu_pump, 30, true);
+	#endif
 
 	
 	// Wait for user to let go of escape or enter
