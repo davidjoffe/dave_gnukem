@@ -1,13 +1,14 @@
 /*
 djstring.cpp
 
-Copyright (C) 1998-2022 David Joffe
+Copyright (C) 1998-2023 David Joffe
 */
 
 #include "config.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string>//std::to_string
 
 #include "djstring.h"
 #include <stdarg.h>//va_list etc. [for djStrPrintf dj2016-10]
@@ -175,12 +176,18 @@ std::string djGetFolderUserSettings()
 	return s;
 }
 
+// Hardly anything uses this function should it even exist if we now have things like std::to_string? Helpers like this made more sense in the days pre things like std::to_string [dj2023]
 std::string djIntToString(int n)
 {
+	//[dj 2013] todo replace with std::to_string? [low] - it's also more thread-safe - and not prone to issues like e.g. possible overrun or cutoff if sizeof(int) is 64-bits on some platform .. it's good to try phase out these printf-style buffers
+#if __cplusplus>=201103L // c++11?
+	return std::to_string(n);
+#else
 	// Note NB this must be large enough for e.g. 128-bit ints 'just in case'. Also this function should be threadsafe so no static buffers etc.
 	char buf[128] = { 0 };
 	snprintf(buf, sizeof(buf), "%d", n);
 	return buf;
+#endif
 }
 
 void djStripCRLF(char* buf)
