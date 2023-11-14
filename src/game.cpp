@@ -1009,7 +1009,7 @@ void PerLevelSetup()
 	g_pInGameMusic = Mix_LoadMUS((sBasePath + asMusicFiles[nMusicFile]).c_str());
 	if (g_pInGameMusic!=NULL)
 	{
-		Mix_FadeInMusicPos(g_pGameMusic, -1, 500, 0);
+		Mix_FadeInMusicPos(g_pInGameMusic, -1, 500, 0);
 	}
 #endif
 

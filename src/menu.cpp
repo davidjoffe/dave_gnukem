@@ -301,6 +301,7 @@ int do_menu( CMenu *pMenu )
 	menu_move( pMenu, option, 0, *szCursor, iFirstSelectable, iLastSelectable);
 
 
+#ifdef __EMSCRIPTEN__
 	// initialize menu pump
 	menuPumpInfo.pMenu = pMenu;
 	menuPumpInfo.option = option;
@@ -308,6 +309,7 @@ int do_menu( CMenu *pMenu )
 	menuPumpInfo.fTimeNow = menuPumpInfo.fTimeNext;
 	menuPumpInfo.bmenurunning = true;
 	menuPumpInfo.szCursor = szCursor;
+#endif
 
 
 	#ifndef __EMSCRIPTEN__

@@ -32,6 +32,8 @@ Copyright (C) 1998-2022 David Joffe
 
 #endif
 
+#endif
+
 #include "djimage.h"
 #include "djtypes.h"
 /*--------------------------------------------------------------------------*/

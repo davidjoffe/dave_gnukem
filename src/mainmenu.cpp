@@ -9,6 +9,7 @@
 #include "djimage.h"
 #include "djgraph.h"
 #include "djsound.h"
+#include "djstring.h"//djAppendPathStr
 
 #include "game.h"//game_startup etc.
 #include "menu.h"
@@ -85,7 +86,6 @@ bool GetHighScoreUserName(std::string& sReturnString)
 	return djGetTextInput(sReturnString, MAX_HIGHSCORE_LEN, WIDTH_INPUTBOX*8, s.c_str());
 }
 
-
 // check if high score table is beaten,
 // let user enter his name
 // and show the table after all
@@ -98,7 +98,11 @@ void CheckHighScores( int score )
 		if (GetHighScoreUserName(sUserName))
 		{
 			AddHighScore(sUserName.c_str(), score);
-			SaveHighScores(); // Save high scores immediately, in case Windows crashes
+
+			extern std::string djGetFolderUserSettings();//<-todo make new better header locatino for this function .. [low prio]
+
+			std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_HIGHSCORES);
+			SaveHighScores(s.c_str()); // Save high scores immediately, in case Windows crashes
 		}
 
 		ShowHighScores();
