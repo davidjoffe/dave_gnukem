@@ -339,7 +339,11 @@ int do_menu( CMenu *pMenu )
 		// Sleep a little to not hog CPU to cap menu update (frame rate) at approx 10Hz
 		while (fTimeNow<fTimeNext)
 		{
+#ifdef __EMSCRIPTEN__
 			//--dh-- SDL_Delay(1);
+#else
+			SDL_Delay(1);
+#endif
 			fTimeNow = djTimeGetTime();
 		}
 
