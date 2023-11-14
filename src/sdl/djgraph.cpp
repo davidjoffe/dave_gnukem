@@ -34,6 +34,11 @@ Copyright (C) 1997-2023 David Joffe
 #include <cassert>//assert
 #endif
 
+// dj2022-12 one small additional note on the below whether unordered_map is faster also may I think depend on factors like size? best may be to actually check and do speed tests BUT also maybwe re-think whether we can just do away with the map entirely rather, there are some possible ways to solve that.
+// However, it might not be worth doing because this game has relatively few images .. and premature optimization as they say is the root of all evil - we should do profile-driven etc.
+// And also if I uncap the framerate we're at about 240fps on my dev machine which while isn't some incredible record it's seemingly pretty fast arleady.
+// however design if we create a struct like say with an image and surface (which may be null or may change etc.) .. hmm think about
+
 //fixme[dj2020] low priority, should ideally be sped up:
 // 1. A map is not really the most efficient way to do this as it must do a lookup for every blit
 // 2. std::map is probably not the fastest map for this either .. unordered_map may be (we don't need correct sorting and we're happy with slower inserts for faster lookups)

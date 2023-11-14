@@ -37,6 +37,7 @@ Copyright (C) 1995-2023 David Joffe
 #include "djfonts.h"//fixme move to new src/highscores_entername.cpp or something?
 #endif
 
+#include "mainmenu.h"//dj2022 refactoring mainmenu stuff into separate file
 #include "hiscores.h"
 #include "menu.h"
 #include "game.h"
@@ -78,23 +79,11 @@ Copyright (C) 1995-2023 David Joffe
 #include <string>
 
 /*--------------------------------------------------------------------------*/
-#define DATAFILE_MAINMENUBACKGROUND "main.tga"
-//#define DATAFILE_MAINMENUBACKGROUND "backgrounds/00007-3069072574.png"
-//#define DATAFILE_MAINMENUBACKGROUND "backgrounds/00009-617832866.png"
 
-djImage *g_pImgMain = NULL;
 
 int  DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::string >& Parameters);	// Application initialization
 void DaveCleanup();					// Application cleanup
-void SelectMission();				// Select a mission
-void RedefineKeys();				// Redefine keys
 
-void DoMainMenu();					// Start main menu
-void CheckHighScores( int score );	// check if high score table is beaten,
-						// let user enter his name
-						// and show the table after all
-void InitMainMenu();
-void KillMainMenu();
 
 #ifdef __OS2__
 void MorphToPM()
@@ -108,33 +97,9 @@ void MorphToPM()
    if (pib->pib_ultype==2) pib->pib_ultype = 3;
 }
 #endif
+//dj2022 ^^ hm [low] should we make a folder src/morphos for morphos specific stuff like we do with win32? in theory probably .. also src/apple maybe etc.. but low prio ...
 
 /*--------------------------------------------------------------------------*/
-// Main menu [NB, warning, the handling code uses indexes :/ .. so if you add/remove items, must update there too - dj2016-10]
-struct SMenuItem mainMenuItems[] =
-{
-	{ false, "                   " },
-	{ true,  "   Start gnu game  " },
-	{ true,  "   Restore game    " },
-	{ true,  "   Select Mission  " },
-	{ true,  "   Ordering info   " },
-	{ true,  "    (not!)         " },
-	{ true,  "   Instructions    " },
-	{ true,  "   Redefine keys   " },
-	{ true,  "   High scores     " },
-	{ true,  "   Credits         " },
-	{ true,  "   About           " },
-	{ true,  "   Retro Settings  " },
-	{ true,  "   Don't quit      " },
-	{ true,  "   Quit            " },
-	{ false, "                   " },
-	{ false, NULL }
-};
-
-unsigned char mainMenuCursor[] = { 128, 129, 130, 131, 0 };
-unsigned char mainMenuCursorSkull[] = { 161, 162, 163, 164, 0 };
-CMenu mainMenu ( "main.cpp:mainMenu" );
-
 
 /*--------------------------------------------------------------------------*/
 #ifdef djUNICODE_TTF
@@ -514,16 +479,6 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	djLOGSTR("djVectorFontListInit ok\n");
 #endif
 
-	// Main menu background image
-	g_pImgMain = new djImage();
-	int nRet = djImageLoad::LoadImage(g_pImgMain, djDATAPATHc(DATAFILE_MAINMENUBACKGROUND));
-	if (nRet<0)
-	//g_pImgMain = djImageLoader::LoadImage(djDATAPATHc(DATAFILE_MAINMENUBACKGROUND));
-	//if (g_pImgMain->Load(djDATAPATHc(DATAFILE_MAINMENUBACKGROUND)) < 0)
-	{
-		printf("Error: Image load failed: %s\n", DATAFILE_MAINMENUBACKGROUND);
-	}
-	djCreateImageHWSurface( g_pImgMain );
 
 	InitMissionSystem();
 
@@ -557,6 +512,7 @@ void DaveCleanup()
 	g_Settings.SetSettingInt("Volume",djSoundGetVolume());
 	g_Settings.SetSetting("SoundsOn",djSoundEnabled()?"ON":"OFF");
 
+	djLOGSTR( "KillMainMenu:\n" );
 	KillMainMenu();
 	djLOGSTR( "KillMainMenu() ok\n" );
 	KillMissionSystem();
@@ -580,9 +536,6 @@ void DaveCleanup()
 	djFontListDone();		// dj2022-11 Unicode/TTF font system
 	djLOGSTR("djFontListDone ok\n");
 #endif
-	djDestroyImageHWSurface(g_pImgMain);
-	djDEL(g_pImgMain);		// Delete main menu background image (title screen)
-	djLOGSTR( "djDEL(g_pImgMain) ok\n" );
 	djGraphicsSystem::GraphDone();			// Graphics
 	djLOGSTR( "GraphDone() ok\n" );
 	djFontDone();			// Font helper [dj2022-11]
@@ -606,6 +559,9 @@ extern int g_nSimulatedGraphics;
 //dj2019-06 just-for-fun extra-retro simulated faux-EGA/CGA
 void SettingsMenu()
 {
+	//dj2022-12 not 100% sure if this menu will always just a "retro settings menu" or maybe in future have more e.g. graphics settings on it or maybe things like volume ..
+	// on the balance it should probably be a separate thing
+
 	struct SMenuItem SettingsMenuItems[] =
 	{
 		// this looks very weird; need to fix menu code to handle this better, or wrap setttingsmenu in additional UI stuff
@@ -657,113 +613,6 @@ void djHelperGenerateRasterizeTTFFonts()
 	djRasterizeTTFFontHelper(djDATAPATHs("fonts/arial.ttf"));
 }
 */
-
-void DoMainMenu()
-{
-	bool bRunning = true;
-
-	//extern void djHelperGenerateRasterizeTTFFonts();//dj2023-02 internal helper to rasterize ttf font
-	//djHelperGenerateRasterizeTTFFonts();
-
-#ifndef NOSOUND
-	//dj2016-10 adding background music to main menu, though have not put any real thought into what would
-	// be the best track here so fixme todo maybe dig a bit more and find better choice here etc. [also for levels]
-	Mix_Music* pMusic = Mix_LoadMUS(djDATAPATHc("music/eric_matyas/8-Bit-Mayhem.ogg"));
-	if (pMusic!=NULL)
-		Mix_FadeInMusicPos(pMusic, -1, 800, 0);
-	else
-	{
-		//'debugassert' / trap / exception type of thing?
-		printf("Warning: Failed to load main menu music\n");
-	}
-#endif
-
-	do
-	{
-		// Clear back buffer [dj2019-06 .. adding this just to make as if we drop out of bigviewportmode and the menu skin doesn't cover full size, then there may be junk drawn at right or bottom]
-		djgSetColorFore(pVisBack, djColor(0, 0, 0));
-		djgDrawBox(pVisBack, 0, 0, pVisBack->width, pVisBack->height);
-
-		// Load main menu background image
-		if (g_pImgMain)
-		{
-			//dj2023-02 change to new stretchblit helper to support high-res backgrounds for hi-res games:
-			djgDrawImageStretchBlit( pVisBack, g_pImgMain, 0, 0, 0, 0, g_pImgMain->Width(), g_pImgMain->Height(), CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H );
-		}
-		GraphDrawString(pVisBack, g_pFont8x8, 0, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)VERSION);
-		const char* szURL = "djoffe.com";
-		GraphDrawString(pVisBack, g_pFont8x8, CFG_APPLICATION_RENDER_RES_W - strlen(szURL)*8, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)szURL);
-
-		GraphFlip(true);
-
-		// Random select menu cursor, either hearts or skulls
-		mainMenu.setMenuCursor ( (rand()%4==0 ? mainMenuCursorSkull : mainMenuCursor) );
-
-		int menu_option = do_menu( &mainMenu );
-
-		switch (menu_option)
-		{
-		case 1:		/* rtfb's vision of this branch :)*/
-		{
-			//int score = PlayGame ();
-			int score = game_startup();
-			CheckHighScores( score );
-#ifndef NOSOUND
-			// Game levels start their own music, so when come out of game and back to main menu, restart main menu music
-			if (pMusic!=NULL)
-				Mix_FadeInMusicPos(pMusic, -1, 800, 0);
-#endif
-			break;
-		}
-		case 2: // restore game [dj2016-10 adding implementation for this - it did nothing before]
-			{
-				int score = game_startup(true);
-				CheckHighScores( score );
-#ifndef NOSOUND
-				// Game levels start their own music, so when come out of game and back to main menu, restart main menu music
-				if (pMusic!=NULL)
-					Mix_FadeInMusicPos(pMusic, -1, 800, 0);
-#endif
-			}
-			break;
-		case 3: // select mission
-			SelectMission();
-			break;
-		case 6: // instructions
-			ShowInstructions();
-			break;
-		case 7:
-			RedefineKeys();
-			break;
-		case 8:
-			ShowHighScores();
-			break;
-		case 9: // credits
-			ShowCredits();
-			break;
-		case 10: // about
-			ShowAbout();
-			break;
-		case 11://dj2019-06 just-for-fun extra-retro simulated faux-EGA/CGA
-			SettingsMenu();
-			break;
-		case 12://Don't quit
-			break;
-		case -1: // escape
-		case 13: // quit
-			bRunning = false;
-			break;
-		}
-	} while (bRunning);
-
-#ifndef NOSOUND
-	if (pMusic)
-	{
-		Mix_FreeMusic(pMusic);
-		pMusic = NULL;
-	}
-#endif
-}
 
 void AppendCharacter(char *szBuffer, char c, int nMaxLen)
 {
@@ -952,23 +801,23 @@ void RedefineKeys()
 	} while (bLoop);
 }
 
-bool GetHighScoreUserName(std::string& sReturnString)
+bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixelW, const char* szLabel)
 {
-	#define MAX_HIGHSCORE_LEN 256
-	#define WIDTH_INPUTBOX 34
+	//#define MAX_HIGHSCORE_LEN 256
+	//#define WIDTH_INPUTBOX 34
 
 	#ifdef djUNICODE_SUPPORT
 	//SDL_EnableUNICODE(1);
 	std::string sInput;
 	#else
-	char szBuffer[2048] = {0};//temp phase out?
+	char szBuffer[8192] = {0};//temp phase out?
 	#endif
 
 	bool bRet = true; // Return false if user selected quit/close or something
 	bool bLoop = true;
 	do
 	{
-		int nDX = WIDTH_INPUTBOX*8;
+		int nDX = (int)uPixelW;
 		//dj2019-07 for now just stick to 320; genericize better later re CFG_APPLICATION_RENDER_RES_W stuff ..
 		//int nXLeft = (CFG_APPLICATION_RENDER_RES_W/2) - (nDX / 2);
 		int nXLeft = (320/2) - (nDX / 2);
@@ -1056,24 +905,24 @@ bool GetHighScoreUserName(std::string& sReturnString)
 				if (Event.key.keysym.sym>=SDLK_a && Event.key.keysym.sym<=SDLK_z)
 				{
 					// I'm assuming these constants are linearly increasing, hopefully they are
-					AppendCharacter(szBuffer, ((char)Event.key.keysym.sym - SDLK_a) + ((ModState & KMOD_SHIFT) ? 'A' : 'a'), MAX_HIGHSCORE_LEN);
+					AppendCharacter(szBuffer, ((char)Event.key.keysym.sym - SDLK_a) + ((ModState & KMOD_SHIFT) ? 'A' : 'a'), nMaxLen);
 				}
 				else if (Event.key.keysym.sym>=SDLK_0 && Event.key.keysym.sym<=SDLK_9)
 				{
 					const char* acShifted = ")!@#$%^&*(";
 					if (ModState & KMOD_SHIFT)
-						AppendCharacter(szBuffer, acShifted[(char)Event.key.keysym.sym - SDLK_0], MAX_HIGHSCORE_LEN);
+						AppendCharacter(szBuffer, acShifted[(char)Event.key.keysym.sym - SDLK_0], nMaxLen);
 					else
-						AppendCharacter(szBuffer, ((char)Event.key.keysym.sym - SDLK_0) + '0', MAX_HIGHSCORE_LEN);
+						AppendCharacter(szBuffer, ((char)Event.key.keysym.sym - SDLK_0) + '0', nMaxLen);
 				}
 				else
 				{
 					switch (Event.key.keysym.sym)
 					{
-					case SDLK_SPACE:	AppendCharacter(szBuffer, ' ', MAX_HIGHSCORE_LEN); break;
-					case SDLK_PLUS:		AppendCharacter(szBuffer, '+', MAX_HIGHSCORE_LEN); break;
-					case SDLK_MINUS:	AppendCharacter(szBuffer, '-', MAX_HIGHSCORE_LEN); break;
-					case SDLK_COMMA:	AppendCharacter(szBuffer, ',', MAX_HIGHSCORE_LEN); break;
+					case SDLK_SPACE:	AppendCharacter(szBuffer, ' ', nMaxLen); break;
+					case SDLK_PLUS:		AppendCharacter(szBuffer, '+', nMaxLen); break;
+					case SDLK_MINUS:	AppendCharacter(szBuffer, '-', nMaxLen); break;
+					case SDLK_COMMA:	AppendCharacter(szBuffer, ',', nMaxLen); break;
 					case SDLK_BACKSPACE:
 						if (strlen(szBuffer)>0)
 							szBuffer[strlen(szBuffer) - 1] = 0;
@@ -1105,8 +954,11 @@ bool GetHighScoreUserName(std::string& sReturnString)
 #else
 		DialogBoxEffect(nXLeft-4, 100, nDX+8, 16, true);
 #endif
+		/*
 		GraphDrawString( pVisBack, g_pFont8x8, 100,  72, (unsigned char*)"New high score!");
 		GraphDrawString( pVisBack, g_pFont8x8,  96,  88, (unsigned char*)"Enter your name:" );
+		*/
+		GraphDrawString( pVisBack, g_pFont8x8, 100,  72, (unsigned char*)szLabel );
 
 #ifdef djUNICODE_SUPPORT
 		std::string sText = sInput;;
@@ -1144,22 +996,6 @@ bool GetHighScoreUserName(std::string& sReturnString)
 	return bRet;
 }
 
-void CheckHighScores( int score )
-{
-	if (IsNewHighScore(score))
-	{
-		std::string sUserName;
-		if (GetHighScoreUserName(sUserName))
-		{
-			AddHighScore(sUserName.c_str(), score);
-
-			std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_HIGHSCORES);
-			SaveHighScores(s.c_str()); // Save high scores immediately, in case Windows crashes
-		}
-
-		ShowHighScores();
-	}
-}
 
 void SelectMission()
 {
@@ -1212,26 +1048,4 @@ void SelectMission()
 	}
 
 	djDELV(pMenuItems);
-}
-
-void InitMainMenu()
-{
-	mainMenu.setClrBack ( djColor(70,70,80)/*djColor(42,57,112)*/ ); //mainMenu.setClrBack ( djColor(10,40,150) ); // Crap colour. Need something better, like a bitmap
-	//mainMenu.m_clrBack = djColor(129,60,129);
-	mainMenu.setSize ( 0 );
-	mainMenu.setItems ( mainMenuItems );
-	mainMenu.setMenuCursor ( mainMenuCursor );
-	mainMenu.setXOffset (-1);
-	mainMenu.setYOffset (-1);
-	//dj2018-04-01 make the Y position sightly higher by 4 pixel than the default, looks slightly better with new city background
-	mainMenu.setYOffset( 8 * (12 - (13 / 2)) - 4 );//13 = num items
-
-	mainMenu.setSoundMove(djSoundLoad(djDATAPATHc("sounds/cardflip.wav")));
-}
-
-// hmm [dj2022-11] it's maybe sligtly debatable whether main menu 'calls' game or main returns control to some 'game state controller' which launches game -
-// I'm inclined to think the latter is more correct .. tho for simple game overkill but keep moving design in more 'correct' direction..
-void KillMainMenu()
-{
-	// TODO
 }
