@@ -1,4 +1,4 @@
-//Copyright (C) 2022 David Joffe / Dave Gnukem project
+//Copyright (C) 2022-2023 David Joffe / Dave Gnukem project
 //
 //dj2022-11-30 new utf8 helper(s) (and possibly later other encoding or string conversion helpers or wrappers if/as needed in future)
 //NB Design-wise this is conceptually part of the generic reusable code so shouldn't have dependencies to any Dave Gnukem specific parts of the codebase
@@ -74,4 +74,55 @@ int djutf8iterate(const char* sz, const unsigned int uLen, int& c)
 	return -1;
 }
 
-
+void djutf8_encode(unsigned int nUnicodeChar32, char *szBufUTF8, int &uLen)
+{
+	if (nUnicodeChar32 <= 0x7F)
+	{
+		szBufUTF8[uLen++] = (char)nUnicodeChar32;
+	}
+	else if (nUnicodeChar32 <= 0x7FF)
+	{
+		szBufUTF8[uLen++] = (char)(0xC0 | (nUnicodeChar32 >> 6));
+		szBufUTF8[uLen++] = (char)(0x80 | (nUnicodeChar32 & 0x3F));
+	}
+	else if (nUnicodeChar32 <= 0xFFFF)
+	{
+		szBufUTF8[uLen++] = (char)(0xE0 | (nUnicodeChar32 >> 12));
+		szBufUTF8[uLen++] = (char)(0x80 | ((nUnicodeChar32 >> 6) & 0x3F));
+		szBufUTF8[uLen++] = (char)(0x80 | (nUnicodeChar32 & 0x3F));
+	}
+	else if (nUnicodeChar32 <= 0x10FFFF)
+	{
+		szBufUTF8[uLen++] = (char)(0xF0 | (nUnicodeChar32 >> 18));
+		szBufUTF8[uLen++] = (char)(0x80 | ((nUnicodeChar32 >> 12) & 0x3F));
+		szBufUTF8[uLen++] = (char)(0x80 | ((nUnicodeChar32 >> 6) & 0x3F));
+		szBufUTF8[uLen++] = (char)(0x80 | (nUnicodeChar32 & 0x3F));
+	}
+}
+/*
+void djutf8_encode(unsigned int nUnicodeChar32, std::string &sStrUTF8)
+{
+	if (nUnicodeChar32 <= 0x7F)
+	{
+		sStrUTF8.append(1, (char)nUnicodeChar32);
+	}
+	else if (nUnicodeChar32 <= 0x7FF)
+	{
+		sStrUTF8.append(1, (char)(0xC0 | (nUnicodeChar32 >> 6)));
+		sStrUTF8.append(1, (char)(0x80 | (nUnicodeChar32 & 0x3F)));
+	}
+	else if (nUnicodeChar32 <= 0xFFFF)
+	{
+		sStrUTF8.append(1, (char)(0xE0 | (nUnicodeChar32 >> 12)));
+		sStrUTF8.append(1, (char)(0x80 | ((nUnicodeChar32 >> 6) & 0x3F)));
+		sStrUTF8.append(1, (char)(0x80 | (nUnicodeChar32 & 0x3F)));
+	}
+	else if (nUnicodeChar32 <= 0x10FFFF)
+	{
+		sStrUTF8.append(1, (char)(0xF0 | (nUnicodeChar32 >> 18)));
+		sStrUTF8.append(1, (char)(0x80 | ((nUnicodeChar32 >> 12) & 0x3F)));
+		sStrUTF8.append(1, (char)(0x80 | ((nUnicodeChar32 >> 6) & 0x3F)));
+		sStrUTF8.append(1, (char)(0x80 | (nUnicodeChar32 & 0x3F)));
+	}
+}
+*/
