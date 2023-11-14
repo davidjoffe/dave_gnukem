@@ -7,6 +7,8 @@
 # 2016-10: Get this working on Mac OS X [dj]
 # 2017-07-29: Remove obsolete standalone-editor-related stuff, and add new thing_monsters.o
 #
+# ~2019 - ~2023 In-progress work by Donovan Hutchence to get this working with Emscripten
+#
 
 CPP = em++
 CC = emcc
