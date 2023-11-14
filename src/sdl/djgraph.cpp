@@ -106,6 +106,9 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 		pVis->pSurface = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, bpp,
 			0, 0, 0, 0);
 		pVis->pTexture = SDL_CreateTextureFromSurface(pVis->pRenderer, pVis->pSurface);
+		// to check/merge emsdk-build changes ->
+		//// 			pVis->pSurface = SDL_DisplayFormat(pSurface); =>
+		//			pVis->pSurface = SDL_DisplayFormatAlpha(pSurface);
 
 		pVis->width = w;
 		pVis->height = h;
