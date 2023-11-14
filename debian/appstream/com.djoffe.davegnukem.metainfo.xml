@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component type="desktop">
+	<categories>
+		<category>Game</category>
+		<category>ActionGame</category>
+	</categories>
+	<content_rating type="oars-1.1">
+		<content_attribute id="violence-cartoon">mild</content_attribute>
+	</content_rating>
+	<description>
+		<p>Dave Gnukem is an open source retro-style 2D scrolling platform shooter, inspired by and similar to Duke Nukem 1. It currently runs on Windows, macOS, Linux and various other platforms. It is written in C++ using SDL library and it features an integrated level editor as well. This game is not really a clone or remake, it is probably most akin to a parody.</p>
+	</description>
+	<developer_name>David Joffe</developer_name>
+	<id>com.djoffe.davegnukem</id>
+	<keywords>
+		<keyword>2D</keyword>
+		<keyword>Action</keyword>
+		<keyword>Duke Nukem</keyword>
+		<keyword>Platform</keyword>
+		<keyword>Retro</keyword>
+	</keywords>
+	<launchable type="desktop-id">davegnukem.desktop</launchable>
+	<metadata_license>MIT</metadata_license>
+	<name>Dave Gnukem</name>
+	<project_license>GPL-2.0-only OR GPL-3.0-only OR MIT</project_license>
+	<provides>
+		<binary>davegnukem</binary>
+	</provides>
+	<releases>
+		<release version="1.0.3" date="2022-11-28" type="stable">
+			<url>https://github.com/davidjoffe/dave_gnukem/releases/tag/1.0.3</url>
+		</release>
+		<release version="1.0.2" date="2022-11-19" type="stable">
+			<url>https://github.com/davidjoffe/dave_gnukem/releases/tag/1.0.2</url>
+		</release>
+		<release version="1.0.1" date="2020-04-25" type="stable">
+			<url>https://github.com/davidjoffe/dave_gnukem/releases/tag/1.0.1</url>
+		</release>
+		<release version="1.0" date="2018-04-03" type="stable">
+			<url>https://github.com/davidjoffe/dave_gnukem/releases/tag/1.0</url>
+		</release>
+		<release version="0.97" date="2018-04-01" type="stable">
+			<url>https://github.com/davidjoffe/dave_gnukem/releases/tag/0.97</url>
+		</release>
+		<release version="0.96" date="2018-03-31" type="stable">
+			<url>https://github.com/davidjoffe/dave_gnukem/releases/tag/0.96</url>
+		</release>
+		<release version="0.91" date="2018-03-11" type="stable">
+			<url>https://github.com/davidjoffe/dave_gnukem/releases/tag/0.91</url>
+		</release>
+		<release version="0.81" date="2017-08-12" type="stable">
+			<url>https://github.com/davidjoffe/dave_gnukem/releases/tag/v0.81</url>
+		</release>
+		<release version="0.72" date="2017-08-04" type="stable">
+			<url>https://github.com/davidjoffe/dave_gnukem/releases/tag/v0.72</url>
+		</release>
+		<release version="0.70" date="2017-06-22" type="stable">
+			<url>https://github.com/davidjoffe/dave_gnukem/releases/tag/v0.70</url>
+		</release>
+	</releases>
+	<screenshots>
+		<screenshot type="default">
+			<image type="source" width="1280" height="800">https://screenshots.debian.net/shrine/screenshot/simage/large-ba1ad64dbc011af7b899da1f4b97a20d.png</image>
+		</screenshot>
+	</screenshots>
+	<summary>Retro-style 2D scrolling platform shooter</summary>
+	<url type="bugtracker">https://github.com/davidjoffe/dave_gnukem/issues</url>
+	<url type="contact">https://djoffe.com/contact/</url>
+	<url type="contribute">https://djoffe.com/gnukem/#h</url>
+	<url type="donation">https://www.paypal.com/paypalme/davidjoffe</url>
+	<url type="faq">https://github.com/davidjoffe/dave_gnukem#faq-frequently-asked-questions</url>
+	<url type="help">https://djoffe.com/gnukem/#f</url>
+	<url type="homepage">https://djoffe.com/gnukem/</url>
+	<url type="vcs-browser">https://github.com/davidjoffe/dave_gnukem</url>
+</component>

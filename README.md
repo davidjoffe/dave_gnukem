@@ -60,8 +60,6 @@ Development live-stream channel(s):
  * https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrolling-shooter-3 etc.
 * https://www.twitch.tv/david_joffe/
 * https://www.youtube.com/user/davidjoffe2 (partial archive)
-* https://www.pscp.tv/DavidJoffe
-* https://mixer.com/gnukem111
 
 ### Notes
 
@@ -133,6 +131,8 @@ TL;DR Shoot anything that moves
 
 # Ports
 
+* Dave Gnukem on repology: https://repology.org/project/davegnukem/versions (and alternative spelling https://repology.org/project/dave-gnukem/versions)
+* Flathub Flatpak release of Dave Gnukem https://flathub.org/apps/details/com.djoffe.gnukem (~2023 by Matthias Mailänder)
 * OS/2 port by Andreas Peters (~2022/11 merge of ~2020 https://github.com/davidjoffe/dave_gnukem/pull/128)
 * Debian (work in progress ~2022 - Matteo Bini; https://github.com/enigma9o7, https://github.com/bgermann; Craig Langman)
 * Bodhi Linux Dec 2021 efforts: https://bodhilinux.boards.net/thread/892/packaged-dave-gnukem-silly-retro

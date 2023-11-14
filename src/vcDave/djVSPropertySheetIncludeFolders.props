@@ -2,10 +2,37 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup>
-    <IncludePath>e:\vdave\vcpkg\installed\x86-windows\include\SDL2\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>e:\vdave\vcpkg\installed\x86-windows\lib\;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
+
+  <PropertyGroup Condition="'$(Configuration)|$(PlatformShortName)' == 'Release|x86'">
+    <IncludePath>c:\v22\installed\x86-windows\include\;c:\v22\installed\x86-windows\include\SDL2;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>c:\v22\installed\x86-windows\lib\;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(PlatformShortName)' == 'Debug|x86'">
+    <IncludePath>c:\v22\installed\x86-windows\include\;c:\v22\installed\x86-windows\include\SDL2;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>c:\v22\installed\x86-windows\debug\lib\;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(PlatformShortName)' == 'Release|x64'">
+    <IncludePath>c:\v22\installed\x64-windows\include\;c:\v22\installed\x64-windows\include\SDL2;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>c:\v22\installed\x64-windows\lib\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(PlatformShortName)' == 'Debug|x64'">
+    <IncludePath>c:\v22\installed\x64-windows\include\;c:\v22\installed\x64-windows\include\SDL2;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>c:\v22\installed\x64-windows\debug\lib\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(PlatformShortName)' == 'Release|arm64'">
+    <IncludePath>c:\v22\installed\arm64-windows\include\;c:\v22\installed\arm64-windows\include\SDL2;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>c:\v22\installed\arm64-windows\lib\;$(VC_LibraryPath_ARM64);$(WindowsSDK_LibraryPath_ARM64)</LibraryPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(PlatformShortName)' == 'Debug|arm64'">
+    <IncludePath>c:\v22\installed\arm64-windows\include\;c:\v22\installed\arm64-windows\include\SDL2;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>c:\v22\installed\arm64-windows\debug\lib\;$(VC_LibraryPath_ARM64);$(WindowsSDK_LibraryPath_ARM64)</LibraryPath>
+  </PropertyGroup>
+
   <ItemDefinitionGroup />
   <ItemGroup />
 </Project>

@@ -21,7 +21,7 @@
 #define V_DATE "29 Nov 2022"
 #endif
 #ifndef VERSION
-#define VERSION V_NUM " - " V_DATE
+#define VERSION "v" V_NUM " - " V_DATE
 #endif
 
 #endif

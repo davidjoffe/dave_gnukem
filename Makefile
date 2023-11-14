@@ -22,34 +22,33 @@ VERSION  = v$(V_NUM) - $(V_DATE)
 
 # paths
 PREFIX   = /usr/local
+BIN_DIR  = $(PREFIX)/games
 DATA_DIR = $(PREFIX)/share/games/$(BIN)/# the trailing slash is required for paths in the source
 
-LIBS    = `sdl2-config --libs` -lSDL2_mixer
-LDFLAGS = $(LIBS)
+LIBS               = `sdl2-config --libs` -lSDL2_mixer
+LDFLAGS_DAVEGNUKEM = $(LIBS) $(LDFLAGS)
 
-CPPFLAGS = -DDATA_DIR=\"$(DATA_DIR)\" -DVERSION=\"'$(VERSION)'\"
+CPPFLAGS_DAVEGNUKEM = -DDATA_DIR=\"$(DATA_DIR)\" -DVERSION=\"'$(VERSION)'\" $(CPPFLAGS)
 
-CXX = g++
-
-OBJ = $(shell find src -iname '*.cpp' -type f | sed 's/\.cpp$$/.o/')
+OBJ = $(shell find src -iname '*.cpp' -type f | sed 's/\.cpp$$/.o/' | sort)
 
 # debug
-#CXXFLAGS = -ggdb -DDEBUG -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
-CXXFLAGS = -O2 -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS)
+#CXXFLAGS_DAVEGNUKEM = -ggdb -DDEBUG -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS_DAVEGNUKEM) $(CXXFLAGS)
+CXXFLAGS_DAVEGNUKEM = -Os -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS_DAVEGNUKEM) $(CXXFLAGS)
 
 all: options davegnukem
 
 options:
 	@echo davegnukem build options:
-	@echo "CXXFLAGS = $(CXXFLAGS)"
-	@echo "LDFLAGS  = $(LDFLAGS)"
+	@echo "CXXFLAGS = $(CXXFLAGS_DAVEGNUKEM)"
+	@echo "LDFLAGS  = $(LDFLAGS_DAVEGNUKEM)"
 	@echo "CXX      = $(CXX)"
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS_DAVEGNUKEM) -c $< -o $@
 
 davegnukem: $(OBJ)
-	$(CXX) -o $(BIN) $(OBJ) $(LDFLAGS)
+	$(CXX) -o $(BIN) $(OBJ) $(LDFLAGS_DAVEGNUKEM)
 
 clean:
 	rm -f $(BIN) $(BIN)-$(V_NUM).tar.gz
@@ -63,10 +62,14 @@ dist: clean
 	rm -fr $(BIN)-$(V_NUM)
 
 install: 
+	# appstream file
+	mkdir -p $(DESTDIR)$(PREFIX)/share/metainfo
+	cp -f debian/appstream/com.djoffe.$(BIN).metainfo.xml $(DESTDIR)$(PREFIX)/share/metainfo
+	chmod 644 $(DESTDIR)$(PREFIX)/share/metainfo/com.djoffe.$(BIN).metainfo.xml
 	# binary
-	mkdir -p $(DESTDIR)$(PREFIX)/games
-	cp -f $(BIN) $(DESTDIR)$(PREFIX)/games
-	chmod 755 $(DESTDIR)$(PREFIX)/games/$(BIN)
+	mkdir -p $(DESTDIR)$(BIN_DIR)
+	cp -f $(BIN) $(DESTDIR)$(BIN_DIR)
+	chmod 755 $(DESTDIR)$(BIN_DIR)/$(BIN)
 	# data
 	mkdir -p $(DESTDIR)$(DATA_DIR)
 	cp -fR data/* $(DESTDIR)$(DATA_DIR)
@@ -86,20 +89,27 @@ install:
 	cp -f HISTORY.txt README.md $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
 	chmod 644 $(DESTDIR)$(PREFIX)/share/doc/$(BIN)/HISTORY.txt \
 		$(DESTDIR)$(PREFIX)/share/doc/$(BIN)/README.md
-	# icon
+	# icons
 	mkdir -p $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps
 	cp -f debian/icons/hicolor/32x32/apps/$(BIN).png $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps
 	chmod 644 $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps/$(BIN).png
+	mkdir -p $(DESTDIR)$(PREFIX)/share/icons/hicolor/128x128/apps
+	cp -f debian/icons/hicolor/128x128/apps/$(BIN).png $(DESTDIR)$(PREFIX)/share/icons/hicolor/128x128/apps
+	chmod 644 $(DESTDIR)$(PREFIX)/share/icons/hicolor/128x128/apps/$(BIN).png
 	# manual page
 	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man6
 	sed 's/VERSION/$(VERSION)/' < debian/$(BIN).6 > $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
 	chmod 644 $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
 
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/games/$(BIN) 
-	rm -fr $(DESTDIR)$(PREFIX)/share/games/$(BIN) 
+	rm -f $(DESTDIR)$(PREFIX)/share/metainfo/com.djoffe.$(BIN).metainfo.xml
+	rm -f $(DESTDIR)$(BIN_DIR)/$(BIN)
+	rm -fr $(DESTDIR)$(DATA_DIR)
 	rm -fr $(DESTDIR)$(PREFIX)/share/doc/$(BIN)-data
 	rm -f $(DESTDIR)$(PREFIX)/share/applications/$(BIN).desktop
 	rm -fr $(DESTDIR)$(PREFIX)/share/doc/$(BIN)
 	rm -f $(DESTDIR)$(PREFIX)/share/icons/hicolor/32x32/apps/$(BIN).png	
+	rm -f $(DESTDIR)$(PREFIX)/share/icons/hicolor/128x128/apps/$(BIN).png
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man6/$(BIN).6
+
+.PHONY: all options clean dist install uninstall

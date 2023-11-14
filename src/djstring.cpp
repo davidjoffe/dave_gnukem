@@ -1,25 +1,17 @@
 /*
 djstring.cpp
 
-Copyright (C) 1998-2022 David Joffe
+Copyright (C) 1998-2023 David Joffe
 */
 
 #include "config.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string>//std::to_string
 
 #include "djstring.h"
 #include <stdarg.h>//va_list etc. [for djStrPrintf dj2016-10]
-#ifdef WIN32
-#include <Windows.h>//GetFileAttributes [for djFileExists]
-#include "Shlobj.h"//SHCreateDirectoryEx
-#else
-#include <sys/types.h>//stat [for djFileExists]
-#include <sys/stat.h>
-#include <unistd.h>
-#include <errno.h>//mkpath
-#endif
 
 char *djStrDeepCopy( const char * src )
 {
@@ -97,7 +89,7 @@ char* djStrPart( const char *str, int i, const char *delim )
 
 void djStrToLower( char * str )
 {
-	for ( unsigned int i=0; i<strlen(str); i++ )
+	for ( unsigned int i=0; i<strlen(str); ++i )
 	{
 		if ((str[i] >= 'A') && (str[i] <= 'Z')) str[i] += 32;
 	}
@@ -167,120 +159,6 @@ std::string djAppendPathStr(const char* szBase,const char* szAppend)
 	return sPath;
 }
 
-#ifdef WIN32
-
-bool djFolderExists(const char* szPath)
-{
-	DWORD dwAttrib = GetFileAttributes(szPath);
-	return (dwAttrib != INVALID_FILE_ATTRIBUTES && 
-		(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
-}
-
-bool djFileExists(const char* szPath)
-{
-	DWORD fileAttr = ::GetFileAttributes(szPath);
-	if (0xFFFFFFFF == fileAttr)
-		return false;
-	return true;
-}
-
-bool djEnsureFolderTreeExists(const char* szPath)
-{
-	if (djFolderExists(szPath))return true;
-	// "Returns ERROR_SUCCESS if successful"
-	if (::SHCreateDirectoryEx(NULL,szPath,NULL)==ERROR_SUCCESS)
-		return true;
-	return false;
-}
-
-#else
-//#ifdef __APPLE__
-bool djFolderExists(const char* szPath)
-{
-	struct stat sb;
-	if (stat(szPath, &sb) == 0 && S_ISDIR(sb.st_mode))
-	{
-		return true;
-	}
-	return false;
-}
-bool djFileExists(const char* szPath)
-{
-	struct stat sb;
-	if (stat(szPath, &sb) == 0 && S_ISREG(sb.st_mode))
-	{
-		return true;
-	}
-	return false;
-}
-
-//[dj2018-03]https://stackoverflow.com/questions/675039/how-can-i-create-directory-tree-in-c-linux
-typedef struct stat Stat;
-static int do_mkdir(const char *path, mode_t mode)
-{
-	Stat            st;
-	int             status = 0;
-
-	if (stat(path, &st) != 0)
-	{
-		/* Directory does not exist. EEXIST for race condition */
-		if (mkdir(path, mode) != 0 && errno != EEXIST)
-			status = -1;
-	}
-	else if (!S_ISDIR(st.st_mode))
-	{
-		errno = ENOTDIR;
-		status = -1;
-	}
-
-	return(status);
-}
-/**
-** mkpath - ensure all directories in path exist
-** Algorithm takes the pessimistic view and works top-down to ensure
-** each directory in path exists, rather than optimistically creating
-** the last element and working backwards.
-*/
-int mkpath(const char *path, mode_t mode)
-{
-	char           *pp;
-	char           *sp;
-	int             status;
-	char           *copypath = strdup(path);
-
-	status = 0;
-	pp = copypath;
-	while (status == 0 && (sp = strchr(pp, '/')) != 0)
-	{
-		if (sp != pp)
-		{
-			/* Neither root nor double slash in path */
-			*sp = '\0';
-			status = do_mkdir(copypath, mode);
-			*sp = '/';
-		}
-		pp = sp + 1;
-	}
-	if (status == 0)
-		status = do_mkdir(path, mode);
-	free(copypath);
-	return (status);
-}
-bool djEnsureFolderTreeExists(const char* szPath)
-{
-	//debug//printf("djEnsureFolderTreeExists(%s)\n",szPath);fflush(NULL);
-	if (djFolderExists(szPath))return true;
-	//debug//printf("2");
-	mkpath(szPath, 0777);
-	//mkdir(szPath, 0777);
-	//debug//printf("(Exists?=%s)\n",djFolderExists(szPath)?"YES":"NO");fflush(NULL);
-	return djFolderExists(szPath);
-	//return mkpath(szPath);
-}
-//#else
-
-#endif
-
 std::string djGetFolderUserSettings()
 {
 #ifdef WIN32
@@ -298,10 +176,23 @@ std::string djGetFolderUserSettings()
 	return s;
 }
 
+// Hardly anything uses this function should it even exist if we now have things like std::to_string? Helpers like this made more sense in the days pre things like std::to_string [dj2023]
 std::string djIntToString(int n)
 {
+	//[dj 2013] todo replace with std::to_string? [low] - it's also more thread-safe - and not prone to issues like e.g. possible overrun or cutoff if sizeof(int) is 64-bits on some platform .. it's good to try phase out these printf-style buffers
+#if __cplusplus>=201103L // c++11?
+	return std::to_string(n);
+#else
 	// Note NB this must be large enough for e.g. 128-bit ints 'just in case'. Also this function should be threadsafe so no static buffers etc.
 	char buf[128] = { 0 };
 	snprintf(buf, sizeof(buf), "%d", n);
 	return buf;
+#endif
+}
+
+void djStripCRLF(char* buf)
+{
+	// While last character in string is either CR or LF, remove.
+	while (strlen(buf) >= 1 && ((buf[strlen(buf) - 1] == '\r') || (buf[strlen(buf) - 1] == '\n')))
+		buf[strlen(buf) - 1] = '\0';
 }

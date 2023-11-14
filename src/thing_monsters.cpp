@@ -1,11 +1,12 @@
 /*--------------------------------------------------------------------------*/
 // thing_monsters.cpp
 /*
-Copyright (C) 2000-2020 David Joffe
+Copyright (C) 2000-2022 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "config.h"
 #include "thing_monsters.h"
+#include "djtypes.h"//djMAX etc.
 #include "block.h"
 #include "mission.h"//GET_EXTRA
 #include "graph.h"//pVisView etc.
@@ -241,7 +242,7 @@ int CRobot::Tick(float fDeltaTime_ms)
 			if (IsInView())
 			{
 				// Check we're facing hero, and hero is more or less at same height ..
-				if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
+				if ((djABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 				{
 					if ((rand()%100)<=3)
 					{
@@ -459,7 +460,7 @@ int CFlyingRobot::Tick(float fDeltaTime_ms)
 		if (IsInView())
 		{
 			// Check we're facing hero, and hero is more or less at same height ..
-			if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
+			if ((djABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 			{
 				if ((rand()%50)<=2)
 				{
@@ -743,7 +744,7 @@ int CCannon::Tick(float fDeltaTime_ms)
 		if (IsInView())
 		{
 			// Check we're facing hero, and hero is more or less at same height ..
-			if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
+			if ((djABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 			{
 				if ((rand()%50)<=2)
 				{
@@ -856,9 +857,9 @@ int CCrawler::Tick(float fDeltaTime_ms)
 void CCrawler::Draw(float fDeltaTime_ms)
 {
 #ifdef djSPRITE_AUTO_DROPSHADOWS
-	DRAW_SPRITEA_SHADOW(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_yoffset,BLOCKW,BLOCKH);
+	DRAW_SPRITEA_SHADOW(pVisView, m_a, djSGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, 1+CALC_XOFFSET(m_x), 1+CALC_YOFFSET(m_y) + m_yoffset,BLOCKW,BLOCKH);
 #endif
-	DRAW_SPRITE16A(pVisView, m_a, SGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) + m_yoffset);
+	DRAW_SPRITE16A(pVisView, m_a, djSGN(m_nXDir)*m_nDir<0 ? m_b + 3 - anim4_count : m_b + anim4_count, CALC_XOFFSET(m_x), CALC_YOFFSET(m_y) + m_yoffset);
 }
 
 int CCrawler::OnHeroShot()
@@ -1074,7 +1075,7 @@ int CJumpingMonster::Tick(float fDeltaTime_ms)
 	if (IsInView() && !m_bFalling && !IsJumping())
 	{
 		// Check we're facing hero, and hero is more or less at same height ..
-		if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
+		if ((djABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 		{
 			m_bLinedUpToShoot = true;
 			if (m_nNoShootCounter>0)
@@ -1210,7 +1211,7 @@ int CDrProton::Tick(float fDeltaTime_ms)
 		{
 			m_nDesiredXRandomVariation = ((rand()%5)-2)*2;//[-4,-2,0,2,4]
 		}
-		//if (ABS(m_nOrigX - m_x) < 3)
+		//if (djABS(m_nOrigX - m_x) < 3)
 		{
 			if (m_x < (g_Player.x + m_nDesiredXRandomVariation))
 			{
@@ -1269,7 +1270,7 @@ int CDrProton::Tick(float fDeltaTime_ms)
 		if (IsInView())// && !m_bFalling && !IsJumping())
 		{
 			// Check we're facing hero, and hero is more or less at same height ..
-			if ((ABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
+			if ((djABS(g_Player.y-m_y)<3) && ((m_nXDir<0 && g_Player.x<=m_x) || (m_nXDir>0 && g_Player.x>=m_x)))
 			{
 				//m_bLinedUpToShoot = true;
 				if (m_nNoShootCounter>0)

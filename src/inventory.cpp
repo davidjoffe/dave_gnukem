@@ -122,7 +122,7 @@ void InvDraw()
 
 int InvGetSize()
 {
-	return g_apInventory.size();
+	return (int)g_apInventory.size();
 }
 
 CThing *InvGetItem(int n)

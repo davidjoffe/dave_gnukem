@@ -8,13 +8,14 @@ SHELL := sh -e
 	dh $@
 
 override_dh_auto_build:
-	$(MAKE) PREFIX=/usr
+	dh_auto_build -- PREFIX=/usr
 
 override_dh_auto_install:
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/davegnukem PREFIX=/usr
+	dh_auto_install -- DESTDIR=$(CURDIR)/debian/davegnukem PREFIX=/usr
 
 	mkdir -p debian/davegnukem-data/usr/share/games
 	mv debian/davegnukem/usr/share/games/davegnukem debian/davegnukem-data/usr/share/games
+	rmdir debian/davegnukem/usr/share/games
 	mkdir -p debian/davegnukem-data/usr/share/doc
 	mv debian/davegnukem/usr/share/doc/davegnukem-data debian/davegnukem-data/usr/share/doc
 	

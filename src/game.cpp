@@ -9,6 +9,7 @@
 
 #include "config.h"
 #include "djfile.h"//dj2022-11
+#include "djtypes.h"
 #include "effect_viewportshadow.h"//dj2022
 #include <stdio.h>
 #include <stdlib.h>
@@ -620,7 +621,7 @@ void UpdateBullets(float fDeltaTime_ms)
 		// (that last case would probably resemble a 'line algorithm') [dj2018-01]
 		int nXPixelDelta = pBullet->dx < 0 ? -1 : 1;
 		int nY = pBullet->y;
-		int nXNumPixelsToMove = ABS(pBullet->dx);
+		int nXNumPixelsToMove = djABS(pBullet->dx);
 		for ( int n=0; n<nXNumPixelsToMove; ++n )
 		{
 			// [dj2018-01]
@@ -877,7 +878,9 @@ void GameInitialSetup()
 	ReInitGameViewport();
 
 	InitHighScores();
-	LoadHighScores();		// Load high scores
+	// Prepend usersettings folder
+	std::string sFilenameHighScores = djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_HIGHSCORES);
+	LoadHighScores(sFilenameHighScores.c_str());		// Load high scores
 
 	SYS_Debug ( "GameInitialSetup(): loading sounds\n" );
 	// Load the game sounds
@@ -1006,7 +1009,7 @@ void PerLevelSetup()
 	g_pInGameMusic = Mix_LoadMUS((sBasePath + asMusicFiles[nMusicFile]).c_str());
 	if (g_pInGameMusic!=NULL)
 	{
-		Mix_FadeInMusic(g_pInGameMusic, -1, 500);
+		Mix_FadeInMusicPos(g_pGameMusic, -1, 500, 0);
 	}
 #endif
 
@@ -1313,7 +1316,12 @@ int game_startup(bool bLoadGame)
 		while (fTimeNow<fTimeNext || bForceUpdate) // until we reach next frames time
 		{
 			// Try to prevent this from hogging the CPU, which can adversely affect other processes
+			//dj this #ifdef etc. a bit gross/clunky should we wrap 'SDL_delay' in a simple wrapper functino to deal with emscripted in there in one place application-wide, or what better way? Hm
+			#ifdef __EMSCRIPTEN__
+			/*SDL_Delay(1);*/
+			#else
 			SDL_Delay(1);
+			#endif
 
 			// poll keys
 			djiPollBegin();
@@ -1632,7 +1640,11 @@ int game_startup(bool bLoadGame)
 					if (g_iKeys[DJKEY_PGDN])
 					{
 						ShowGameMessage("CHEAT: HealthKeysFirepower", 96);
+#ifdef __EMSCRIPTEN__
+						/*SDL_Delay(100);*///<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
+#else
 						SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
+#endif
 						// Full health
 						SetHealth(MAX_HEALTH);
 
@@ -1714,7 +1726,11 @@ int game_startup(bool bLoadGame)
 					{
 						// Note this function does clamping to MAX_FIREPOWER so we don't need to check here
 						HeroSetFirepower(g_nFirepower+1);
+#ifdef __EMSCRIPTEN__
+						/*SDL_Delay(200);*///<-'wrong' workaround for, it immediately adds a lot
+#else
 						SDL_Delay(200);//<-'wrong' workaround for, it immediately adds a lot
+#endif
 					}
 				}
 #endif//#ifdef DAVEGNUKEM_CHEATS_ENABLED
@@ -1834,8 +1850,8 @@ int game_startup(bool bLoadGame)
 
 		// ensure we don't leave the borders of the level
 		// fixme; is this still necessary what with the (other functions)
-		g_Player.x = MAX( MIN(g_Player.x,126), 1 );
-		g_Player.y = MAX( MIN(g_Player.y, 99), 2 );
+		g_Player.x = djMAX( djMIN(g_Player.x,126), 1 );
+		g_Player.y = djMAX( djMIN(g_Player.y, 99), 2 );
 		//debug//printf("}");
 
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
@@ -2993,6 +3009,10 @@ bool SaveGame()
 bool LoadGame()
 {
 	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_SAVEGAME);
+
+	if (!djFileExists(s.c_str()))// [dj2022-11]
+		return false;
+
 	FILE *pIn = djFile::dj_fopen(s.c_str(), "r");
 	if (pIn==NULL)
 		return false;

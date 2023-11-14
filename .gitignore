@@ -1,5 +1,9 @@
 #dj2019-05 Creating basic .gitignore, this file isn't critical but maybe just makes it a bit easier when working.
 
+/MacRelease*
+# Likely Finder droppings
+*.DS_Store
+
 #The data subfolder is just a separate git project ie https://github.com/davidjoffe/gnukem_data - don't try commit etc. here
 /data
 #Same with datasrc if you have it

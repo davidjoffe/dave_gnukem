@@ -3,7 +3,7 @@
 \brief   Graphics helpers
 \author  David Joffe
 
-Copyright (C) 1998-2022 David Joffe
+Copyright (C) 1998-2023 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 // graph.h
@@ -25,6 +25,7 @@ Copyright (C) 1998-2022 David Joffe
 //! Image file to use for font
 //#define FILE_IMG_FONT DATA_DIR "font.tga"
 #define DATAFILE_IMG_FONT "font.tga"
+//#define DATAFILE_IMG_FONT "fonts/PixelOperator8.ttf.png"
 
 //! Main visual
 extern djVisual *pVisMain;

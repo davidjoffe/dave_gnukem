@@ -3,7 +3,7 @@
 // David Joffe 1998/12
 // replacing the old djgega.cpp graphics interface
 /*
-Copyright (C) 1998-2022 David Joffe
+Copyright (C) 1998-2023 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 
@@ -30,6 +30,10 @@ Copyright (C) 1998-2022 David Joffe
 #include "djfonts.h"
 #include "datadir.h"//LoadFont
 #endif//#ifdef djUNICODE_TTF
+
+#ifdef djUSE_SDLIMAGE//d2023-02
+#include <SDL_image.h>
+#endif
 
 #include "console.h"//dj2022-11 refactoring
 #include "sys_log.h"//djLog helpers
@@ -168,6 +172,12 @@ bool djSDLInit()
 	// Initialize graphics library
 	SDL_Init(SDL_INIT_VIDEO);
 
+#ifdef djUSE_SDLIMAGE//dj2023-02
+	// Initialize SDL_image for PNG loading
+	const int nImgFlags = IMG_INIT_PNG|IMG_INIT_JPG;
+	/*int nRet = */IMG_Init(nImgFlags/*|IMG_INIT_TIF*/);
+#endif
+
 #ifdef djUNICODE_TTF
 	TTF_Init();//dj2022-11
 #endif
@@ -177,6 +187,10 @@ bool djSDLDone()
 {
 #ifdef djUNICODE_TTF
 	TTF_Quit();//dj2022-11
+#endif
+
+#ifdef djUSE_SDLIMAGE
+	IMG_Quit();
 #endif
 
 	SDL_Quit();
@@ -274,6 +288,8 @@ bool djGraphicsSystem::GraphInit( bool bFullScreen, int iWidth, int iHeight, int
 
 	//--- (5) Create hardware surface for main 8x8 font bitmap (FIXME error check)
 	djCreateImageHWSurface(g_pFont8x8);
+	//SDL_Surface *pSurface = (SDL_Surface *)djCreateImageHWSurface(g_pFont8x8);
+	//SDL_SetColorKey(pSurface, SDL_TRUE, SDL_MapRGB(pSurface->format, 0, 0, 0));
 
 #ifdef WIN32
 	// [Windows] Not sure if it's LibSDL or Windows but the window keeps getting created positioned so that the bottom portion of it is

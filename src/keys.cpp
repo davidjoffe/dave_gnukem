@@ -14,6 +14,7 @@ Created: 09/2001
 #include "SDL.h"
 #endif
 #include <vector>
+#include <stdio.h>
 
 // dj2022-11 [low prio] we might want to give porters more control over these default keys (some consolde platforms have needed to hardcode oddly specific things like 'j' etc. here, can't recall which right now but I saw it in a Dave Gnukem fork recently) ..
 // Also to think about is that a slightly rude user reported to me that these keys can interfere with default keys for some window managers like MATE etc. apparently for things like desktop switching? Or something like that

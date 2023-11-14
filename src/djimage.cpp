@@ -1,13 +1,14 @@
 /*
 djimage.cpp
 
-Copyright (C) 1998-2022 David Joffe
+Copyright (C) 1998-2023 David Joffe
 
 dj2022-11 Note that since we're now on SDL2 we could potentially use e.g. SDLimage lib to more easily load 'better' file formats like png etc. (though would just require a new dependency)
 */
 
 #include "config.h"
 #include "djimage.h"
+#include "djimageload.h"
 #include "djfile.h"
 #include "djstring.h"
 #include "djtypes.h"
@@ -72,7 +73,7 @@ djImage::djImage( int iWidth, int iHeight, int ibpp )
 	m_iWidth    = iWidth;
 	m_iHeight   = iHeight;
 	m_ibpp      = ibpp;
-	m_ipixwidth = CalculatePixelWidth( ibpp );
+	m_ipixwidth = CalculatePixelWidthBytesPerPixel( ibpp );
 	m_ipitch = m_ipixwidth * iWidth;
 
 	m_pData = new unsigned char[iWidth*iHeight*m_ipixwidth];
@@ -87,25 +88,50 @@ djImage::~djImage()
 	djDELV(m_pData);
 }
 
-void djImage::CreateImage( int x, int y, int ibpp, int ipitch/*=-1*/ )
+void djImage::CreateImage( int x, int y, int nBitsPerPixel, int pitch/*=-1*/, void* pOptionalCopyDataFrom, unsigned int Rmask
+	, unsigned int Gmask
+	, unsigned int Bmask
+	, unsigned int Amask
+ )
 {
 	djDELV(m_pData);
 
+	//dj2023-02 new fields adding to help with possible PNG loading different formats so we can be mroe explicit
+	m_Rmask = Rmask;
+	m_Gmask = Gmask;
+	m_Bmask = Bmask;
+	m_Amask = Amask;
+
 	m_iWidth = x;
 	m_iHeight = y;
-	m_ibpp = ibpp;
-	m_ipixwidth = CalculatePixelWidth( ibpp );
-	if (ipitch==-1) ipitch = m_ipixwidth * x;
-	m_ipitch = ipitch;
+	m_ibpp = nBitsPerPixel;
+	m_ipixwidth = CalculatePixelWidthBytesPerPixel( nBitsPerPixel );
+	
+	// if pitch negative auto-calculate it by multiplying horizontal pixels by bytes-per-pixel
+	if (pitch<=0) pitch = m_ipixwidth * x;
+	// error-check: logically pitch must be a minimum of 'm_ipixwidth * x' (but it may be higher, that's the point of pitch/stride)
+	if (pitch<m_ipixwidth * x) pitch = m_ipixwidth * x;
 
-	m_pData = new unsigned char[ipitch*y*m_ipixwidth];
+	m_ipitch = pitch;
+
+	// dj2023-02 this code that was here for ages looks wrong but then it's always been wrong how can nobody have noticed until now?
+	// "pitch*y*m_ipixwidth" seems to alloc too much ..? the pitch is already the 'bytes per row' so we should only have to multiply 'bytes per row * rows' I think?
+	//m_pData = new unsigned char[pitch*y*m_ipixwidth];
+	// if thing suddenly start crashing here though, this is probably the culprit .. dj2023-02 .. as I'm changing what appears to be an over-alloc of memory in this image data
+	const size_t uMemSize = pitch*y;
+	m_pData = new unsigned char[uMemSize];
 	if (m_pData != NULL)
-		memset( (void*)m_pData, 0, ipitch*y*m_ipixwidth );
+	{
+		if (pOptionalCopyDataFrom)
+			memcpy((void*)m_pData, pOptionalCopyDataFrom, uMemSize);
+		else
+			memset( (void*)m_pData, 0, uMemSize);
+	}
 }
 
-int djImage::CalculatePixelWidth( int ibpp )
+int djImage::CalculatePixelWidthBytesPerPixel( int nBitsPerPixel )
 {
-	switch (ibpp)
+	switch (nBitsPerPixel)
 	{
 	case  8: return 1;
 	case 16: return 2;
@@ -158,43 +184,25 @@ int djImage::Load( const char * szFilename )
 	if (szFilename == NULL) return -1; // NULL string
 	if (szFilename[0] == 0) return -1; // empty string
 
-	//char * szTemp = NULL;
-	//char * szExt = NULL;
-	int    ret = -1;
+    std::string filename = szFilename;
+    std::string extension = filename.substr(filename.find_last_of(".") + 1);
+	extern void djStrToLowerTmpHelper( std::string& s );
+    djStrToLowerTmpHelper(extension);
 
-	 // fixme why are we bothering with all this? we only load TGA
-	ret = LoadTGA(szFilename);
-	if (ret < 0)
+    // For TGA files pass to our own old TGA loader
+	if (extension == "tga")
 	{
-		//dj2022-11 hm this is maybe slightly gross must rethink where all the various logs "should" go etc. and clean up logging system
-		printf("Warning: Image load failed: %s\n", szFilename);
-		//fixme add some sort of 'debugassert' stuff here to help with testign?
-	}
-	/*
-	szTemp = djStrDeepCopy( szFilename );
-	djStrToLower( szTemp );
-
-	// Attempt to determine file type from extension
-	if ( strlen( szTemp ) >= 4 )
-	{
-		szExt = szTemp + strlen(szTemp) - 4;
-		//if (0 == strncmp( szExt, ".spr", 4 ))      ret = LoadSPR( szFilename );
-		if (0 == strncmp( szExt, ".tga", 4 )) ret = LoadTGA( szFilename );
-		else
+		// fixme why are we bothering with all this? we only load TGA
+		int ret = LoadTGA(szFilename);
+		if (ret < 0)
 		{
-			// Attempt to load image as dj sprite file
-			ret = -1;// LoadSPR(szFilename);
+			// dj2022-11 hm this is maybe slightly gross must rethink where all the various logs "should" go etc. and clean up logging system
+			printf("Warning: Image load failed: %s\n", szFilename);
+			// fixme add some sort of 'debugassert' stuff here to help with testign?
 		}
+		return ret;
 	}
-	else
-	{
-		// Attempt to load image as dj sprite file
-		//ret = LoadSPR( szFilename );
-	}
-
-	djDELV(szTemp);
-	*/
-	return ret;
+	return djImageLoad::LoadImage(this, szFilename);
 }
 
 int djImage::LoadTGA( const char * szFilename )

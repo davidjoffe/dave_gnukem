@@ -12,7 +12,24 @@ Copyright (C) 1998-2022 David Joffe
 #ifdef __OS2__
 #include <SDL/SDL.h>
 #else
+
+#ifdef __EMSCRIPTEN__
+//emsdk ..
+#include <SDL/SDL.h>
+#else
+
+//// __has_include is only C++17 or higher
+//#if __cplusplus>=201703L && __has_include(<SDL/SDL.h>)
+//#include <SDL/SDL.h>
+//#elif __cplusplus>=201703L && __has_include(<SDL.h>)
+//#include <SDL.h>
+//#else
+// [todo tidy this all up and simplify and maybe add a small simple light wrapper helper .h (or more than one) to help with this stuff]
+// Want to try be slightly smarter with __has_include (but it's C++17 only) so don't want to uncomment these things yet until I've tested it better so leaving it commented for now
+// All our includes are done like "SDL.h" and I've seen samples online that do it but it seems wrong because "" means check current directory first, which is davegnukem which obviously does not have SDL.h so shouldn't these all be <SDL.h> etc.? I think if we're on C++7 or higher it's a good idea to maybe try detect and do fallbacks etc.
 #include "SDL.h"
+//#endif
+
 #endif
 
 #include "djimage.h"
@@ -123,6 +140,7 @@ extern void       djgDrawVLine( djVisual * pVis, int x, int y, int n );
 extern void       djgDrawImage( djVisual *pVis, djImage *pImage, int x, int y, int w, int h );
 //! Draw (w,h) pixels of an image at (xD,yD) from (xS,yS) on image
 extern void       djgDrawImage( djVisual *pVis, djImage *pImage, int xS, int yS, int xD, int yD, int w, int h );
+extern void       djgDrawImageStretchBlit( djVisual *pVis, djImage *pImage, int xS, int yS, int xD, int yD, int wS, int hS, int wD, int hD );
 //! Draw (w,h) pixels of an image at (xD,yD) from (xS,yS) on image with transparency
 extern void       djgDrawImageAlpha( djVisual *pVis, djImage *pImage, int xS, int yS, int xD, int yD, int w, int h );
 //! Draw (w,h) pixels from a visual at (xD,yD) from (xS,yS)

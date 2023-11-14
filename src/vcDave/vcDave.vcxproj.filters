@@ -78,6 +78,9 @@
     <ClCompile Include="..\djimage.cpp">
       <Filter>Source Files\djGameLib</Filter>
     </ClCompile>
+    <ClCompile Include="..\djimageload.cpp">
+      <Filter>Source Files\djGameLib</Filter>
+    </ClCompile>
     <ClCompile Include="..\djlog.cpp">
       <Filter>Source Files\djGameLib</Filter>
     </ClCompile>
@@ -207,6 +210,9 @@
       <Filter>Header Files\djGameLibHeaders</Filter>
     </ClInclude>
     <ClInclude Include="..\djimage.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djimageload.h">
       <Filter>Header Files\djGameLibHeaders</Filter>
     </ClInclude>
     <ClInclude Include="..\djinput.h">

@@ -140,6 +140,7 @@
     <ClCompile Include="..\djfile.cpp" />
     <ClCompile Include="..\djfonts.cpp" />
     <ClCompile Include="..\djimage.cpp" />
+    <ClCompile Include="..\djimageload.cpp" />
     <ClCompile Include="..\djlog.cpp" />
     <ClCompile Include="..\djstring.cpp" />
     <ClCompile Include="..\djtypes.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="..\djgamelib.h" />
     <ClInclude Include="..\djgraph.h" />
     <ClInclude Include="..\djimage.h" />
+    <ClInclude Include="..\djimageload.h" />
     <ClInclude Include="..\djinput.h" />
     <ClInclude Include="..\djlog.h" />
     <ClInclude Include="..\djsound.h" />

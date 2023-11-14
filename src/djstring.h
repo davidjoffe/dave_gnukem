@@ -35,13 +35,13 @@ extern void djAppendPathS(std::string& sPath,const char* szAppend);
 extern void djAppendPath(char* szPath,const char* szAppend);
 extern std::string djAppendPathStr(const char* szBase,const char* szAppend);
 
-extern bool djFolderExists(const char* szPath);
-extern bool djFileExists(const char* szPath);
-extern bool djEnsureFolderTreeExists(const char* szPath);
 
 // This doesn't belong in djstring.h[dj2018-03]
 extern std::string djGetFolderUserSettings();
 
 extern std::string djIntToString(int n);
+
+//! Strip newline character from string (to handle both UNIX and stupid DOS text file formats)
+extern void djStripCRLF(char* buf);
 
 #endif

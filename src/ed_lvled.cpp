@@ -1346,7 +1346,7 @@ void ShowInstructions()
 	unsigned int uMaxStrLen = 0;
 	for ( int i=0; i<NUM_LEVEL_INSTRUCTIONS; ++i )//Get longest string width, to calculate this things width
 	{
-		uMaxStrLen = djMAX(uMaxStrLen,strlen(level_instructions[i]));
+		uMaxStrLen = djMAX(uMaxStrLen, (unsigned int)strlen(level_instructions[i]));
 	}
 	unsigned int uOffsetX = pVisMain->width - uMaxStrLen * FONT_WIDTH;
 	unsigned int uOffsetY = pVisMain->height - NUM_LEVEL_INSTRUCTIONS * FONT_HEIGHT;

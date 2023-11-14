@@ -8,6 +8,7 @@ Copyright (C) 2001-2022 David Joffe
 
 #include "settings.h"
 #include "djfile.h"
+#include "djstring.h"
 #include <stdio.h>
 #include "djtypes.h"
 
@@ -25,10 +26,20 @@ CSettings::~CSettings()
 bool CSettings::Load(const char *szFilename)
 {
 	DeleteAllSettings();
+
+	// dj2022-12 adding this check so we don't log spurious scary-sounding message on first time run of application as it's normal for the file not to be there yet
+	if (!djFileExists(szFilename))
+	{
+		//printf("User settings file not found, using default settings\n");
+		return false;
+	}
+
 	FILE *pIn = djFile::dj_fopen(szFilename, "r");
 	if (pIn==NULL)
 		return false;
-	char buf[2048]={0};
+
+	// fixme should actually phase out these kinds of static buffer loading entirely .. must do carefully tho in a way that we can handle arb 'fuzztest' style data etc. without overruns or crashes or game freezing on incredibly long lines or trying to alloc 4GB text lines .. so not entirely trivial ... create some helpers maybe 
+	char buf[4096]={0};
 
 	//" If the End-of-File is encountered and no characters have been read, the contents of str remain unchanged and a null pointer is returned."
 	#define djREADLINE() buf[0]=0; if ((fgets(buf, sizeof(buf), pIn) == NULL) && ferror(pIn)) goto error; djStripCRLF(buf)

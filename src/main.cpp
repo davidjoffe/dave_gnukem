@@ -11,7 +11,7 @@
 // ~2022 : Matteo Bini migration from SDL1 to SDL2
 
 /*
-Copyright (C) 1995-2022 David Joffe
+Copyright (C) 1995-2023 David Joffe
 */
 
 /*--------------------------------------------------------------------------*/
@@ -27,7 +27,9 @@ Copyright (C) 1995-2022 David Joffe
 
 #include "graph.h"
 
+#include "djfile.h"//djFileExists etc.
 #include "djimage.h"
+#include "djimageload.h"
 #include "djinput.h"
 #include "djtime.h"
 #include "djstring.h"
@@ -77,6 +79,7 @@ Copyright (C) 1995-2022 David Joffe
 #include <string>
 
 /*--------------------------------------------------------------------------*/
+
 
 int  DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::string >& Parameters);	// Application initialization
 void DaveCleanup();					// Application cleanup
@@ -216,11 +219,19 @@ int main ( int argc, char** argv )
 	DoMainMenu();
 
 	// Cleanup
+	//DaveCleanup();
+
+	//SYS_Debug ( "\n" );
+
+	return 0;
+}
+
+void mainCleanup()
+{
+	// Cleanup
 	DaveCleanup();
 
 	SYS_Debug ( "\n" );
-
-	return 0;
 }
 
 int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::string >& Parameters)
@@ -266,8 +277,6 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 
 #ifdef __APPLE__
 
-	//fixme todo! also set path correctly if we're running out of a .app?
-
 	// Basically what we want to do here is:
 	// If the 'cwd' does NOT have a data folder under it, but
 	// the 'executable path' does, then we want to *change* the
@@ -281,6 +290,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		printf("cwd:%s\n", cwd);
 
 		//Some semi-'arb' Dave Gnukem data file someone is unlikely to have in say their user home folder or whatever .. just want to check if present to do some fallback-checking
+		//const std::string sArbFileToCheck = "missions.txt";
 
 		//debug//printf("Current working directory:%s\n",cwd);
 		// Check if data folder is present relative to cwd
@@ -318,14 +328,22 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 				{
 					printf("Successfully found the data path :)\n");fflush(NULL);
 					// Yay, we found the data folder by the executable -
-					// change the 'working directory' to 'path'
-					//chdir(execpath);
-
-					// dj2022-11 Hmm not mad about changing the working directory .. app should work regardless of working directory? And should just store/save the paths we need at application initialize ..
-
+					// NB note: Changing the working directory is bad practice and causes problems (we used to do that here but I changed it to not anymore)
+					// Now we rather just set the datadir path and look for data files relative to that when we need them using helpers
+					// App should work regardless of working directory.
 					//dj2022-11 Make this full path the datadir .. this needs to be tested on Mac
-					// THIS IS NOT NECESSARILY RIGHT?
 					djSetDataDir(sTryDataPath.c_str());
+				}
+				else 
+				{
+					// Are we running out of a .app?
+					sTryDataPath = djAppendPathStr(execpath, "../Resources/data/");
+					sTryDataFile = djAppendPathStr(sTryDataPath.c_str(), "missions.txt");
+					if (djFileExists(sTryDataFile.c_str()))
+					{
+						printf("Successfully found the data path :)\n");fflush(NULL);
+						djSetDataDir(sTryDataPath.c_str());
+					}
 				}
 			}
 //else
@@ -354,9 +372,22 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		if (!djFolderExists("data/"))
 		{
 			printf("Fallback failed: data/\n");
-			return -1;
+
+			//dj2022-12 add 'gnukem_data' also as fallback in case someone did a plain git clone without a datadir .. I suppose this is slightly debatable but we can tweak this behaviour and make it more customizable .. could even make it OOP-y ..
+			//djSetDataDir("gnukem_data/");
+			printf("[datadir] datadir: Trying gnukem_data/\n");
+			if (!djFolderExists("gnukem_data/"))
+			{
+				printf("[datadir] Fallback failed: gnukem_data/\n");
+				return -1;
+			}
+			printf("Successfully found fallback data folder: gnukem_data/\n");
+			djSetDataDir("gnukem_data/");
+
+			//return -1;
 		}
-		printf("Successfully found fallback data folder: data/\n");
+		else
+			printf("Successfully found fallback data folder: data/\n");
 
 
 		// (dj2022-11 Add the below line, hmm, not sure whether it really belongs in the help text here to mention things like git repo cloning (and also maybe the URL may change later) but for now
@@ -368,9 +399,8 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		//return -1;
 	}
 
-	g_Settings.Load(
-		djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_CONFIG_FILE).c_str()
-		);	// Load saved settings
+	std::string sUserConfigFile = djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_CONFIG_FILE).c_str();
+	g_Settings.Load(sUserConfigFile.c_str());	// Load saved settings
 	// We need to first check the setting is *actually there*, not just call e.g. FindSettingInt(), otherwise
 	// if volume setting has never been set/saved before, it will return a value of 0 which will set the volume to 0.
 	// We need to distinguish between 'never been set', and 'actually set to 0'. [dj2016-10]
@@ -449,6 +479,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	djLOGSTR("djVectorFontListInit ok\n");
 #endif
 
+
 	InitMissionSystem();
 
 	// Load missions
@@ -488,7 +519,8 @@ void DaveCleanup()
 	djLOGSTR( "KillMissionSystem() ok\n" );
 	KillCredits();
 	djLOGSTR( "KillCredits() ok\n" );
-	SaveHighScores();		// Save high scores
+	std::string s = djAppendPathStr(djGetFolderUserSettings().c_str(), USERFILE_HIGHSCORES);
+	SaveHighScores(s.c_str());		// Save high scores
 	djLOGSTR( "SaveHighScores() ok\n" );
 	GameFinalCleanup();		// Game
 	djLOGSTR( "GameFinalCleanup() ok\n" );
@@ -567,6 +599,20 @@ void SettingsMenu()
 	else if (sSelectedMenuCommand == "settings/retro/cga")
 		g_nSimulatedGraphics = 2;
 }
+
+/*
+void djHelperGenerateRasterizeTTFFonts()
+{
+	//[dj2023-02]This helper not currently used directly by game, just to help pre-generate ... but conceivably could be used directly
+	extern void djRasterizeTTFFontHelper(const std::string& sFilename);
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperator8.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperator8-Bold.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperatorMono8.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperatorMono8-Bold.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperatorMonoHB8.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/arial.ttf"));
+}
+*/
 
 void AppendCharacter(char *szBuffer, char c, int nMaxLen)
 {
@@ -747,7 +793,11 @@ void RedefineKeys()
 		GraphFlip(true);
 
 		//Prevent CPU hogging or it eats up a full core here [dj2016-10]
+#ifdef __EMSCRIPTEN__
+		/*SDL_Delay(20);*/
+#else
 		SDL_Delay(20);
+#endif
 	} while (bLoop);
 }
 
@@ -928,7 +978,11 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 		GraphFlip(true);
 
 		//Prevent CPU hogging or it eats up a full core here [dj2019-07] (A little simplistic but it'll do)
+#ifdef __EMSCRIPTEN__
+		/*SDL_Delay(20);*/
+#else
 		SDL_Delay(20);
+#endif
 
 	} while (bLoop);
 
@@ -942,7 +996,6 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 	return bRet;
 }
 
-/*--------------------------------------------------------------------------*/
 
 void SelectMission()
 {
