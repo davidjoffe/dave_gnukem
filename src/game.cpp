@@ -1009,7 +1009,7 @@ void PerLevelSetup()
 	g_pInGameMusic = Mix_LoadMUS((sBasePath + asMusicFiles[nMusicFile]).c_str());
 	if (g_pInGameMusic!=NULL)
 	{
-		Mix_FadeInMusic(g_pInGameMusic, -1, 500);
+		Mix_FadeInMusicPos(g_pGameMusic, -1, 500, 0);
 	}
 #endif
 
@@ -1316,7 +1316,12 @@ int game_startup(bool bLoadGame)
 		while (fTimeNow<fTimeNext || bForceUpdate) // until we reach next frames time
 		{
 			// Try to prevent this from hogging the CPU, which can adversely affect other processes
+			//dj this #ifdef etc. a bit gross/clunky should we wrap 'SDL_delay' in a simple wrapper functino to deal with emscripted in there in one place application-wide, or what better way? Hm
+			#ifdef __EMSCRIPTEN__
+			/*SDL_Delay(1);*/
+			#else
 			SDL_Delay(1);
+			#endif
 
 			// poll keys
 			djiPollBegin();
@@ -1635,7 +1640,11 @@ int game_startup(bool bLoadGame)
 					if (g_iKeys[DJKEY_PGDN])
 					{
 						ShowGameMessage("CHEAT: HealthKeysFirepower", 96);
+#ifdef __EMSCRIPTEN__
+						/*SDL_Delay(100);*///<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
+#else
 						SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
+#endif
 						// Full health
 						SetHealth(MAX_HEALTH);
 
@@ -1717,7 +1726,11 @@ int game_startup(bool bLoadGame)
 					{
 						// Note this function does clamping to MAX_FIREPOWER so we don't need to check here
 						HeroSetFirepower(g_nFirepower+1);
+#ifdef __EMSCRIPTEN__
+						/*SDL_Delay(200);*///<-'wrong' workaround for, it immediately adds a lot
+#else
 						SDL_Delay(200);//<-'wrong' workaround for, it immediately adds a lot
+#endif
 					}
 				}
 #endif//#ifdef DAVEGNUKEM_CHEATS_ENABLED
