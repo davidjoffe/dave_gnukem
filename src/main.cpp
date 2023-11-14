@@ -944,7 +944,11 @@ void RedefineKeys()
 		GraphFlip(true);
 
 		//Prevent CPU hogging or it eats up a full core here [dj2016-10]
+#ifdef __EMSCRIPTEN__
 		/*SDL_Delay(20);*/
+#else
+		SDL_Delay(20);
+#endif
 	} while (bLoop);
 }
 
@@ -1122,7 +1126,11 @@ bool GetHighScoreUserName(std::string& sReturnString)
 		GraphFlip(true);
 
 		//Prevent CPU hogging or it eats up a full core here [dj2019-07] (A little simplistic but it'll do)
+#ifdef __EMSCRIPTEN__
 		/*SDL_Delay(20);*/
+#else
+		SDL_Delay(20);
+#endif
 
 	} while (bLoop);
 

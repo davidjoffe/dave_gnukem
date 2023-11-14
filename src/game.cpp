@@ -1640,7 +1640,11 @@ int game_startup(bool bLoadGame)
 					if (g_iKeys[DJKEY_PGDN])
 					{
 						ShowGameMessage("CHEAT: HealthKeysFirepower", 96);
+#ifdef __EMSCRIPTEN__
 						/*SDL_Delay(100);*///<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
+#else
+						SDL_Delay(100);//<-'wrong' workaround for, it adds 6 access cards [dj2017-06]
+#endif
 						// Full health
 						SetHealth(MAX_HEALTH);
 
@@ -1722,7 +1726,11 @@ int game_startup(bool bLoadGame)
 					{
 						// Note this function does clamping to MAX_FIREPOWER so we don't need to check here
 						HeroSetFirepower(g_nFirepower+1);
+#ifdef __EMSCRIPTEN__
 						/*SDL_Delay(200);*///<-'wrong' workaround for, it immediately adds a lot
+#else
+						SDL_Delay(200);//<-'wrong' workaround for, it immediately adds a lot
+#endif
 					}
 				}
 #endif//#ifdef DAVEGNUKEM_CHEATS_ENABLED
