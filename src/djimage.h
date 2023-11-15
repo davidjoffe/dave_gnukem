@@ -82,6 +82,7 @@ public:
 	//! Load an image from disk. Only TGA (24/32-bit) filetype is supported.
 	int Load( const char * szFilename );
 	
+	// Todo [low prio], design-wise it's not really correct for the djImage class to have loading code in it, the core djImage should know nothing about loading but just expose methods for a code laying 'layer' above this class to do actual loading.
 	int LoadTGA( const char * szFilename );
 	
 	//dj2022-11 for now comment out SaveRAW as not using it for anything, but maybe might use it in future so leaving it in for now, but should maybe be refactored differently (probably shouldn't be *in* the image class, image loaders/savers should conceptually be a layer above and 'outside' the core image class)
