@@ -598,21 +598,11 @@ void SettingsMenu()
 		g_nSimulatedGraphics = 1;
 	else if (sSelectedMenuCommand == "settings/retro/cga")
 		g_nSimulatedGraphics = 2;
-}
 
-/*
-void djHelperGenerateRasterizeTTFFonts()
-{
-	//[dj2023-02]This helper not currently used directly by game, just to help pre-generate ... but conceivably could be used directly
-	extern void djRasterizeTTFFontHelper(const std::string& sFilename);
-	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperator8.ttf"));
-	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperator8-Bold.ttf"));
-	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperatorMono8.ttf"));
-	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperatorMono8-Bold.ttf"));
-	djRasterizeTTFFontHelper(djDATAPATHs("fonts/PixelOperatorMonoHB8.ttf"));
-	djRasterizeTTFFontHelper(djDATAPATHs("fonts/arial.ttf"));
+	// Hmm some sort of 'dev' menu or options may help somewhere for things like this: (or maybe use a key combo or something e.g. hold in Ctrl+Shift and select the "Ordering info" humor menu option which does nothing anyway and you get a dev menu?)
+	//extern void djHelperGenerateRasterizeTTFFonts();
+	//djHelperGenerateRasterizeTTFFonts();
 }
-*/
 
 void AppendCharacter(char *szBuffer, char c, int nMaxLen)
 {

@@ -8,6 +8,7 @@
 #include "djfonts.h"
 #include "djutf8.h" // <- for 'utf8 to 32-bit' conversion for TTF_GlyphIsProvided32 to help find closest best matching font
 #ifdef djUNICODE_TTF
+	// /#include "datadir.h"//Don't actually want just for font rasterize?
 
 // hm to move obcviously not meant to be in hiscores
 #if defined(WIN32) && defined(_MSC_VER)
@@ -241,14 +242,18 @@ int djUnicodeTextHelpers::GuessDirection(const char* szTextUTF8, const unsigned 
 
 #define FONT_SIZE 8
 #define SPRITE_MAP_WIDTH 256
-#define SPRITE_MAP_HEIGHT 256
-#define NUM_CHARS 1024
+//#define SPRITE_MAP_HEIGHT 256
+//#define NUM_CHARS 1024
+
+#define SPRITE_MAP_HEIGHT 128
+#define NUM_CHARS 512
+
 //#define SPRITE_MAP_WIDTH 1024
 //#define SPRITE_MAP_HEIGHT 1024
 //#define NUM_CHARS (128*128)
 
 //[dj2023-02]This helper not currently used directly by game, just to help pre-generate ... but conceivably could be used directly
-void djRasterizeTTFFontHelper(const std::string& sFilename)//, const std::string& sFilenameOut)
+void djRasterizeTTFFontHelper(const std::string& sFilename, int nCharW=8, int nCharH=8)//, const std::string& sFilenameOut)
 {
 	TTF_Font *font = TTF_OpenFont(sFilename.c_str(), FONT_SIZE);
 	if (!font)
@@ -257,7 +262,9 @@ void djRasterizeTTFFontHelper(const std::string& sFilename)//, const std::string
 		return;
 	}
 
-	SDL_Surface *sprite_map = SDL_CreateRGBSurface(0, SPRITE_MAP_WIDTH, SPRITE_MAP_HEIGHT, 32, 0, 0, 0, 0);
+	// Create 32-bit with alpha channel
+	printf("Create 32-bit with alpha channel\n");
+	SDL_Surface *sprite_map = SDL_CreateRGBSurface(0, SPRITE_MAP_WIDTH, SPRITE_MAP_HEIGHT, 32, 0xFF, 0xFF00, 0xFF0000, 0xFF000000);
 	if (!sprite_map)
 	{	
 		printf("SDL_CreateRGBSurface: %s\n", SDL_GetError());
@@ -271,6 +278,15 @@ void djRasterizeTTFFontHelper(const std::string& sFilename)//, const std::string
 	{
 		if (i == 0)	continue;
 
+		// Hm actually if the glyph isn't there, we still want a transparent block rendered in target image? (so we can see where the glyph is missing and so they don't render as squares when you try use the font). Same for char 0.
+		// What we could also do here is make smart 'maps' mapping unicode 32-bit int char to the position in the sprite, then, for a rasterized font, we could just not have
+		// empty space so the resulting rasterized font can be more densely packed with characters in a higher range that may be useful.
+		// This may also help for languages like Hebrew etc. or Thai or Sindi or Greek etc. where the characters are in higher ranges than we currently simply render here.
+		// And/or we could generate multiple mapss
+		// Of course we don't always want that, necessary e.g. for French we don't want thousands of characters, just the core ones we need for French, as we don't want
+		// all the texture memory filled up with thousands of characters we maybe don't need for a language?
+		// We could/should also have some sort of 'fallback rendering' system(s) in future, e.g. if we were writing some sort of massively multiplayer online game with this
+		// then we want a system that allows people of all languages to enter text and chat and see the text.
 #if SDL_VERSION_ATLEAST(2, 0, 18)
 		if (!TTF_GlyphIsProvided32(font, i))
 			continue;
@@ -295,25 +311,54 @@ void djRasterizeTTFFontHelper(const std::string& sFilename)//, const std::string
 		}
 		if (character)
 		{
-			int x = (i % (SPRITE_MAP_WIDTH / FONT_SIZE)) * FONT_SIZE;
-			int y = (i / (SPRITE_MAP_WIDTH / FONT_SIZE)) * FONT_SIZE;
-			SDL_Rect dst_rect = {x, y, FONT_SIZE, FONT_SIZE};
+			int x = (i % (SPRITE_MAP_WIDTH / nCharW)) * nCharW;
+			int y = (i / (SPRITE_MAP_WIDTH / nCharW)) * nCharH;
+			SDL_Rect dst_rect = {x, y, nCharW, nCharH};
 			SDL_BlitSurface(character, NULL, sprite_map, &dst_rect);
+
+			// Make pixel transparent if black .. hm maybe later make configurable
+			/*
+			for ( int h = 0; h < nCharH; ++h )
+			{
+				for ( int w = 0; w < nCharW; ++w )
+				{
+					Uint32 pixel = ((Uint32*)character->pixels)[(y+h) * character->pitch / 4 + x+w];
+					Uint8 r=255, g=255, b=255, a=255;
+					SDL_GetRGBA(pixel, character->format, &r, &g, &b, &a);
+					if (r == 0 && g == 0 && b == 0)
+					{
+						((Uint32*)character->pixels)[(y+h) * character->pitch / 4 + x+w] = 0;
+					}
+				}
+			}
+			//*/
 
 			SDL_FreeSurface(character);
 		}
 	}
 
-	SDL_SaveBMP(sprite_map, (sFilename + ".bmp").c_str());
-	if (SDL_SaveBMP(sprite_map, (sFilename + ".png").c_str()) != 0)
-	{
-		printf("SDL_SaveBMP: %s\n", SDL_GetError());
-		return;
-	}
+	// Try save with alpha channel
+
+	// BMP includes alpha thankfully for 32-bit images
+	SDL_SaveBMP(sprite_map, (sFilename + "-raster.bmp").c_str());
+	// Can use e.g. imagemagick + optipng on the generated .bmp to convert to .png and compress
 
 	SDL_FreeSurface(sprite_map);
 	TTF_CloseFont(font);
 }
+/*
+void djHelperGenerateRasterizeTTFFonts()
+{
+	//[dj2023-02]This helper not currently used directly by game, just to help pre-generate ... but conceivably could be used directly
+	//extern void djRasterizeTTFFontHelper(const std::string& sFilename);
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/pixeloperator/PixelOperator8.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/pixeloperator/PixelOperator8-Bold.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/pixeloperator/PixelOperatorMono8.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/pixeloperator/PixelOperatorMono8-Bold.ttf"));
+	djRasterizeTTFFontHelper(djDATAPATHs("fonts/pixeloperator/PixelOperatorMonoHB8.ttf"));
+	//djRasterizeTTFFontHelper(djDATAPATHs("fonts/arial.ttf"));
+}
+//*/
 #endif
 //---------------------------------------------------------------------------
 

@@ -1772,13 +1772,12 @@ int game_startup(bool bLoadGame)
 		}
 
 
-		// Make a simple FPS display for debug purposes
+		// Make a simple FPS (Frames per Second) display for debug purposes
 		//fixme_notworking://in largeviewportmode
-		float fTimeRun;
-		fTimeRun = fTimeNow - fTimeFirst;
+		const float fTimeRun = fTimeNow - fTimeFirst;
 		iFrameCount++;
-		static char sbuf[1024]={0};
-		snprintf( sbuf, sizeof(sbuf), "%.2f", (float)iFrameCount / fTimeRun );
+		static char szBufFPS[1024]={0};
+		snprintf( szBufFPS, sizeof(szBufFPS), "%.2f", (float)iFrameCount / fTimeRun );
 		//snprintf( sbuf, sizeof(sbuf), "%.2f %d %d", (float)iFrameCount / fTimeRun ,HERO_PIXELX,HERO_PIXELY);
 		if (iFrameCount==60)
 		{
@@ -1787,7 +1786,7 @@ int game_startup(bool bLoadGame)
 		}
 		if (!g_bLargeViewport)
 			djgDrawImage( pVisBack, pSkinGame, 0, 8, 0, 8, 196, 8 );
-		GraphDrawString( pVisBack, g_pFont8x8, 0, 8, (unsigned char*)sbuf );
+		GraphDrawString( pVisBack, g_pFont8x8, 0, 8, (unsigned char*)szBufFPS );
 
 		/////////////////////////////
 		// UPDATE
