@@ -16,7 +16,7 @@ class djImageLoad
 {
 public:
 	static int LoadImage(djImage* pImg, const char *szFilename);
-	//static djImage* LoadImage(const char *szFilename);
+	static djImage* LoadImage(const char *szFilename);
 };
 
 #endif
