@@ -34,13 +34,14 @@ int djutf8iterate(const char* sz, const unsigned int uLen, int& c)
 		c = (int)b1;
 		return 1;
 	}
-	//start of 2-byte codepoint?
-	else if ((b1 & 0b11000000)==0b11000000)
+	// Start of 2-byte codepoint?
+	else if ((b1 & 0b11000000) == 0b11000000)
 	{
-        if (uLen<2) return -1;//<- need enough characters to consume
-		const int v1 = (int)(*sz & 0b00011111);		++sz; if (*sz==0) return -1;
+		if (uLen < 2) return -1; // Need enough characters to consume
+		const int v1 = (int)(*sz & 0b00011111); ++sz;
+		if (*sz == 0) return -1;
 		const int v2 = (int)(*sz & 0b00111111);
-		c = (v1 << 5) | v2;
+		c = (v1 << 6) | v2; // Corrected bit shift
 		return 2;
 	}
 	//start of 3-byte codepoint?
