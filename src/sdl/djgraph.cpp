@@ -34,11 +34,6 @@ Copyright (C) 1997-2023 David Joffe
 #include <cassert>//assert
 #endif
 
-// dj2022-12 one small additional note on the below whether unordered_map is faster also may I think depend on factors like size? best may be to actually check and do speed tests BUT also maybwe re-think whether we can just do away with the map entirely rather, there are some possible ways to solve that.
-// However, it might not be worth doing because this game has relatively few images .. and premature optimization as they say is the root of all evil - we should do profile-driven etc.
-// And also if I uncap the framerate we're at about 240fps on my dev machine which while isn't some incredible record it's seemingly pretty fast arleady.
-// however design if we create a struct like say with an image and surface (which may be null or may change etc.) .. hmm think about
-
 //fixme[dj2020] low priority, should ideally be sped up:
 // 1. A map is not really the most efficient way to do this as it must do a lookup for every blit
 // 2. std::map is probably not the fastest map for this either .. unordered_map may be (we don't need correct sorting and we're happy with slower inserts for faster lookups)
@@ -794,6 +789,28 @@ void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 	https://wiki.libsdl.org/CategoryEndian
 	https://wiki.libsdl.org/SDL_CreateRGBSurface
 	*/
+	if (pImage->BPP()==24)//3 bytes = RGB with NO alpha .. ?
+	{
+	pSurfaceHardware = ::SDL_CreateRGBSurfaceFrom(
+		pImage->Data(),
+		pImage->Width(),
+		pImage->Height(),
+		pImage->BPP(),
+		pImage->Pitch(),
+		// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
+		#if SDL_BYTEORDER==SDL_BIG_ENDIAN
+		pImage->m_Rmask,//?
+		pImage->m_Gmask,
+		pImage->m_Bmask,
+		0//0xFFFFFFFF
+		#else
+		//0xFF, 0xFF00, 0xFF0000,
+		pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, 0
+		#endif
+	);
+	}
+	else
+	{
 
 	// dj2023-02 our loaded PNGs may ahve different byte order it seems .. this now all needs more testing .. either we must convert image files on load,
 	// or generically handle more cases here .. or both I suppose, to help make sure this stuff works on all platforms etc.
@@ -823,7 +840,7 @@ void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 		pImage->Data(),
 		pImage->Width(),
 		pImage->Height(),
-		32,
+		32,//pImage->BPP(),
 		pImage->Pitch(),
 		// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
 		#if SDL_BYTEORDER==SDL_BIG_ENDIAN
@@ -836,6 +853,8 @@ void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 		#endif
 	);
 	#endif
+
+	}
 	//fixme should be sped up:
 	// 1. A map is not really the most efficient way to do this as it must do a lookup for every blit
 	// 2. std::map is probably not the fastest map for this either .. unordered_map may be (we don't need correct sorting and we're happy with slower inserts for faster lookups)
