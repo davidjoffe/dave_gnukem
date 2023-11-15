@@ -15,6 +15,34 @@ Copyright (C) 1995-2022 David Joffe
 /*--------------------------------------------------------------------------*/
 #include "djtypes.h"
 #include "djsound.h"
+
+/*--------------------------------------------------------------------------*/
+// Class forwards (don't include actual headers here for compile speed reasons etc.)
+class djSprite;
+/*--------------------------------------------------------------------------*/
+
+
+/*--------------------------------------------------------------------------*/
+//*
+class djMenuCursor
+{
+public:
+	djMenuCursor() {}
+	virtual ~djMenuCursor() {}
+};
+class djMenuCursorSprite : public djMenuCursor
+{
+public:
+	djMenuCursorSprite() : djMenuCursor() {}
+	virtual ~djMenuCursorSprite() { /*djDEL(m_pSprite);*/ }
+
+	djSprite* m_pSprite = nullptr;
+};
+//*/
+/*--------------------------------------------------------------------------*/
+extern djMenuCursorSprite* g_pDefaultMenuCursor;
+/*--------------------------------------------------------------------------*/
+
 /*--------------------------------------------------------------------------*/
 //! A single item in the menu
 struct SMenuItem
@@ -50,7 +78,9 @@ public:
 	CMenu(const char *idstr);
 	~CMenu();
 
+	// Really old stuff that uses hardcoded offsets into old main game font .. not generic, getting rid of ..and replacing with new djSprite* stuff (to help support localization so menus can be in more langauges)
 	void setMenuCursor ( const unsigned char *cursor ) { m_szCursor = (unsigned char*)cursor; };
+	void SetMenuCursor( djSprite* pSprite ) { m_pCursorSprite = pSprite; m_nCursorSpriteAnimOffset = 0; }
 	void setClrBack ( const djColor &clr ) { m_clrBack = clr; };
 	void setSize ( int sz ) { m_iSize = sz; };
 	void setXOffset ( int offs ) { m_xOffset = offs; }
@@ -63,18 +93,21 @@ public:
 	int getYOffset () const { return m_yOffset; }
 	int getSize () const { return m_iSize; }
 	const unsigned char* getMenuCursor () const { return m_szCursor; }
+	djSprite* GetMenuCursorSprite() { return m_pCursorSprite; }
 	SOUND_HANDLE getSoundMove () const { return m_iSoundMove; }
 	const SMenuItem* getItems () const { return m_items; }
 
 private:
-	const SMenuItem		*m_items;	// We DON'T own this!! (m_szText==NULL)-terminated
-	const unsigned char	*m_szCursor; // We DON'T own this!!
-	int				m_xOffset;
-	int				m_yOffset;
-	int				m_iSize;
+	const SMenuItem		*m_items = nullptr;	// We DON'T own this!! (m_szText==NULL)-terminated
+	const unsigned char	*m_szCursor = nullptr; // We DON'T own this!!
+	djSprite		*m_pCursorSprite = nullptr; // We DON'T own this!!
+	int				m_nCursorSpriteAnimOffset = 0;
+	int				m_xOffset=0;
+	int				m_yOffset=0;
+	int				m_iSize=0;
 	djColor			m_clrBack;	// background color (the above ones are obsolete)
 	SOUND_HANDLE	m_iSoundMove;	// Sound to play when cursor moved
-	char			*idstring;	// for debug purposes
+	char			*idstring=nullptr;	// for debug purposes
 };
 
 //! Pop up a menu and wait for the user to select something from the menu.

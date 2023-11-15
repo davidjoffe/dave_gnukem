@@ -1,4 +1,4 @@
-//Copyright (C) 1995-2022 David Joffe
+//Copyright (C) 1995-2023 David Joffe
 //
 // dj2022-12 Just refactoring old main menu code out of main.cpp (and in prep toward some localization stuff)
 
@@ -21,16 +21,14 @@
 
 // For Mix_Music but not sure I'm mad about that but it's not the most serious thing to worry about .. dj2022
 #ifndef NOSOUND
-//dj2022-12 hm just a thought but isn't a difference like that resolvable by passing the paths differently in build system for OS2? no idea how OS/2 version is built tho. low prio.
-#ifdef __OS2__
-	#include <SDL/SDL_mixer.h>
-#else
-	#include <SDL_mixer.h>//For background music stuff
-#endif
-#endif
+	//dj2022-12 hm just a thought but isn't a difference like that resolvable by passing the paths differently in build system for OS2? no idea how OS/2 version is built tho. low prio.
+	//For background music stuff
+	#include "sdl/djinclude_sdlmixer.h"
+#endif//#ifndef NOSOUND
 
 /*--------------------------------------------------------------------------*/
 #define DATAFILE_MAINMENUBACKGROUND "main.tga"
+//#define DATAFILE_MAINMENUBACKGROUND "tlex.png"
 //! Background image *behind* main menu (e.g. grim cityscape for Dave Gnukem)
 djImage *g_pImgMain = NULL;
 
@@ -60,6 +58,8 @@ const struct SMenuItem mainMenuItems[] =
 	{ false, NULL }
 };
 
+// [dj2023-11] For localization purposes I need to more genericize text rendering and font stuff, which means I need to refactor the skull-cursor stuff after over 20 years of it being done like this to have these menu cursors be in their own separate new sprite images (not be in, and re-use, the main old game font.tga) so that we can toggle to e.g. e.g. pixel operator as UI font if loading French interface etc.
+// These are/were ugly hardcoded offsets into main.tga where these which now will become meaningless, and done more nicely/generically
 const unsigned char mainMenuCursor[] = { 128, 129, 130, 131, 0 };
 const unsigned char mainMenuCursorSkull[] = { 161, 162, 163, 164, 0 };
 CMenu mainMenu ( "main.cpp:mainMenu" );
@@ -112,8 +112,47 @@ void CheckHighScores( int score )
 
 
 /*--------------------------------------------------------------------------*/
+
+//funny skull (slight parody homage to old Doom menu)
+djSprite* g_pCursor2=nullptr;
+djSprite* g_pShadow=nullptr;
+djSprite* g_pBars=nullptr;
+djSprite* g_pFont2=nullptr;
+djSprite* g_pFontNumbers=nullptr;
+djSprite* LoadSpriteHelper(const char* szPath, int nW, int nH)
+{
+	if (szPath==nullptr||szPath[0]==0)
+		return nullptr;
+	printf("LoadSpriteHelper\n");
+	djSprite* pSprite = new djSprite;
+	if (pSprite->LoadSpriteImage(szPath, nW, nH))
+	{
+		djCreateImageHWSurface( pSprite->GetImage() );
+		return pSprite;
+	}
+	else
+	{
+		delete pSprite;
+	}
+	return nullptr;
+}
 void InitMainMenu()
 {
+	//djDEL(g_pDefaultMenuCursor);
+	if (g_pDefaultMenuCursor==nullptr)
+	{
+		g_pDefaultMenuCursor = new djMenuCursorSprite();
+		g_pDefaultMenuCursor->m_pSprite = LoadSpriteHelper(djDATAPATHc("menucursor/cursor1-8x8.png"), 8, 8);
+	}
+	//djDEL(g_pFont2);
+		g_pFont2 = LoadSpriteHelper(djDATAPATHc("fonts/pixeloperator/PixelOperator8-raster.png"), 8, 8);
+		g_pFontNumbers = LoadSpriteHelper(djDATAPATHc("fonts/numbers.png"), 8, 8);
+	//funny skull (slight parody homage to old Doom menu)
+	g_pCursor2 = LoadSpriteHelper(djDATAPATHc("menucursor/cursor2-8x8.png"), 8, 8);
+	g_pShadow = LoadSpriteHelper(djDATAPATHc("ui/dropshadow.png"), 8, 8);
+	g_pBars = LoadSpriteHelper(djDATAPATHc("ui/bars.png"), 8, 8);
+
+
 	mainMenu.setClrBack ( djColor(70,70,80)/*djColor(42,57,112)*/ ); //mainMenu.setClrBack ( djColor(10,40,150) ); // Crap colour. Need something better, like a bitmap
 	//mainMenu.m_clrBack = djColor(129,60,129);
 	mainMenu.setSize ( 0 );
@@ -189,6 +228,15 @@ void DoMainMenu()
 		// Random select menu cursor, either hearts or skulls
 		mainMenu.setMenuCursor ( (rand()%4==0 ? mainMenuCursorSkull : mainMenuCursor) );
 
+		if (((rand()%4)==0) && g_pCursor2!=nullptr && g_pCursor2->IsLoaded())
+			//funny skull (slight parody homage to old Doom menu)
+			mainMenu.SetMenuCursor(g_pCursor2);
+		else
+			mainMenu.SetMenuCursor(nullptr);//Use default menu cursor
+
+		// Old hardcoded cursor (to deprecate font.tga stuff with hardcoded offsets)
+		mainMenu.setMenuCursor ( (rand()%4==0 ? mainMenuCursorSkull : mainMenuCursor) );
+
 		int menu_option = do_menu( &mainMenu );
 
 		switch (menu_option)
@@ -245,6 +293,8 @@ void DoMainMenu()
 			bRunning = false;
 			break;
 		}
+
+		mainMenu.SetMenuCursor(nullptr);
 	} while (bRunning);
 
 #ifndef NOSOUND

@@ -68,12 +68,9 @@ Copyright (C) 1995-2023 David Joffe
 #endif
 
 #ifndef NOSOUND
-#ifdef __OS2__
-#include <SDL/SDL_mixer.h>
-#else
-#include <SDL_mixer.h>//For background music stuff
-#endif
-#endif
+//For background music stuff
+#include "sdl/djinclude_sdlmixer.h"
+#endif//#ifndef NOSOUND
 
 #include <map>
 #include <string>
@@ -604,13 +601,12 @@ void SettingsMenu()
 	//djHelperGenerateRasterizeTTFFonts();
 }
 
-void AppendCharacter(char *szBuffer, char c, int nMaxLen)
+void AppendCharacter(std::string& sBuffer, char c, int nMaxLen)
 {
-	int nStrLen = strlen(szBuffer);
-	if (nStrLen<nMaxLen)
+	const size_t nStrLen = sBuffer.length();
+	if (nMaxLen<0 || nStrLen<(size_t)nMaxLen)
 	{
-		szBuffer[nStrLen] = c;
-		szBuffer[nStrLen+1] = 0;
+		sBuffer += c;
 	}
 }
 
@@ -798,10 +794,8 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 
 	#ifdef djUNICODE_SUPPORT
 	//SDL_EnableUNICODE(1);
-	std::string sInput;
-	#else
-	char szBuffer[8192] = {0};//temp phase out?
 	#endif
+	std::string sInput;
 
 	bool bRet = true; // Return false if user selected quit/close or something
 	bool bLoop = true;
@@ -895,27 +889,31 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 				if (Event.key.keysym.sym>=SDLK_a && Event.key.keysym.sym<=SDLK_z)
 				{
 					// I'm assuming these constants are linearly increasing, hopefully they are
-					AppendCharacter(szBuffer, ((char)Event.key.keysym.sym - SDLK_a) + ((ModState & KMOD_SHIFT) ? 'A' : 'a'), nMaxLen);
+					AppendCharacter(sInput, ((char)Event.key.keysym.sym - SDLK_a) + ((ModState & KMOD_SHIFT) ? 'A' : 'a'), nMaxLen);
 				}
 				else if (Event.key.keysym.sym>=SDLK_0 && Event.key.keysym.sym<=SDLK_9)
 				{
 					const char* acShifted = ")!@#$%^&*(";
 					if (ModState & KMOD_SHIFT)
-						AppendCharacter(szBuffer, acShifted[(char)Event.key.keysym.sym - SDLK_0], nMaxLen);
+						AppendCharacter(sInput, acShifted[(char)Event.key.keysym.sym - SDLK_0], nMaxLen);
 					else
-						AppendCharacter(szBuffer, ((char)Event.key.keysym.sym - SDLK_0) + '0', nMaxLen);
+						AppendCharacter(sInput, ((char)Event.key.keysym.sym - SDLK_0) + '0', nMaxLen);
 				}
 				else
 				{
 					switch (Event.key.keysym.sym)
 					{
-					case SDLK_SPACE:	AppendCharacter(szBuffer, ' ', nMaxLen); break;
-					case SDLK_PLUS:		AppendCharacter(szBuffer, '+', nMaxLen); break;
-					case SDLK_MINUS:	AppendCharacter(szBuffer, '-', nMaxLen); break;
-					case SDLK_COMMA:	AppendCharacter(szBuffer, ',', nMaxLen); break;
+					case SDLK_SPACE:	AppendCharacter(sInput, ' ', nMaxLen); break;
+					case SDLK_PLUS:		AppendCharacter(sInput, '+', nMaxLen); break;
+					case SDLK_MINUS:	AppendCharacter(sInput, '-', nMaxLen); break;
+					case SDLK_COMMA:	AppendCharacter(sInput, ',', nMaxLen); break;
 					case SDLK_BACKSPACE:
-						if (strlen(szBuffer)>0)
-							szBuffer[strlen(szBuffer) - 1] = 0;
+						// fixme this isn't right for utf8 multi-byte characters:
+						if (sInput.length()>0)
+						{
+							sInput = sInput.substr(0, sInput.length()-1);
+							//szBuffer[strlen(szBuffer) - 1] = 0;
+						}
 						break;
 					}
 				}
@@ -956,11 +954,11 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 			sText += "|";//<- simple 'fake cursor' (vertical bar/pipe character)
 		DrawStringUnicodeHelper(pVisBack, nXLeft - 2, 104, SDL_Color{ 255, 255, 255, 255 }, sText.c_str(), sText.length());
 #else
-		GraphDrawString( pVisBack, g_pFont8x8, nXLeft-2, 104, (unsigned char*)szBuffer );
+		GraphDrawString( pVisBack, g_pFont8x8, nXLeft-2, 104, (unsigned char*)sInput.c_str() );
 		if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
 		{
 			unsigned char szCursor[2] = { 254, 0 };
-			GraphDrawString( pVisBack, g_pFont8x8, (nXLeft-2) + 8*strlen(szBuffer), 104, szCursor );
+			GraphDrawString( pVisBack, g_pFont8x8, (nXLeft-2) + 8*sInput.length(), 104, szCursor );
 		}
 #endif
 
@@ -976,12 +974,8 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 
 	} while (bLoop);
 
-#ifdef djUNICODE_SUPPORT
 	sReturnString = sInput;
 	//SDL_EnableUNICODE(0);
-#else
-	sReturnString = szBuffer;
-#endif
 
 	return bRet;
 }

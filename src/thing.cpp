@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------------*/
 // thing.cpp
 /*
-Copyright (C) 2000-2022 David Joffe
+Copyright (C) 2000-2023 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "config.h"
@@ -670,10 +670,16 @@ int CFloatingScore::Tick(float fDeltaTime_ms)
 
 void CFloatingScore::Draw(float fDeltaTime_ms)
 {
+	extern djSprite* g_pFontNumbers;//<- new better more generic way [dj2023-11]
+	//djImage* pImg = nullptr;
+	djImage* pImg = g_pFont8x8;//<- OLD hardcoded font.tga way - to deprecate. fallback.
+	if (g_pFontNumbers && g_pFontNumbers->IsLoaded())
+		pImg = g_pFontNumbers->GetImage();
+
 	for ( int i=0; i<m_bufferlength; ++i )
 	{
 		// 5x7 font
-		djgDrawImageAlpha( pVisView, g_pFont8x8,
+		djgDrawImageAlpha( pVisView, pImg,
 			((int)m_buffer[i]%32)*8,
 			((int)m_buffer[i]/32)*8,
 			i * 6 + HALFBLOCKW * ( -g_Viewport.xo_small + 2 + (((m_x - g_Viewport.xo) << 1))),

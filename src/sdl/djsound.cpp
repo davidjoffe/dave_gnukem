@@ -12,16 +12,20 @@ Copyright (C) 1999-2022 David Joffe and Kent Mein
 #include <SDL/SDL_audio.h>
 #include <SDL/SDL_error.h>
 #else
-#include <SDL_audio.h>
-#include <SDL_error.h>
+
+	#if defined(__has_include)
+
+	#include <SDL_audio.h>
+	#include <SDL_error.h>
+	#else
+	#include <SDL_audio.h>
+	#include <SDL_error.h>
+	#endif
+
 #endif
 #ifndef NOSOUND
-#ifdef __OS2__
-#include <SDL/SDL_mixer.h>
-#else
-#include <SDL_mixer.h>
-#endif
-#endif
+#include "djinclude_sdlmixer.h"
+#endif//#ifndef NOSOUND
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__)
 #include <stdlib.h>//Fixing malloc.h 'not found' error compiling on Mac [dj2016-10]

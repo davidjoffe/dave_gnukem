@@ -3,7 +3,7 @@
 //
 // Created 1995/07/28
 //
-// Copyright (C) 1995-2022 David Joffe
+// Copyright (C) 1995-2023 David Joffe
 //
 /*--------------------------------------------------------------------------*/
 
@@ -50,11 +50,8 @@
 #include "instructions.h"//Slightly don't like this dependency. For ShowInstructions() from in-game menu. [dj2017-08]
 
 #ifndef NOSOUND
-#ifdef __OS2__
-#include <SDL/SDL_mixer.h>
-#else
-#include <SDL_mixer.h>//For background music stuff
-#endif
+#include "sdl/djinclude_sdlmixer.h"
+
 Mix_Music* g_pInGameMusic=NULL;
 #endif
 
@@ -1785,8 +1782,12 @@ int game_startup(bool bLoadGame)
 			fTimeFirst += (fTimeRun/2);
 		}
 		if (!g_bLargeViewport)
-			djgDrawImage( pVisBack, pSkinGame, 0, 8, 0, 8, 196, 8 );
-		GraphDrawString( pVisBack, g_pFont8x8, 0, 8, (unsigned char*)szBufFPS );
+			djgDrawImage( pVisBack, pSkinGame, 12, 4, 12, 4, 196, 8 );
+		extern djSprite* g_pFont2;
+		if (g_pFont2 && g_pFont2->IsLoaded())
+			GraphDrawString( pVisBack, g_pFont2->GetImage(), 12, 4, (unsigned char*)szBufFPS );
+		else
+		GraphDrawString( pVisBack, g_pFont8x8, 12, 4, (unsigned char*)szBufFPS );
 
 		/////////////////////////////
 		// UPDATE
@@ -2153,9 +2154,11 @@ bool HeroIsHurting()
 void DrawHealth()
 {
 	// Build a string representing health bars (which are in the 8x8 font)
+	/*
 	unsigned char szHealth[MAX_HEALTH+1]={0};
 	for ( unsigned int i=0; i<MAX_HEALTH; ++i )
 	{
+		// [dj2023-11] UNHARDCODING and doing more nicely generically. The below are ugly old hardcoded offsets into main old font.tga, we want to be able to not even load that and everythign else must work, so, separating small things like this into separate new png's [dj2023-11] so we can do French etc.
 		// 170 = health; 169 = not health
 		szHealth[MAX_HEALTH-1-i] = ((int)i<g_nHealth?170:169);
 	}
@@ -2164,6 +2167,26 @@ void DrawHealth()
 		GraphDrawString( pVisView, g_pFont8x8, g_nViewOffsetX+g_nViewportPixelW-MAX_HEALTH*8, g_nViewOffsetY, (unsigned char*)szHealth );
 	else
 		GraphDrawString( pVisBack, g_pFont8x8, HEALTH_X, HEALTH_Y, (unsigned char*)szHealth );
+	//*/
+
+	// [dj2023-11] UNHARDCODING and doing more nicely generically. The below are ugly old hardcoded offsets into main old font.tga, we want to be able to not even load that and everythign else must work, so, separating small things like this into separate new png's [dj2023-11] so we can do French etc.
+	extern djSprite* g_pBars;
+	if (g_pBars!=nullptr && g_pBars->IsLoaded())
+	{
+		djImage* pImg=g_pBars->GetImage();
+		int nW = g_pBars->GetSpriteW();
+		int nH = g_pBars->GetSpriteH();
+		for ( unsigned int i=0; i<MAX_HEALTH; ++i )
+		{
+			const int nSpriteOffset = ((int)i < g_nHealth ? 1 : 0);// unhealthy vs healthy bar sprite
+			// X position offset:
+			int nXOffset = ((MAX_HEALTH-1)*nW) - (i*nW);//<- this is the offset from the right side of the screen (or right side of healthbar)
+			if (g_bLargeViewport || g_bBigViewportMode)
+				djgDrawImageAlpha( pVisView, pImg, nSpriteOffset*nW, 0, g_nViewOffsetX+g_nViewportPixelW-MAX_HEALTH*nW + nXOffset, g_nViewOffsetY, nW, nH );
+			else
+				djgDrawImageAlpha( pVisBack, pImg, nSpriteOffset*nW, 0, HEALTH_X + nXOffset, HEALTH_Y, nW, nH );
+		}
+	}
 }
 
 void SetHealth(int nHealth)

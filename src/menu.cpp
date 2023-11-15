@@ -3,7 +3,7 @@
 /*
 menu.cpp
 
-Copyright (C) 1995-2022 David Joffe
+Copyright (C) 1995-2023 David Joffe
 */
 
 #include "graph.h"
@@ -13,6 +13,7 @@ Copyright (C) 1995-2022 David Joffe
 
 #include "menu.h"
 
+#include "djimage.h"//djSprite
 #include "djstring.h"
 #include "djinput.h"
 #include "djtime.h"
@@ -23,13 +24,20 @@ Copyright (C) 1995-2022 David Joffe
 #endif
 
 djImage* g_pImgMenuBackground8x8 = NULL;//dj2016-10 background 'noise' image experiment
+/*--------------------------------------------------------------------------*/
+djMenuCursorSprite* g_pDefaultMenuCursor=nullptr;
+int g_nMenuCursorAnimOffset=0;
+/*--------------------------------------------------------------------------*/
 
 void menu_move( CMenu *pMenu, int& option, int diff, unsigned char cCursor, int iFirstSelectable, int iLastSelectable)
 {
+	if (pMenu==nullptr) return;//sanitycheck
+	int x=pMenu->getXOffset()+8;
+	int y=pMenu->getYOffset()+option*8;
 	//djgSetColorFore( pVisBack, pMenu->getClrBack() );
 	//djgDrawBox( pVisBack, pMenu->getXOffset()+8, pMenu->getYOffset()+option*8, 8, 8 );
 	// Clear cursor at current position
-	djgDrawImage( pVisBack, g_pImgMenuBackground8x8, pMenu->getXOffset()+8, pMenu->getYOffset()+option*8, 8, 8 );
+	djgDrawImage( pVisBack, g_pImgMenuBackground8x8, x, y, 8, 8 );
 
 	int iOptionPrev = option;
 	option += diff;
@@ -44,8 +52,26 @@ void menu_move( CMenu *pMenu, int& option, int diff, unsigned char cCursor, int 
 		djSoundPlay( pMenu->getSoundMove () );
 	}
 
+	y=pMenu->getYOffset()+option*8;
+
 	// Redraw the menu cursor
-	djgDrawImageAlpha( pVisBack, g_pFont8x8, ((int)cCursor%32)*8, ((int)cCursor/32)*8, pMenu->getXOffset()+8, pMenu->getYOffset()+8*option, 8, 8 );
+	// First check if custom menu cursor sprite e.g. the skull one selected for menu; if not, try the default one (if any)
+	djSprite* pSprite =  pMenu->GetMenuCursorSprite();
+	if (pSprite==nullptr || !pSprite->IsLoaded())
+	{
+		pSprite = (g_pDefaultMenuCursor!=nullptr && g_pDefaultMenuCursor->m_pSprite!=nullptr && g_pDefaultMenuCursor->m_pSprite->IsLoaded() ? g_pDefaultMenuCursor->m_pSprite : nullptr);
+	}
+	if (pSprite!=nullptr && pSprite->GetImage()!=nullptr)
+	{
+		if (g_nMenuCursorAnimOffset>=pSprite->GetNumSpritesX())
+			g_nMenuCursorAnimOffset = 0;
+		djgDrawImageAlpha( pVisBack, pSprite->GetImage(),
+			g_nMenuCursorAnimOffset * pSprite->GetSpriteW(), 0, x, y,
+			pSprite->GetSpriteW(),
+			pSprite->GetSpriteH());
+	}
+	else//todo:deprecate: fallback: old way (old hardcoded font.tga):
+	djgDrawImageAlpha( pVisBack, g_pFont8x8, ((int)cCursor%32)*8, ((int)cCursor/32)*8, x, y, 8, 8 );
 }
 /*--------------------------------------------------------------------------*/
 #ifdef __EMSCRIPTEN__
@@ -239,21 +265,40 @@ int do_menu( CMenu *pMenu )
 		pMenu->setYOffset( 8 * (12 - (size / 2)) );
 
 	// Draw dropshadows [dj2018-03-30]
+	//DrawDropShadowHelper(pMenu, size,pMenu->getXOffset(),pMenu->getYOffset(),	);
 	const unsigned char szTR[2]={(unsigned char)251,0};//top right
 	const unsigned char szR [2]={(unsigned char)252,0};//right
 	const unsigned char szBR[2]={(unsigned char)250,0};//bottom right
 	const unsigned char szB [2]={(unsigned char)249,0};//bottom
 	const unsigned char szBL[2]={(unsigned char)248,0};//bottom left
+	extern djSprite* g_pShadow;//<- new better more generic shadow in own sprite [dj2023]
+	//right and top right
 	for ( i=0; i<size; ++i )
 	{
-		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+(strlen(pMenu->getItems()[i].m_szText))*8, pMenu->getYOffset()+i*8, i==0?szTR:szR );
+		const int x = pMenu->getXOffset() + (int)lenLongestString*8;
+		if (g_pShadow)
+			djgDrawImageAlpha( pVisBack, g_pShadow->GetImage(), (i==0 ? 3 : 4)*8, 0, x, pMenu->getYOffset()+i*8, 8, 8);
+		else
+			GraphDrawString( pVisBack, g_pFont8x8, x, pMenu->getYOffset()+i*8, i==0?szTR:szR );
 	}
+	// bottom
 	for (size_t x = 0; x < lenLongestString; ++x)
 	{
-		GraphDrawString(pVisBack, g_pFont8x8, pMenu->getXOffset() + (int)x * 8, pMenu->getYOffset() + size * 8, szB);
+		if (g_pShadow)
+			djgDrawImageAlpha( pVisBack, g_pShadow->GetImage(), 1*8, 0, pMenu->getXOffset() + (int)x * 8, pMenu->getYOffset() + size * 8, 8, 8);
+		else
+			GraphDrawString(pVisBack, g_pFont8x8, pMenu->getXOffset() + (int)x * 8, pMenu->getYOffset() + size * 8, szB);
 	}
-	GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+ (int)lenLongestString*8, pMenu->getYOffset()+size*8, szBR );
-	GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset(), pMenu->getYOffset()+size*8, szBL );
+	// bottom right
+	if (g_pShadow)
+		djgDrawImageAlpha( pVisBack, g_pShadow->GetImage(), 2*8, 0, pMenu->getXOffset()+ (int)lenLongestString*8, pMenu->getYOffset()+size*8, 8, 8);
+	else
+		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+ (int)lenLongestString*8, pMenu->getYOffset()+size*8, szBR );
+	// bottom left
+	if (g_pShadow)
+		djgDrawImageAlpha( pVisBack, g_pShadow->GetImage(), 0*8, 0, pMenu->getXOffset(), pMenu->getYOffset()+size*8, 8, 8);
+	else
+		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset(), pMenu->getYOffset()+size*8, szBL );
 
 	// draw menu
 	for ( i=0; i<size; i++ )
@@ -335,7 +380,8 @@ int do_menu( CMenu *pMenu )
 
 	do
 	{
-		fTimeNow = djTimeGetTime();
+		const float fTimeFirst = djTimeGetTime();
+		fTimeNow = fTimeFirst;//djTimeGetTime();
 		fTimeNext = fTimeNow + fTimeFrame;
 		
 		// Sleep a little to not hog CPU to cap menu update (frame rate) at approx 10Hz
@@ -348,6 +394,20 @@ int do_menu( CMenu *pMenu )
 #endif
 			fTimeNow = djTimeGetTime();
 		}
+
+		
+		
+		// Menu cursor steady animation rate regardless of frame rate ..
+		static float fTimePassed = 0;
+		fTimePassed += (fTimeNow - fTimeFirst);
+		if (fTimePassed>0.1f)//About 10Hz (but do some catch-up if slow FPS)
+		{
+			while (fTimePassed>0.1f)
+				fTimePassed -= 0.1f;
+			++g_nMenuCursorAnimOffset;
+			//g_nMenuCursorAnimOffset = (g_nMenuCursorAnimOffset % pSprite->GetNumSpritesX());
+		}
+
 
 		// [dj2016-10] Re-implementing this to do own djiPollBegin/djiPollEnd in menu instead of calling djiPoll()
 		// because of issue whereby key events get 'entirely' missed if up/down even within one 'frame'.
@@ -423,6 +483,7 @@ int do_menu( CMenu *pMenu )
 							do
 							{
 								c = paItems[nCurPos].m_szText[nFindFirstAlphChar];
+								// todo support diacritics here? e.g. french access? e.g. if press 'e' then find accented e etc.? [low prio but nice to have]
 								// Make lowercase
 								if ((c >= 'A') && (c <= 'Z')) c += 32;//32 transfers 'A' to e.g. 'a' in ASCII
 
@@ -500,6 +561,7 @@ int do_menu( CMenu *pMenu )
 CMenu::CMenu(const char *idstr) :
 	m_items(NULL),
 	m_szCursor(NULL),
+	m_pCursorSprite(nullptr),
 	m_xOffset(-1),
 	m_yOffset(-1),
 	m_iSize(-1),

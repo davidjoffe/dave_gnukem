@@ -1,7 +1,7 @@
 /*
 hiscores.cpp
 
-Copyright (C) 2001-2022 David Joffe
+Copyright (C) 2001-2023 David Joffe
 
 Conceptually should divide this file into more model/view/controller separation? low prio. dj2022-11
 */
@@ -102,9 +102,30 @@ void ShowHighScores()
 		{
 			GraphDrawString(pVisBack, g_pFont8x8, 16,          nYSTART + i * nHEIGHTPERROW, (unsigned char*)djIntToString(i + 1).c_str());//i+1 because i is 0-based index but human 1-based
 			GraphDrawString(pVisBack, g_pFont8x8, 16 + 8 * 3,  nYSTART + i * nHEIGHTPERROW, (unsigned char*)djIntToString(g_aScores[i].nScore).c_str());
+
+			const unsigned nXPOS = 24 + 11 * 8;
+
+			bool bNEW = false;
+			extern djSprite* g_pFont2;
+			djImage* pImg = g_pFont8x8;
+			if (g_pFont2!=nullptr && g_pFont2->IsLoaded())
+			{
+				pImg = g_pFont2->GetImage();
+				bNEW=true;
+			}
+
+			const std::string sText = g_aScores[i].szName;
+
 #ifndef djUNICODE_TTF
-			GraphDrawString(pVisBack, g_pFont8x8, 24 + 11 * 8, nYSTART + i * nHEIGHTPERROW, (unsigned char*)g_aScores[i].szName);
+			if (!bNEW)
+			GraphDrawString(pVisBack, g_pFont8x8, nXPOS, nYSTART + i * nHEIGHTPERROW, (unsigned char*)sText.c_str());
+			else
+			{
+				GraphDrawStringUTF8(pVisBack, pImg, nXPOS, nYSTART + i * nHEIGHTPERROW, 8, 8, (unsigned char*)sText.c_str(), sText.length());
+			}
 #else
+			if (bNEW)
+			{
 			// dj2022-11 though it's not so easy to do the same cheesey gradient we have on our 8x8 font, I grabbed the colors from that font to create a sort of a gradient anyway across the list of names that matches the visual color look .. not wonderful but not awful
 			std::vector< SDL_Color > aColorGrad;
 			aColorGrad.push_back(SDL_Color{ 221, 69, 69, 255 });
@@ -117,9 +138,8 @@ void ShowHighScores()
 			aColorGrad.push_back(SDL_Color{ 233, 185, 139, 255 });
 			aColorGrad.push_back(SDL_Color{ 233, 185, 139, 255 });
 			aColorGrad.push_back(SDL_Color{ 237, 217, 158, 255 });
-			std::string sText = g_aScores[i].szName;
-			const unsigned nXPOS = 24 + 11 * 8;
 			DrawStringUnicodeHelper(pVisBack, nXPOS, nYSTART + i * nHEIGHTPERROW - 6, aColorGrad[i % aColorGrad.size()], sText.c_str(), sText.length());
+		}
 #endif//#ifndef djUNICODE_TTF
 		}//i
 
