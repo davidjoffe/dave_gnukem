@@ -19,7 +19,7 @@ Copyright (C) 1998-2023 David Joffe
 //-------------------- Testing using stb_image.h
 // Uncomment to enable usage of stb_image.h to load images:
 // Currently still a bit experimental
-//#define djUSE_STB_IMAGE
+#define djUSE_STB_IMAGE
 //-----------------------------------------
 
 #ifdef djUSE_STB_IMAGE
@@ -75,6 +75,7 @@ djImage* djImageLoad_STB_LoadPNG(const char* szFilename, djImage* pUseThisImage=
 		pImg->m_Rmask = 0xFF;
 		pImg->m_Gmask = 0xFF00;
 		pImg->m_Bmask = 0xFF0000;
+        //pImg->m_Amask = 0xFF000000;
     }
     else if (channels==4)//"RGBA" order in file
     {

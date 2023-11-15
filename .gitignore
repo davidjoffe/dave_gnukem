@@ -12,8 +12,11 @@
 # Temporary Visual Studio build products that should not be committed:
 /src/vcDave/Debug
 /src/vcDave/Release
+/src/vcDave/x64/*
 /DaveGnukem.exe
 /DaveGnukem.pdb
+
+*.dll
 
 # Temporary local Visual Studio settings and cached stuff eg precompiled headers that should not be committed
 /src/vcDave/.vs/
