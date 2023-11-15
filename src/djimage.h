@@ -103,5 +103,36 @@ protected:
 	int             m_ipitch = 0;		//!< pitch is effectively total actual in-memory width in of a single row of image (including any hypothetical padding, if any) (I think this should probably be in bytes but not 100% sure all old code in this codebase treats it that way or sets it up correctly)
 };
 
+//----------------------------------------------------------------------------
+// This should be in its own file:
+// Should this be renamed spritegrid?
+// This corresponds to a single physical image (for now, or maybe always .. depends how this evolves in future)
+class djSprite
+{
+public:
+	djSprite() { }
+	virtual ~djSprite() { }
+
+	virtual bool LoadSpriteImage( const char * szFilename, int nSpriteW, int nSpriteH );
+	virtual djImage* GetImage() { return m_pImage; }
+
+	virtual bool IsLoaded() const { return m_pImage!=nullptr; }
+
+	int GetSpriteW() const { return m_nSpriteW; }
+	int GetSpriteH() const { return m_nSpriteH; }
+
+	int GetNumSpritesX() const { return m_nSpritesX; }
+	int GetNumSpritesY() const { return m_nSpritesY; }
+
+	djImage* m_pImage=nullptr;
+
+	//! Number of actual sprites on horizontal axis, this is derived automatically when loading the image
+	int m_nSpritesX=0;
+	//! Number of actual sprites on vertical axis, this is derived automatically when loading the image
+	int m_nSpritesY=0;
+	int m_nSpriteW=0;
+	int m_nSpriteH=0;
+};
+//----------------------------------------------------------------------------
 
 #endif

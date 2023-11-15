@@ -10,6 +10,11 @@ Copyright (C) 1998-2023 David Joffe
 #include "djimage.h"
 #include "djimageload.h"
 #include <string>
+#ifdef __OS2__
+#include <SDL/SDL_endian.h>
+#else
+#include <SDL_endian.h>
+#endif
 #ifdef djUSE_SDLIMAGE
 // Hm not 100% sure if we should best put here 'SDL2/SDL_image.h' or just 'SDL_image.h' and let makefiles etc. pass the folder in ..
 #include <SDL_image.h>
@@ -35,7 +40,7 @@ djImage* djImageLoad_STB_LoadPNG(const char* szFilename, djImage* pUseThisImage=
 {
     if (szFilename==nullptr || szFilename[0]==0)
         return nullptr;// Empty filename?
-
+    
 	//SYS_Debug ( std::string("djImageLoad_STB_LoadPNG:"+szFilename).c_str() );
 
     int width=0, height=0, channels=0;
@@ -72,18 +77,39 @@ djImage* djImageLoad_STB_LoadPNG(const char* szFilename, djImage* pUseThisImage=
     // also where is 'correct' place to check for endianness etc.?
     if (channels==3)//"RGB" order in file
     {
-		pImg->m_Rmask = 0xFF;
-		pImg->m_Gmask = 0xFF00;
-		pImg->m_Bmask = 0xFF0000;
-        //pImg->m_Amask = 0xFF000000;
+        // R,G,B,A masks (specify different masks on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100)
+
+        //RGB big enddian
+#if SDL_BYTEORDER==SDL_BIG_ENDIAN
+        // not 100% sure these are correct ...
+        pImg->m_Rmask = 0xFF000000;
+        pImg->m_Gmask = 0x00FF0000;
+        pImg->m_Bmask = 0x0000FF00;
+        //?pImg->m_Amask = 0;
+#else
+        //RGB little endian
+        pImg->m_Rmask = 0xFF;
+        pImg->m_Gmask = 0xFF00;
+        pImg->m_Bmask = 0xFF0000;
+        //?pImg->m_Amask = 0;
+#endif
     }
     else if (channels==4)//"RGBA" order in file
     {
         // Little endian so if R is first in file the Rmask is 0xFF (I *think* .. double-check this...)
-		pImg->m_Rmask = 0xFF;
-		pImg->m_Gmask = 0xFF00;
-		pImg->m_Bmask = 0xFF0000;
-		pImg->m_Amask = 0xFF000000;
+#if SDL_BYTEORDER==SDL_BIG_ENDIAN
+        //RGBA big enddian
+        pImg->m_Rmask = 0xFF000000;
+        pImg->m_Gmask = 0x00FF0000;
+        pImg->m_Bmask = 0x0000FF00;
+        pImg->m_Amask = 0x000000FF;
+#else
+        //RGBA little endian
+        pImg->m_Rmask = 0xFF;
+        pImg->m_Gmask = 0xFF00;
+        pImg->m_Bmask = 0xFF0000;
+        pImg->m_Amask = 0xFF000000;
+#endif
     }
 
     stbi_image_free(data); // Free the data obtained from stb_image

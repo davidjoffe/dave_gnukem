@@ -19,8 +19,10 @@ Copyright (C) 1997-2023 David Joffe
 #include "../sys_log.h"
 #ifdef __OS2__
 #include <SDL/SDL.h>
+#include <SDL/SDL_endian.h>
 #else
 #include "SDL.h"
+#include <SDL_endian.h>
 #endif
 
 #include <cstdint>//for uint32_t
@@ -571,6 +573,7 @@ void djgDrawImageAlpha( djVisual *pVis, djImage *pImage, int xS, int yS, int xD,
 	}
 	if (pHWSurface)
 	{
+		// SBSU - don't blit if totally out of bounds?
 		//BLIT
 		SDL_Rect rectSrc;
 		rectSrc.x = xS;
@@ -797,16 +800,13 @@ void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 		pImage->Height(),
 		pImage->BPP(),
 		pImage->Pitch(),
-		// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
-		#if SDL_BYTEORDER==SDL_BIG_ENDIAN
-		pImage->m_Rmask,//?
-		pImage->m_Gmask,
-		pImage->m_Bmask,
-		0//0xFFFFFFFF
-		#else
-		//0xFF, 0xFF00, 0xFF0000,
-		pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, 0
-		#endif
+		//// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
+		// Above fix/patch moved to inside TGA loading code (in order to accommodate also new .png loading more smoothly) - todo check it doesn't accidentally break big endian platforms again etc.
+		//#if SDL_BYTEORDER==SDL_BIG_ENDIAN
+		//pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, pImage->m_Amask
+		//#else
+		pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, pImage->m_Amask
+		//#endif
 	);
 	}
 	else
@@ -823,17 +823,8 @@ void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 		pImage->BPP(),
 		pImage->Pitch(),
 		// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
-		#if SDL_BYTEORDER==SDL_BIG_ENDIAN
-		pImage->m_Rmask,
-		pImage->m_Gmask,
-		pImage->m_Bmask,
-		pImage->m_Amask
-		#else
-		pImage->m_Rmask,
-		pImage->m_Gmask,
-		pImage->m_Bmask,
-		pImage->m_Amask
-		#endif
+		// Above fix/patch moved to inside TGA loading code (in order to accommodate also new .png loading more smoothly) - todo check it doesn't accidentally break big endian platforms again etc.
+		pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, pImage->m_Amask
 	);
 	#else
 	pSurfaceHardware = ::SDL_CreateRGBSurfaceFrom(
@@ -843,14 +834,16 @@ void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 		32,//pImage->BPP(),
 		pImage->Pitch(),
 		// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
-		#if SDL_BYTEORDER==SDL_BIG_ENDIAN
-		0x0000FF00, 0X00FF0000, 0xFF000000, 0x000000FF
-		#else
+		//#if SDL_BYTEORDER==SDL_BIG_ENDIAN
+		//0x0000FF00, 0X00FF0000, 0xFF000000, 0x000000FF
+		//#else
+		pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, pImage->m_Amask
+		/*was hardcoded as:
 		0xFF0000,
 		0xFF00,
 		0xFF,
-		0xFF000000
-		#endif
+		0xFF000000*/// 
+		//#endif
 	);
 	#endif
 

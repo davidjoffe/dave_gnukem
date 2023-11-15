@@ -16,6 +16,11 @@ dj2022-11 Note that since we're now on SDL2 we could potentially use e.g. SDLima
 #include "djgraph.h"
 #include "sys_error.h"
 #include <string.h>
+	#ifdef __OS2__
+	#include <SDL/SDL_endian.h>
+	#else
+	#include <SDL_endian.h>
+	#endif
 /*--------------------------------------------------------------------------*/
 // TGA types
 enum EfdTGAType
@@ -256,6 +261,7 @@ int djImage::LoadTGA( const char * szFilename )
 			{
 				// Create a blank image
 				CreateImage( nWidth, nHeight, 16 );
+				// todo - handle bitmasks for 16-bit? or rather: should we even really support this? not sure... I think all our existing TGAs are 24 or 32-bit, and, in future any new images will be .png anyway ... so maybe phase out? [dj2023-11])
 				unsigned char *pBuf = new unsigned char[nWidth*3];
 				for ( unsigned int i=0; i<nHeight; ++i )
 				{
@@ -277,6 +283,25 @@ int djImage::LoadTGA( const char * szFilename )
 				// FIXME: Creating a 32-bit image!
 				// Create a blank image
 				CreateImage( nWidth, nHeight, 32 );
+				// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
+				//dj2023 moving this code and check from djgraph.h 'createHWsurface' to the LoadTGA code ->
+				// This is due to PNGs having different byte order from TGAs, but createhwsurface should probably do things uniformly using these mask bits ..
+				// so try move this here (likewise .png loader should set up 'equivalent but different')... hope that's correct solution and hope doesn't break any ports [dj2023-11]
+#if SDL_BYTEORDER==SDL_BIG_ENDIAN
+				// ARGB?
+				m_Rmask=0x0000FF00;
+				m_Gmask=0X00FF0000;
+				m_Bmask=0xFF000000;
+				m_Amask=0x000000FF;
+#else
+				// BGRA?
+				m_Rmask=0x00FF0000;
+				m_Gmask=0x0000FF00;
+				m_Bmask=0x000000FF;
+				m_Amask=0xFF000000;
+
+#endif
+
 				unsigned char *pBuf = new unsigned char[nWidth*3];
 				for ( unsigned int i=0; i<nHeight; i++ )
 				{
@@ -299,6 +324,24 @@ int djImage::LoadTGA( const char * szFilename )
 			{
 				// Create a blank image
 				CreateImage( nWidth, nHeight, 32 );
+
+				// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
+				//dj2023 moving this code and check from djgraph.h 'createHWsurface' to the LoadTGA code ->
+				// This is due to PNGs having different byte order from TGAs, but createhwsurface should probably do things uniformly using these mask bits ..
+				// so try move this here (likewise .png loader should set up 'equivalent but different')... hope that's correct solution and hope doesn't break any ports [dj2023-11]
+#if SDL_BYTEORDER==SDL_BIG_ENDIAN
+				// ARGB?
+				m_Rmask=0x0000FF00;
+				m_Gmask=0X00FF0000;
+				m_Bmask=0xFF000000;
+				m_Amask=0x000000FF;
+#else
+				// BGRA?
+				m_Rmask=0x00FF0000;
+				m_Gmask=0x0000FF00;
+				m_Bmask=0x000000FF;
+				m_Amask=0xFF000000;
+#endif
 				unsigned char *pBuf = new unsigned char[nWidth*4];
 				for ( unsigned int i=0; i<nHeight; i++ )
 				{
@@ -376,3 +419,30 @@ int djImage::SaveRAW( const char * szFilename )
 }
 
 */
+
+//---------------------------------------------------------------------------
+
+bool djSprite::LoadSpriteImage( const char * szFilename, int nSpriteW, int nSpriteH )
+{
+	m_pImage=nullptr;
+	m_nSpritesX = 0;
+	m_nSpritesY = 0;
+	m_nSpriteW = 0;
+	m_nSpriteH = 0;
+
+	if (szFilename==nullptr||szFilename[0]==0)
+		return false;
+
+	m_pImage = djImageLoad::LoadImage( szFilename );
+	if (m_pImage==nullptr)
+		return false;
+
+	m_nSpriteW = nSpriteW;
+	m_nSpriteH = nSpriteH;
+	m_nSpritesX = (m_pImage->Width() / m_nSpriteW);
+	m_nSpritesY = (m_pImage->Height() / m_nSpriteH);
+
+	return true;
+}
+
+//---------------------------------------------------------------------------

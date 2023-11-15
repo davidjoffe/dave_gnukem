@@ -46,6 +46,7 @@ Copyright (C) 1998-2023 David Joffe
 
 #include "djtypes.h"
 
+#include "djutf8.h"// For GraphDrawStringUTF8 (dj2023-11) for utf8 iterate
 
 djImage *g_pFont8x8=NULL;
 
@@ -55,6 +56,7 @@ djVisual *pVisView = NULL;
 
 /*--------------------------------------------------------------------------*/
 
+//#define DATAFILE_IMG_FONT2 "fonts/pixeloperator/PixelOperator8-raster.png"
 
 //dj2022-11 new helpers refactoring to try fullscreen toggle. Load the image but not yet the hardware surface cache item (do that after GraphInit) so we can do fullscreen toggle (semi-experimental this stuff may change)
 void djFontInit()
@@ -65,6 +67,7 @@ void djFontInit()
 	if (NULL != (g_pFont8x8 = new djImage))
 	{
 		g_pFont8x8->Load(djDATAPATHc(DATAFILE_IMG_FONT));// FILE_IMG_FONT);
+		//g_pFont8x8->Load(djDATAPATHc(DATAFILE_IMG_FONT2));// FILE_IMG_FONT);
 	}
 }
 void djFontDone()
@@ -358,11 +361,57 @@ void GraphFlipView(int iViewWidthPixels, int iViewHeightPixels, int nXS, int nYS
 	djgDrawVisual(pVisBack, pVisView, nXD, nYD, nXS, nYS, iViewWidthPixels, iViewHeightPixels);
 }
 
+void GraphDrawStringUTF8( djVisual *pVis, djImage *pImg, int x, int y, int nCharW, int nCharH, const unsigned char *szStr, int nStrLen )
+{
+	if (szStr == nullptr || szStr[0]==0) return;
+	// FIXME: bounds check properly
+	if (x<0 || y<0) return;
+
+	// Draw each character in the string
+
+	const char* szStart = (const char*)szStr;
+	int c = -1;//codepoint in 32-bit
+	size_t uOffset = 0;
+	size_t uLen2 = (nStrLen<0 ? strlen(szStart) : (size_t)nStrLen);//If length passed in, avoid a strlen() for speed reasons
+	// [dj2023] Must convert utf8 to 32-bit Unicode glyphs and iterate over string
+	// Remember that utf8 is multi-byte and variable-width encoding so a single Unicode codepoint (i.e. one 32-bit value) could be maybe e.g. 1 byte or 2 bytes or 3 bytes or 4 bytes etc. in the utf8 string (but strlen returns the full number of bytes, not "Unicode Characters")
+	//"Reads a single codepoint from the UTF-8 sequence being pointed to by str. The maximum number of bytes read is strlen, unless strlen is negative (in which case up to 4 bytes are read). If a valid codepoint could be read, it is stored in the variable pointed to by codepoint_ref, otherwise that variable will be set to -1. In case of success, the number of bytes read is returned; otherwise, a negative error code is returned."
+	int ret = djutf8iterate(szStart + uOffset, uLen2, c);
+	int nMatches = 0;
+	int x_=x;
+	int y_=y;
+	while (ret > 0)
+	{
+		uLen2 -= (size_t)ret;
+		uOffset += (size_t)ret;
+
+		// \n is 10, \r is 13 .. 
+		if (c=='\n')//Newline?
+		{
+			y_ += nCharH;
+			x_ = x;
+		}
+		else
+		{
+			int nXSrc = (c % (pImg->Width() / nCharW)) * nCharW;
+			int nYSrc = (c / (pImg->Width() / nCharW)) * nCharH;
+			//djgDrawImageAlpha( pVis, pImg, nXSrc, nYSrc, x_, y_, nCharW, nCharH);
+			//sstd::string sDebug = std::to_string((int)c);
+			//GraphDrawString(pVis, pImg, x_, y_, (const unsigned char*)sDebug.c_str());
+			//x_ += nCharW * (int)sDebug.length();
+			
+			djgDrawImageAlpha( pVis, pImg, nXSrc, nYSrc, x_, y_, nCharW, nCharH);
+			x_ += nCharW;
+		}
+		ret = djutf8iterate(szStart + uOffset, uLen2, c);
+	}
+}
+
 // FIXME: Currenetly assumes a 256-char 32x8 character 256x128 pixel alpha-mapped image
 void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const unsigned char *szStr )
 {
 	if (szStr == nullptr) return;
-	// FIXME: bounds check properyl
+	// FIXME: bounds check properly
 	if (x<0 || y<0) return;
 
 	const unsigned int W=8;
