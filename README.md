@@ -1,7 +1,7 @@
 # Dave Gnukem
 Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'. It is kind of a parody of the original. Please note it is not a 'clone', and not a 're-make'.)
 
-**29 Nov 2022:** Version 1.0.3 released: First official stable SDL2-based version, with new 'formally maintained' Debian package files (both SDL2 support and Debian packages done by Matteo Bini)
+**29 Nov 2022: Version 1.0.3 released**: First official stable SDL2-based version, with new 'formally maintained' Debian package files (both SDL2 support and Debian packages done by Matteo Bini), as well as Ubuntu, Raspbian etc.
 
 **News Apr 2018: Version 1.0 released.** Apr 2019 OpenBSD port. (Apr 2020: Version 1.0.1 released.) (19 Nov 2022: 1.0.2 and 1.0.3 update to SDL2! Also adding OS/2 port)
 
@@ -172,6 +172,8 @@ Then follow the same instructions as for Linux, e.g. git clone the src, cd into 
 # History / Changes
 
 Recent:
+
+* ~2023 Localization work in progress (e.g. to be able to translate Dave Gnukem to French and other languages)
 
 2022/11/29 - Version 1.0.3 First official stable SDL2-based version, with new formally maintained Debian package files
 
@@ -449,7 +451,7 @@ To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add 
 
 # TODOs (To Sort - many done now):
 
-* It would be really great to have packages for e.g. Debian, Ubuntu etc. (possibly two packages? one for the binary, one for the data)
+* Localization (in progress)
 * Videos?
 * Check through code for possible buffer over-runs?
 * 'Texture Manager':
@@ -492,6 +494,7 @@ The source code itself (and most of the data/sprites) for Dave Gnukem are dual-l
 
 With respect to particular **data items**, the following license conditions apply:
 
+* 2023-11 Add Pixel Operator fonts (these are licensed "CC0 1.0 Universal": public domain)
 * 2018-03-22 Add boots sprite made by freepik.com, from flaticon.com, license Creative Commons BY 3.0
 * 2017-08-04 Add font data/fonts/simple_6x8.tga by http://www.zingot.com/ from https://opengameart.org/content/bitmap-font-pack License https://creativecommons.org/licenses/by/3.0/ (small changes made to color, and convert from PNG to TGA)
 * 2016-10-30 data/sounds/soft_explode.wav From same Juhani Junkala collection as per below
@@ -512,7 +515,7 @@ Additional game data credits: Apart from the abovementioned, most the sprites we
 
 * ~2022 Matteo Bini entirely developed and contributed updates of the code from SDL1 to SDL2 (~2022 merging in progress) https://github.com/davidjoffe/dave_gnukem/pull/135
 
-* ~2021/2022- [Ongoing] Some valuable contributions for Debian support (work in progress, see https://github.com/davidjoffe/dave_gnukem/pull/131 discussion) - amongst others:
+* ~2021/2022/2023- Valuable contributions for Debian, Ubuntu etc. support (work in progress, see https://github.com/davidjoffe/dave_gnukem/pull/131 discussion) - amongst others:
 	Matteo Bini
 	https://github.com/enigma9o7
 	https://github.com/bgermann
