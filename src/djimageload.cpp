@@ -36,12 +36,14 @@ Copyright (C) 1998-2023 David Joffe
 //-----------------------------------------
 //-------------------- Testing using stb_image.h
 #ifdef djUSE_STB_IMAGE
-djImage* djImageLoad_STB_LoadPNG(const char* szFilename, djImage* pUseThisImage=nullptr)
+// Hm, although this was originally intended to load PNGs it directly loads JPG with no changes, so it may load other formats too, but
+// I guess some formats we may end up with different RGB/RGBA byte orders and desired masks? So in future should tweak/extend if/as needed. [~dj2023[
+djImage* djImageLoad_STB_LoadImage(const char* szFilename, djImage* pUseThisImage=nullptr)
 {
     if (szFilename==nullptr || szFilename[0]==0)
         return nullptr;// Empty filename?
     
-	//SYS_Debug ( std::string("djImageLoad_STB_LoadPNG:"+szFilename).c_str() );
+	//SYS_Debug ( std::string("djImageLoad_STB_LoadImage:"+szFilename).c_str() );
 
     int width=0, height=0, channels=0;
     // Request 3 channels for RGB or 4 for RGBA
@@ -54,7 +56,8 @@ djImage* djImageLoad_STB_LoadPNG(const char* szFilename, djImage* pUseThisImage=
     // Ensure we are dealing with RGB or RGBA formats
     if (channels != 3 && channels != 4) {
         stbi_image_free(data);
-        printf("stbi_load failed\n");
+        printf("stbi_load failed (currently only 3/4 byte formats supported)\n");
+        //todo[low prio] handle more?
 
         return nullptr;//false;
     }
@@ -70,8 +73,12 @@ djImage* djImageLoad_STB_LoadPNG(const char* szFilename, djImage* pUseThisImage=
     // Calculate the size of the image data
     size_t dataSize = width * height * channels;
 
+    // CBSU/SBSU - could we avoid this extra copy? (but, without any other performance hits doing that) [ LOW PRIO ]
+
     // Assuming djImage has a buffer 'm_pBuffer' or similar to store pixel data
     memcpy(pImg->Data(), data, dataSize);
+
+    // todo - should we convert all images to single game-wide byte order for speed reasons? [larger topic - low prio]
 
     // todo, double-check these are correct [dj 2023-11]
     // also where is 'correct' place to check for endianness etc.?
@@ -171,7 +178,7 @@ int djImageLoad::LoadImage(djImage* pImg, const char *szFilename)
     else if (extension=="png")
     {
         // This 'this' is weird
-        djImage* pRet = djImageLoad_STB_LoadPNG(szFilename, pImg);
+        djImage* pRet = djImageLoad_STB_LoadImage(szFilename, pImg);
 		//if (!pImg->LoadPNG(szFilename))
         if (!pRet)
 		{
@@ -180,6 +187,19 @@ int djImageLoad::LoadImage(djImage* pImg, const char *szFilename)
 			// fixme add some sort of 'debugassert' stuff here to help with testign?
             return -1;
 		}
+        return 0;
+    }
+    else // fallback loader - try anything stb_image.h will handle .. this allows JPGs too :) //if (extension=="jpg"||extension=="jpeg")
+    {
+        // Fallback loader attempt for various other formats stb_image may support ...
+        djImage* pRet = djImageLoad_STB_LoadImage(szFilename, pImg);
+        if (!pRet)
+        {
+            // dj2022-11 hm this is maybe slightly gross must rethink where all the various logs "should" go etc. and clean up logging system
+            printf("Warning: Image load failed: %s\n", szFilename);
+            // fixme add some sort of 'debugassert' stuff here to help with testign?
+            return -1;
+        }
         return 0;
     }
 #endif//djUSE_STB_IMAGE
