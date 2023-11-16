@@ -45,6 +45,9 @@ extern djMenuCursorSprite* g_pDefaultMenuCursor;
 
 /*--------------------------------------------------------------------------*/
 //! A single item in the menu
+//! // This is a really gross old class from the 1900s and needs modernizing :/
+//! It's gross in so many ways from the strdup to the way CMenu expects a NULL termination to signify end of an array of these :/ .. all like old C style code
+//! Can it be rescued? or need rewritng?
 struct SMenuItem
 {
 	SMenuItem(bool bItem = false, const char* szText = nullptr, const char* szRetVal = nullptr) : m_bitem(bItem), m_szText(szText), m_szRetVal(szRetVal)
@@ -55,6 +58,9 @@ struct SMenuItem
 	bool m_bitem=false;
 	//! The menu text to display
 	const char *m_szText=nullptr;
+
+	// Non-owned pointer presumably ..
+	void SetText(const char* szText) { m_szText = szText; }
 
 	//! dj2022-11 [optional] new return by a string identifier so we can try have slightly more sane (and potentially less bug-introducing) handling than gross switch statements with lists of hardcoded numerical values henceforth
 	const char* m_szRetVal = nullptr;
@@ -78,7 +84,7 @@ public:
 	CMenu(const char *idstr);
 	~CMenu();
 
-	// Really old stuff that uses hardcoded offsets into old main game font .. not generic, getting rid of ..and replacing with new djSprite* stuff (to help support localization so menus can be in more langauges)
+	// Really old stuff that uses hardcoded offsets into old main game font .. not generic, getting rid of ..and replacing with new djSprite* stuff (to help support localization so menus can be in more langauges)	
 	void setMenuCursor ( const unsigned char *cursor ) { m_szCursor = (unsigned char*)cursor; };
 	void SetMenuCursor( djSprite* pSprite ) { m_pCursorSprite = pSprite; m_nCursorSpriteAnimOffset = 0; }
 	void setClrBack ( const djColor &clr ) { m_clrBack = clr; };

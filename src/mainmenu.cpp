@@ -11,6 +11,7 @@
 #include "djsound.h"
 #include "djstring.h"//djAppendPathStr
 #include "djlang.h"//djGetLanguage()
+	#include <map>
 #include "djsprite.h"
 
 #include "game.h"//game_startup etc.
@@ -166,6 +167,142 @@ void InitMainMenu()
 	mainMenu.setYOffset( 8 * (12 - (13 / 2)) - 4 );//13 = num items
 
 	mainMenu.setSoundMove(djSoundLoad(djDATAPATHc("sounds/cardflip.wav")));
+
+
+	// MAIN MENU LOCALIZATION ...
+	std::map<std::string, std::map<std::string, std::string>> map;
+
+	// NB NB NB!!! THE BELOW ARE AI-DONE TRANSLATINOS TO HELP WITH DEV AND TESTING
+	// NOT human translations yet and likely have mistakes:
+
+	// Afrikaans translations
+	/*
+	map["af"]["Start gnu game"] = "Begin gnu-spel";
+	map["af"]["Restore game"] = "Herstel spel";
+	map["af"]["Select Mission"] = "Kies Missie";
+	map["af"]["Ordering info"] = "Bestelinligting";
+	map["af"]["(not!)"] = "(nie!)";
+	map["af"]["Instructions"] = "Instruksies";
+	map["af"]["Redefine keys"] = "Herkies sleutels";
+	map["af"]["High scores"] = "Hoë tellings";
+	map["af"]["Credits"] = "Krediete";
+	map["af"]["About"] = "Oor";
+	map["af"]["Retro Settings"] = "Retro-instellings";
+	map["af"]["Don't quit"] = "Moenie ophou nie";
+	map["af"]["Quit"] = "Uitgaan";
+	*/
+
+	// French translations
+	//map["fr"]["Start gnu game"] = "*Démarrer";
+	/*map["fr"]["Start gnu game"] = "Démarrer le jeu gnu";
+	map["fr"]["Restore game"] = "Restaurer le jeu";
+	map["fr"]["Select Mission"] = "Sélectionner la mission";
+	map["fr"]["Ordering info"] = "Information de commande";
+	map["fr"]["(not!)"] = "(pas vrai!)";
+	map["fr"]["Instructions"] = "Instructions";
+	map["fr"]["Redefine keys"] = "Redéfinir les touches";
+	map["fr"]["High scores"] = "Scores élevés";
+	*/
+	//map["fr"]["Credits"] = "Crédits";
+	//map["fr"]["About"] = "À propos";
+	//map["fr"]["Retro Settings"] = "Paramètres rétro";
+	//map["fr"]["Don't quit"] = "Ne quittez pas";
+	//map["fr"]["Quit"] = "Quitter";
+
+	// German translations
+	/*
+	map["de"]["Start gnu game"] = "Neues Spiel starten";
+	map["de"]["Restore game"] = "Spiel wiederherstellen";
+	map["de"]["Select Mission"] = "Mission auswählen";
+	map["de"]["Ordering info"] = "Bestellinformationen";
+	map["de"]["(not!)"] = "(nicht!)";
+	map["de"]["Instructions"] = "Anleitung";
+	map["de"]["Redefine keys"] = "Tasten neu belegen";
+	map["de"]["High scores"] = "Bestenliste";
+	map["de"]["Credits"] = "Credits";
+	map["de"]["About"] = "Über";
+	map["de"]["Retro Settings"] = "Retro-Einstellungen";
+	map["de"]["Don't quit"] = "Nicht beenden";
+	map["de"]["Quit"] = "Beenden";
+
+	// Spanish translations
+	map["es"]["Start gnu game"] = "Iniciar juego gnu";
+	map["es"]["Restore game"] = "Restaurar juego";
+	map["es"]["Select Mission"] = "Seleccionar Misión";
+	map["es"]["Ordering info"] = "Información de pedido";
+	map["es"]["(not!)"] = "(¡no!)";
+	map["es"]["Instructions"] = "Instrucciones";
+	map["es"]["Redefine keys"] = "Redefinir teclas";
+	map["es"]["High scores"] = "Puntuaciones altas";
+	map["es"]["Credits"] = "Créditos";
+	map["es"]["About"] = "Acerca de";
+	map["es"]["Retro Settings"] = "Configuraciones Retro";
+	map["es"]["Don't quit"] = "No salir";
+	map["es"]["Quit"] = "Salir";
+	*/
+
+	std::string sLang = djGetLanguage();
+	if (!sLang.empty() && sLang!="en")
+	{
+		// Translate the menu items
+		size_t uCount = 0;
+		const SMenuItem *pItem = &mainMenuItems[0];
+		while (pItem->m_szText!=nullptr)
+		{
+			//g_pMainMenuItems[pItem-mainMenuItems] = *pItem;
+
+			pItem++;
+			++uCount;
+		}
+		SMenuItem* pMenu = new SMenuItem[uCount+1];//+1?
+		unsigned int uIndex = 0;
+		pItem = &mainMenuItems[0];
+		while (pItem->m_szText!=nullptr)
+		{
+			std::string sItem = pItem->m_szText;
+			// First copy it
+			pMenu[uIndex] = mainMenuItems[uIndex];
+
+			pMenu[uIndex].SetText("");
+
+			std::string sNew = mainMenuItems[uIndex].m_szText;
+			if (sNew.empty())
+			{
+				++uIndex;
+				continue;
+			}
+
+			std::string sOrigL;
+			//std::string sOrigR;
+			// But now we need our own copy of the string (with translation perhaps)
+			if (!sItem.empty())
+			{
+				while (sItem[0]==' ') { sOrigL += ' '; sItem = sItem.substr(1); }//left-trim spaces, although it's gross we still need them for now
+				while (sItem.back()==' ') { sItem = sItem.substr(0, sItem.size()-1); } //right-trim spaces, that was always gross
+				if (!sItem.empty())
+				{
+					if (map[sLang].find(sItem)!=map[sLang].end())
+						sNew = sOrigL + map[sLang][sItem];// + sOrigR;
+				}
+			}
+			pMenu[uIndex].SetText(nullptr);
+			// Store new copies on the heap of the translated strings
+			{
+				char *sz = new char[sNew.size()+1];
+				strcpy(sz, sNew.c_str());
+				pMenu[uIndex].SetText(sz);
+			}
+
+			pItem++;
+			++uIndex;
+		}
+		// Do the old-fashioned nullptr-terminator thing ..
+		pMenu[uIndex].m_szText = nullptr;
+
+		// Fixme leaks
+		mainMenu.setItems ( pMenu );
+	}
+
 
 
 	// Main menu background image
