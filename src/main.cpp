@@ -26,6 +26,7 @@ Copyright (C) 1995-2023 David Joffe
 #include <time.h>   // for srand()
 
 #include "graph.h"
+#include "djlang.h"//djSelectLanguage localization
 
 #include "djfile.h"//djFileExists etc.
 #include "djimage.h"
@@ -185,6 +186,7 @@ int main ( int argc, char** argv )
 				if (0 == strncmp( argv[i], "-f", 2 )) bfullscreen = true;
 				if (0 == strncmp( argv[i], "-640", 4 )) b640 = true;
 				if (0 == strncmp( argv[i], "-scale", 6 )) sNextParamGetValue = "scale";
+				if (0 == strncmp( argv[i], "-lang", 5 )) sNextParamGetValue = "lang";
 #ifdef djCFG_ALLOW_COMMANDLINE_DATADIR
 				if (0 == strncmp( argv[i], "-datadir", 8 )) sNextParamGetValue = "datadir";
 #endif
@@ -199,6 +201,7 @@ int main ( int argc, char** argv )
 		printf( "   -f    Fullscreen mode\n" );
 		printf( "   -640  640x480 mode\n" );
 		printf( "   -scale N [Optional] Force window size multiple of base resolution (1=320x200)\n" );
+		printf( "   -lang langcode [Optional] (beta) Select user interface language by code, e.g. -lang fr\n" );
 #ifdef djCFG_ALLOW_COMMANDLINE_DATADIR
 		printf( "   -datadir DIR [Optional] Specify preferred default data path (may be absolute or relative)\n" );
 #endif
@@ -415,6 +418,18 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	srand((unsigned int)time(NULL));				// Seed the random number generator
 
 	djTimeInit();					// Initialise timer
+
+	// This should happen before djFontInit (for now ...) for localization stuff
+	{
+		const std::map< std::string, std::string >::const_iterator iter=Parameters.find("lang");
+		if (iter!=Parameters.end())
+		{
+			printf("SETTING LANGUAGE\n");
+			std::string sLangCode = iter->second;
+			djSelectLanguage( sLangCode.c_str() );
+		}
+	}
+
 
 	InitialiseGameKeySystem();		// Initialise game keys
 

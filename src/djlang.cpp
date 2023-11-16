@@ -12,10 +12,25 @@ Copyright (C) 2023 David Joffe
 
 std::string g_sCurLang="en";
 
-void djSelectLanguage(const char* szLang="en")
+//---------------------------------------------------------------------------
+
+void djSelectLanguage(const char* szLang)
 {
     if (szLang==nullptr|| szLang[0]==0)
+    {
         g_sCurLang = "en";//default
+    }
     else
+    {
         g_sCurLang = szLang;
+    }
+    // Hm what's the longest possible language CODE (with region etc.) hrm?
+    if (g_sCurLang.length()>32)// Trim if overly long
+        g_sCurLang = g_sCurLang.substr(0, 32);
 }
+
+const char* djGetLanguage()
+{
+    return g_sCurLang.c_str();
+}
+//---------------------------------------------------------------------------

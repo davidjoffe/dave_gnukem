@@ -10,6 +10,7 @@
 #include "djgraph.h"
 #include "djsound.h"
 #include "djstring.h"//djAppendPathStr
+#include "djlang.h"//djGetLanguage()
 #include "djsprite.h"
 
 #include "game.h"//game_startup etc.
@@ -223,6 +224,11 @@ void DoMainMenu()
 		GraphDrawString(pVisBack, g_pFont8x8, 0, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)VERSION);
 		const char* szURL = "djoffe.com";
 		GraphDrawString(pVisBack, g_pFont8x8, CFG_APPLICATION_RENDER_RES_W - strlen(szURL)*8, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)szURL);
+
+		// Language code selected for localization
+		const std::string sLang = djGetLanguage();
+		if (!sLang.empty() && sLang!="en")
+			GraphDrawString(pVisBack, g_pFont2->GetImage(), CFG_APPLICATION_RENDER_RES_W - sLang.length()*8, CFG_APPLICATION_RENDER_RES_H - 16, (unsigned char*)sLang.c_str());
 
 		GraphFlip(true);
 

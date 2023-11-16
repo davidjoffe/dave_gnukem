@@ -8,6 +8,7 @@ Copyright (C) 1998-2023 David Joffe
 /*--------------------------------------------------------------------------*/
 
 #include "config.h"//CFG_APPLICATION_RENDER_RES_W //dj2019-06
+#include "djlang.h"
 #ifdef WIN32
 #include <Windows.h>//for workaround
 #endif
@@ -56,7 +57,8 @@ djVisual *pVisView = NULL;
 
 /*--------------------------------------------------------------------------*/
 
-//#define DATAFILE_IMG_FONT2 "fonts/pixeloperator/PixelOperator8-raster.png"
+// Hrm, other default font for non-en languages ..	    (our old font.tag is not Unicode codepoint-wise)
+#define DATAFILE_IMG_FONT_OTHERLANG "fonts/pixeloperator/PixelOperator8-raster.png"
 
 //dj2022-11 new helpers refactoring to try fullscreen toggle. Load the image but not yet the hardware surface cache item (do that after GraphInit) so we can do fullscreen toggle (semi-experimental this stuff may change)
 void djFontInit()
@@ -66,7 +68,11 @@ void djFontInit()
 	//--- Load 8x8 font bitmap (FIXME error check)
 	if (NULL != (g_pFont8x8 = new djImage))
 	{
-		g_pFont8x8->Load(djDATAPATHc(DATAFILE_IMG_FONT));// FILE_IMG_FONT);
+		std::string sLang = djGetLanguage();
+		if (sLang!="en" && !sLang.empty())
+			g_pFont8x8->Load(djDATAPATHc(DATAFILE_IMG_FONT_OTHERLANG));// FILE_IMG_FONT);
+		else
+			g_pFont8x8->Load(djDATAPATHc(DATAFILE_IMG_FONT));// FILE_IMG_FONT);
 		//g_pFont8x8->Load(djDATAPATHc(DATAFILE_IMG_FONT2));// FILE_IMG_FONT);
 	}
 }
