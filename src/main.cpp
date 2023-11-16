@@ -27,6 +27,7 @@ Copyright (C) 1995-2023 David Joffe
 
 #include "graph.h"
 #include "djlang.h"//djSelectLanguage localization
+	#include "djsprite.h"
 
 #include "djfile.h"//djFileExists etc.
 #include "djimage.h"
@@ -72,6 +73,7 @@ Copyright (C) 1995-2023 David Joffe
 //For background music stuff
 #include "sdl/djinclude_sdlmixer.h"
 #endif//#ifndef NOSOUND
+//#include "SDL.h"//SDL_EnableUNICODE
 
 #include <map>
 #include <string>
@@ -802,12 +804,13 @@ void RedefineKeys()
 	} while (bLoop);
 }
 
+#define djALLOW_UNICODE_TEXT_ENTRY
 bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixelW, const char* szLabel)
 {
 	//#define MAX_HIGHSCORE_LEN 256
 	//#define WIDTH_INPUTBOX 34
 
-	#ifdef djUNICODE_SUPPORT
+	#ifdef djALLOW_UNICODE_TEXT_ENTRY
 	//SDL_EnableUNICODE(1);
 	#endif
 	std::string sInput;
@@ -834,7 +837,7 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 		{
 			switch (Event.type)
 			{
-#ifdef djUNICODE_SUPPORT
+#ifdef djALLOW_UNICODE_TEXT_ENTRY
 			case SDL_TEXTINPUT://dj2022-11 NB for Unicode input (what platforms are supported here?)
 				sInput += Event.text.text;
 				break;
@@ -952,7 +955,8 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 			bLoop = false;
 		}
 
-#ifdef djUNICODE_SUPPORT
+#ifdef djALLOW_UNICODE_TEXT_ENTRY
+		// Huh?
 		DialogBoxEffect(nXLeft-4, 100, nDX+8, 22, true);
 #else
 		DialogBoxEffect(nXLeft-4, 100, nDX+8, 16, true);
@@ -964,17 +968,28 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 		GraphDrawString( pVisBack, g_pFont8x8, 100,  72, (unsigned char*)szLabel );
 
 #ifdef djUNICODE_SUPPORT
-		std::string sText = sInput;;
+		//djALLOW_UNICODE_TEXT_ENTRY
+		std::string sText = sInput;
 		if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
 			sText += "|";//<- simple 'fake cursor' (vertical bar/pipe character)
 		DrawStringUnicodeHelper(pVisBack, nXLeft - 2, 104, SDL_Color{ 255, 255, 255, 255 }, sText.c_str(), sText.length());
 #else
+		#ifdef djALLOW_UNICODE_TEXT_ENTRY
+			extern djSprite* g_pFont2;
+			djImage* pImg = g_pFont2->GetImage();
+			std::string sText = sInput;
+			if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
+				sText += "|";//<- simple 'fake cursor' (vertical bar/pipe character)
+			GraphDrawStringUTF8( pVisBack, pImg, nXLeft - 2, 104, 8, 8, (const unsigned char*)sText.c_str(), sText.length() );
+			//DrawStringUnicodeHelper(pVisBack, nXLeft - 2, 104, SDL_Color{ 255, 255, 255, 255 }, sText.c_str(), sText.length());
+#else//ASCII:
 		GraphDrawString( pVisBack, g_pFont8x8, nXLeft-2, 104, (unsigned char*)sInput.c_str() );
 		if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
 		{
 			unsigned char szCursor[2] = { 254, 0 };
 			GraphDrawString( pVisBack, g_pFont8x8, (nXLeft-2) + 8*sInput.length(), 104, szCursor );
 		}
+		#endif
 #endif
 
 
@@ -990,7 +1005,9 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 	} while (bLoop);
 
 	sReturnString = sInput;
+	#ifdef djALLOW_UNICODE_TEXT_ENTRY
 	//SDL_EnableUNICODE(0);
+	#endif
 
 	return bRet;
 }
