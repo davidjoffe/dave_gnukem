@@ -84,6 +84,9 @@
     <ClCompile Include="..\djlog.cpp">
       <Filter>Source Files\djGameLib</Filter>
     </ClCompile>
+    <ClCompile Include="..\djsprite.cpp">
+      <Filter>Source Files\djGameLib</Filter>
+    </ClCompile>
     <ClCompile Include="..\djstring.cpp">
       <Filter>Source Files\djGameLib</Filter>
     </ClCompile>
@@ -222,6 +225,9 @@
       <Filter>Header Files\djGameLibHeaders</Filter>
     </ClInclude>
     <ClInclude Include="..\djsound.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djsprite.h">
       <Filter>Header Files\djGameLibHeaders</Filter>
     </ClInclude>
     <ClInclude Include="..\djstring.h">

@@ -10,6 +10,7 @@
 #include "djgraph.h"
 #include "djsound.h"
 #include "djstring.h"//djAppendPathStr
+#include "djsprite.h"
 
 #include "game.h"//game_startup etc.
 #include "menu.h"

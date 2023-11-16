@@ -12,6 +12,7 @@ Copyright (C) 2000-2023 David Joffe
 #include "block.h" // Class type definitions
 #include "djlog.h"
 #include "hero.h"
+#include "djsprite.h"
 #include <assert.h>
 #include "game.h"
 #include "level.h"//For LEVCHAR_FOREA etc. for CRocket

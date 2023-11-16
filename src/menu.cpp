@@ -13,7 +13,8 @@ Copyright (C) 1995-2023 David Joffe
 
 #include "menu.h"
 
-#include "djimage.h"//djSprite
+#include "djsprite.h"
+#include "djimage.h"
 #include "djstring.h"
 #include "djinput.h"
 #include "djtime.h"

@@ -40,6 +40,7 @@
 #include "djlog.h"
 #include "djtime.h"
 #include "djinput.h"
+#include "djsprite.h"
 #include "menu.h"
 #include "keys.h"
 #include "ed.h"

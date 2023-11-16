@@ -377,7 +377,6 @@ void GraphDrawStringUTF8( djVisual *pVis, djImage *pImg, int x, int y, int nChar
 	// Remember that utf8 is multi-byte and variable-width encoding so a single Unicode codepoint (i.e. one 32-bit value) could be maybe e.g. 1 byte or 2 bytes or 3 bytes or 4 bytes etc. in the utf8 string (but strlen returns the full number of bytes, not "Unicode Characters")
 	//"Reads a single codepoint from the UTF-8 sequence being pointed to by str. The maximum number of bytes read is strlen, unless strlen is negative (in which case up to 4 bytes are read). If a valid codepoint could be read, it is stored in the variable pointed to by codepoint_ref, otherwise that variable will be set to -1. In case of success, the number of bytes read is returned; otherwise, a negative error code is returned."
 	int ret = djutf8iterate(szStart + uOffset, uLen2, c);
-	int nMatches = 0;
 	int x_=x;
 	int y_=y;
 	while (ret > 0)

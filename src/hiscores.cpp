@@ -18,6 +18,7 @@ Conceptually should divide this file into more model/view/controller separation?
 #include "djtypes.h"
 #include "menu.h"
 #include "graph.h"
+#include "djsprite.h"//todo refactor out of here?
 #include "djlog.h"
 #include "djimage.h"
 //------------------------
