@@ -33,4 +33,10 @@ const char* djGetLanguage()
 {
     return g_sCurLang.c_str();
 }
+
+bool djLang::DoTranslations()
+{
+    // Hrm, is this correct? Maybe default language should be 'none' and 'en' could host translations .. that way can do things like the pun
+    return !g_sCurLang.empty() && g_sCurLang!="en";
+}
 //---------------------------------------------------------------------------

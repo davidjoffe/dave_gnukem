@@ -68,8 +68,8 @@ void djFontInit()
 	//--- Load 8x8 font bitmap (FIXME error check)
 	if (NULL != (g_pFont8x8 = new djImage))
 	{
-		std::string sLang = djGetLanguage();
-		if (sLang!="en" && !sLang.empty())
+		//std::string sLang = djGetLanguage();
+		if (djLang::DoTranslations())//sLang!="en" && !sLang.empty())
 			g_pFont8x8->Load(djDATAPATHc(DATAFILE_IMG_FONT_OTHERLANG));// FILE_IMG_FONT);
 		else
 			g_pFont8x8->Load(djDATAPATHc(DATAFILE_IMG_FONT));// FILE_IMG_FONT);

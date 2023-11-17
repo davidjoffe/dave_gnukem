@@ -6,21 +6,22 @@
 
 #ifdef djLOCALIZE_ON
 
-#ifdef djLOCALIZE_USE_OWN
+    #ifdef djLOCALIZE_USE_OWN
 
-// Either have our own here, or use 3rd party e.g. gettext lib ...
-const char* gettext(const char* msgid);
-const char* pgettext(const char* /*context*/, const char* msgid);
-const char* pgettext(const char* /*context*/, const char* msgid);
-const char* npgettext(const char* /*context*/, const char* msgid_singular, const char* msgid_plural, unsigned long n);
+    // Either have our own here, or use 3rd party e.g. gettext lib ...
+    const char* gettext(const char* msgid);
+    const char* pgettext(const char* /*context*/, const char* msgid);
+    const char* pgettext(const char* /*context*/, const char* msgid);
+    const char* npgettext(const char* /*context*/, const char* msgid_singular, const char* msgid_plural, unsigned long n);
 
-#else
+    #else
 
-// Add the necessary include code for gettext headers
-#include <gettext.h>
+    // Add the necessary include code for gettext headers
+    #include <gettext.h>
 
-#endif//djLOCALIZE_USE_OWN
+    #endif//djLOCALIZE_USE_OWN
 
+#else//#ifdef djLOCALIZE_ON
 // If localization is not enabled we want simple stubs/wrappers to just return the passed-in strings e.g.:
 // pgettext("mainmenu", "Exit"); => return "Exit"
 
@@ -50,4 +51,4 @@ inline const char* npgettext(const char* /*context*/, const char* msgid_singular
 //#define _(szStr) gettext(szStr)
 
 
-#endif // _LOCALIZE_ON_
+#endif //djLOCALIZE_ON
