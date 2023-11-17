@@ -13,6 +13,7 @@ Copyright (C) 1995-2023 David Joffe
 
 #include "menu.h"
 
+#include "djlang.h"//djLang::DoTranslations()
 #include "djsprite.h"
 #include "djimage.h"
 #include "djstring.h"
@@ -251,10 +252,18 @@ int do_menu( CMenu *pMenu )
 	for (i = 0; i < size; i++)
 	{
 		if (pMenu->getItems()[i].m_szText == nullptr) continue;
-		size_t len = strlen(pMenu->getItems()[i].m_szText);
+		const std::string sText = pMenu->getItems()[i].m_szText;
+		// This weird code is to remove the "   " padding from front of items, so that we can get a more accurate width of the text
+		// It should be deprecated once we remove all the 'hardcoded' leading 3-space-padding from menu text items ...
+		// We want to use this lenLongestString info to calculate things like how wide to draw the menu box and its dropshadow etc.
+		size_t len = sText.length();
+		if (sText.substr(0,3)=="   ")
+			len = len - 3;
 		if (len > lenLongestString)
 			lenLongestString = len;
 	}
+	// Since we're using 8x8 font, add 3 pixels padding ... but since we're removing the "   " padding from front of items, add some to leave space for cursor and indent etc.
+	lenLongestString += 3;
 
 	// default selected option
 	int option = iFirstSelectable;
@@ -341,8 +350,41 @@ int do_menu( CMenu *pMenu )
 			size*8-1
 			);
 
+		const SMenuItem& Item = *(pMenu->getItems() + i);
+
 		// Draw menu text
-		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset(), pMenu->getYOffset()+i*8, (unsigned char*)pMenu->getItems()[i].m_szText );
+		// If localized, use utf8 GraphDrawString version, else use the old one (font.tga based which is kind of gross and maybe should be deprecated or refactored or renamed as UTF8 should be regarded as 'the norm' this isn't the 90s anymore, it's 2023, though this code literally comes from the 90s)
+		if (!djLang::DoTranslations())
+		{
+			// If it's selectable item we right-indent it to make space for cursor (unless it already starts with three spaces)
+			if (Item.IsSelectable() && std::string(Item.m_szText).substr(0,3)!="   ")
+			{
+				// We must leave some space for menu cursor on left of selectable items shoudl do this differently though)
+				// TODO: DEPRECATE THIS LEADING SPACES STUFF?
+				// now we can start tweaking this e.g. to save space on screen we can shave some pixels, doesn't have to be exact align to 8 anymore once we localize all menu strings and strip leading spaces that are/were hard-baked into strongs
+				GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+3*8 + Item.m_Pos.x , pMenu->getYOffset()+i*8, (unsigned char*)Item.m_szText );
+			}
+			else
+				GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset() + Item.m_Pos.x, pMenu->getYOffset()+i*8, (unsigned char*)Item.m_szText );
+		}
+		// Draw menu text
+		if (djLang::DoTranslations())
+		{
+			extern djSprite* g_pFont2;
+			const SMenuItem& Item = *(pMenu->getItems() + i);
+			// Draw menu text
+			// If it's selectable item we right-indent it to make space for cursor (unless it already starts with three spaces)
+			if (Item.IsSelectable() && std::string(Item.m_szText).substr(0,3)!="   ")
+			{
+				// We must leave some space for menu cursor on left of selectable items shoudl do this differently though)
+				// TODO: DEPRECATE THIS LEADING SPACES STUFF?
+				// now we can start tweaking this e.g. to save space on screen we can shave some pixels, doesn't have to be exact align to 8 anymore once we localize all menu strings and strip leading spaces that are/were hard-baked into strongs
+				GraphDrawStringUTF8( pVisBack, g_pFont2->GetImage(), pMenu->getXOffset()+3*8 + Item.m_Pos.x , pMenu->getYOffset()+i*8, 8, 8, (unsigned char*)Item.m_szText );
+			}
+			else
+				GraphDrawStringUTF8( pVisBack, g_pFont2->GetImage(), pMenu->getXOffset() + Item.m_Pos.x, pMenu->getYOffset()+i*8, 8, 8, (unsigned char*)Item.m_szText );
+		}
+
 	}
 	menu_move( pMenu, option, 0, *szCursor, iFirstSelectable, iLastSelectable);
 

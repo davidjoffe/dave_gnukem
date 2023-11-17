@@ -43,6 +43,27 @@ public:
 extern djMenuCursorSprite* g_pDefaultMenuCursor;
 /*--------------------------------------------------------------------------*/
 
+// For performance reasons we may want an initialized version of this for graphics stuff? Should we (for safety so programmers are aware) give it a name that indicates such? [low]
+class djRectBase
+{
+public:
+	int x;
+	int y;
+	int w;
+	int h;
+};
+class djRect : public djRectBase
+{
+public:
+	djRect(int nX, int nY, int nW, int nH)
+	{
+		x = nX;
+		y = nY;
+		w = nW;
+		h = nH;
+	}
+};
+
 /*--------------------------------------------------------------------------*/
 //! A single item in the menu
 //! // This is a really gross old class from the 1900s and needs modernizing :/
@@ -50,7 +71,8 @@ extern djMenuCursorSprite* g_pDefaultMenuCursor;
 //! Can it be rescued? or need rewritng?
 struct SMenuItem
 {
-	SMenuItem(bool bItem = false, const char* szText = nullptr, const char* szRetVal = nullptr) : m_bitem(bItem), m_szText(szText), m_szRetVal(szRetVal)
+	SMenuItem(bool bItem = false, const char* szText = nullptr, const char* szRetVal = nullptr, int nX=0, int nY=0, int nW=0, int nH=0) : m_bitem(bItem), m_szText(szText), m_szRetVal(szRetVal),
+		m_Pos(nX, nY, nW, nH)
 	{
 	}
 
@@ -66,7 +88,16 @@ struct SMenuItem
 	const char* m_szRetVal = nullptr;
 
 	const bool IsSelectable() const { return m_bitem; }
+
+	djRect m_Pos;//(0,0,0,0);
+	//int m_nXOffset;
+	//int m_nYOffset;
 };
+
+// Rather than a 'menu with text' we should conceptualize this as a general sort of 'widgets' UI system perhaps - then we could add custom things like, say, checkboxes straight in UI
+/*class djMenuText : public SMenuItem
+{
+};*/
 /*--------------------------------------------------------------------------*/
 /*!
 \class CMenu
