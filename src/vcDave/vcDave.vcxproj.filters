@@ -51,6 +51,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\localization\djgettext.cpp">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClCompile>
     <ClCompile Include="..\win32\dpiscaling.cpp">
       <Filter>Source Files\djGameLib\win32</Filter>
     </ClCompile>
