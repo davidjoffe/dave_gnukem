@@ -213,6 +213,7 @@
     <ClInclude Include="..\inventory.h" />
     <ClInclude Include="..\keys.h" />
     <ClInclude Include="..\level.h" />
+    <ClInclude Include="..\localization\djgettext.h" />
     <ClInclude Include="..\m_aliases.h" />
     <ClInclude Include="..\m_misc.h" />
     <ClInclude Include="..\mainmenu.h" />

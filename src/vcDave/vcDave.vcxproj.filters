@@ -248,6 +248,9 @@
     <ClInclude Include="..\djutf8.h">
       <Filter>Header Files\djGameLibHeaders</Filter>
     </ClInclude>
+    <ClInclude Include="..\localization\djgettext.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
     <ClInclude Include="..\ed.h">
       <Filter>Header Files\EditorHeaders</Filter>
     </ClInclude>
