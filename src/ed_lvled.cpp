@@ -1,7 +1,10 @@
+// Copyright ~1995-2023 David Joffe
 // Level editor
 
 #include "config.h"
 #include "djfile.h"//djFile::dj_fopen
+#include "loadedlevel.h"
+#include "djsprite.h"
 #include "ed_lvled.h"
 #include "ed_common.h"
 #include "ed_macros.h"
@@ -689,7 +692,11 @@ void DoCreateNewLevel()
 	djAppendPathS(sLevelRelativePath, sFilenameWithoutPath.c_str());
 	pLevel->SetFilename(sLevelRelativePath.c_str());
 	pLevel->m_szName		= djStrDeepCopy("");
+// whaaat?
 	pLevel->m_szBackground	= djStrDeepCopy("levels/bg1.tga");//fixme for now hardcoded
+	pLevel->m_sBack1 = "";//levels/bg1.png";
+	
+
 	pLevel->m_szAuthor		= djStrDeepCopy("");
 	g_pCurMission->AddLevel(pLevel);
 
@@ -1228,6 +1235,20 @@ void DrawMinimap()
 
 	// Draw the purple rectangle indicating where your zoomed view is
 	DrawMinimapRectangle();
+
+	//dj2023-11 new
+	///*
+	if (g_Level.ImgBack1())
+	{
+		djgDrawImage(pVisMain,
+			g_Level.ImgBack1(),
+			levelview_x*16, levelview_y*16,
+			POS_LEVELVIEW_X + 0 * BLOCKW,
+			POS_LEVELVIEW_Y + 0 * BLOCKH,
+			levelview_w*16, levelview_h*16);
+	}
+	//*/
+
 	// Draw the zoomed view
 	bool bHighlightBack = false;//Must be drawn after the foreground block's drawn, that's why we use this flag
 	bool bHighlightBackMouseOver = false;//Must be drawn after the foreground block's drawn, that's why we use this flag
@@ -1240,18 +1261,24 @@ void DrawMinimap()
 			bHighlightBack = false;//dj2018-01 Flickering display to highlight selected sprite
 			bHighlightBackMouseOver = false;//dj2018-01 Flickering display to highlight mouse-over sprite
 			// Draw a black block if ShowBack is disabled
+			// why? hmm
 			if (!bShowBack)
 			{
 				djgSetColorFore( pVisMain, djColor(0,0,0) );
+				// todo Back1 stuff and can't see back1 .. don't draw this bg if 0?
 				djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*BLOCKW, POS_LEVELVIEW_Y + i*BLOCKH, BLOCKW, BLOCKH );
 			}
 			else
 			{
+				// todo Back1 stuff and can't see back1 .. don't draw this bg if 0?
 				ED_DrawSprite( POS_LEVELVIEW_X + j * BLOCKW,
 					POS_LEVELVIEW_Y + i * BLOCKH,
 					a, b );
 				if ( ((a) || (b)) )
 				{
+//				ED_DrawSprite( POS_LEVELVIEW_X + j * BLOCKW,
+//					POS_LEVELVIEW_Y + i * BLOCKH,
+//					a, b );
 					if (a==sprite0a && b==sprite0b)
 						bHighlightBack = true;
 					

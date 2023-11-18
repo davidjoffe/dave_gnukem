@@ -10,6 +10,7 @@
 #include "config.h"
 #include "djfile.h"//dj2022-11
 #include "djtypes.h"
+#include "loadedlevel.h"//dj2023
 #include "effect_viewportshadow.h"//dj2022
 #include <stdio.h>
 #include <stdlib.h>
@@ -1172,6 +1173,18 @@ void PerLevelSetup()
 	}
 #endif
 
+	// loaded new back1 stuff [dj2023]
+	const std::string sFile = djDATAPATHs(g_pCurMission->GetLevel(g_nLevel)->m_sBack1);
+	g_Level.pBack1 = nullptr;
+	g_Level.pImgBack1 = nullptr;
+	if (!sFile.empty())
+	{
+		extern djSprite* LoadSpriteHelper(const char* szPath, int nW, int nH);
+		g_Level.pBack1 = LoadSpriteHelper(sFile.c_str(), 16, 16);
+		if (g_Level.pBack1!=nullptr && g_Level.pBack1->IsLoaded())
+			g_Level.pImgBack1 = g_Level.pBack1->GetImage();
+	}
+
 	//dj2022-11 changing this from DATA_DIR to djDataDir() .. should keep an eye here to make sure no problems introduced ..
 	// Load map background image
 	pBackground = new djImage;
@@ -2301,12 +2314,6 @@ void GameDrawView(float fDeltaTime_ms)
 		//djgClear(pVisView);
 	}
 
-	//dj2019
-	//dj2019-MMtest//xo=0;
-	//dj2019-MMtest//yo=0;
-	//dj2019-MMtest//xo_small=0;
-
-
 #ifdef djEFFECT_VIEWPORTSHADOW
 	// dj2022-11 These new values currently only used for this effectg but could maybe in future be used for more things if need be
 	// It looks a bit complex but isn't really, it's just the position in world space of top left of viewport (in pixels) (doesn't change over drawing a single frame for all blocks)
@@ -2314,6 +2321,13 @@ void GameDrawView(float fDeltaTime_ms)
 	const int nViewportOriginX = g_Viewport.xo * BLOCKW + (g_Viewport.xo_small == 0 ? 0 : BLOCKW / 2);
 	const int nViewportOriginY = g_Viewport.yo * BLOCKH;
 #endif
+
+	// todo ... more work on this. is this in front or behind pBackground?
+	if (g_Level.ImgBack1()!=nullptr)
+	{
+		//djgDrawImage(pVisView, g_Level.ImgBack1(), nViewportOriginX, nViewportOriginY, g_nViewOffsetX, g_nViewOffsetY, g_nViewportPixelW, g_nViewportPixelH);
+		djgDrawImage(pVisView, g_Level.ImgBack1(), g_Viewport.xo, g_Viewport.yo, g_nViewOffsetX, g_nViewOffsetY, g_nViewportPixelW, g_nViewportPixelH);
+	}
 
 	//dj2019-07 Re this "10 seconds got to just after coke can, purple lab" comment: I don't know anymore what I meant with that (possibly something timing/benchmark-related),
 	// but that comment was written in the 1990s, as the 'purple lab' was a computer lab at University of Pretoria where I studied .. for some reason I think of this comment often still when I think about this game so I want to leave this here:

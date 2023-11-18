@@ -156,6 +156,9 @@
     <ClCompile Include="..\level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\loadedlevel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\keys.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -306,6 +309,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\level.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\loadedlevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\m_aliases.h">

@@ -165,6 +165,7 @@
     <ClCompile Include="..\inventory.cpp" />
     <ClCompile Include="..\keys.cpp" />
     <ClCompile Include="..\level.cpp" />
+    <ClCompile Include="..\loadedlevel.cpp" />
     <ClCompile Include="..\localization\djgettext.cpp" />
     <ClCompile Include="..\m_misc.cpp" />
     <ClCompile Include="..\main.cpp" />
@@ -214,6 +215,7 @@
     <ClInclude Include="..\inventory.h" />
     <ClInclude Include="..\keys.h" />
     <ClInclude Include="..\level.h" />
+    <ClInclude Include="..\loadedlevel.h" />
     <ClInclude Include="..\localization\djgettext.h" />
     <ClInclude Include="..\m_aliases.h" />
     <ClInclude Include="..\m_misc.h" />

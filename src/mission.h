@@ -119,6 +119,8 @@ public:
 	char *m_szName = nullptr;
 	char *m_szAuthor = nullptr;
 	char *m_szBackground = nullptr; // background image filename
+
+	std::string m_sBack1 = "";//"levels/back1.png";;
 };
 /*--------------------------------------------------------------------------*/
 // This 128 has nothing to do with the levelwidth 128, not to be confused with it (dj2019-07):
