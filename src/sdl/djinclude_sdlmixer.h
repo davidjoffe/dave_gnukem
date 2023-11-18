@@ -18,8 +18,11 @@
 
 			// [dj2023-11] vcpkg starts to have this new sdl2-mixer-ext instead of the usual sdl2-mixer (for libvorbis especially I think we may need it) but I don't see it in Ubuntu WSL etc. so for now just on Windows start trying to sort of auto-figure out whether to use sdl2-mixer-ext or sdl2-mixer
 			#if __has_include(<SDL_mixer_ext.h>)
+				// [dj2023] add this define so we know we are using the ext lib for things like #pragma link setting on MSVC platforms
+				#define djUSING_SDL_MIXER_EXT
 				#include <SDL_mixer_ext.h>
 			#elif __has_include(<SDL/SDL_mixer_ext.h>)
+				#define djUSING_SDL_MIXER_EXT
 				#include <SDL/SDL_mixer_ext.h>
 			#elif __has_include(<SDL/SDL_mixer.h>)
 				#include <SDL/SDL_mixer.h>

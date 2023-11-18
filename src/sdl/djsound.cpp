@@ -33,6 +33,15 @@ Copyright (C) 1999-2022 David Joffe and Kent Mein
 #include <malloc.h>
 #endif
 
+#if defined(WIN32) && defined(_MSC_VER)
+// Microsoft compiler stuff .. hmm not sure where best .. unless cmake etc.
+#ifdef djUSING_SDL_MIXER_EXT
+#pragma comment(lib, "SDL2_mixer_ext.lib")
+#else
+#pragma comment(lib, "SDL2_mixer.lib")
+#endif
+#endif
+
 //#define NOSOUND
 
 //For now [dj2016-10] just make background music some relative percentage of the main volume (so background is a bit softer so as not to get too annoying) - later could add a separate setting for background music volume
