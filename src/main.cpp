@@ -28,6 +28,7 @@ Copyright (C) 1995-2023 David Joffe
 #include "graph.h"
 #include "djlang.h"//djSelectLanguage localization
 	#include "djsprite.h"
+	#include "localization/djgettext.h"//LoadAllPOFiles
 
 #include "djfile.h"//djFileExists etc.
 #include "djimage.h"
@@ -203,7 +204,9 @@ int main ( int argc, char** argv )
 		printf( "   -f    Fullscreen mode\n" );
 		printf( "   -640  640x480 mode\n" );
 		printf( "   -scale N [Optional] Force window size multiple of base resolution (1=320x200)\n" );
+//#ifdef djLOCALIZE_ON		
 		printf( "   -lang langcode [Optional] (beta) Select user interface language by code, e.g. -lang fr\n" );
+//#endif
 #ifdef djCFG_ALLOW_COMMANDLINE_DATADIR
 		printf( "   -datadir DIR [Optional] Specify preferred default data path (may be absolute or relative)\n" );
 #endif
@@ -420,15 +423,55 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 	srand((unsigned int)time(NULL));				// Seed the random number generator
 
 	djTimeInit();					// Initialise timer
+	//printf("do_menu\n");fflush(nullptr);
 
+	// todo allow localization selection from user config also?
+	//printf("SETTING LANGUAGE\n");
+	#ifdef djLOCALIZE_ON
+	printf("Localization system initialization\n");
+	#else
+	printf("Localization system not enabled\n");
+	#endif
+	//djInitLocalization();
+	std::string sLang;
 	// This should happen before djFontInit (for now ...) for localization stuff
 	{
 		const std::map< std::string, std::string >::const_iterator iter=Parameters.find("lang");
 		if (iter!=Parameters.end())
 		{
-			printf("SETTING LANGUAGE\n");
-			std::string sLangCode = iter->second;
-			djSelectLanguage( sLangCode.c_str() );
+			//printf("SETTING LANGUAGE\n");
+			sLang = iter->second;
+			djSelectLanguage( sLang.c_str() );
+		}
+		else if (g_Settings.FindSetting("lang")!=nullptr)
+		{
+			const char* szLang = g_Settings.FindSetting("lang");
+			if (szLang!=nullptr && szLang[0]!=0)
+			{
+				sLang = szLang;
+				djSelectLanguage( szLang );
+			}
+		}
+	}
+	// Load all .po files [or should we just load one? hm, should maybe be an option for dev/testing to load all]
+	// For most real games should only really load the one you need (lookups would be faster, loading faster) but I can see for dev/testing loading all may be useful, then toggle between them.
+	if (!sLang.empty() && sLang!="en")
+	{
+		printf("SETTING LANGUAGE: %s\n", sLang.c_str());
+		const bool bLoadAllPOFiles = false;
+		if (bLoadAllPOFiles)
+		{
+			printf("Loading all .po files\n");
+			LoadAllPOFiles(djDATAPATHs("lang/"));
+			printf("DONE loading po files\n");
+		}
+		else
+		{
+			const std::string sFile = djDATAPATHs("lang/po/" + sLang + ".po");
+			printf("Loading .po file:\n");
+			printf("%s\n", sFile.c_str());
+			//void loadPOFile(const std::string& filename, const std::string& lang);
+			loadPOFile(sFile, sLang);
 		}
 	}
 
@@ -587,7 +630,7 @@ void SettingsMenu()
 		{ true,  "   High (CGA) (simulated 4-color)   ", "settings/retro/cga" },
 		//{ false, "                                     " },
 		{ false, "                                     " },
-		{ false, NULL }
+		{ false, "" }//NB <- this empty one must be here :/
 	};
 
 	unsigned char MenuCursor[] = { 128, 129, 130, 131, 0 };
@@ -603,8 +646,8 @@ void SettingsMenu()
 	//dj2022-11 refactoring
 	int nMenuOption = do_menu( &Menu );
 	std::string sSelectedMenuCommand;
-	if (nMenuOption >= 0 && Menu.getItems()[nMenuOption].m_szRetVal != nullptr)
-		sSelectedMenuCommand = Menu.getItems()[nMenuOption].m_szRetVal;
+	if (nMenuOption >= 0 && !Menu.getItems()[nMenuOption].GetRetVal().empty())
+		sSelectedMenuCommand = Menu.getItems()[nMenuOption].GetRetVal();
 	
 	if (sSelectedMenuCommand == "settings/retro/default")
 		g_nSimulatedGraphics = 0;
@@ -1031,19 +1074,18 @@ void SelectMission()
 	for ( i=0; i<(int)g_apMissions.size(); i++ )
 	{
 		pMenuItems[i+1].m_bitem = true;
-		char* szText = new char[512];
-		//fixme ^ leaks
-		snprintf( szText, 512, "   %-31.31s  ", g_apMissions[i]->GetName() );//snprintf( szText, 512, "|  %-31.31s |", g_apMissions[i]->GetName() );
-		pMenuItems[i+1].m_szText = szText;//<- a bit gross [a bit you say]
+		char szText[1024]={0};
+		snprintf( szText, 512, "%-31.31s", g_apMissions[i]->GetName() );//snprintf( szText, 512, "|  %-31.31s |", g_apMissions[i]->GetName() );
+		pMenuItems[i+1].m_sText = szText;//<- a bit gross [a bit you say]
+		//pMenuItems[i+1].m_Pos.x = 3*24;//<- newer better way than the above
 	}
 	// Top and bottom menu entries, the borders
 	pMenuItems[0].m_bitem = false;
-	pMenuItems[0].m_szText = djStrDeepCopy( "                                    " );//pMenuItems[0].m_szText = djStrDeepCopy( "{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}" );
+	pMenuItems[0].m_sText = "                                    ";
 
 	pMenuItems[g_apMissions.size()+1].m_bitem = false;
-	pMenuItems[g_apMissions.size()+1].m_szText = djStrDeepCopy("                                    ");//djStrDeepCopy("[~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~]");
-	pMenuItems[g_apMissions.size()+2].m_bitem = false; // Null-terminator
-	pMenuItems[g_apMissions.size()+2].m_szText = NULL;
+	pMenuItems[g_apMissions.size()+1].m_sText = "                                    ";
+	pMenuItems[g_apMissions.size()+2].SetTerminal(); // Null-terminator
 
 	menuMission.setItems ( pMenuItems );
 
@@ -1052,15 +1094,6 @@ void SelectMission()
 	if (iret != -1)
 	{
 		g_pCurMission = g_apMissions[iret - 1];
-	}
-
-	// Unallocate menu
-	for ( i=0; i<(int)g_apMissions.size() + 2; i++ )
-	{
-		if (pMenuItems[i].m_szText)
-		{
-			djDELV(pMenuItems[i].m_szText);
-		}
 	}
 
 	djDELV(pMenuItems);

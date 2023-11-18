@@ -60,7 +60,7 @@ struct SMenuItem instructionsHighScoreItems[] =
    { false, "        " },
    { true,  "   OK   " },
    { false, "        " },
-   { false, NULL }
+   { false, "" }//NB slightly old-fashioned indication of final 'null' item, without this bad things happen [someday to refactor nicer]
 };
 unsigned char instructionsHighScoreCursor[] = { 128, 129, 130, 131, 0 };
 CMenu HighScoresMenu ( "highscores.cpp:HighScoresMenu" );

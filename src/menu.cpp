@@ -199,6 +199,7 @@ void do_menu_pump()
 /*--------------------------------------------------------------------------*/
 int do_menu( CMenu *pMenu )
 {
+	//printf("do_menu\n");fflush(nullptr);
 	//dj2016-10-28 trying background image with 'noise' instead of solid background color for menu ..
 	if (g_pImgMenuBackground8x8==NULL)
 	{
@@ -214,7 +215,7 @@ int do_menu( CMenu *pMenu )
 
 	// calculate size of menu
 	int size = 0;
-	for ( size=0; pMenu->getItems()[size].m_szText != NULL; size++ )
+	for ( size=0; !pMenu->getItems()[size].IsTerminal(); size++ )
 		;
 
 	pMenu->setSize ( size );
@@ -251,8 +252,8 @@ int do_menu( CMenu *pMenu )
 	size_t lenLongestString = 0;
 	for (i = 0; i < size; i++)
 	{
-		if (pMenu->getItems()[i].m_szText == nullptr) continue;
-		const std::string sText = pMenu->getItems()[i].m_szText;
+		if (pMenu->getItems()[i].GetTextStr().empty()) continue;
+		const std::string& sText = pMenu->getItems()[i].GetTextStr();
 		// This weird code is to remove the "   " padding from front of items, so that we can get a more accurate width of the text
 		// It should be deprecated once we remove all the 'hardcoded' leading 3-space-padding from menu text items ...
 		// We want to use this lenLongestString info to calculate things like how wide to draw the menu box and its dropshadow etc.
@@ -357,15 +358,15 @@ int do_menu( CMenu *pMenu )
 		if (!djLang::DoTranslations())
 		{
 			// If it's selectable item we right-indent it to make space for cursor (unless it already starts with three spaces)
-			if (Item.IsSelectable() && std::string(Item.m_szText).substr(0,3)!="   ")
+			if (Item.IsSelectable() && Item.GetTextStr().substr(0,3)!="   ")
 			{
 				// We must leave some space for menu cursor on left of selectable items shoudl do this differently though)
 				// TODO: DEPRECATE THIS LEADING SPACES STUFF?
 				// now we can start tweaking this e.g. to save space on screen we can shave some pixels, doesn't have to be exact align to 8 anymore once we localize all menu strings and strip leading spaces that are/were hard-baked into strongs
-				GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+3*8 + Item.m_Pos.x , pMenu->getYOffset()+i*8, (unsigned char*)Item.m_szText );
+				GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+3*8 + Item.m_Pos.x , pMenu->getYOffset()+i*8, (unsigned char*)Item.GetTextStr().c_str() );
 			}
 			else
-				GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset() + Item.m_Pos.x, pMenu->getYOffset()+i*8, (unsigned char*)Item.m_szText );
+				GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset() + Item.m_Pos.x, pMenu->getYOffset()+i*8, (unsigned char*)Item.GetTextStr().c_str() );
 		}
 		// Draw menu text
 		if (djLang::DoTranslations())
@@ -374,15 +375,15 @@ int do_menu( CMenu *pMenu )
 			const SMenuItem& Item = *(pMenu->getItems() + i);
 			// Draw menu text
 			// If it's selectable item we right-indent it to make space for cursor (unless it already starts with three spaces)
-			if (Item.IsSelectable() && std::string(Item.m_szText).substr(0,3)!="   ")
+			if (Item.IsSelectable() && Item.GetTextStr().substr(0,3)!="   ")
 			{
 				// We must leave some space for menu cursor on left of selectable items shoudl do this differently though)
 				// TODO: DEPRECATE THIS LEADING SPACES STUFF?
 				// now we can start tweaking this e.g. to save space on screen we can shave some pixels, doesn't have to be exact align to 8 anymore once we localize all menu strings and strip leading spaces that are/were hard-baked into strongs
-				GraphDrawStringUTF8( pVisBack, g_pFont2->GetImage(), pMenu->getXOffset()+3*8 + Item.m_Pos.x , pMenu->getYOffset()+i*8, 8, 8, (unsigned char*)Item.m_szText );
+				GraphDrawStringUTF8( pVisBack, g_pFont2->GetImage(), pMenu->getXOffset()+3*8 + Item.m_Pos.x , pMenu->getYOffset()+i*8, 8, 8, (unsigned char*)Item.GetTextStr().c_str() );
 			}
 			else
-				GraphDrawStringUTF8( pVisBack, g_pFont2->GetImage(), pMenu->getXOffset() + Item.m_Pos.x, pMenu->getYOffset()+i*8, 8, 8, (unsigned char*)Item.m_szText );
+				GraphDrawStringUTF8( pVisBack, g_pFont2->GetImage(), pMenu->getXOffset() + Item.m_Pos.x, pMenu->getYOffset()+i*8, 8, 8, (unsigned char*)Item.GetTextStr().c_str() );
 		}
 
 	}
@@ -519,13 +520,13 @@ int do_menu( CMenu *pMenu )
 					{
 						nCurPos = (nCurPos + 1) % pMenu->getSize();//<- mod to wrap around
 						// Find the first/next menu item that starts with the typed character (after whitespace etc.), with wraparound, and jump to it if found (but I think probably not act as if Enter pressed)
-						if (paItems[nCurPos].IsSelectable() && paItems[nCurPos].m_szText!=nullptr)
+						if (paItems[nCurPos].IsSelectable() && !paItems[nCurPos].GetTextStr().empty())
 						{
 							int nFindFirstAlphChar = 0;
 							char c = 0;
 							do
 							{
-								c = paItems[nCurPos].m_szText[nFindFirstAlphChar];
+								c = paItems[nCurPos].GetText()[nFindFirstAlphChar];
 								// todo support diacritics here? e.g. french access? e.g. if press 'e' then find accented e etc.? [low prio but nice to have]
 								// Make lowercase
 								if ((c >= 'A') && (c <= 'Z')) c += 32;//32 transfers 'A' to e.g. 'a' in ASCII

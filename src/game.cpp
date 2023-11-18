@@ -2793,6 +2793,7 @@ void DrawDebugInfo()
 
 	//snprintf(buf,sizeof(buf), "xo,yo=%d,%d", xo, yo);
 	//GraphDrawString(pVisView, g_pFont8x8, 32, 70, (unsigned char*)buf );
+	// todo, add: endianness indication, RGBA bitmasks etc.? also new localization info.
 }
 
 void DrawBullets(float fDeltaTime_ms)
@@ -3173,7 +3174,7 @@ void IngameMenu()
 		#endif
 		{ true,  "   Abort Game          ", "ingame/abort_game" },
 		{ false, "                       " },
-		{ false, NULL }
+		{ false, "" }//NB slightly old-fashioned indication of final 'null' item, without this bad things happen [someday to refactor nicer]
 	};
 	const unsigned char gameMenuCursor[] = { 128, 129, 130, 131, 0 };
 	CMenu gameMenu("game.cpp:gameMenu");
@@ -3193,8 +3194,8 @@ void IngameMenu()
 	//dj2022-11 testing moving away from gross hardcoded numbers for menu return values but only a few implemented so far ..
 	// hm should maybe make a new small wrapper for this
 	std::string sSelectedMenuCommand;
-	if (nMenuOption >= 0 && gameMenu.getItems()[nMenuOption].m_szRetVal != nullptr)
-		sSelectedMenuCommand = gameMenu.getItems()[nMenuOption].m_szRetVal;
+	if (nMenuOption >= 0 && !gameMenu.getItems()[nMenuOption].GetRetVal().empty())
+		sSelectedMenuCommand = gameMenu.getItems()[nMenuOption].GetRetVal();
 #ifdef djEFFECT_VIEWPORTSHADOW
 	//dj2022-11 testing new beta shadow effect
 	if (sSelectedMenuCommand == "setting/betashadoweffect")

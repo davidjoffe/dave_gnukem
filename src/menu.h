@@ -15,6 +15,7 @@ Copyright (C) 1995-2022 David Joffe
 /*--------------------------------------------------------------------------*/
 #include "djtypes.h"
 #include "djsound.h"
+#include <string>
 
 /*--------------------------------------------------------------------------*/
 // Class forwards (don't include actual headers here for compile speed reasons etc.)
@@ -71,27 +72,36 @@ public:
 //! Can it be rescued? or need rewritng?
 struct SMenuItem
 {
-	SMenuItem(bool bItem = false, const char* szText = nullptr, const char* szRetVal = nullptr, int nX=0, int nY=0, int nW=0, int nH=0) : m_bitem(bItem), m_szText(szText), m_szRetVal(szRetVal),
+	SMenuItem(bool bItem = false, const std::string& sText="", const std::string& sRetVal="", int nX=0, int nY=0, int nW=0, int nH=0) : m_bitem(bItem),
+		m_sText(sText),
+		m_sRetVal(sRetVal),
 		m_Pos(nX, nY, nW, nH)
 	{
+
 	}
 
 	//! A real (i.e. selectable) menu item (true), or just a string (false)?
 	bool m_bitem=false;
 	//! The menu text to display
-	const char *m_szText=nullptr;
+	std::string m_sText;
 
 	// Non-owned pointer presumably ..
-	void SetText(const char* szText) { m_szText = szText; }
+	void SetText(const char* szText) { m_sText = szText; }
+	const char* GetText() const { return m_sText.c_str(); }
+	const std::string& GetTextStr() const { return m_sText; }
+
+	// Old-fashioned C-style 'null terminator' concept is morphing a bit .. [dj2023]
+	const bool IsTerminal() const { return m_sText.empty(); }
+	void SetTerminal() { m_sText.clear(); m_bitem = false; }
 
 	//! dj2022-11 [optional] new return by a string identifier so we can try have slightly more sane (and potentially less bug-introducing) handling than gross switch statements with lists of hardcoded numerical values henceforth
-	const char* m_szRetVal = nullptr;
+	std::string m_sRetVal;
+	const std::string& GetRetVal() const { return m_sRetVal; }
 
 	const bool IsSelectable() const { return m_bitem; }
 
+	// Optional positional offset for drawing
 	djRect m_Pos;//(0,0,0,0);
-	//int m_nXOffset;
-	//int m_nYOffset;
 };
 
 // Rather than a 'menu with text' we should conceptualize this as a general sort of 'widgets' UI system perhaps - then we could add custom things like, say, checkboxes straight in UI
@@ -104,8 +114,8 @@ struct SMenuItem
 \nosubgrouping
 
 A menu (e.g. the main menu). Consists of an array of menu items (\ref SMenuItem).
-A menu item with \ref SMenuItem::m_szText value NULL indicates the end of the
-array.
+A menu item with \ref SMenuItem::m_sText value empty indicates the end of the
+array (slightly old-fashioned and may change in future)
 
 (Note that using a null-terminator to indicate end of menu is a bit 'risky' as any programmer who naively creates a new menu may not realize .. and then it reads past of end of their memory menu .. so not the best strategy .. this was 20 years ago urg ..~dj2022 Refactor someday.)
 */
@@ -114,6 +124,8 @@ class CMenu
 public:
 	CMenu(const char *idstr);
 	~CMenu();
+
+	// Several things no longer used here, or being phased out:
 
 	// Really old stuff that uses hardcoded offsets into old main game font .. not generic, getting rid of ..and replacing with new djSprite* stuff (to help support localization so menus can be in more langauges)	
 	void setMenuCursor ( const unsigned char *cursor ) { m_szCursor = (unsigned char*)cursor; };

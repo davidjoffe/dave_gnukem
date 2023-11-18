@@ -8,6 +8,7 @@ Copyright (C) 2023 David Joffe
 
 #include "config.h"
 #include "djlang.h"
+#include "localization/djgettext.h"// djlang.h 'knows about' djgettext but not vice versa currently (this might change if/as I re-think things - dj)
 #include <string>
 
 std::string g_sCurLang="en";
@@ -27,6 +28,12 @@ void djSelectLanguage(const char* szLang)
     // Hm what's the longest possible language CODE (with region etc.) hrm?
     if (g_sCurLang.length()>32)// Trim if overly long
         g_sCurLang = g_sCurLang.substr(0, 32);
+
+    // Load and/or select .po file(s) (dj2023 todo still thinking about best place for this etc.)
+    if (djLang::DoTranslations())
+    {
+        select_locale(g_sCurLang);
+    }
 }
 
 const char* djGetLanguage()

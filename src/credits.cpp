@@ -1,7 +1,7 @@
 /*********
   credits.cpp
 
-  Copyright (C) 1999-2018 David Joffe
+  Copyright (C) 1999-2023 David Joffe
 *********/
 
 #include <stdlib.h> // for NULL
@@ -18,7 +18,7 @@ const struct SMenuItem creditsMenuItems[] =
    { false, "        " },
    { true,  "   OK   " },
    { false, "        " },
-   { false, NULL }
+   { false, "" }
 };
 unsigned char creditsMenuCursor[] = { 128, 129, 130, 131, 0 };
 CMenu creditsMenu ( "credits.cpp:creditsMenu" );

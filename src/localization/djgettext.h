@@ -1,18 +1,30 @@
 //#include "../config.h"
 
 //#define djLOCALIZE_ON
-//#define djLOCALIZE_USE_OWN
-////#define djLOCALIZE_USE_GETTEXT
+#define djLOCALIZE_USE_OWN
+
+        ////#define djLOCALIZE_USE_GETTEXT
 
 #ifdef djLOCALIZE_ON
 
     #ifdef djLOCALIZE_USE_OWN
 
+    #include <string>
+
+    // TO KEEP IN MIND - we may want multiple sets of translations
+
     // Either have our own here, or use 3rd party e.g. gettext lib ...
-    const char* gettext(const char* msgid);
-    const char* pgettext(const char* /*context*/, const char* msgid);
-    const char* pgettext(const char* /*context*/, const char* msgid);
-    const char* npgettext(const char* /*context*/, const char* msgid_singular, const char* msgid_plural, unsigned long n);
+    //const char* pgettext(const char* /*context*/, const char* msgid);
+    //const char* npgettext(const char* /*context*/, const char* msgid_singular, const char* msgid_plural, unsigned long n);
+    // The names of these are so they work xgettext etc. (see https://www.gnu.org/software/gettext/manual/html_node/xgettext-Invocation.html)
+    extern std::string gettext(const std::string& msgID);
+    extern std::string pgettext(const std::string& contextStr, const std::string& msgID);
+    extern std::string select_locale(const std::string& lang);
+extern std::string djGetText_GetLang();
+    //extern std::string bindcurrentdomain(const std::string& lang);
+    extern void loadPOFile(const std::string& filename, const std::string& lang);
+
+    extern void LoadAllPOFiles(const std::string& sPath);
 
     #else
 
@@ -25,30 +37,21 @@
 // If localization is not enabled we want simple stubs/wrappers to just return the passed-in strings e.g.:
 // pgettext("mainmenu", "Exit"); => return "Exit"
 
-//#include <string>
+    #include <string>
+    std::string select_locale(const std::string& lang);
+    extern void LoadAllPOFiles(const std::string& sPath);
+    extern void loadPOFile(const std::string& filename, const std::string& lang);
 
-// Define gettext stub
-inline const char* gettext(const char* msgid) {
-    return msgid;
-}
+    // Define gettext stub
+    const char* gettext(const char* msgid);
+    // Define pgettext stub
+    const char* pgettext(const char* /*context*/, const char* msgid);
+    // Define ngettext stub
+    const char* ngettext(const char* msgid_singular, const char* msgid_plural, unsigned long n);
+    // Define npgettext stub
+    const char* npgettext(const char* /*context*/, const char* msgid_singular, const char* msgid_plural, unsigned long n);
 
-// Define pgettext stub
-inline const char* pgettext(const char* /*context*/, const char* msgid) {
-    return msgid;
-}
-
-// Define ngettext stub
-inline const char* ngettext(const char* msgid_singular, const char* msgid_plural, unsigned long n) {
-    return n == 1 ? msgid_singular : msgid_plural;
-}
-
-// Define npgettext stub
-inline const char* npgettext(const char* /*context*/, const char* msgid_singular, const char* msgid_plural, unsigned long n) {
-    return n == 1 ? msgid_singular : msgid_plural;
-}
-
-// Common convention to use _ for gettext()
-//#define _(szStr) gettext(szStr)
-
+    // Common convention to use _ for gettext()
+    //#define _(szStr) gettext(szStr)
 
 #endif //djLOCALIZE_ON

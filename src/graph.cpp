@@ -46,10 +46,22 @@ Copyright (C) 1998-2023 David Joffe
 #include "djlog.h"
 
 #include "djtypes.h"
+#include "djsprite.h"
 
 #include "djutf8.h"// For GraphDrawStringUTF8 (dj2023-11) for utf8 iterate
 
 djImage *g_pFont8x8=NULL;
+djImage* djDefaultFont()
+{
+	extern djSprite* g_pFont2;
+	//if (djLang::DoTranslations() && g_pFont2!=nullptr && g_pFont2->GetImage()!=nullptr)
+	// Unicode-based (utf8)
+	if (g_pFont2!=nullptr && g_pFont2->GetImage()!=nullptr)
+		return g_pFont2->GetImage();
+	// Old font.tga (not Unicode-based)
+	return g_pFont8x8;
+}
+// Hm we need to know not just the font, but whether it's utf8 or that old font.tga thing?
 
 djVisual *pVisMain = NULL;
 djVisual *pVisBack = NULL;
@@ -71,6 +83,7 @@ void djFontInit()
 		//std::string sLang = djGetLanguage();
 		if (djLang::DoTranslations())//sLang!="en" && !sLang.empty())
 			g_pFont8x8->Load(djDATAPATHc(DATAFILE_IMG_FONT_OTHERLANG));// FILE_IMG_FONT);
+			//g_pFont8x8->Load(djDATAPATHc(DATAFILE_IMG_FONT));// FILE_IMG_FONT);
 		else
 			g_pFont8x8->Load(djDATAPATHc(DATAFILE_IMG_FONT));// FILE_IMG_FONT);
 		//g_pFont8x8->Load(djDATAPATHc(DATAFILE_IMG_FONT2));// FILE_IMG_FONT);

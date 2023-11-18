@@ -11,9 +11,8 @@
 #include "djsound.h"
 #include "djstring.h"//djAppendPathStr
 #include "djlang.h"//djGetLanguage()
-	#include <map>
+#include "localization/djgettext.h"//dj2023 for localizations e.g. French Dave Gnukem
 #include "djsprite.h"
-
 #include "game.h"//game_startup etc.
 #include "menu.h"
 #include "hiscores.h"
@@ -41,25 +40,58 @@ extern void SelectMission();				// Select a mission
 extern void RedefineKeys();				// Redefine keys
 /*--------------------------------------------------------------------------*/
 // Main menu [NB, warning, the handling code uses indexes :/ .. so if you add/remove items, must update there too - dj2016-10]
-const struct SMenuItem mainMenuItems[] =
+// TODO: The old const struct globals may represent a problem with the pgettext call because we need to have already initialized the .po loading etc. by the time this gets created
+// Todo refactor all the menus for localization to be created dynamically now rather at runtime like this so that pgettext can do its thing.
+const struct SMenuItem* CreateMenuItems_MainMenu()
 {
+	struct SMenuItem mainMenuItems[] =
+	{
 	{ false, "                   " },
-	{ true,  "   Start gnu game  " },
-	{ true,  "   Restore game    " },
-	{ true,  "   Select Mission  " },
-	{ true,  "   Ordering info   " },
-	{ true,  "    (not!)         " },
-	{ true,  "   Instructions    " },
-	{ true,  "   Redefine keys   " },
-	{ true,  "   High scores     " },
-	{ true,  "   Credits         " },
-	{ true,  "   About           " },
-	{ true,  "   Retro Settings  " },
-	{ true,  "   Don't quit      " },
-	{ true,  "   Quit            " },
+	// TRANSLATORS: This is a pun on "Start new game". "Gnu" is an open-source reference. 
+	// If a similar pun works in your language, feel free to use it. Otherwise, 
+	// translate as "Start new game".
+	{ true,  pgettext("mainmenu/game/start", "Start gnu game") },
+	//mainmenu.addmenuitem(pgettext("mainmenu", "Start gnu game"));
+	{ true,  pgettext("mainmenu/game/restore", "Restore game") },
+	{ true,  pgettext("mainmenu", "Select Mission") },
+	{ true,  pgettext("mainmenu/orderinfo-info", "Ordering info") },
+	// TRANSLATORS: This is a negation of 'ordering info' (a joke menu item since it's open source) but also another reference to 90's 'not!', while the joke 'Ordering info' menu item is there in the first place as a parody reference to the Shareware games like the original Duke Nukem we're parodying here, which had 'ordering info'
+	{ true,  pgettext("mainmenu/not", "(not!)"), "", 10 },//10 pixels x offset indentation
+	{ true,  pgettext("mainmenu/instructions", "Instructions") },
+	{ true,  pgettext("mainmenu/redefine-keys", "Redefine keys") },
+	{ true,  pgettext("mainmenu/highscores", "High scores") },
+	{ true,  pgettext("mainmenu/credits", "Credits") },
+	{ true,  pgettext("mainmenu/about", "About") },
+	{ true,  pgettext("mainmenu/settings-retro", "Retro Settings") },
+	// TRANSLATORS: Note this is/was meant to mean "Don't quit the game" i.e. it's a humor joke menu item that does nothing
+	{ true,  pgettext("mainmenu/dontquit", "Don't quit") },
+	{ true,  pgettext("mainmenu/quit", "Quit") },
 	{ false, "                   " },
-	{ false, NULL }
-};
+	{ false, "" }//Terminal (if you don't have this last empty one bad things will happen)
+	};
+
+	//{ true,  pgettext("mainmenu", "Select language") }, //?todo add 'select language'?
+	//{ true,  pgettext("mainmenu", "Settings") },//todo make general Settings?
+
+	// Urgh, get count due to old-fashioned null-terminator stuff ...
+	size_t uCount = 0;
+	const SMenuItem *pItem = &mainMenuItems[0];
+	while (!pItem->IsTerminal())
+	{
+		pItem++;
+		++uCount;
+	}
+	struct SMenuItem* pMenuItemsRet = new SMenuItem[uCount+1];
+	// Copy and return (um this this is gross there are constant string char* pointers in there to above, will it even work?)
+	// Probably .. the mainMenuItems may be on the stack, but the constant strings 'should' exist for the lifetime of the program
+	// Still, this is icky, we should probably rather use std::string for menu stuff
+	for ( size_t i=0; i<uCount; ++i )
+	{
+		pMenuItemsRet[i] = mainMenuItems[i];
+	}
+	pMenuItemsRet[uCount].SetTerminal();//last one
+	return pMenuItemsRet;
+}
 
 // [dj2023-11] For localization purposes I need to more genericize text rendering and font stuff, which means I need to refactor the skull-cursor stuff after over 20 years of it being done like this to have these menu cursors be in their own separate new sprite images (not be in, and re-use, the main old game font.tga) so that we can toggle to e.g. e.g. pixel operator as UI font if loading French interface etc.
 // These are/were ugly hardcoded offsets into main.tga where these which now will become meaningless, and done more nicely/generically
@@ -122,11 +154,12 @@ djSprite* g_pShadow=nullptr;
 djSprite* g_pBars=nullptr;
 djSprite* g_pFont2=nullptr;
 djSprite* g_pFontNumbers=nullptr;
+djSprite* g_pCharBackground=nullptr;
 djSprite* LoadSpriteHelper(const char* szPath, int nW, int nH)
 {
 	if (szPath==nullptr||szPath[0]==0)
 		return nullptr;
-	printf("LoadSpriteHelper\n");
+	printf("LoadSprite:");
 	djSprite* pSprite = new djSprite;
 	if (pSprite->LoadSpriteImage(szPath, nW, nH))
 	{
@@ -141,6 +174,8 @@ djSprite* LoadSpriteHelper(const char* szPath, int nW, int nH)
 }
 void InitMainMenu()
 {
+	std::string sLang = djGetLanguage();
+	
 	//djDEL(g_pDefaultMenuCursor);
 	if (g_pDefaultMenuCursor==nullptr)
 	{
@@ -154,7 +189,9 @@ void InitMainMenu()
 	g_pCursor2 = LoadSpriteHelper(djDATAPATHc("menucursor/cursor2-8x8.png"), 8, 8);
 	g_pShadow = LoadSpriteHelper(djDATAPATHc("ui/dropshadow.png"), 8, 8);
 	g_pBars = LoadSpriteHelper(djDATAPATHc("ui/bars.png"), 8, 8);
+	g_pCharBackground = LoadSpriteHelper(djDATAPATHc("menucharbackground.tga"), 8, 8);
 
+	const struct SMenuItem* mainMenuItems = CreateMenuItems_MainMenu();
 
 	mainMenu.setClrBack ( djColor(70,70,80)/*djColor(42,57,112)*/ ); //mainMenu.setClrBack ( djColor(10,40,150) ); // Crap colour. Need something better, like a bitmap
 	//mainMenu.m_clrBack = djColor(129,60,129);
@@ -169,103 +206,31 @@ void InitMainMenu()
 	mainMenu.setSoundMove(djSoundLoad(djDATAPATHc("sounds/cardflip.wav")));
 
 
-	// MAIN MENU LOCALIZATION ...
-	std::map<std::string, std::map<std::string, std::string>> map;
 
-	// NB NB NB!!! THE BELOW ARE AI-DONE TRANSLATINOS TO HELP WITH DEV AND TESTING
-	// NOT human translations yet and likely have mistakes:
-
-	// Afrikaans translations
-	/*
-	map["af"]["Start gnu game"] = "Begin gnu-spel";
-	map["af"]["Restore game"] = "Herstel spel";
-	map["af"]["Select Mission"] = "Kies Missie";
-	map["af"]["Ordering info"] = "Bestelinligting";
-	map["af"]["(not!)"] = "(nie!)";
-	map["af"]["Instructions"] = "Instruksies";
-	map["af"]["Redefine keys"] = "Herkies sleutels";
-	map["af"]["High scores"] = "Hoë tellings";
-	map["af"]["Credits"] = "Krediete";
-	map["af"]["About"] = "Oor";
-	map["af"]["Retro Settings"] = "Retro-instellings";
-	map["af"]["Don't quit"] = "Moenie ophou nie";
-	map["af"]["Quit"] = "Uitgaan";
-	*/
-
-	// French translations
-	//map["fr"]["Start gnu game"] = "*Démarrer";
-	/*map["fr"]["Start gnu game"] = "Démarrer le jeu gnu";
-	map["fr"]["Restore game"] = "Restaurer le jeu";
-	map["fr"]["Select Mission"] = "Sélectionner la mission";
-	map["fr"]["Ordering info"] = "Information de commande";
-	map["fr"]["(not!)"] = "(pas vrai!)";
-	map["fr"]["Instructions"] = "Instructions";
-	map["fr"]["Redefine keys"] = "Redéfinir les touches";
-	map["fr"]["High scores"] = "Scores élevés";
-	*/
-	//map["fr"]["Credits"] = "Crédits";
-	//map["fr"]["About"] = "À propos";
-	//map["fr"]["Retro Settings"] = "Paramètres rétro";
-	//map["fr"]["Don't quit"] = "Ne quittez pas";
-	//map["fr"]["Quit"] = "Quitter";
-
-	// German translations
-	/*
-	map["de"]["Start gnu game"] = "Neues Spiel starten";
-	map["de"]["Restore game"] = "Spiel wiederherstellen";
-	map["de"]["Select Mission"] = "Mission auswählen";
-	map["de"]["Ordering info"] = "Bestellinformationen";
-	map["de"]["(not!)"] = "(nicht!)";
-	map["de"]["Instructions"] = "Anleitung";
-	map["de"]["Redefine keys"] = "Tasten neu belegen";
-	map["de"]["High scores"] = "Bestenliste";
-	map["de"]["Credits"] = "Credits";
-	map["de"]["About"] = "Über";
-	map["de"]["Retro Settings"] = "Retro-Einstellungen";
-	map["de"]["Don't quit"] = "Nicht beenden";
-	map["de"]["Quit"] = "Beenden";
-
-	// Spanish translations
-	map["es"]["Start gnu game"] = "Iniciar juego gnu";
-	map["es"]["Restore game"] = "Restaurar juego";
-	map["es"]["Select Mission"] = "Seleccionar Misión";
-	map["es"]["Ordering info"] = "Información de pedido";
-	map["es"]["(not!)"] = "(¡no!)";
-	map["es"]["Instructions"] = "Instrucciones";
-	map["es"]["Redefine keys"] = "Redefinir teclas";
-	map["es"]["High scores"] = "Puntuaciones altas";
-	map["es"]["Credits"] = "Créditos";
-	map["es"]["About"] = "Acerca de";
-	map["es"]["Retro Settings"] = "Configuraciones Retro";
-	map["es"]["Don't quit"] = "No salir";
-	map["es"]["Quit"] = "Salir";
-	*/
-
+/*
 	std::string sLang = djGetLanguage();
 	if (!sLang.empty() && sLang!="en")
 	{
 		// Translate the menu items
 		size_t uCount = 0;
 		const SMenuItem *pItem = &mainMenuItems[0];
-		while (pItem->m_szText!=nullptr)
+		while (!pItem->IsTerminal())
 		{
-			//g_pMainMenuItems[pItem-mainMenuItems] = *pItem;
-
 			pItem++;
 			++uCount;
 		}
 		SMenuItem* pMenu = new SMenuItem[uCount+1];//+1?
 		unsigned int uIndex = 0;
 		pItem = &mainMenuItems[0];
-		while (pItem->m_szText!=nullptr)
+		while (!pItem->IsTerminal())
 		{
-			std::string sItem = pItem->m_szText;
+			std::string sItem = pItem->GetTextStr();
 			// First copy it
 			pMenu[uIndex] = mainMenuItems[uIndex];
 
-			pMenu[uIndex].SetText("");
+			//pMenu[uIndex].SetText("");
 
-			std::string sNew = mainMenuItems[uIndex].m_szText;
+			std::string sNew = mainMenuItems[uIndex].GetTextStr();
 			if (sNew.empty())
 			{
 				++uIndex;
@@ -285,25 +250,19 @@ void InitMainMenu()
 						sNew = sOrigL + map[sLang][sItem];// + sOrigR;
 				}
 			}
-			pMenu[uIndex].SetText(nullptr);
 			// Store new copies on the heap of the translated strings
-			{
-				char *sz = new char[sNew.size()+1];
-				strcpy(sz, sNew.c_str());
-				pMenu[uIndex].SetText(sz);
-			}
+			pMenu[uIndex].SetText(sNew.c_str());
 
 			pItem++;
 			++uIndex;
 		}
 		// Do the old-fashioned nullptr-terminator thing ..
-		pMenu[uIndex].m_szText = nullptr;
+		pMenu[uIndex].SetTerminal();
 
 		// Fixme leaks
 		mainMenu.setItems ( pMenu );
 	}
-
-
+	*/
 
 	// Main menu background image
 	g_pImgMain = new djImage();
@@ -358,14 +317,14 @@ void DoMainMenu()
 			// Simple 1 to 1 blit .. later it might be worthwhile doing a stretch blit if size doesn't match resolution? [LOW - dj2019]
 			djgDrawImage( pVisBack, g_pImgMain, 0, 0, g_pImgMain->Width(), g_pImgMain->Height() );
 		}
-		GraphDrawString(pVisBack, g_pFont8x8, 0, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)VERSION);
+		GraphDrawString(pVisBack, djDefaultFont(), 0, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)VERSION);
 		const char* szURL = "djoffe.com";
-		GraphDrawString(pVisBack, g_pFont8x8, CFG_APPLICATION_RENDER_RES_W - strlen(szURL)*8, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)szURL);
+		GraphDrawString(pVisBack, djDefaultFont(), CFG_APPLICATION_RENDER_RES_W - strlen(szURL)*8, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)szURL);
 
 		// Language code selected for localization
 		const std::string sLang = djGetLanguage();
-		if (!sLang.empty() && sLang!="en")
-			GraphDrawString(pVisBack, g_pFont2->GetImage(), CFG_APPLICATION_RENDER_RES_W - sLang.length()*8, CFG_APPLICATION_RENDER_RES_H - 16, (unsigned char*)sLang.c_str());
+		//if (djLang::DoTranslations())//!sLang.empty() && sLang!="en")
+		GraphDrawString(pVisBack, djDefaultFont(), CFG_APPLICATION_RENDER_RES_W - sLang.length()*8, CFG_APPLICATION_RENDER_RES_H - 16, (unsigned char*)sLang.c_str());
 
 		GraphFlip(true);
 

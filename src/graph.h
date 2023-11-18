@@ -26,6 +26,7 @@ Copyright (C) 1998-2023 David Joffe
 //#define FILE_IMG_FONT DATA_DIR "font.tga"
 #define DATAFILE_IMG_FONT "font.tga"
 //#define DATAFILE_IMG_FONT "fonts/pixeloperator/PixelOperator8-raster.png"
+extern djImage* djDefaultFont();
 
 //! Main visual
 extern djVisual *pVisMain;
