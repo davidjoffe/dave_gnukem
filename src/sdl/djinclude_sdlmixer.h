@@ -32,8 +32,10 @@
 
 		#else
 
-			#if __has_include(<SDL/SDL_mixer.h>)
-				#include <SDL/SDL_mixer.h>
+			#if __has_include(<SDL2/SDL_mixer.h>)
+				#include <SDL2/SDL_mixer.h>
+			//#if __has_include(<SDL/SDL_mixer.h>)
+			//	#include <SDL/SDL_mixer.h>
 			#else
 				#include <SDL_mixer.h>
 			#endif
