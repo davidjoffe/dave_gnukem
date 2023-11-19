@@ -11,6 +11,8 @@
 #include "djfile.h"//dj2022-11
 #include "djtypes.h"
 #include "loadedlevel.h"//dj2023
+#include "localization/djgettext.h"//pgettext
+#include "djlang.h"
 #include "effect_viewportshadow.h"//dj2022
 #include <stdio.h>
 #include <stdlib.h>
@@ -2630,6 +2632,24 @@ void GameDrawSkin()
 	// Draw the game skin
 	if (pSkinGame)
 		djgDrawImage( pVisBack, pSkinGame, 0, 0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H );
+	//dj2023-11
+	const std::string sLang=djGetLanguage();
+	if (djLang::DoTranslations())
+	{
+		djSprite* spr = djDefaultFontSprite();
+		//
+		// Localized labels for "Health" etc.
+		int x = HEALTH_X - 4;
+		int y = 2+HEALTH_Y - 16;
+		std::string sText = pgettext("ingame", "Health");
+		GraphDrawStringUTF8(pVisBack, djDefaultFont(), x, y, spr->GetSpriteW(), spr->GetSpriteH(), sText.c_str(), sText.length());
+		sText = pgettext("ingame", "Score");
+		GraphDrawStringUTF8(pVisBack, djDefaultFont(), x, y - 32, spr->GetSpriteW(), spr->GetSpriteH(), sText.c_str(), sText.length());
+		sText = pgettext("ingame", "Firepower");
+		GraphDrawStringUTF8(pVisBack, djDefaultFont(), x, y + 40, spr->GetSpriteW(), spr->GetSpriteH(), sText.c_str(), sText.length());
+		sText = pgettext("ingame", "Inventory");
+		GraphDrawStringUTF8(pVisBack, djDefaultFont(), x, y + 80, spr->GetSpriteW(), spr->GetSpriteH(), sText.c_str(), sText.length());
+	}
 }
 
 int GetCurrentLevel()
