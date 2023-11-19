@@ -1,7 +1,7 @@
 /*
 djinput.cpp
 
-Copyright (C) 1995-2022 David Joffe
+Copyright (C) 1995-2023 David Joffe
 
 Created: '95/07/20 (originally as a test keyboard interrupt hook)
 */
@@ -26,6 +26,19 @@ int djMouse::x = 0;
 int djMouse::y = 0;
 int djMouse::b = 0;
 /*--------------------------------------------------------------------------*/
+
+/*
+One might be wondering why there's an extra layer of 'dj' key codes that map to 'sdlk' (and the code sometimes uses one, other times uses directly SDL keycodes)?
+One might ask why not just use SDL keycodes? Although my memory's getting fuzzy on the details, the main reason is the history
+of the code: In '94/95 there was no LibSDL yet (it was released only later), and so the first versions of the code, these 'dj keycodes'
+acted as a sort of wrapper between different implementations (e.g. DirectX on Windows, at some stage LibGGI on Linux etc.) and this
+actually originated even earlier as an x86 assembler keyboard interrupt handler sometime around the mid-90s.
+Long story short, when LibSDL came along it functioned *as* the cross-platform wrapper that this input key code stuff had effectively been
+for this code, and so probably the 'DJKEYs' aren't really necessary anymore, and it's arguable could be replaced with direct SDLK codes in all or most places,
+unless we ever plan to port to something else and want or need some other wrappers, it may be good to just try keep that in mind in the code design and try use
+re-usability etc. and other good principles when doing input stuff.
+(In the mid-90s there was no 'libSDL' yet, and even after the first SDL releases it was initially small and a while before it was clear it would 'take over' more widely eg https://discourse.libsdl.org/t/sdl-and-ggi/1258/2)
+*/
 
 // This structure maps SDL key codes to DJ key codes
 SdjKeyMapping key_pairs[] =

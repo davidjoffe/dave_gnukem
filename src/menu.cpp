@@ -492,11 +492,17 @@ int do_menu( CMenu *pMenu )
 					menu_move( pMenu, option, 1, *szCursor, iFirstSelectable, iLastSelectable);
 
 				// home key
-				else if (Event.key.keysym.sym==SDLK_HOME)//g_iKeys[DJKEY_HOME])
+				else if (Event.key.keysym.sym==SDLK_HOME ||
+					// Numlock OFF + keypad7 = Home (at least on my laptop), make it also act as 'home' here [dj2023]
+					( ( (SDL_GetModState() & KMOD_NUM)==0) && Event.key.keysym.sym==SDLK_KP_7  )
+					)
 					menu_move( pMenu, option, -option + pMenu->getSize() - 1, *szCursor, iFirstSelectable, iLastSelectable);
 
 				// end key
-				else if (Event.key.keysym.sym==SDLK_END)//if (g_iKeys[DJKEY_END])
+				else if (Event.key.keysym.sym==SDLK_END ||
+					// Numlock OFF + keypad1 = End (at least on my laptop), make it also act as 'end' here [dj2023]
+					( ( (SDL_GetModState() & KMOD_NUM)==0) && Event.key.keysym.sym==SDLK_KP_1  )
+					)
 					menu_move( pMenu, option, -option, *szCursor, iFirstSelectable, iLastSelectable);
 
 				// enter

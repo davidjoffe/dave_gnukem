@@ -42,6 +42,28 @@ extern void InitialiseGameKeySystem();
 
 //! Return true if given key is an allowable game-play key
 extern bool IsGameKey(int nKeyCode);
+// Is there really a good reason for this function to exist? [dj2023-11]
+// I don't remember exactly why/what etc. but it looks like it's used during redefining keys
+// But, looks like a good way to possibly exclude potentially important (and maybe new) keycodes for niche platforms e.g. retro handhelds
+// Why not just accept any keycode during redefining? This could at best be used to check for supported ones to display correctly or something
+// and then have some fallback code e.g. if some platform returns a new 'unknown' keycode just show the keycode and allow it to be defined and used in the game?
+// but 
+// I mean, then instead of a vector, maybe an unordered_map (unordered for faster lookups) that just map keycode to name
+// and then we don't exclude any key accepted during redefining OR playing, but just do something like:
+// if (map.find(nkeyCode)!=map.end())
+//    sKeyName = map[nKeyCode];
+// else
+//    sKeyName = std::string("<") + std::to_string(nkeyCode) + ">";
+// e.g. if you press Up then it displays "Up" but if an unknown keycode comes in from some future or niche device still accept it
+// but just display e.g. "<143>" or whatever the internal code is.
+// Or am I remembering wrong why this is here? I wrote this really long ago
+// The above would also be more 'future-proof' e.g. say in a few years new keyboards come out with lots of new keycode, or
+// different languages or something - or odd joysticks or mice that map arbitrary keycodes - make this 'future-proof' so
+// it automatically supports anything, and not have a moving target we have to chase to keep adding so-called 'valid' keys.
+// If SDL_input stuff sends a keycode it's surely "valid" whether we have it this list
+// If there are keycodes we should explicitly not allow redefining in a game (are there? I don't think so) then rather
+// have an 'IsInvalidGameKey' with an exclusion list (or just take this out entirely and allow anything, unless it causes problems)
+
 
 //! Store current game keys into the settings object
 extern void StoreGameKeys();
