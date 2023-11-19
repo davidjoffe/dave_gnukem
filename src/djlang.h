@@ -7,6 +7,14 @@ Copyright (C) 2023 David Joffe
 */
 
 //#include <string>
+
+/*
+//dj2023-11 to generate initial strings, do something like: 
+cd src
+xgettext --force-po -c -C *.cpp -o ../lang/locale/en.po
+*/
+
+
 //---------------------------------------------------------------------------
 #ifndef _dj_LANG_H_
 #define _dj_LANG_H_

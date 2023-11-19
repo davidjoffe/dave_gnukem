@@ -467,19 +467,25 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		}
 		else
 		{
-			std::string sFile = djDATAPATHs("locale/" + sLang + ".po");
 			printf("Loading locale: %s.po\n", sLang.c_str());
-			printf("%s\n", sFile.c_str());
+
+			std::string sFile;
+			// This one is maybe questionable, but the idea is if you're busy with localdev, check the main official folder in main repo (same as Makefile and binary normally e.g. after you run make) ...
+			// Should actually look at our executable binary path and look relative to that (that's "safer" and my actual intention here - future todo, low prio)
+			sFile = djDATAPATHs("../locale/" + sLang + ".po");
+			//printf("%s\n", sFile.c_str());
 			if (!djFileExists(sFile.c_str()))
 			{
 				// Try fallbacks?
-				sFile = djDATAPATHs("data/locale/" + sLang + ".po");
+				// data/locale
+				sFile = djDATAPATHs("locale/" + sLang + ".po");
  				if (!djFileExists(sFile.c_str()))
 				{
-					sFile = djDATAPATHs("data/locale-auto/" + sLang + ".po");
+					// data/locale-auto
+					sFile = djDATAPATHs("locale-auto/" + sLang + ".po");
 					if (!djFileExists(sFile.c_str()))
 					{
-						sFile = djDATAPATHs("locale-auto/" + sLang + ".po");
+						//sFile = djDATAPATHs("locale-auto/" + sLang + ".po");
 					}
 				}
 			}
