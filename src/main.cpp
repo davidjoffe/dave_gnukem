@@ -467,16 +467,31 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		}
 		else
 		{
-			const std::string sFile = djDATAPATHs("lang/po/" + sLang + ".po");
-			printf("Loading .po file:\n");
+			std::string sFile = djDATAPATHs("locale/" + sLang + ".po");
+			printf("Loading locale: %s.po\n", sLang.c_str());
 			printf("%s\n", sFile.c_str());
 			if (!djFileExists(sFile.c_str()))
 			{
-				printf("WARNING: .po file not found\n");
+				// Try fallbacks?
+				sFile = djDATAPATHs("data/locale/" + sLang + ".po");
+ 				if (!djFileExists(sFile.c_str()))
+				{
+					sFile = djDATAPATHs("data/locale-auto/" + sLang + ".po");
+					if (!djFileExists(sFile.c_str()))
+					{
+						sFile = djDATAPATHs("locale-auto/" + sLang + ".po");
+					}
+				}
+			}
+
+			//void loadPOFile(const std::string& filename, const std::string& lang);
+			if (djFileExists(sFile.c_str()))
+			{
+				printf("Loading local .po file: %s\n", sFile.c_str());
+				loadPOFile(sFile, sLang);
 			}
 			else
-			//void loadPOFile(const std::string& filename, const std::string& lang);
-			loadPOFile(sFile, sLang);
+				printf("WARNING: .po file not found\n");
 		}
 	}
 
