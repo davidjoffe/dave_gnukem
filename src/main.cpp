@@ -470,6 +470,11 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 			const std::string sFile = djDATAPATHs("lang/po/" + sLang + ".po");
 			printf("Loading .po file:\n");
 			printf("%s\n", sFile.c_str());
+			if (!djFileExists(sFile.c_str()))
+			{
+				printf("WARNING: .po file not found\n");
+			}
+			else
 			//void loadPOFile(const std::string& filename, const std::string& lang);
 			loadPOFile(sFile, sLang);
 		}

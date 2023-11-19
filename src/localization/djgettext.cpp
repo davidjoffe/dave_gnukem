@@ -85,10 +85,14 @@ std::string processEscapedCharacters(const std::string& input) {
 #include <iostream>
 
 void loadPOFile(const std::string& filename, LanguageMap& StringsDB, const std::string& lang) {
+    if (filename.empty())
+        return;
     printf("Loading PO file %s lang %s\n", filename.c_str(), lang.c_str());
     std::ifstream file(filename);
     if (!file.is_open()) {
-        throw std::runtime_error("Unable to open file: " + filename);
+        //throw std::runtime_error("Unable to open file: " + filename);
+        printf("Unable to open file: %s\n", filename.c_str());
+        return;
     }
 
     std::string line;
