@@ -1,0 +1,93 @@
+# DAVE GNUKEM SPANISH TRANSLATIONS
+# Copyright (C) 1995-2023
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-11-17 20:10+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Spanish <LL@li.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. TRANSLATORS: This is a pun on "Start new game". "Gnu" is an open-source reference.
+#. If a similar pun works in your language, feel free to use it. Otherwise,
+#. translate as "Start new game".
+#: mainmenu.cpp:53
+msgctxt "mainmenu/start"
+msgid "Start gnu game"
+msgstr "Iniciar juego gnu"
+
+#. mainmenu.addmenuitem(pgettext("mainmenu", "Start gnu game"));
+#: mainmenu.cpp:55
+msgctxt "mainmenu/restore"
+msgid "Restore game"
+msgstr "Restaurar juego"
+
+#: mainmenu.cpp:56
+msgctxt "mainmenu"
+msgid "Select Mission"
+msgstr "Seleccionar Misión"
+
+#: mainmenu.cpp:57
+msgctxt "mainmenu"
+msgid "Ordering info"
+msgstr "Información de pedido"
+
+#: mainmenu.cpp:58
+msgctxt "mainmenu"
+msgid "(not!)"
+msgstr "(¡no!)"
+
+#. { true,  pgettext("mainmenu", "Select language") }, //?todo add 'select language'?
+#: mainmenu.cpp:60
+msgctxt "mainmenu"
+msgid "Instructions"
+msgstr "Instrucciones"
+
+#: mainmenu.cpp:61
+msgctxt "mainmenu"
+msgid "Redefine keys"
+msgstr "Redefinir teclas"
+
+#: mainmenu.cpp:62
+msgctxt "mainmenu"
+msgid "High scores"
+msgstr "Puntuaciones altas"
+
+#: mainmenu.cpp:63
+msgctxt "mainmenu"
+msgid "Credits"
+msgstr "Créditos"
+
+#: mainmenu.cpp:64
+msgctxt "mainmenu"
+msgid "About"
+msgstr "Acerca de"
+
+#: mainmenu.cpp:65
+msgctxt "mainmenu"
+msgid "Settings"
+msgstr "Configuraciones"
+
+#: mainmenu.cpp:66
+msgctxt "mainmenu"
+msgid "Retro Settings"
+msgstr "Configuraciones Retro"
+
+#. todo make general Settings?
+#: mainmenu.cpp:67
+msgctxt "mainmenu"
+msgid "Don't quit"
+msgstr "No salir"
+
+#: mainmenu.cpp:68
+msgctxt "mainmenu"
+msgid "Quit"
+msgstr "Salir"

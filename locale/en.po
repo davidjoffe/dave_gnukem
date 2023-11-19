@@ -1,0 +1,90 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-11-18 02:49+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. TRANSLATORS: This is a pun on "Start new game". "Gnu" is an open-source reference.
+#. If a similar pun works in your language, feel free to use it. Otherwise,
+#. translate as "Start new game".
+#: mainmenu.cpp:53
+msgctxt "mainmenu/game/start"
+msgid "Start gnu game"
+msgstr ""
+
+#. mainmenu.addmenuitem(pgettext("mainmenu", "Start gnu game"));
+#: mainmenu.cpp:55
+msgctxt "mainmenu/game/restore"
+msgid "Restore game"
+msgstr ""
+
+#: mainmenu.cpp:56
+msgctxt "mainmenu"
+msgid "Select Mission"
+msgstr ""
+
+#: mainmenu.cpp:57
+msgctxt "mainmenu/orderinfo-info"
+msgid "Ordering info"
+msgstr ""
+
+#. TRANSLATORS: This is a negation of 'ordering info' (a joke menu item since it's open source) but also another reference to 90's 'not!', while the joke 'Ordering info' menu item is there in the first place as a parody reference to the Shareware games like the original Duke Nukem we're parodying here, which had 'ordering info'
+#: mainmenu.cpp:59
+msgctxt "mainmenu/not"
+msgid "(not!)"
+msgstr ""
+
+#. 10 pixels x offset indentation
+#: mainmenu.cpp:60
+msgctxt "mainmenu/instructions"
+msgid "Instructions"
+msgstr ""
+
+#: mainmenu.cpp:61
+msgctxt "mainmenu/redefine-keys"
+msgid "Redefine keys"
+msgstr ""
+
+#: mainmenu.cpp:62
+msgctxt "mainmenu/highscores"
+msgid "High scores"
+msgstr ""
+
+#: mainmenu.cpp:63
+msgctxt "mainmenu/credits"
+msgid "Credits"
+msgstr ""
+
+#: mainmenu.cpp:64
+msgctxt "mainmenu/about"
+msgid "About"
+msgstr ""
+
+#: mainmenu.cpp:65
+msgctxt "mainmenu/settings-retro"
+msgid "Retro Settings"
+msgstr ""
+
+#. TRANSLATORS: Note this is/was meant to mean "Don't quit the game" i.e. it's a humor joke menu item that does nothing
+#: mainmenu.cpp:67
+msgctxt "mainmenu/dontquit"
+msgid "Don't quit"
+msgstr ""
+
+#: mainmenu.cpp:68
+msgctxt "mainmenu/quit"
+msgid "Quit"
+msgstr ""
