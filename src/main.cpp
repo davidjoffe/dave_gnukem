@@ -28,7 +28,7 @@ Copyright (C) 1995-2023 David Joffe
 #include "graph.h"
 #include "djlang.h"//djSelectLanguage localization
 	#include "djsprite.h"
-	#include "localization/djgettext.h"//LoadAllPOFiles
+	#include "localization/djgettext.h"
 
 #include "djfile.h"//djFileExists etc.
 #include "djimage.h"
@@ -462,7 +462,7 @@ int DaveStartup(bool bFullScreen, bool b640, const std::map< std::string, std::s
 		if (bLoadAllPOFiles)
 		{
 			printf("Loading all .po files\n");
-			LoadAllPOFiles(djDATAPATHs("lang/"));
+			//LoadAllPOFiles(djDATAPATHs("lang/"));
 			printf("DONE loading po files\n");
 		}
 		else

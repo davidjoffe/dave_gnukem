@@ -1,3 +1,11 @@
+/*!
+\file    djgettext.cpp
+\brief   Localization / languages: gettext() and pgettext() etc.
+\author  David Joffe
+
+Copyright (C) 1995-2023 David Joffe
+*/
+/*--------------------------------------------------------------------------*/
 
 #include "djgettext.h"
 
@@ -143,15 +151,15 @@ void loadPOFile(const std::string& filename, const std::string& lang)
     loadPOFile(filename, StringsDB, lang);
 }
 
-
-
+// dj2023-11 for now disabling LoadAllPOFiles as it's causing issues on older C++ on some platforms (and not really needed yet anyway)
+/*
 #include <iostream>
 #include <filesystem>
 //#include <string>
 
 namespace fs = std::__fs::filesystem;
 
-//*
+
 void loadPOFilesFromDirectory(const fs::path& directory, LanguageMap& StringsDB) {
     if (!fs::exists(directory) || !fs::is_directory(directory)) {
         std::cerr << "Provided path is not a directory or does not exist: " << directory << std::endl;
@@ -170,14 +178,16 @@ void loadPOFilesFromDirectory(const fs::path& directory, LanguageMap& StringsDB)
         }
     }
 }
+*/
 //*/
+/*
 void LoadAllPOFiles(const std::string& sPath)
 {
     //return;
 ///    LanguageMap StringsDB;
     printf("Loading all PO files from %s\n", sPath.c_str());
     loadPOFilesFromDirectory(sPath, StringsDB);
-}
+}*/
 
 
 //std::string g_sCurLang = "";
@@ -301,9 +311,9 @@ std::string select_locale(const std::string& lang)
 {
     return "";
 }
-void LoadAllPOFiles(const std::string& sPath)
+/*void LoadAllPOFiles(const std::string& sPath)
 {
-}
+}*/
 void loadPOFile(const std::string& filename, const std::string& lang)
 {
 }

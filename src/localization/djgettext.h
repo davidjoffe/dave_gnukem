@@ -1,6 +1,15 @@
+/*!
+\file    djgettext.h
+\brief   Localization / languages: gettext() and pgettext() etc.
+\author  David Joffe
+
+Copyright (C) 1995-2023 David Joffe
+*/
 //#include "../config.h"
 
-//#define djLOCALIZE_ON
+// dj2023-11 for now disabling LoadAllPOFiles as it's causing issues on older C++ on some platforms (and not really needed yet anyway)
+
+/define djLOCALIZE_ON
 #define djLOCALIZE_USE_OWN
 
         ////#define djLOCALIZE_USE_GETTEXT
@@ -24,7 +33,7 @@ extern std::string djGetText_GetLang();
     //extern std::string bindcurrentdomain(const std::string& lang);
     extern void loadPOFile(const std::string& filename, const std::string& lang);
 
-    extern void LoadAllPOFiles(const std::string& sPath);
+    //extern void LoadAllPOFiles(const std::string& sPath);
 
     #else
 
@@ -39,7 +48,7 @@ extern std::string djGetText_GetLang();
 
     #include <string>
     std::string select_locale(const std::string& lang);
-    extern void LoadAllPOFiles(const std::string& sPath);
+    //extern void LoadAllPOFiles(const std::string& sPath);
     extern void loadPOFile(const std::string& filename, const std::string& lang);
 
     // Define gettext stub
