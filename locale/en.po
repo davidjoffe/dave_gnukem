@@ -17,6 +17,28 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#.
+#. Localized labels for "Health" etc.
+#: game.cpp:2642
+msgctxt "ingame"
+msgid "Health"
+msgstr ""
+
+#: game.cpp:2644
+msgctxt "ingame"
+msgid "Firepower"
+msgstr ""
+
+#: game.cpp:2645
+msgctxt "ingame"
+msgid "Score"
+msgstr ""
+
+#: game.cpp:2646
+msgctxt "ingame"
+msgid "Inventory"
+msgstr ""
+
 #. TRANSLATORS: This is a pun on "Start new game". "Gnu" is an open-source reference.
 #. If a similar pun works in your language, feel free to use it. Otherwise,
 #. preferably translate as "Start new game", which has the advantage of being potentially more re-usable for other games
