@@ -9,7 +9,7 @@ Copyright (C) 1995-2023 David Joffe
 
 // dj2023-11 for now disabling LoadAllPOFiles as it's causing issues on older C++ on some platforms (and not really needed yet anyway)
 
-/define djLOCALIZE_ON
+#define djLOCALIZE_ON
 #define djLOCALIZE_USE_OWN
 
         ////#define djLOCALIZE_USE_GETTEXT
