@@ -1,9 +1,8 @@
 // effect_viewportshadow.cpp
-// Copyright (C) 1995-2022 David Joffe / Dave Gnukem project
+// Copyright (C) 1995-2023 David Joffe / Dave Gnukem project
 //
 // dj2022-11 just refactoring this recent new effect from game.cpp into separate .h/cpp files for neatness as game.cpp getting a bit long and cluttered
 //
-
 /*--------------------------------------------------------------------------*/
 #include "config.h"
 #include "effect_viewportshadow.h"
@@ -143,13 +142,13 @@ void djEffectFauxShadowingAroundHero::InitEffect()
 		for (int x = 0; x < 16; ++x)
 		{
 			// Black pixel, with different alpha
-			int nPixel = ((unsigned int)(nAlpha & 0xFF) << 24); //fixme which bits should be alpha?
+			const int nPixel = ((unsigned int)(nAlpha & 0xFF) << 24); //fixme which bits should be alpha?
 			for (unsigned int i = 0; i < SHADSIZE; ++i)
 			{
 				for (unsigned int j = 0; j < SHADSIZE; ++j)
 				{
 					//slight and subtle random noise so it doesn't look too smooth
-					int nRandNoise = (rand() % 3);
+					const int nRandNoise = (rand() % 3);
 					m_pImgShadows->PutPixel(x * SHADSIZE + i, y * SHADSIZE + j, nPixel
 						+ ((nRandNoise<<0) + (nRandNoise<<8) + (nRandNoise<<16))
 					);

@@ -90,9 +90,9 @@ void M_ParseErrno ( int err )
 			fprintf ( stderr, "errno=EXDEV(%d)\n\tThe two le names newname and oldname are on different file systems.\n", errno );
 			break;
 		}
-		default:
+		default:													 // refactor all this log stuff.. cleanup/simplify ..
 		{
-			fprintf ( stderr, "errno=%d\n\tdefault switch hit. Deep shit.\n", errno );
+			fprintf ( stderr, "errno=%d\n\tdefault switch hit\n", errno );
 			break;
 		}
 	}

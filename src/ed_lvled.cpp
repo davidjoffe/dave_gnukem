@@ -1273,6 +1273,9 @@ void DrawMinimap()
 				djgSetColorFore( pVisMain, djColor(0,0,0) );
 				// todo Back1 stuff and can't see back1 .. don't draw this bg if 0?
 				//djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*BLOCKW, POS_LEVELVIEW_Y + i*BLOCKH, BLOCKW/2, BLOCKH/2 );
+				//dj2023-11 hm want to see backing if turn off foreground and background with backing on
+				// (but future-todo should detect the backing bounds? as it's not necessarily same as levelw/h)
+				if (!g_Level.ImgBack1())
 				djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*BLOCKW, POS_LEVELVIEW_Y + i*BLOCKH, BLOCKW, BLOCKH );
 			}
 			else
@@ -1328,6 +1331,15 @@ void DrawMinimap()
 					}
 				}
 			}//bLevelFore
+
+			// Grid? todo make togglable
+			if (g_Level.ImgBack1())
+			{
+				// sbsu [low prio] more efficient ways to do this, also should only draw two lines etc.
+				djgSetColorFore( pVisMain, djColor(100,100,100,100) );
+				djgDrawRectangle(pVisMain, POS_LEVELVIEW_X + j*BLOCKW, POS_LEVELVIEW_Y + i*BLOCKH   ,16,16);
+			}
+
 			const int nCROSSHAIRSIZE=5;
 			if (g_bFlashingIndicatorTimer && bHighlightBack)
 			{

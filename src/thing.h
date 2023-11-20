@@ -3,7 +3,7 @@
 \brief   "Thing"
 \author  David Joffe
 
-Copyright (C) 1999-2022 David Joffe
+Copyright (C) 1999-2023 David Joffe
 
 dj2022-11 adding basic deltatime support (though Dave Gnukem 1 isn't using it at all [either yet, or may never, not sure, as it's 18Hz frame-capped]) but to potentially allow other games etc. to run at high frame rates with smooth scrolling etc. in future
 Not sure if the official "Dave Gnukem 1" should ever use this though because the whole point is to have similar look and feel to Duke Nukem 1 (i.e. the same old frame rate and similar blocky scrolling behaviour etc.) for that retro nostalgia vibe.
@@ -60,9 +60,11 @@ enum EdjLayer
 };
 /*-----------------------------------------------------------*/
 
-//! This crap should go. Fixme.
+// todo - refactor/re-think this THING_DIE stuff slightly and improve design-wise:
+
+//! Remove and delete the thing/entity
 #define THING_DIE -1
-//! Remove, but not delete
+//! Remove, but not delete, the thing/entity
 #define THING_REMOVE -2
 
 

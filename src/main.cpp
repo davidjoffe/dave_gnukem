@@ -186,13 +186,21 @@ int main ( int argc, char** argv )
 			}
 			else
 			{
+				const std::string s = argv[i];
+				//if (s=="-v") Parameters["v"] = "1";//todo add log verbosity in future?
+
 				if (0 == strncmp( argv[i], "-f", 2 )) bfullscreen = true;
 				if (0 == strncmp( argv[i], "-640", 4 )) b640 = true;
 				if (0 == strncmp( argv[i], "-scale", 6 )) sNextParamGetValue = "scale";
-				if (0 == strncmp( argv[i], "-lang", 5 )) sNextParamGetValue = "lang";
+				else if (0 == strncmp( argv[i], "-lang", 5 )) sNextParamGetValue = "lang";
 #ifdef djCFG_ALLOW_COMMANDLINE_DATADIR
-				if (0 == strncmp( argv[i], "-datadir", 8 )) sNextParamGetValue = "datadir";
+				else if (0 == strncmp( argv[i], "-datadir", 8 )) sNextParamGetValue = "datadir";
 #endif
+				// Generic check for if arg starts with "--" or "-" (officially it's - for this app but maybe we should accept -- too? or does "--" imply an "=" usually? [low prio] or should we not confuse things and just stick with with "-"? maybe for now)
+				//else if (s.substr(0,2)=="--")
+					//sNextParamGetValue = s.substr(2);
+				else if (s.substr(0,1)=="-")
+					sNextParamGetValue = s.substr(1);
 			}
 		}
 	}

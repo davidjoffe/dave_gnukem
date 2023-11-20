@@ -245,8 +245,7 @@ void InitMainMenu()
 
 	const struct SMenuItem* mainMenuItems = CreateMenuItems_MainMenu();
 
-	mainMenu.setClrBack ( djColor(70,70,80)/*djColor(42,57,112)*/ ); //mainMenu.setClrBack ( djColor(10,40,150) ); // Crap colour. Need something better, like a bitmap
-	//mainMenu.m_clrBack = djColor(129,60,129);
+	mainMenu.setClrBack ( djColor(70,70,80) );
 	mainMenu.setSize ( 0 );
 	mainMenu.setItems ( mainMenuItems );
 	mainMenu.setMenuCursor ( mainMenuCursor );
@@ -258,63 +257,6 @@ void InitMainMenu()
 	mainMenu.setSoundMove(djSoundLoad(djDATAPATHc("sounds/cardflip.wav")));
 
 
-
-/*
-	std::string sLang = djGetLanguage();
-	if (!sLang.empty() && sLang!="en")
-	{
-		// Translate the menu items
-		size_t uCount = 0;
-		const SMenuItem *pItem = &mainMenuItems[0];
-		while (!pItem->IsTerminal())
-		{
-			pItem++;
-			++uCount;
-		}
-		SMenuItem* pMenu = new SMenuItem[uCount+1];//+1?
-		unsigned int uIndex = 0;
-		pItem = &mainMenuItems[0];
-		while (!pItem->IsTerminal())
-		{
-			std::string sItem = pItem->GetTextStr();
-			// First copy it
-			pMenu[uIndex] = mainMenuItems[uIndex];
-
-			//pMenu[uIndex].SetText("");
-
-			std::string sNew = mainMenuItems[uIndex].GetTextStr();
-			if (sNew.empty())
-			{
-				++uIndex;
-				continue;
-			}
-
-			std::string sOrigL;
-			//std::string sOrigR;
-			// But now we need our own copy of the string (with translation perhaps)
-			if (!sItem.empty())
-			{
-				while (sItem[0]==' ') { sOrigL += ' '; sItem = sItem.substr(1); }//left-trim spaces, although it's gross we still need them for now
-				while (sItem.back()==' ') { sItem = sItem.substr(0, sItem.size()-1); } //right-trim spaces, that was always gross
-				if (!sItem.empty())
-				{
-					if (map[sLang].find(sItem)!=map[sLang].end())
-						sNew = sOrigL + map[sLang][sItem];// + sOrigR;
-				}
-			}
-			// Store new copies on the heap of the translated strings
-			pMenu[uIndex].SetText(sNew.c_str());
-
-			pItem++;
-			++uIndex;
-		}
-		// Do the old-fashioned nullptr-terminator thing ..
-		pMenu[uIndex].SetTerminal();
-
-		// Fixme leaks
-		mainMenu.setItems ( pMenu );
-	}
-	*/
 
 	// Main menu background image
 	g_pImgMain = new djImage();

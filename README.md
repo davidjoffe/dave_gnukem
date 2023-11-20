@@ -122,6 +122,7 @@ TL;DR Shoot anything that moves
 * Detects and corrects wrongthink
 * Bugs older than your children
 * Safe for use during pregnancy
+* Makefiles (from the 90s) to struggle with, like the 90s
 * Floors
 * Walls
 * Doors
@@ -168,6 +169,10 @@ Then follow the same instructions as for Linux, e.g. git clone the src, cd into 
 
 * Q: Why does it say "Ordering info" in the menu?
 * A: A small parody and retro recognition item, because the original shareware Duke Nukem 1 had that in the menu - but since this is open source, we add a "not" right after that is [also very 1990s](https://en.wikipedia.org/wiki/..._Not!)
+
+# Roadmap
+
+[Here's a roadmap](https://upload.wikimedia.org/wikipedia/commons/a/a8/Paris_printable_tourist_attractions_map.jpg)
 
 # History / Changes
 
