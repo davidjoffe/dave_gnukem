@@ -9,6 +9,7 @@ Copyright (C) 1998-2023 David Joffe
 
 #include "config.h"//CFG_APPLICATION_RENDER_RES_W //dj2019-06
 #include "djlang.h"
+#include "djfile.h"//djFileExists
 #ifdef WIN32
 #include <Windows.h>//for workaround
 #endif
@@ -60,6 +61,14 @@ djImage* djDefaultFont()
 		return g_pFont2->GetImage();
 	// Old font.tga (not Unicode-based)
 	return g_pFont8x8;
+}
+djSprite* djDefaultFontSprite()
+{
+	extern djSprite* g_pFont2;
+	if (g_pFont2!=nullptr && g_pFont2->IsLoaded())
+		return g_pFont2;
+	// Hmm should we have a djSprite for the old font.tga? [low]
+	return nullptr;
 }
 // Hm we need to know not just the font, but whether it's utf8 or that old font.tga thing?
 
@@ -280,9 +289,16 @@ bool djGraphicsSystem::GraphInit( bool bFullScreen, int iWidth, int iHeight, int
 	// Hide mouse cursor
 	SDL_ShowCursor(0);
 
+	std::string sIcon = djDATAPATHs("icon.bmp");
+	#ifdef __APPLE__
+	//dj2023 new hi-res icon (todo - Linux too? or still 32x32 for Linux?)
+	if (djFileExists(djDATAPATHc("icon/Dave Gnukem.png")))
+		sIcon = djDATAPATHs("icon/Dave Gnukem.png");
+	#endif
+
 	//--- (1) - Front buffer
 	djLog::LogFormatStr( "GraphInit(): djgOpenVisual(w,h=%d,%d).\n", iWidth, iHeight );
-	if (NULL == (pVisMain = djgOpenVisual( bFullScreen?"fullscreen":NULL, iWidth, iHeight, 32, false, "Dave Gnukem", djDATAPATHc("icon.bmp"))))
+	if (NULL == (pVisMain = djgOpenVisual( bFullScreen?"fullscreen":NULL, iWidth, iHeight, 32, false, "Dave Gnukem", sIcon.c_str())))
 	{
 		printf( "GraphInit(): COULDN'T CREATE MAIN WINDOW\n" );
 		return false;
@@ -380,7 +396,7 @@ void GraphFlipView(int iViewWidthPixels, int iViewHeightPixels, int nXS, int nYS
 	djgDrawVisual(pVisBack, pVisView, nXD, nYD, nXS, nYS, iViewWidthPixels, iViewHeightPixels);
 }
 
-void GraphDrawStringUTF8( djVisual *pVis, djImage *pImg, int x, int y, int nCharW, int nCharH, const unsigned char *szStr, int nStrLen )
+void GraphDrawStringUTF8( djVisual *pVis, djImage *pImg, int x, int y, int nCharW, int nCharH, const char *szStr, int nStrLen )
 {
 	if (szStr == nullptr || szStr[0]==0) return;
 	// FIXME: bounds check properly

@@ -14,6 +14,7 @@ Copyright (C) 1997-2023 David Joffe
 // not work.
 
 #include "../config.h"//[For CFG_APPLICATION_RENDER_RES_W etc. dj2019-06 slightly ugly dependency direction, conceptually, but not the biggest thing in the world to worry about now, maybe later.]
+#include "../djimageload.h"
 #include "../djgraph.h"
 #include "../djtypes.h"
 #include "../sys_log.h"
@@ -101,7 +102,32 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 			pVis->m_bFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_RESIZABLE);
 		pVis->pWindow = win;//<- dj2022-11 added storing this pWindow pointer so we can cleanup with corresponding SDL_DestroyWindow (for in-game fullscreen toggle etc.)
 		if (szWindowIconFile != nullptr)
+		{
+			#ifdef __APPLE__
+			//printf("APPLE   %s\n", szWindowIconFile);	
+			djImage* pImage = djImageLoad::LoadImage(szWindowIconFile);
+			if (pImage)
+			{
+				//printf("APPLE2   %s\n", szWindowIconFile);	
+				// Convert the djImage temporarily to a SDL_Surface
+				SDL_Surface* pSurface = ::SDL_CreateRGBSurfaceFrom(
+						pImage->Data(),
+						pImage->Width(),
+						pImage->Height(),
+						pImage->BPP(),
+						pImage->Pitch(),
+						pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, pImage->m_Amask
+					);				
+				SDL_SetWindowIcon(win, pSurface);
+			}
+			else
+			{
 			SDL_SetWindowIcon(win, SDL_LoadBMP(szWindowIconFile));
+			}
+			#else
+			SDL_SetWindowIcon(win, SDL_LoadBMP(szWindowIconFile));
+			#endif
+		}
 		pVis->pRenderer = SDL_CreateRenderer(win, -1, 0);
 		SDL_RenderSetLogicalSize(pVis->pRenderer, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H);
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");

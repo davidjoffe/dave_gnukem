@@ -122,7 +122,7 @@ void ShowHighScores()
 			GraphDrawString(pVisBack, g_pFont8x8, nXPOS, nYSTART + i * nHEIGHTPERROW, (unsigned char*)sText.c_str());
 			else
 			{
-				GraphDrawStringUTF8(pVisBack, pImg, nXPOS, nYSTART + i * nHEIGHTPERROW, 8, 8, (unsigned char*)sText.c_str(), sText.length());
+				GraphDrawStringUTF8(pVisBack, pImg, nXPOS, nYSTART + i * nHEIGHTPERROW, 8, 8, sText.c_str(), sText.length());
 			}
 #else
 			if (bNEW)

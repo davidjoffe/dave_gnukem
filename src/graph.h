@@ -27,6 +27,8 @@ Copyright (C) 1998-2023 David Joffe
 #define DATAFILE_IMG_FONT "font.tga"
 //#define DATAFILE_IMG_FONT "fonts/pixeloperator/PixelOperator8-raster.png"
 extern djImage* djDefaultFont();
+class djSprite;
+extern djSprite* djDefaultFontSprite();
 
 //! Main visual
 extern djVisual *pVisMain;
@@ -98,7 +100,7 @@ extern void GraphFlipView(int iViewWidthPixels, int iViewHeightPixels, int nXS, 
 
 //! Draw a string of characters from a font bitmap
 extern void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const unsigned char *szStr );
-extern void GraphDrawStringUTF8( djVisual *pVis, djImage *pImg, int x, int y, int nCharW, int nCharH, const unsigned char *szStr, int nStrLen=-1 );
+extern void GraphDrawStringUTF8( djVisual *pVis, djImage *pImg, int x, int y, int nCharW, int nCharH, const char *szStr, int nStrLen=-1 );
 
 #ifdef djUNICODE_TTF
 //dj2022-11 basics of new Unicode TTF/OTF font stuff

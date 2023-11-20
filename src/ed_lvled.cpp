@@ -694,7 +694,13 @@ void DoCreateNewLevel()
 	pLevel->m_szName		= djStrDeepCopy("");
 // whaaat?
 	pLevel->m_szBackground	= djStrDeepCopy("levels/bg1.tga");//fixme for now hardcoded
+	// Hm, a cheap and easy way to 'cheat' and not change file format here is to just set it to be the same as the level (but change the extension)?
+	// The 'proper' way would be to have a separate 'background' file for the level editor, but that's a bit of a pain to implement right now.
 	pLevel->m_sBack1 = "";//levels/bg1.png";
+	//pLevel->m_sBack1 = sLevelRelativePath + "_back1.png";
+	// If no such file, clear it
+	//if (!djFileExists(djDATAPATHc(pLevel->m_sBack1.c_str())))
+	//	pLevel->m_sBack1 = "";
 	
 
 	pLevel->m_szAuthor		= djStrDeepCopy("");

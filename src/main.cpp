@@ -1049,7 +1049,7 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 			std::string sText = sInput;
 			if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
 				sText += "|";//<- simple 'fake cursor' (vertical bar/pipe character)
-			GraphDrawStringUTF8( pVisBack, pImg, nXLeft - 2, 104, 8, 8, (const unsigned char*)sText.c_str(), sText.length() );
+			GraphDrawStringUTF8( pVisBack, pImg, nXLeft - 2, 104, 8, 8, sText.c_str(), sText.length() );
 			//DrawStringUnicodeHelper(pVisBack, nXLeft - 2, 104, SDL_Color{ 255, 255, 255, 255 }, sText.c_str(), sText.length());
 #else//ASCII:
 		GraphDrawString( pVisBack, g_pFont8x8, nXLeft-2, 104, (unsigned char*)sInput.c_str() );
