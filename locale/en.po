@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-20 01:28+0200\n"
+"POT-Creation-Date: 2023-11-20 03:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,26 +17,59 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#.
-#. Localized labels for "Health" etc.
-#: game.cpp:2642
+#: game.cpp:2644
 msgctxt "ingame"
 msgid "Health"
 msgstr ""
 
-#: game.cpp:2644
-msgctxt "ingame"
-msgid "Firepower"
-msgstr ""
-
-#: game.cpp:2645
+#: game.cpp:2646
 msgctxt "ingame"
 msgid "Score"
 msgstr ""
 
-#: game.cpp:2646
+#: game.cpp:2648
+msgctxt "ingame"
+msgid "Firepower"
+msgstr ""
+
+#: game.cpp:2650
 msgctxt "ingame"
 msgid "Inventory"
+msgstr ""
+
+#: game.cpp:3208
+msgctxt "ingamemenu"
+msgid "Continue"
+msgstr ""
+
+#: game.cpp:3209
+msgctxt "ingamemenu"
+msgid "Save Game"
+msgstr ""
+
+#: game.cpp:3210
+msgctxt "ingamemenu"
+msgid "Restore Game"
+msgstr ""
+
+#: game.cpp:3211
+msgctxt "ingamemenu"
+msgid "Instructions"
+msgstr ""
+
+#: game.cpp:3212
+msgctxt "ingamemenu"
+msgid "Retro Settings"
+msgstr ""
+
+#: game.cpp:3223
+msgctxt "ingamemenu"
+msgid "Fullscreen"
+msgstr ""
+
+#: game.cpp:3226
+msgctxt "ingamemenu"
+msgid "Abort Game"
 msgstr ""
 
 #. TRANSLATORS: This is a pun on "Start new game". "Gnu" is an open-source reference.
@@ -118,5 +151,5 @@ msgstr ""
 #. Quit/exit the game
 #: mainmenu.cpp:97
 msgctxt "mainmenu/quit"
-msgid "Quitter"
+msgid "Quit"
 msgstr ""

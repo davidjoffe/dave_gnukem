@@ -436,7 +436,7 @@ void DoMainMenu()
 		{ "mainmenu/redefine_keys", []() {
 			RedefineKeys();
 		}},
-		{ "mainmenu/show_high_scores", []() {
+		{ "mainmenu/high_scores", []() {
 			ShowHighScores();
 		}},
 		{ "mainmenu/credits", []() {

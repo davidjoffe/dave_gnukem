@@ -1272,19 +1272,20 @@ void DrawMinimap()
 			{
 				djgSetColorFore( pVisMain, djColor(0,0,0) );
 				// todo Back1 stuff and can't see back1 .. don't draw this bg if 0?
+				//djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*BLOCKW, POS_LEVELVIEW_Y + i*BLOCKH, BLOCKW/2, BLOCKH/2 );
 				djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*BLOCKW, POS_LEVELVIEW_Y + i*BLOCKH, BLOCKW, BLOCKH );
 			}
 			else
 			{
 				// todo Back1 stuff and can't see back1 .. don't draw this bg if 0?
+//				ED_DrawSprite( POS_LEVELVIEW_X + j * BLOCKW,
+	//				POS_LEVELVIEW_Y + i * BLOCKH,
+		//			a, b );
+				if ( ((a) || (b)) )
+				{
 				ED_DrawSprite( POS_LEVELVIEW_X + j * BLOCKW,
 					POS_LEVELVIEW_Y + i * BLOCKH,
 					a, b );
-				if ( ((a) || (b)) )
-				{
-//				ED_DrawSprite( POS_LEVELVIEW_X + j * BLOCKW,
-//					POS_LEVELVIEW_Y + i * BLOCKH,
-//					a, b );
 					if (a==sprite0a && b==sprite0b)
 						bHighlightBack = true;
 					

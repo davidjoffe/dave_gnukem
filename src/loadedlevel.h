@@ -23,6 +23,8 @@ struct tsLoadedLevel
 	//djSprite* pBackground = nullptr; // Level background image
 	// Main game backing sprite (while playing) - new [dj2023-11]
 	djSprite* pBack1 = nullptr;
+	djSprite* Back1() const { return pBack1; }
+
 	// For speed reasons an extra copy of pBack1->GetImage() (if loaded) or nullptr if not
 	djImage* pImgBack1 = nullptr;
 	//djImage* ImgBack1() const { return pBack1!=nullptr && pBack1->IsLoaded() ? pBack1->GetImage() : nullptr; }

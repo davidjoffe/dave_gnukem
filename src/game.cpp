@@ -1176,10 +1176,11 @@ void PerLevelSetup()
 #endif
 
 	// loaded new back1 stuff [dj2023]
-	const std::string sFile = djDATAPATHs(g_pCurMission->GetLevel(g_nLevel)->m_sBack1);
+	std::string sFile = djDATAPATHs(g_pCurMission->GetLevel(g_nLevel)->m_sBack1);
+	sFile = djDATAPATHs(std::string(g_pCurMission->GetLevel(g_nLevel)->GetFilename()) + "_back1.png");
 	g_Level.pBack1 = nullptr;
 	g_Level.pImgBack1 = nullptr;
-	if (!sFile.empty())
+	if (!sFile.empty() && djFileExists(sFile.c_str()))
 	{
 		extern djSprite* LoadSpriteHelper(const char* szPath, int nW, int nH);
 		g_Level.pBack1 = LoadSpriteHelper(sFile.c_str(), 16, 16);
@@ -2327,8 +2328,7 @@ void GameDrawView(float fDeltaTime_ms)
 	// todo ... more work on this. is this in front or behind pBackground?
 	if (g_Level.ImgBack1()!=nullptr)
 	{
-		//djgDrawImage(pVisView, g_Level.ImgBack1(), nViewportOriginX, nViewportOriginY, g_nViewOffsetX, g_nViewOffsetY, g_nViewportPixelW, g_nViewportPixelH);
-		djgDrawImage(pVisView, g_Level.ImgBack1(), g_Viewport.xo, g_Viewport.yo, g_nViewOffsetX, g_nViewOffsetY, g_nViewportPixelW, g_nViewportPixelH);
+		djgDrawImage(pVisView, g_Level.ImgBack1(), nViewportOriginX, nViewportOriginY, g_nViewOffsetX, g_nViewOffsetY, g_nViewportPixelW, g_nViewportPixelH);
 	}
 
 	//dj2019-07 Re this "10 seconds got to just after coke can, purple lab" comment: I don't know anymore what I meant with that (possibly something timing/benchmark-related),
@@ -2828,6 +2828,23 @@ void DrawDebugInfo()
 	//snprintf(buf,sizeof(buf), "xo,yo=%d,%d", xo, yo);
 	//GraphDrawString(pVisView, g_pFont8x8, 32, 70, (unsigned char*)buf );
 	// todo, add: endianness indication, RGBA bitmasks etc.? also new localization info.
+
+	std::string s = djDATAPATHs(std::string(g_pCurMission->GetLevel(g_nLevel)->GetFilename()) + "_back1.png");
+	if (!djFileExists(s.c_str())) s="N:" + s; else s="Y:" + s; 
+	GraphDrawStringUTF8(pVisView, djDefaultFont(), 32, 80, 8, 8, s.c_str());
+	if (g_Level.Back1())//2023 back1 stuff (debug info)
+	{
+		s = std::to_string(g_Level.Back1()->GetSpriteW()) + " "
+			+ std::to_string(g_Level.Back1()->GetSpriteH()) + " "
+			+ std::to_string(g_Level.Back1()->GetNumSpritesX()) + " "
+			+ std::to_string(g_Level.Back1()->GetNumSpritesY());
+		if (g_Level.Back1()->GetImage())
+		{
+			s += " " + std::to_string(g_Level.Back1()->GetImage()->Width()) + " "
+				+ std::to_string(g_Level.Back1()->GetImage()->Height()) + " ";
+		}
+		GraphDrawStringUTF8(pVisView, djDefaultFont(), 32, 88, 8, 8, s.c_str());
+	}
 }
 
 void DrawBullets(float fDeltaTime_ms)
@@ -3188,11 +3205,11 @@ void IngameMenu()
 	struct SMenuItem gameMenuItems[] =
 	{
 		{ false, "                       " },
-		{ true,  "   Continue            " },
-		{ true,  "   Save Game           " },
-		{ true,  "   Restore Game        " },
-		{ true,  "   Instructions        " },
-		{ true,  "   Retro Settings      ", "show_retrosettings_menu" },//dj2019-06 new
+		{ true,  pgettext("ingamemenu", "Continue") },
+		{ true,  pgettext("ingamemenu", "Save Game") },
+		{ true,  pgettext("ingamemenu", "Restore Game") },
+		{ true,  pgettext("ingamemenu", "Instructions") },
+		{ true,  pgettext("ingamemenu", "Retro Settings"), "show_retrosettings_menu" },//dj2019-06 new
 		#ifdef djEFFECT_VIEWPORTSHADOW
 		{ true,  sViewportShadows.c_str(), "setting/betashadoweffect" },
 		#endif
@@ -3203,10 +3220,10 @@ void IngameMenu()
 		#if defined(djCFG_FORCE_FULLSCREEN_ALWAYS) || defined(djCFG_FORCE_WINDOWED_ALWAYS)
 		#else
 		#ifdef djINGAME_FULLSCREEN_TOGGLE//dj2022-11 will think about these names, hmm
-		{ true,  "   Fullscreen          ", "ingame/toggle_fullscreen" },//Hmm note some consoles/ports might only work in fullscreen mode or something? should have 
+		{ true,  pgettext("ingamemenu", "Fullscreen"), "ingame/toggle_fullscreen" },//Hmm note some consoles/ports might only work in fullscreen mode or something? should have 
 		#endif
 		#endif
-		{ true,  "   Abort Game          ", "ingame/abort_game" },
+		{ true,  pgettext("ingamemenu", "Abort Game"), "ingame/abort_game" },
 		{ false, "                       " },
 		{ false, "" }//NB slightly old-fashioned indication of final 'null' item, without this bad things happen [someday to refactor nicer]
 	};
