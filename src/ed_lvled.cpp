@@ -675,12 +675,12 @@ void DoCreateNewLevel()
 	do
 	{
 		++n;
-		char szBuf[8192]={0};//fixLOW MAX_PATH? Some issue with MAX_PATH I can't remember what right now [dj2017-08]
-		snprintf(szBuf,sizeof(szBuf),"newlevel%03d.lev", n);
-		sFilenameWithoutPath = szBuf;
 
+		sFilenameWithoutPath = std::string("level ") + std::to_string(n) + ".lev";
+		
+		// Build filename to try (if it exists already, increment counter and try next auto new filename)
 		sFilenameWithPath = sPath;
-		djAppendPathS(sFilenameWithPath, szBuf);
+		djAppendPathS(sFilenameWithPath, sFilenameWithoutPath.c_str());
 	} while (djFileExists(sFilenameWithPath.c_str()));
 
 	// See config.h for explanation of the size here. Basically create a blank empty map datablock temporarily and save to the new file.
@@ -696,8 +696,9 @@ void DoCreateNewLevel()
 	pLevel->m_szBackground	= djStrDeepCopy("levels/bg1.tga");//fixme for now hardcoded
 	// Hm, a cheap and easy way to 'cheat' and not change file format here is to just set it to be the same as the level (but change the extension)?
 	// The 'proper' way would be to have a separate 'background' file for the level editor, but that's a bit of a pain to implement right now.
-	pLevel->m_sBack1 = "";//levels/bg1.png";
-	//pLevel->m_sBack1 = sLevelRelativePath + "_back1.png";
+	// e.g. "levels/foo.lev => levels/foo-back1.png" optional
+	pLevel->m_sBack1 = sLevelRelativePath.substr(0, sLevelRelativePath.length() - 4) + "-back1.png";
+		//sLevelRelativePath + "_back1.png";
 	// If no such file, clear it
 	//if (!djFileExists(djDATAPATHc(pLevel->m_sBack1.c_str())))
 	//	pLevel->m_sBack1 = "";
@@ -1255,6 +1256,10 @@ void DrawMinimap()
 	}
 	//*/
 
+
+	#define LEVX (POS_LEVELVIEW_X + j*BLOCKW)
+	#define LEVY (POS_LEVELVIEW_Y + i*BLOCKH)
+
 	// Draw the zoomed view
 	bool bHighlightBack = false;//Must be drawn after the foreground block's drawn, that's why we use this flag
 	bool bHighlightBackMouseOver = false;//Must be drawn after the foreground block's drawn, that's why we use this flag
@@ -1276,7 +1281,7 @@ void DrawMinimap()
 				//dj2023-11 hm want to see backing if turn off foreground and background with backing on
 				// (but future-todo should detect the backing bounds? as it's not necessarily same as levelw/h)
 				if (!g_Level.ImgBack1())
-				djgDrawBox( pVisMain, POS_LEVELVIEW_X + j*BLOCKW, POS_LEVELVIEW_Y + i*BLOCKH, BLOCKW, BLOCKH );
+				djgDrawBox( pVisMain, LEVX, LEVY, BLOCKW, BLOCKH );
 			}
 			else
 			{
@@ -1336,8 +1341,9 @@ void DrawMinimap()
 			if (g_Level.ImgBack1())
 			{
 				// sbsu [low prio] more efficient ways to do this, also should only draw two lines etc.
-				djgSetColorFore( pVisMain, djColor(100,100,100,100) );
-				djgDrawRectangle(pVisMain, POS_LEVELVIEW_X + j*BLOCKW, POS_LEVELVIEW_Y + i*BLOCKH   ,16,16);
+				djgSetColorFore( pVisMain, djColor(100,100,100,80) );
+				djgDrawHLine( pVisMain, LEVX,LEVY, BLOCKW );
+				djgDrawVLine( pVisMain, LEVX,LEVY, BLOCKH );
 			}
 
 			const int nCROSSHAIRSIZE=5;

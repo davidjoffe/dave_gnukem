@@ -3,7 +3,7 @@
 \brief   Level sets, campaigns, missions, whatever you want to call 'em
 \author  David Joffe
 
-Copyright (C) 1998-2019 David Joffe
+Copyright (C) 1998-2023 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 /* David Joffe '99/02 */
@@ -106,7 +106,7 @@ protected:
 Level descriptor (e.g. information such as filename). Not to be confused with a particular LOADED level while in-game (which is a large memory block currently).
 This should probably be renamed to LevelDescriptor
 */
-class CLevel : public CNamed
+class CLevel// : public CNamed
 {
 public:
 	CLevel();
@@ -120,7 +120,7 @@ public:
 	char *m_szAuthor = nullptr;
 	char *m_szBackground = nullptr; // background image filename
 
-	std::string m_sBack1 = "";//"levels/back1.png";;
+	std::string m_sBack1 = "";//optional [not used pre ~2023 release DG1] "levels/back1.png";;
 };
 /*--------------------------------------------------------------------------*/
 // This 128 has nothing to do with the levelwidth 128, not to be confused with it (dj2019-07):
