@@ -21,6 +21,7 @@
 #include "graph.h"
 #include "instructions.h"//ShowInstructions()
 
+#include <map>//dj2023-11 menu stuff
 // For Mix_Music but not sure I'm mad about that but it's not the most serious thing to worry about .. dj2022
 #ifndef NOSOUND
 	//dj2022-12 hm just a thought but isn't a difference like that resolvable by passing the paths differently in build system for OS2? no idea how OS/2 version is built tho. low prio.
@@ -44,59 +45,110 @@ extern void RedefineKeys();				// Redefine keys
 // Todo refactor all the menus for localization to be created dynamically now rather at runtime like this so that pgettext can do its thing.
 const struct SMenuItem* CreateMenuItems_MainMenu()
 {
-	struct SMenuItem mainMenuItems[] =
-	{
-	{ false, "                   " },
-	// TRANSLATORS: This is a pun on "Start new game". "Gnu" is an open-source reference. 
-	// If a similar pun works in your language, feel free to use it. Otherwise, 
-	// translate as "Start new game".
-	{ true,  pgettext("mainmenu/game/start", "Start gnu game") },
-	//mainmenu.addmenuitem(pgettext("mainmenu", "Start gnu game"));
-	{ true,  pgettext("mainmenu/game/restore", "Restore game") },
-	{ true,  pgettext("mainmenu", "Select Mission") },
-	{ true,  pgettext("mainmenu/orderinfo-info", "Ordering info") },
-	// TRANSLATORS: This is a negation of 'ordering info' (a joke menu item since it's open source) but also another reference to 90's 'not!', while the joke 'Ordering info' menu item is there in the first place as a parody reference to the Shareware games like the original Duke Nukem we're parodying here, which had 'ordering info'
-	{ true,  pgettext("mainmenu/not", "(not!)"), "", 10 },//10 pixels x offset indentation
-	{ true,  pgettext("mainmenu/instructions", "Instructions") },
-	{ true,  pgettext("mainmenu/redefine-keys", "Redefine keys") },
-	{ true,  pgettext("mainmenu/highscores", "High scores") },
-	{ true,  pgettext("mainmenu/credits", "Credits") },
-	{ true,  pgettext("mainmenu/about", "About") },
-	{ true,  pgettext("mainmenu/settings-retro", "Retro Settings") },
-	// TRANSLATORS: Note this is/was meant to mean "Don't quit the game" i.e. it's a humor joke menu item that does nothing
-	{ true,  pgettext("mainmenu/dontquit", "Don't quit") },
-	{ true,  pgettext("mainmenu/quit", "Quit") },
-	{ false, "                   " },
-	{ false, "" }//Terminal (if you don't have this last empty one bad things will happen)
+	// Menu internal command IDs
+	// We must start with the vector to preserve order for display in the menu to human
+	// THESE MAY CHANGE because some of these also appear elsewhere on the in-game menu
+	std::vector<std::string> asItemCommands = {
+		//"<text>:Heading",
+		"mainmenu/start_new_game",
+		"mainmenu/restore_game",
+		"mainmenu/select_mission",
+		"mainmenu/order_info",
+		"mainmenu/not",
+		"mainmenu/instructions",
+		"mainmenu/redefine_keys",
+		"mainmenu/high_scores",
+		"mainmenu/credits",
+		"mainmenu/about",
+		//"mainmenu/language",
+		//"mainmenu/crash",
+		//"mainmenu/settings",
+		"mainmenu/settings_retro",
+		"mainmenu/dont_quit",
+		"mainmenu/quit"
 	};
 
-	//{ true,  pgettext("mainmenu", "Select language") }, //?todo add 'select language'?
-	//{ true,  pgettext("mainmenu", "Settings") },//todo make general Settings?
+	//{ "<text>:Heading", "A heading" },
 
-	// Urgh, get count due to old-fashioned null-terminator stuff ...
-	size_t uCount = 0;
-	const SMenuItem *pItem = &mainMenuItems[0];
-	while (!pItem->IsTerminal())
+	// Menu display strings
+	std::map<std::string, std::string> map = {
+
+		// TRANSLATORS: This is a pun on "Start new game". "Gnu" is an open-source reference. 
+		// If a similar pun works in your language, feel free to use it. Otherwise, 
+		// preferably translate as "Start new game", which has the advantage of being potentially more re-usable for other games
+		{ "mainmenu/start_new_game",	pgettext("mainmenu/start_new_game", "Start gnu game") },
+		{ "mainmenu/restore_game",		pgettext("mainmenu/restore_game", "Restore game") },
+		{ "mainmenu/select_mission",	pgettext("mainmenu/select_mission", "Select Mission") },
+		// Humor menu item (but might not be if this is re-use in future for orderable games)
+		{ "mainmenu/order_info",		pgettext("mainmenu/order_info", "Ordering info") },
+		// Humor menu item. TRANSLATORS: This is a negation of 'ordering info' (a joke menu item since it's open source) but also since it's a retro game, it's another retro 90s reference to 90's 'not!', while the joke 'Ordering info' menu item is there in the first place as a parody reference to the Shareware games like the original Duke Nukem we're parodying here, which had 'ordering info'
+		{ "mainmenu/not",				pgettext("mainmenu/not", "(not!)") },
+		{ "mainmenu/instructions",		pgettext("mainmenu/instructions", "Instructions") },
+		{ "mainmenu/redefine_keys",		pgettext("mainmenu/redefine_keys", "Redefine keys") },
+		{ "mainmenu/high_scores",		pgettext("mainmenu/high_scores", "High scores") },
+		{ "mainmenu/credits",			pgettext("mainmenu/credits", "Credits") },
+		{ "mainmenu/about",				pgettext("mainmenu/about", "About") },
+		{ "mainmenu/language",			pgettext("mainmenu/language", "Choose language") },
+		{ "mainmenu/settings",			pgettext("mainmenu/settings", "Settings") },
+		{ "mainmenu/settings_retro",	pgettext("mainmendu/settings_retro", "Retro Settings") },
+		// Humor menu item. TRANSLATORS: Note this is/was meant to mean "Don't quit the game" (or "Don't exit the game") (not "Don't give up") i.e. it's a humor joke menu item that does nothing
+		{ "mainmenu/dont_quit",			pgettext("mainmenu/dont_quit", "Don't quit") },
+		// Quit/exit the game
+		{ "mainmenu/quit",				pgettext("mainmenu/quit", "Quit") }
+		};
+	std::map<std::string, int> mapX = {
+		{ "mainmenu/not", 8 }
+	};
+
+	// todo should we link the callbacks here or closer to when we call?
+
+	// +3 for leading spacing string, following spacing string and 'IsTerminal' terminator to indicate last one (ideally all those things should be refactored)
+	const size_t uNewSize = asItemCommands.size() + 3;
+
+	std::vector<SMenuItem> aItems;
+	aItems.reserve(uNewSize);
+	aItems.push_back(SMenuItem( false, "                   " ));
+
+	// 'paMenuItems' means 'pointer to array of menu items'
+	for ( unsigned int i=0; i<asItemCommands.size(); ++i )
 	{
-		pItem++;
-		++uCount;
+		const std::string sItemCommand = asItemCommands[i];
+		std::string sItemText;// = asItemCommands[i];
+		if (map.find(asItemCommands[i]) != map.end())
+			sItemText = map[asItemCommands[i]];
+		else
+			sItemText = asItemCommands[i];
+		
+		// If it's only spaces use 'false' or overtly a text-only type eg retro settings submenu heading
+		bool bIsSelectable = true;
+		if (sItemCommand.substr(0,6)=="<text>")
+			bIsSelectable = false;
+
+		//paMenuItems[i+1] = SMenuItem( bIsSelectable, sItemText, sItemCommand );
+		aItems.push_back(SMenuItem( bIsSelectable, sItemText, sItemCommand ));
+
+		if (mapX.find(sItemCommand)!=mapX.end()){
+			//paMenuItems[i+1].m_Pos.x = mapX[sItemCommand];
+			aItems.back().m_Pos.x = mapX[sItemCommand];
+		}
 	}
-	struct SMenuItem* pMenuItemsRet = new SMenuItem[uCount+1];
-	// Copy and return (um this this is gross there are constant string char* pointers in there to above, will it even work?)
-	// Probably .. the mainMenuItems may be on the stack, but the constant strings 'should' exist for the lifetime of the program
-	// Still, this is icky, we should probably rather use std::string for menu stuff
-	for ( size_t i=0; i<uCount; ++i )
+
+	aItems.push_back(SMenuItem( false, "                   " ));
+	aItems.push_back(SMenuItem( false, "" ));//Terminal (if you don't have this last empty one bad things will happen)
+
+	// Copy vector from std::vector to 'pointer to array'
+	SMenuItem* paItems = new SMenuItem[uNewSize];
+	for ( size_t i=0; i<uNewSize; ++i )
 	{
-		pMenuItemsRet[i] = mainMenuItems[i];
+		paItems[i] = aItems[i];
 	}
-	pMenuItemsRet[uCount].SetTerminal();//last one
-	return pMenuItemsRet;
+	return paItems;
 }
 
 // [dj2023-11] For localization purposes I need to more genericize text rendering and font stuff, which means I need to refactor the skull-cursor stuff after over 20 years of it being done like this to have these menu cursors be in their own separate new sprite images (not be in, and re-use, the main old game font.tga) so that we can toggle to e.g. e.g. pixel operator as UI font if loading French interface etc.
 // These are/were ugly hardcoded offsets into main.tga where these which now will become meaningless, and done more nicely/generically
 const unsigned char mainMenuCursor[] = { 128, 129, 130, 131, 0 };
-const unsigned char mainMenuCursorSkull[] = { 161, 162, 163, 164, 0 };
+//const unsigned char mainMenuCursorSkull[] = { 161, 162, 163, 164, 0 };
 CMenu mainMenu ( "main.cpp:mainMenu" );
 /*--------------------------------------------------------------------------*/
 
@@ -288,16 +340,25 @@ void KillMainMenu()
 /*--------------------------------------------------------------------------*/
 
 /*--------------------------------------------------------------------------*/
+class djMenu
+{
+public:
+	bool bRunning = true;
+#ifndef NOSOUND
+	Mix_Music* pMusic = nullptr; 
+#endif
+};
+djMenu g_Menu;
 void DoMainMenu()
 {
-	bool bRunning = true;
+	g_Menu.bRunning = true;
 
 #ifndef NOSOUND
 	//dj2016-10 adding background music to main menu, though have not put any real thought into what would
 	// be the best track here so fixme todo maybe dig a bit more and find better choice here etc. [also for levels]
-	Mix_Music* pMusic = Mix_LoadMUS(djDATAPATHc("music/eric_matyas/8-Bit-Mayhem.ogg"));
-	if (pMusic!=NULL)
-		Mix_FadeInMusic(pMusic, -1, 800);
+	g_Menu.pMusic = Mix_LoadMUS(djDATAPATHc("music/eric_matyas/8-Bit-Mayhem.ogg"));
+	if (g_Menu.pMusic!=NULL)
+		Mix_FadeInMusicPos(g_Menu.pMusic, -1, 800, 0);
 	else
 	{
 		//'debugassert' / trap / exception type of thing?
@@ -329,82 +390,101 @@ void DoMainMenu()
 		GraphFlip(true);
 
 		// Random select menu cursor, either hearts or skulls
-		mainMenu.setMenuCursor ( (rand()%4==0 ? mainMenuCursorSkull : mainMenuCursor) );
-
+		//mainMenu.setMenuCursor ( (rand()%4==0 ? mainMenuCursorSkull : mainMenuCursor) );
 		if (((rand()%4)==0) && g_pCursor2!=nullptr && g_pCursor2->IsLoaded())
 			//funny skull (slight parody homage to old Doom menu)
 			mainMenu.SetMenuCursor(g_pCursor2);
 		else
 			mainMenu.SetMenuCursor(nullptr);//Use default menu cursor
 
-		// Old hardcoded cursor (to deprecate font.tga stuff with hardcoded offsets)
-		mainMenu.setMenuCursor ( (rand()%4==0 ? mainMenuCursorSkull : mainMenuCursor) );
 
+		/*
 		int menu_option = do_menu( &mainMenu );
-
-		switch (menu_option)
+		*/
+		typedef void (*djCALLBACK)();
+		// ACTUALLY 'DO MENU'. Note we want to refactor here from returning an int to returning and using a command ID (and/or callback)
+		std::map<std::string, djCALLBACK> mapCallbacks =
 		{
-		case 1:		/* rtfb's vision of this branch :)*/
-		{
+		{ "mainmenu/start_new_game", []() {
 			//int score = PlayGame ();
 			int score = game_startup();
 			CheckHighScores( score );
 #ifndef NOSOUND
 			// Game levels start their own music, so when come out of game and back to main menu, restart main menu music
-			if (pMusic!=NULL)
-				Mix_FadeInMusic(pMusic, -1, 800);
+			if (g_Menu.pMusic!=NULL)
+				Mix_FadeInMusic(g_Menu.pMusic, -1, 800);
 #endif
-			break;
-		}
-		case 2: // restore game [dj2016-10 adding implementation for this - it did nothing before]
-			{
+			}
+		},
+		{ "mainmenu/restore_game",		[]() // restore game [dj2016-10 adding implementation for this - it did nothing before]
+				{
 				int score = game_startup(true);
 				CheckHighScores( score );
 #ifndef NOSOUND
 				// Game levels start their own music, so when come out of game and back to main menu, restart main menu music
-				if (pMusic!=NULL)
-					Mix_FadeInMusic(pMusic, -1, 800);
+				if (g_Menu.pMusic!=NULL)
+					Mix_FadeInMusicPos(g_Menu.pMusic, -1, 800, 0);
 #endif
 			}
-			break;
-		case 3: // select mission
+		},
+		{ "mainmenu/select_mission", []() { // select mission
 			SelectMission();
-			break;
-		case 6: // instructions
+		}},
+		{ "mainmenu/instructions", []() {
 			ShowInstructions();
-			break;
-		case 7:
+		}},
+		{ "mainmenu/redefine_keys", []() {
 			RedefineKeys();
-			break;
-		case 8:
+		}},
+		{ "mainmenu/show_high_scores", []() {
 			ShowHighScores();
-			break;
-		case 9: // credits
+		}},
+		{ "mainmenu/credits", []() {
 			ShowCredits();
-			break;
-		case 10: // about
+		}},
+		{ "mainmenu/about", []() {
 			ShowAbout();
-			break;
-		case 11://dj2019-06 just-for-fun extra-retro simulated faux-EGA/CGA
+		}},
+		{ "mainmenu/settings_retro", []() {//dj2019-06 just-for-fun extra-retro simulated faux-EGA/CGA
     		extern void SettingsMenu();
 			SettingsMenu();
-			break;
-		case 12://Don't quit
-			break;
-		case -1: // escape
-		case 13: // quit
-			bRunning = false;
-			break;
+		}},
+		{ "mainmenu/dont_quit", []() {//Don't quit
+			// Do nothing
+		}},
+		//}},{ "mainmenu/",		[]() {//		case -1: // escape
+		{ "mainmenu/quit",		[]() {// quit
+			g_Menu.bRunning = false;
+		}
+		}
+		};//mapCallbacks
+
+		
+		int menu_option = do_menu( &mainMenu );
+		if (menu_option<0)//Escape
+			g_Menu.bRunning = false;
+
+		std::string sCommand;
+		if (menu_option >= 0 && !mainMenu.getItems()[menu_option].GetRetVal().empty())
+			sCommand = mainMenu.getItems()[menu_option].GetRetVal();
+		if (!sCommand.empty())
+		{
+			if (mapCallbacks.find(sCommand)!=mapCallbacks.end())
+			{
+				// If menu callback defined, call it
+				mapCallbacks[sCommand]();
+			}
 		}
 
+
 		mainMenu.SetMenuCursor(nullptr);
-	} while (bRunning);
+	} while (g_Menu.bRunning);
 
 #ifndef NOSOUND
-	if (pMusic)
+	if (g_Menu.pMusic)
 	{
-		Mix_FreeMusic(pMusic);
-		pMusic = NULL;
+		Mix_FreeMusic(g_Menu.pMusic);
+		g_Menu.pMusic = NULL;
 	}
 #endif
 }
