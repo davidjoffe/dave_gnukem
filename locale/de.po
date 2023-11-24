@@ -1,0 +1,148 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-11-24 05:15+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: game.cpp:2644
+msgctxt "ingame"
+msgid "Health"
+msgstr "Gesundheit"
+
+#: game.cpp:2646
+msgctxt "ingame"
+msgid "Score"
+msgstr "Punktzahl"
+
+#: game.cpp:2648
+msgctxt "ingame"
+msgid "Firepower"
+msgstr "Feuerkraft"
+
+#: game.cpp:2650
+msgctxt "ingame"
+msgid "Inventory"
+msgstr "Inventar"
+
+#: game.cpp:3208
+msgctxt "ingamemenu"
+msgid "Continue"
+msgstr "Fortsetzen"
+
+#: game.cpp:3209
+msgctxt "ingamemenu"
+msgid "Save Game"
+msgstr "Spiel speichern"
+
+#: game.cpp:3210
+msgctxt "ingamemenu"
+msgid "Restore Game"
+msgstr "Spiel wiederherstellen"
+
+#: game.cpp:3211
+msgctxt "ingamemenu"
+msgid "Instructions"
+msgstr "Anleitung"
+
+#: game.cpp:3212
+msgctxt "ingamemenu"
+msgid "Retro Settings"
+msgstr "Retro-Einstellungen"
+
+#: game.cpp:3223
+msgctxt "ingamemenu"
+msgid "Fullscreen"
+msgstr "Vollbild"
+
+#: game.cpp:3226
+msgctxt "ingamemenu"
+msgid "Abort Game"
+msgstr "Spiel abbrechen"
+
+#: mainmenu.cpp:79
+msgctxt "mainmenu/start_new_game"
+msgid "Start new game"
+msgstr "Neues Spiel starten"
+
+#: mainmenu.cpp:80
+msgctxt "mainmenu/restore_game"
+msgid "Restore game"
+msgstr "Spiel wiederherstellen"
+
+#: mainmenu.cpp:81
+msgctxt "mainmenu/select_mission"
+msgid "Select Mission"
+msgstr "Mission auswählen"
+
+#: mainmenu.cpp:83
+msgctxt "mainmenu/order_info"
+msgid "Ordering info"
+msgstr "Bestellinformationen"
+
+#: mainmenu.cpp:85
+msgctxt "mainmenu/not"
+msgid "(not!)"
+msgstr "(nicht!)"
+
+#: mainmenu.cpp:86
+msgctxt "mainmenu/instructions"
+msgid "Instructions"
+msgstr "Anleitung"
+
+#: mainmenu.cpp:87
+msgctxt "mainmenu/redefine_keys"
+msgid "Redefine keys"
+msgstr "Tasten neu belegen"
+
+#: mainmenu.cpp:88
+msgctxt "mainmenu/high_scores"
+msgid "High scores"
+msgstr "Highscores"
+
+#: mainmenu.cpp:89
+msgctxt "mainmenu/credits"
+msgid "Credits"
+msgstr "Credits"
+
+#: mainmenu.cpp:90
+msgctxt "mainmenu/about"
+msgid "About"
+msgstr "Über"
+
+#: mainmenu.cpp:91
+msgctxt "mainmenu/language"
+msgid "Choose language"
+msgstr "Sprache wählen"
+
+#: mainmenu.cpp:92
+msgctxt "mainmenu/settings"
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: mainmenu.cpp:93
+msgctxt "mainmendu/settings_retro"
+msgid "Retro Settings"
+msgstr "Retro-Einstellungen"
+
+#: mainmenu.cpp:95
+msgctxt "mainmenu/dont_quit"
+msgid "Don't quit"
+msgstr "Nicht beenden"
+
+#: mainmenu.cpp:97
+msgctxt "mainmenu/quit"
+msgid "Quit"
+msgstr "Beenden"
+
