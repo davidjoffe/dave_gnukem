@@ -328,6 +328,15 @@ void DoMainMenu()
 		const std::string sLang = djGetLanguage();
 		//if (djLang::DoTranslations())//!sLang.empty() && sLang!="en")
 		GraphDrawString(pVisBack, djDefaultFont(), CFG_APPLICATION_RENDER_RES_W - sLang.length()*8, CFG_APPLICATION_RENDER_RES_H - 16, (unsigned char*)sLang.c_str());
+		//Right to Left eg Hebrew?
+		/*
+		int nDirection = djLang::GetCurLangDirection();
+		if (nDirection<0)
+		{
+			std::string sDirection = "RTL";
+			GraphDrawString(pVisBack, djDefaultFont(), CFG_APPLICATION_RENDER_RES_W - sDirection.length()*8, CFG_APPLICATION_RENDER_RES_H - 24, (unsigned char*)sDirection.c_str());
+		}
+		//*/
 
 		GraphFlip(true);
 
