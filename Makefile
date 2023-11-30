@@ -30,7 +30,56 @@ LDFLAGS_DAVEGNUKEM = $(LIBS) $(LDFLAGS)
 
 CPPFLAGS_DAVEGNUKEM = -DDATA_DIR=\"$(DATA_DIR)\" -DVERSION=\"'$(VERSION)'\" $(CPPFLAGS)
 
-OBJ = $(shell find src -iname '*.cpp' -type f | sed 's/\.cpp$$/.o/' | sort)
+OBJ = src/block.o \
+      src/bullet.o \
+      src/console.o \
+      src/credits.o \
+      src/datadir.o \
+      src/djfile.o \
+      src/djfonts.o \
+      src/djimageload.o \
+      src/djimage.o \
+      src/djlang.o \
+      src/djlog.o \
+      src/djsprite.o \
+      src/djstring.o \
+      src/djtypes.o \
+      src/djutf8.o \
+      src/ed_common.o \
+      src/ed_DrawBoxContents.o \
+      src/ed_lvled.o \
+      src/ed_macros.o \
+      src/ed.o \
+      src/ed_spred.o \
+      src/effect_viewportshadow.o \
+      src/gameending.o \
+      src/game.o \
+      src/graph.o \
+      src/hero.o \
+      src/hiscores.o \
+      src/instructions.o \
+      src/inventory.o \
+      src/keys.o \
+      src/level.o \
+      src/loadedlevel.o \
+      src/localization/djgettext.o \
+      src/mainmenu.o \
+      src/main.o \
+      src/menu.o \
+      src/mission.o \
+      src/mixins.o \
+      src/m_misc.o \
+      src/sdl/djgraph.o \
+      src/sdl/djinput.o \
+      src/sdl/djsound.o \
+      src/sdl/djtime.o \
+      src/settings.o \
+      src/sys_error.o \
+      src/sys_log.o \
+      src/thing_monsters.o \
+      src/thing.o \
+      src/win32/dpiscaling.o \
+      src/win32/winmain.o \
 
 # debug
 #CXXFLAGS_DAVEGNUKEM = -ggdb -DDEBUG -std=c++14 -Wall `sdl2-config --cflags` $(CPPFLAGS_DAVEGNUKEM) $(CXXFLAGS)
