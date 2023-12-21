@@ -3,7 +3,7 @@
 \brief   The control of the game itself
 \author  David Joffe
 
-Copyright (C) 1995-2022 David Joffe
+Copyright (C) 1995-2023 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 /* [File created] David Joffe '95/07/28 */

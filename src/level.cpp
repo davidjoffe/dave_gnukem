@@ -1,7 +1,7 @@
 /*
 level.cpp
 
-Copyright (C) 1995-2022 David Joffe
+Copyright (C) 1995-2023 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "level.h"

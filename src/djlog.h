@@ -5,7 +5,7 @@
 
 modified by Vytautas Shaltenis, a.k.a. rtfb
 
-Copyright (C) 1998-2019 David Joffe
+Copyright (C) 1998-2023 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _DJLOG_H_

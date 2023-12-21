@@ -1,7 +1,7 @@
 /*
 djlog.cpp
 
-Copyright (C) 1998-2022 David Joffe
+Copyright (C) 1998-2023 David Joffe
 */
 
 #include "config.h"

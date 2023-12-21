@@ -3,7 +3,7 @@
 \brief   Graphics functionality
 \author  David Joffe
 
-Copyright (C) 1998-2022 David Joffe
+Copyright (C) 1998-2023 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _DJGRAPH_H_

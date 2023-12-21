@@ -3,7 +3,7 @@
 \brief   Some string helper functions
 \author  David Joffe
 
-Copyright (C) 1998-2018 David Joffe
+Copyright (C) 1998-2023 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _DJSTRING_H_

@@ -3,7 +3,7 @@
 \brief   Basic types and macros
 \author  David Joffe
 
-Copyright (C) 1998-2022 David Joffe
+Copyright (C) 1998-2023 David Joffe
 
 Try keep this file as 'small and light as possible' with few includes a reasonably pragmatically possible..
 Also some of these names are just itching to clash with other projects in global namespace .. starting to change some of them to reduce risk .. dj2022-11
@@ -43,22 +43,11 @@ public:
 //! Make 16 bit integer from low and high 8-bit components
 #define MAKEINT16(lo,hi) ((lo) | ((hi)<<8))
 
-/* Deprecating, for sake of consistency, use only dj*
-#ifndef DEL
-//! Helper for "delete" operator
-#define DEL(x) if (x) { delete (x); x = NULL; }
-#endif
 
-#ifndef DELV
-//! Helper for "delete[]" operator
-#define DELV(x) if (x) { delete[] (x); x = NULL; }
-#endif
-*/
-
-//! Helper for "delete" operator
+//! Helper for "delete" operator that also sets the pointer to null for safety to help avoid dangling pointers
 #define djDEL(x) if (x) { delete (x); x = NULL; }
 
-//! Helper for "delete[]" operator
+//! Helper for "delete[]" operator that also sets the pointer to null for safety to help avoid dangling pointers
 #define djDELV(x) if (x) { delete[] (x); x = NULL; }
 
 //! Return true if point (x,y) is (inclusively) inside the rectangle (x1, y1, x2, y2)

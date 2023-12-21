@@ -3,7 +3,7 @@
 //
 // Sound interface
 //
-// Copyright (C) 1999-2018 David Joffe
+// Copyright (C) 1999-2023 David Joffe
 /*--------------------------------------------------------------------------*/
 #ifndef _DJSOUND_H_
 #define _DJSOUND_H_
