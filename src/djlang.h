@@ -34,6 +34,12 @@ public:
 	// Returns true if translations are enabled and a language for localization is selected
 	static bool DoTranslations();
 
+	// 1=left-to-right, -1=right-to-left (e.g. Arabic "ar" or Hebrew "he"). Cached value for speed and update the value only when lang code changes
+	// Return value negative means right to left language e.g. Hebrew or Arabic
+	static int GetCurLangDirection();
+	// 1=left-to-right, -1=right-to-left (e.g. Arabic "ar" or Hebrew "he")
+	// Return value negative means right to left language e.g. Hebrew or Arabic
+	static int GetLangDirection(const char* szCode, int nLen=-1);
 };
 //---------------------------------------------------------------------------
 #endif

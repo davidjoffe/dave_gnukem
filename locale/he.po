@@ -1,21 +1,75 @@
-# DAVE GNUKEM FRENCH
-# Copyright (C) 1995-2023
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-# SPDX-FileCopyrightText: 2023 Max le Fou <buttbadger@gmail.com>
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-17 20:10+0200\n"
-"PO-Revision-Date: 2023-11-26 13:32+0100\n"
-"Last-Translator: Max le Fou <buttbadger@gmail.com>\n"
-"Language-Team: French <kde-i18n-doc@kde.org>\n"
-"Language: fr\n"
+"POT-Creation-Date: 2023-11-24 05:15+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 23.08.3\n"
+
+#: game.cpp:2644
+msgctxt "ingame"
+msgid "Health"
+msgstr "בריאות"
+
+#: game.cpp:2646
+msgctxt "ingame"
+msgid "Score"
+msgstr "ניקוד"
+
+#: game.cpp:2648
+msgctxt "ingame"
+msgid "Firepower"
+msgstr "כוח אש"
+
+#: game.cpp:2650
+msgctxt "ingame"
+msgid "Inventory"
+msgstr "מלאי"
+
+#: game.cpp:3208
+msgctxt "ingamemenu"
+msgid "Continue"
+msgstr "המשך"
+
+#: game.cpp:3209
+msgctxt "ingamemenu"
+msgid "Save Game"
+msgstr ""
+
+#: game.cpp:3210
+msgctxt "ingamemenu"
+msgid "Restore Game"
+msgstr ""
+
+#: game.cpp:3211
+msgctxt "ingamemenu"
+msgid "הוראות"
+msgstr ""
+
+#: game.cpp:3212
+msgctxt "ingamemenu"
+msgid "Retro Settings"
+msgstr ""
+
+#: game.cpp:3223
+msgctxt "ingamemenu"
+msgid "Fullscreen"
+msgstr ""
+
+#: game.cpp:3226
+msgctxt "ingamemenu"
+msgid "Abort Game"
+msgstr ""
 
 #. TRANSLATORS: This is a pun on "Start new game". "Gnu" is an open-source reference.
 #. If a similar pun works in your language, feel free to use it. Otherwise,
@@ -23,79 +77,78 @@ msgstr ""
 #: mainmenu.cpp:79
 msgctxt "mainmenu/start_new_game"
 msgid "Start gnu game"
-msgstr "Nouvelle partie"
+msgstr ""
 
 #: mainmenu.cpp:80
 msgctxt "mainmenu/restore_game"
 msgid "Restore game"
-msgstr "Charger une partie"
+msgstr ""
 
 #: mainmenu.cpp:81
 msgctxt "mainmenu/select_mission"
 msgid "Select Mission"
-msgstr "Choisir mission"
+msgstr ""
 
 #. Humor menu item (but might not be if this is re-use in future for orderable games)
 #: mainmenu.cpp:83
 msgctxt "mainmenu/order_info"
 msgid "Ordering info"
-msgstr "Infos sur la commande"
+msgstr ""
 
 #. Humor menu item. TRANSLATORS: This is a negation of 'ordering info' (a joke menu item since it's open source) but also since it's a retro game, it's another retro 90s reference to 90's 'not!', while the joke 'Ordering info' menu item is there in the first place as a parody reference to the Shareware games like the original Duke Nukem we're parodying here, which had 'ordering info'
 #: mainmenu.cpp:85
 msgctxt "mainmenu/not"
 msgid "(not!)"
-msgstr "(ou pas !)"
+msgstr ""
 
 #: mainmenu.cpp:86
 msgctxt "mainmenu/instructions"
 msgid "Instructions"
-msgstr "Mode d'emploi"
+msgstr ""
 
 #: mainmenu.cpp:87
 msgctxt "mainmenu/redefine_keys"
 msgid "Redefine keys"
-msgstr "Configurations des touches"
+msgstr ""
 
 #: mainmenu.cpp:88
 msgctxt "mainmenu/high_scores"
 msgid "High scores"
-msgstr "Meilleurs scores"
+msgstr ""
 
 #: mainmenu.cpp:89
 msgctxt "mainmenu/credits"
 msgid "Credits"
-msgstr "Crédits"
+msgstr ""
 
 #: mainmenu.cpp:90
 msgctxt "mainmenu/about"
 msgid "About"
-msgstr "A propos"
+msgstr ""
 
 #: mainmenu.cpp:91
 msgctxt "mainmenu/language"
 msgid "Choose language"
-msgstr "Choisir une langue"
+msgstr ""
 
 #: mainmenu.cpp:92
 msgctxt "mainmenu/settings"
 msgid "Settings"
-msgstr "Options"
+msgstr "הגדרות"
 
 #: mainmenu.cpp:93
 msgctxt "mainmendu/settings_retro"
 msgid "Retro Settings"
-msgstr "Options rétro"
+msgstr ""
 
 #. Humor menu item. TRANSLATORS: Note this is/was meant to mean "Don't quit the game" (or "Don't exit the game") (not "Don't give up") i.e. it's a humor joke menu item that does nothing
 #: mainmenu.cpp:95
 msgctxt "mainmenu/dont_quit"
 msgid "Don't quit"
-msgstr "Ne pas quitter"
+msgstr "אל תפסיק"
 
 #. Quit/exit the game
 #: mainmenu.cpp:97
 msgctxt "mainmenu/quit"
 msgid "Quit"
-msgstr "Quitter"
-
+msgstr "צא"

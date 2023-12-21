@@ -10,6 +10,19 @@ Copyright (C) 1998-2023 David Joffe
 // David Joffe 1998/12
 // replacing the old djgega.cpp graphics interface
 /*--------------------------------------------------------------------------*/
+// [dj] A few off-the-cuff thoughts on text rendering and language direction and localization and right-to-left support:
+// It's slightly debatable how best to handle rendering text in a game that is, say, just a numerical score, which should remain LTR - each piece of text
+// we may need to do some determining of the text direction and maybe in future handle mixed text in a fancy way but for this simple game we don't need to be too fancy
+// We could also include support for some basic Unicode modifiers to help during text rendering, that could give e.g. user interface some power and control
+// if a text is rendering in wrong direction - e.g. let's say we had some text that's one Hebrew character followed by 10 directioon-ambiguous or Latin alphabet characters or Roman numerals
+// and our mixed-text rendering engine decides to render it wrong, then maybe we could allow translators to e.g. use Unicode special direction symbols to help correct it in these edge cases
+//
+// In general when coding and designing for localization, also think about these issues to try keep localization simpler, e.g.:
+// Better: "Score: [N]"
+// Worse: "Your score is [N] point(s)"
+// The former is much, much easier to just localize "Score", while the latter creates various translation issues in many different languages (from conjugation issues to different representations of plural to possible mixed-text rendering direction issues and so on)
+/*--------------------------------------------------------------------------*/
+
 #ifndef _GRAPH_H_
 #define _GRAPH_H_
 

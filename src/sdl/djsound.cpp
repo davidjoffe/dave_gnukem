@@ -35,12 +35,23 @@ Copyright (C) 1999-2022 David Joffe and Kent Mein
 
 #if defined(WIN32) && defined(_MSC_VER)
 // Microsoft compiler stuff .. hmm not sure where best .. unless cmake etc.
-#ifdef djUSING_SDL_MIXER_EXT
-#pragma comment(lib, "SDL2_mixer_ext.lib")
-#else
-#pragma comment(lib, "SDL2_mixer.lib")
-#endif
-#endif
+#ifdef _DEBUG
+
+	#ifdef djUSING_SDL_MIXER_EXT
+		#pragma comment(lib, "SDL2_mixer_ext.lib")
+	#else//djUSING_SDL_MIXER_EXT
+		// Should this be SDL2_mixerd.lib?
+		#pragma comment(lib, "SDL2_mixer.lib")
+	#endif//djUSING_SDL_MIXER_EXT
+
+#else//_DEBUG
+	#ifdef djUSING_SDL_MIXER_EXT
+		#pragma comment(lib, "SDL2_mixer_ext.lib")
+	#else//djUSING_SDL_MIXER_EXT
+		#pragma comment(lib, "SDL2_mixer.lib")
+	#endif//djUSING_SDL_MIXER_EXT
+#endif//_DEBUG
+#endif//#if defined(WIN32) && defined(_MSC_VER)
 
 //#define NOSOUND
 

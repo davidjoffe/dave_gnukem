@@ -325,9 +325,22 @@ void DoMainMenu()
 		GraphDrawString(pVisBack, djDefaultFont(), CFG_APPLICATION_RENDER_RES_W - strlen(szURL)*8, CFG_APPLICATION_RENDER_RES_H - 8, (unsigned char*)szURL);
 
 		// Language code selected for localization
-		const std::string sLang = djGetLanguage();
+		std::string sLang = djGetLanguage();
+		if (djLang::GetCurLangDirection() < 0)
+		{
+			sLang+="(RTL)";// If we're actually in RTL this might confusingly display as 'LTR' if our text renderer just blindly reverses it
+		}
 		//if (djLang::DoTranslations())//!sLang.empty() && sLang!="en")
 		GraphDrawString(pVisBack, djDefaultFont(), CFG_APPLICATION_RENDER_RES_W - sLang.length()*8, CFG_APPLICATION_RENDER_RES_H - 16, (unsigned char*)sLang.c_str());
+		//Right to Left eg Hebrew?
+		/*
+		int nDirection = djLang::GetCurLangDirection();
+		if (nDirection<0)
+		{
+			std::string sDirection = "RTL";
+			GraphDrawString(pVisBack, djDefaultFont(), CFG_APPLICATION_RENDER_RES_W - sDirection.length()*8, CFG_APPLICATION_RENDER_RES_H - 24, (unsigned char*)sDirection.c_str());
+		}
+		//*/
 
 		GraphFlip(true);
 
