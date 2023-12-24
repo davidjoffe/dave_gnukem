@@ -3,7 +3,7 @@
 \brief   Hero-related stuff
 \author  David Joffe
 
-Copyright (C) 2001-2022 David Joffe
+Copyright (C) 2001-2023 David Joffe
 
 I'm not a fan of the various globals here; they're mostly from the very
 oldest parts of the codebase, when I was still an inexperienced coder ...

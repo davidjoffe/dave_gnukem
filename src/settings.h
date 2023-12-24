@@ -3,7 +3,7 @@
 \brief   Game configuration file
 \author  David Joffe
 
-Copyright (C) 2001-2018 David Joffe
+Copyright (C) 2001-2023 David Joffe
 
 09/2001
 */

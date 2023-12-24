@@ -3,7 +3,7 @@
 \brief   Level sets, campaigns, missions, whatever you want to call 'em
 \author  David Joffe
 
-Copyright (C) 1998-2019 David Joffe
+Copyright (C) 1998-2023 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 /* David Joffe '99/02 */

@@ -5,7 +5,7 @@
 /*
 mission.cpp
 
-Copyright (C) 1999-2022 David Joffe
+Copyright (C) 1999-2023 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "config.h"
