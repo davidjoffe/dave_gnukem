@@ -25,6 +25,7 @@ void _SYS_Error ( const char *file, int line, const char *fmt, ... )
 	static thread_local char		text[4096]={0};
 	static thread_local char		text2[4096+1024]={0};
 
+	//todo-deprecate:// See issue "Move away from printf-style formatting"
 	va_list		args;
 	va_start ( args, fmt );
 		vsnprintf ( text, sizeof(text), fmt, args );
@@ -46,6 +47,7 @@ void _SYS_Warning ( const char *file, int line, const char *fmt, ... )
 	static thread_local char		text[4096] = { 0 };
 	static thread_local char		text2[4096+1024] = { 0 };
 
+	//todo-deprecate:// See issue "Move away from printf-style formatting"
 	va_list		args;
 	va_start ( args, fmt );
 		vsnprintf ( text, sizeof(text), fmt, args );
@@ -65,6 +67,7 @@ void _SYS_Debug ( const char *file, int line, const char *fmt, ... )
 	static thread_local char		text[4096]={0};
 	static thread_local char		text2[4096+1024]={0};
 
+	//todo-deprecate:// See issue "Move away from printf-style formatting"
 	va_list		args;
 	va_start ( args, fmt );
 		vsnprintf ( text, sizeof(text), fmt, args );

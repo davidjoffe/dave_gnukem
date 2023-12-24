@@ -95,6 +95,7 @@ void djStrToLower( char * str )
 	}
 }
 
+//todo-deprecate:// See issue "Move away from printf-style formatting"
 std::string djStrPrintf( const char* szFormat, ... )
 {
 	if ( szFormat == NULL )
@@ -102,7 +103,7 @@ std::string djStrPrintf( const char* szFormat, ... )
 
 	// fixme handle larger / arbitrary lengths? this is gross but you can auto-detect the required length with some effort
 
-
+	//todo-deprecate:// See issue "Move away from printf-style formatting"
 	// Print the formatted string onto buf
 	static thread_local char buf[16384]={0};
 	va_list args;
