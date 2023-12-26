@@ -22,10 +22,6 @@ Copyright (C) 1998-2023 David Joffe
 #else
 #define TRACE ;;
 #endif
-
-#define djMSG log_message
-
-extern void log_message( const char * szFormat, ... );
 */
 
 #endif
