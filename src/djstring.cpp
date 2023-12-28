@@ -6,12 +6,10 @@ Copyright (C) 1998-2023 David Joffe
 
 #include "config.h"
 #include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string>//std::to_string
+	#include <stdlib.h>//getenv()
+	#include <stdio.h>//snprintf
 
 #include "djstring.h"
-#include <stdarg.h>//va_list etc. [for djStrPrintf dj2016-10]
 
 char *djStrDeepCopy( const char * src )
 {
@@ -94,26 +92,6 @@ void djStrToLower( char * str )
 		if ((str[i] >= 'A') && (str[i] <= 'Z')) str[i] += 32;
 	}
 }
-
-//todo-deprecate:// See issue "Move away from printf-style formatting"
-std::string djStrPrintf( const char* szFormat, ... )
-{
-	if ( szFormat == NULL )
-		return "";
-
-	// fixme handle larger / arbitrary lengths? this is gross but you can auto-detect the required length with some effort
-
-	//todo-deprecate:// See issue "Move away from printf-style formatting"
-	// Print the formatted string onto buf
-	static thread_local char buf[16384]={0};
-	va_list args;
-	va_start(args, szFormat);
-	vsnprintf(buf, 4096, szFormat, args);
-	va_end(args);
-
-	return buf;
-}
-
 
 // Should actually have a fileutils cpp/h or somethign [low dj2017-08] these don't belong here
 

@@ -3,6 +3,9 @@
 //dj2022-11 just refactoring crude simple console message (or ingame message) stuff into own .h/cpp
 //[low prio thoughts]: Not quite sure if this is a 'console' or a 'game message' and maybe in future there might be two distint things (in-game messages vs an actual console where e.g. one might type commands say)
 
+// Note the phrase 'console' here is not to be confused with 'console command line text output' of the application e.g. stout/stderr
+// Here we are talking about a 'console' in the sense of a 'console message' or 'in-game message' (e.g. "You picked up the key" or "You died" or "You won the game" etc)
+
 /*--------------------------------------------------------------------------*/
 #include "config.h"
 #include "console.h"

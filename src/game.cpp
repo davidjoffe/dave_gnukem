@@ -1505,7 +1505,7 @@ int game_startup(bool bLoadGame)
 						do
 						{
 							++n;
-							std::string sBuf = djStrPrintf("gnukem_screenshot_%03d.bmp", n);
+							const std::string sBuf = std::string("gnukem_screenshot_") + std::to_string(n) + ".bmp";
 
 							sFilenameWithPath = djAppendPathStr(sPath.c_str(),sBuf.c_str());
 						} while (djFileExists(sFilenameWithPath.c_str()));
@@ -1533,15 +1533,18 @@ int game_startup(bool bLoadGame)
 					// 1. Some keyboards - like my Asus laptop - don't seem to have regular PgUp/PgDn
 					// 2. It conflicts with keyboards like OpenPandora where PgUp/PgDn are mapped to important game keys
 					// (Not mad about the 6/7 choice might change that in future, or make it configurable or something.)
+					{
+					// Get localized string for "Volume"
+					const std::string sVolume = pgettext("sound", "Volume");
 					if (Event.key.keysym.sym==SDLK_7)//SDLK_PAGEUP)
 					{
 						djSoundAdjustVolume(4);
-						djConsoleMessage::SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+						djConsoleMessage::SetConsoleMessage(sVolume + ": " + std::to_string(static_cast<int>((100.f * (static_cast<float>(djSoundGetVolume()) / 128.f)))));
 					}
 					else if (Event.key.keysym.sym==SDLK_6)//SDLK_PAGEDOWN)
 					{
 						djSoundAdjustVolume(-4);
-						djConsoleMessage::SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+						djConsoleMessage::SetConsoleMessage(sVolume + ": " + std::to_string(static_cast<int>((100.f * (static_cast<float>(djSoundGetVolume()) / 128.f)))));
 					}
 					else if (Event.key.keysym.sym==SDLK_INSERT)
 					{
@@ -1550,6 +1553,7 @@ int game_startup(bool bLoadGame)
 						else
 							djSoundEnable();
 						djConsoleMessage::SetConsoleMessage( djSoundEnabled() ? "Sounds ON (Ins)" : "Sounds OFF (Ins)" );
+					}
 					}
 					break;
 				case SDL_KEYUP:
@@ -1831,7 +1835,8 @@ int game_startup(bool bLoadGame)
 		
 		if (!g_sAutoScreenshotFolder.empty())
 		{
-			std::string sFilename = djStrPrintf("gnukem_%08d.bmp",g_nScreenshotNumber);
+			const std::string sAppName="gnukem";
+			std::string sFilename = sAppName + "_" + std::to_string(g_nScreenshotNumber) + ".bmp";
 			std::string sPath = djAppendPathStr(g_sAutoScreenshotFolder.c_str(), sFilename.c_str());
 			SDL_SaveBMP(pVisMain->pSurface, sPath.c_str());//"c:\\dj\\DelmeTestMain.bmp");
 			++g_nScreenshotNumber;
@@ -3196,7 +3201,7 @@ void IngameMenu()
 	//dj2022-11 Just made gameMenuItems stuff non-global and function scope so I can more easily add 'on/off' info .. but should think about all that
 	/*--------------------------------------------------------------------------*/
 #ifdef djEFFECT_VIEWPORTSHADOW
-	const std::string sViewportShadows = (g_Effect.m_nEnabledIntensity==0 ? "   Viewport shadow: off" : djStrPrintf("   Viewport shadows: %d  ", g_Effect.m_nEnabledIntensity));
+	const std::string sViewportShadows = (g_Effect.m_nEnabledIntensity == 0 ? "   Viewport shadow: off" : std::string("   Viewport shadows: ") + std::to_string(g_Effect.m_nEnabledIntensity) + "  ");
 #endif
 	const std::string sAutoShadows = (g_bAutoShadows ? "   Map auto shadows: on   " : "   Map auto shadows: off  ");
 #ifdef djSPRITE_AUTO_DROPSHADOWS
@@ -3255,7 +3260,7 @@ void IngameMenu()
 		std::string sMsg = "beta shadow effect toggled to: ";
 		if (g_Effect.m_nEnabledIntensity == 0) sMsg += "OFF";
 		else
-			sMsg += djStrPrintf("%d", (int)g_Effect.m_nEnabledIntensity);
+			sMsg += std::to_string(static_cast<int>(g_Effect.m_nEnabledIntensity));
 		djConsoleMessage::SetConsoleMessage(sMsg);
 		return;
 	}

@@ -152,7 +152,8 @@ void GraphFlip(bool bScaleView)
 			std::string sFrameRate;//Note this is 'instantaneous' frame rate i.e. last-frame-only so can look a bit jumpy, no smoothing
 			if (uTimeNow>=0 && uTimeNow>uTimeLast)
 			{
-				sFrameRate = djStrPrintf("%.2f", 1000.f / (float)(uTimeNow - uTimeLast));
+				// Was %.2f but we moving from printf-style stuff ..
+				sFrameRate = std::to_string(1000.f / static_cast<float>(uTimeNow - uTimeLast));
 				GraphDrawString( pVisBack, g_pFont8x8, 150, 0, (const unsigned char*)sFrameRate.c_str() );
 			}
 		}
