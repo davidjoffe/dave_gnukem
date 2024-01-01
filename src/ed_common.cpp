@@ -136,8 +136,8 @@ void ED_SetSprite( int ispritenew, int ox, int oy )
 
 	g_iSprite = ispritenew;
 	// show sprite index
-	char buf[128]={0};
-	snprintf( buf, sizeof(buf), "%3d", (int)g_iSprite );
+	std::string buf = std::to_string((int)g_iSprite);
+	buf = std::string(3 - buf.length(), ' ') + buf;//right pad
 	ED_DrawStringClear( 0, 472, buf );
 	ED_DrawString( 0, 472, buf );
 
@@ -155,12 +155,13 @@ void ED_SetSprite( int ispritenew, int ox, int oy )
 }
 
 
-void ED_DrawString( int x, int y, const char *szStr )
+void ED_DrawString( int x, int y, const std::string& sText )
 {
 	if (!g_pEdFont) return;
-	for ( int i=0; i<(int)strlen(szStr); i++ )
+	const size_t uLen=sText.length();
+	for ( int i=0; i<uLen; ++i )
 	{
-		int iChar = (int)((unsigned char*)szStr)[i];
+		const int iChar = (int)sText[i];
 		int iX, iY;
 		iX = (iChar%32)*8;
 		iY = (iChar/32)*8;
@@ -168,17 +169,16 @@ void ED_DrawString( int x, int y, const char *szStr )
 	}
 }
 
-
-void ED_DrawStringClear( int x, int y, const char *szStr )
+void ED_DrawStringClear( int x, int y, const std::string& sText )
 {
 	if (!g_pEdFont) return;
 	djgSetColorFore( pVisMain, djColor(0,0,0) );
-	for ( int i=0; i<(int)strlen(szStr); i++ )
+	const size_t uLen=sText.length();
+	for ( int i=0; i<uLen; ++i )
 	{
 		djgDrawBox( pVisMain, x+i*8, y, 8, 8 );
 	}
 }
-
 
 
 void ED_SpriteShowType( bool bClear )

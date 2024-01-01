@@ -158,7 +158,24 @@ void djLog::LogStr(const char* szPlainString)
 #endif
 }
 
+void djLog::LogStr(const std::string& sText)
+{
+	if (!g_bLogInitialized) return;
+	if (sText.empty()) return;
 
+	if (log_files[0] != NULL)
+	{
+		fprintf(log_files[0], "%s", sText.c_str());
+		fflush(log_files[0]);
+	}
+
+//#if defined(WIN32) && defined(_DEBUG)
+	//dj2016-10 Log to debugger in Windows
+	//::OutputDebugString( szPlainString );
+//#endif
+}
+
+// todo deprecate
 void djLog::LogFormatStr( const char *fmt, ... )
 {
 	if (!g_bLogInitialized)
@@ -178,59 +195,17 @@ void djLog::LogFormatStr( const char *fmt, ... )
 }
 
 
-
-/*
-void djLog::LogFormatStr2( dword log_mask, const char *fmt, ... )
-{
-	if ( !initialised )
-		return;
-	if ( NULL == fmt )
-		return;
-
-	static thread_local char		text[4096] = { 0 };
-	memset(text, 0, 4096);
-
-	va_list		ap;
-	va_start ( ap, fmt );
-		vsnprintf ( (char*)text, sizeof(text), fmt, ap );
-	va_end ( ap );
-
-	for ( unsigned int i=0; i<num_logs; i++ )
-	{
-		if ( SETBIT(i) == log_mask )
-		{
-			if (log_files[i]!=NULL)
-			{
-				fprintf ( log_files[i], "%s", text );
-				fflush ( log_files[i] );
-			}
-
-			#if defined(WIN32) && defined(_DEBUG)
-			//dj2016-10 Log to debugger in Windows
-			//::OutputDebugString( text );
-			#endif
-		}
-	}
-}
-*/
-
-
-
 // This tells logger whether or not to log to system console
 void LogToScreen ( const bool l2s )
 {
 	log2screen = l2s;
 }
 
-
-
 // This tells logger whether or not to log to game console
 void LogToConsole ( const bool l2c )
 {
 	log2console = l2c;
 }
-
-
 
 void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 {
@@ -258,91 +233,3 @@ void BackupAndCreate ( FILE **f, const char *filename, int bklevel )
 		SYS_Error ( "Could not ceate log file!\n" );
 	}
 }
-
-
-
-
-/*void PushBackup2 ( const char *filename, int bklevel )
-{
-	char		oldname[SYS_MAX_FILE]={0};
-	char		newname[SYS_MAX_FILE]={0};
-	char		appendix[SYS_MAX_EXT]={0};
-	FILE		*ff = NULL;
-
-	strcpy ( oldname, filename );
-
-	ff = djFile::dj_fopen ( oldname, "r" );
-	if ( ff )
-		fclose ( ff );
-
-	while ( ff && log_backup_level != bklevel )
-	{
-		snprintf ( appendix, sizeof(appendix), "old%d", bklevel );
-		strcpy ( newname, log_filename_base );
-		M_ForceFileExtension ( newname, appendix );
-
-		errno = 0;
-		if ( -1 == rename ( oldname, newname ) )
-		{
-			M_ParseErrno ( errno );
-		}
-		strcpy ( oldname, newname );
-		ff = djFile::dj_fopen ( oldname, "r" );
-		if ( ff )
-			fclose ( ff );
-		bklevel++;
-	}
-}*/
-
-
-
-
-
-// dj2019-06 Commenting out call to this function to effectively disable rotating of logs to fix this issue as reported by keithbowes:
-// https://github.com/davidjoffe/dave_gnukem/issues/120
-// ("home directory is littered with files like ~/.old0, ~/.old1, ~/.old2")
-// I don't really feel it's worth rotating logs; I seldom if ever go look at old logs. We can maybe add it
-// later (and fix the 'littering' issue) IF it seems in future like it's worth it to have rotating logs.
-// Otherwise, later maybe just delete this function (that's my recommendation, to simplify this code)
-/*
-void PushBackup ( const char *filename, int bklevel )
-{
-	char		newname[SYS_MAX_FILE]={0};
-	char		appendix[SYS_MAX_EXT]={0};
-	FILE		*ff=nullptr;
-
-	ff = djFile::dj_fopen( filename, "r" );
-	if (ff)
-	{
-		fclose(ff);
-		ff = nullptr;
-	}
-
-	if ( !ff )
-	{
-		return;
-	}
-
-	if ( ff && log_backup_level == bklevel )
-	{
-		unlink ( filename );
-		return;
-	}
-
-// assemble a new name:
-	snprintf ( appendix, sizeof(appendix), "old%d", bklevel );
-	strcpy ( newname, log_filename_base );
-	M_ForceFileExtension ( newname, appendix );
-
-	PushBackup ( newname, bklevel+1 );
-	rename ( filename, newname );
-}
-*/
-
-
-/*//dj2022 commenting this out for now as doesn't seem to be used anywhere in code [anymore]
-unsigned int SysLog ()
-{
-	return sys_log;
-}
-*/

@@ -30,7 +30,7 @@ Copyright (C) 1998-2023 David Joffe
 #include "datadir.h"
 #include "djgraph.h"
 #include "djimage.h"
-//#include <string>
+#include <string>
 #ifdef djUNICODE_TTF
 //#include "djfonts.h"//dj2022-11 may refactor this may move to another file
 #endif
@@ -113,7 +113,9 @@ extern void GraphFlipView(int iViewWidthPixels, int iViewHeightPixels, int nXS, 
 
 //! Draw a string of characters from a font bitmap
 extern void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const unsigned char *szStr );
+extern void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const std::string& sText );
 extern void GraphDrawStringUTF8( djVisual *pVis, djImage *pImg, int x, int y, int nCharW, int nCharH, const char *szStr, int nStrLen=-1 );
+extern void GraphDrawStringUTF8( djVisual *pVis, djImage *pImg, int x, int y, int nCharW, int nCharH, const std::string& sText);
 
 #ifdef djUNICODE_TTF
 //dj2022-11 basics of new Unicode TTF/OTF font stuff

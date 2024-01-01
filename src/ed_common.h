@@ -1,7 +1,8 @@
-
+// Copyright (C) 1995-2023 David Joffe
+#pragma once
 #ifndef __EDITOR_COMMON_STUFF_H__
 #define __EDITOR_COMMON_STUFF_H__
-
+#include <string>
 
 // !!!!!!!!!!!
 // If these two change, change them in ed_DrawBoxContents too!!!
@@ -55,8 +56,8 @@ int ED_IncCurrSpriteSet ( int amount );
 void ED_DrawSprite( int x, int y, int a, int b );
 // void ED_DrawSprites();
 void ED_ClearScreen();
-void ED_DrawString( int x, int y, const char *szStr );
-void ED_DrawStringClear( int x, int y, const char *szStr );
+void ED_DrawString( int x, int y, const std::string& sStr );
+void ED_DrawStringClear( int x, int y, const std::string& sStr );
 
 // 2nd level drawers/visual-related:
 //void ED_DrawBoxContents();
