@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2023 David Joffe
+Copyright (C) 2023-2024 David Joffe
 djvec2d.cpp
 
 Template 2D vector class

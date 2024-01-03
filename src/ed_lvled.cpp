@@ -1,4 +1,4 @@
-// Copyright ~1995-2023 David Joffe
+// Copyright ~1995-2024 David Joffe
 // Level editor
 
 #include "config.h"

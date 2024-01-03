@@ -73,6 +73,7 @@ djImage::djImage()
 	m_ipitch    = 0;
 }
 
+// hm these probably shouldn't be int's
 djImage::djImage( int iWidth, int iHeight, int ibpp )
 {
 	m_iWidth    = iWidth;
@@ -81,10 +82,42 @@ djImage::djImage( int iWidth, int iHeight, int ibpp )
 	m_ipixwidth = CalculatePixelWidthBytesPerPixel( ibpp );
 	m_ipitch = m_ipixwidth * iWidth;
 
-	m_pData = new unsigned char[iWidth*iHeight*m_ipixwidth];
+	// If someone passes in parameters that make it overly huge to allocate then not sure what best to do but for
+	// safety let's shrink image dimensions until it's not too big to allocate
+	// Note on Win32 even though in theory we have 4GB in fact we have max 2GB for user-mode apps (and even then it's not all contiguous)
+	// But still, that's a huge image size - it's not realistic really that for a game we are likely to want such a huge image,
+	// it's more likely a mistake if it happens, but let's just shrink it down to something more reasonable
+	// Let's make it maybe 1GB or hmm ~512MB max (which is still huge, but at least it's not 2GB)
+	// If this happens it's either someone doing something dodgy or a developer error (e.g. trying to load excessively huge image)
+	size_t uMemSize = m_iWidth * m_iHeight * m_ipixwidth;
+	bool bWarnResized = false;
+	//while (uMemSize > (size_t)(1L*1024*1024*1024))
+	while (uMemSize > (size_t)(512*1024*1024))
+	{
+		m_iWidth /= 2;
+		if (m_iWidth<1) m_iWidth=1;
+		m_iHeight /= 2;
+		if (m_iHeight<1) m_iHeight=1;
+		m_ipitch = m_ipixwidth * m_iWidth;
 
+		uMemSize = m_iWidth * m_iHeight * m_ipixwidth;
+		bWarnResized = true;
+	}
+	if (bWarnResized)
+	{
+		std::string sError = "Error: djImage::Create: image size too large, resizing to " + std::to_string(m_iWidth) + "x" + std::to_string(m_iHeight) + "\n";
+		SYS_Error("%s", sError.c_str());
+		printf("%s", sError.c_str());
+	}
+
+	m_pData = new unsigned char[uMemSize];
 	if (m_pData != NULL)
-		memset( (void*)m_pData, 0, iWidth*iHeight*m_ipixwidth );
+		memset( (void*)m_pData, 0, uMemSize );
+	else
+	{
+		printf("Error: djImage::djImage: failed to allocate image memory\n");
+		// Todo should we add try/catch in alloc ... also should we auto-shrink?
+	}
 }
 
 djImage::~djImage()
@@ -123,7 +156,37 @@ void djImage::CreateImage( int x, int y, int nBitsPerPixel, int pitch/*=-1*/, vo
 	// "pitch*y*m_ipixwidth" seems to alloc too much ..? the pitch is already the 'bytes per row' so we should only have to multiply 'bytes per row * rows' I think?
 	//m_pData = new unsigned char[pitch*y*m_ipixwidth];
 	// if thing suddenly start crashing here though, this is probably the culprit .. dj2023-02 .. as I'm changing what appears to be an over-alloc of memory in this image data
-	const size_t uMemSize = pitch*y;
+	//const size_t uMemSize = pitch*y;
+
+	// If someone passes in parameters that make it overly huge to allocate then not sure what best to do but for
+	// safety let's shrink image dimensions until it's not too big to allocate
+	// Note on Win32 even though in theory we have 4GB in fact we have max 2GB for user-mode apps (and even then it's not all contiguous)
+	// But still, that's a huge image size - it's not realistic really that for a game we are likely to want such a huge image,
+	// it's more likely a mistake if it happens, but let's just shrink it down to something more reasonable
+	// Let's make it maybe 1GB or hmm ~512MB max (which is still huge, but at least it's not 2GB)
+	// If this happens it's either someone doing something dodgy or a developer error (e.g. trying to load excessively huge image)
+	size_t uMemSize = m_iWidth * m_iHeight * m_ipixwidth;
+	bool bWarnResized = false;
+	//while (uMemSize > (size_t)(1L*1024*1024*1024))
+	while (uMemSize > (size_t)(512*1024*1024))
+	{
+		m_iWidth /= 2;
+		if (m_iWidth<1) m_iWidth=1;
+		m_iHeight /= 2;
+		if (m_iHeight<1) m_iHeight=1;
+		m_ipitch = m_ipixwidth * m_iWidth;
+
+		uMemSize = m_iWidth * m_iHeight * m_ipixwidth;
+		bWarnResized = true;
+	}
+	if (bWarnResized)
+	{
+		std::string sError = "Error: djImage::Create: image size too large, resizing to " + std::to_string(m_iWidth) + "x" + std::to_string(m_iHeight) + "\n";
+		SYS_Error("%s", sError.c_str());
+		printf("%s", sError.c_str());
+	}
+
+
 	m_pData = new unsigned char[uMemSize];
 	if (m_pData != NULL)
 	{
@@ -412,12 +475,10 @@ int djImage::SaveRAW( const char * szFilename )
 	}
 
 	write( fin, (void*)m_pData, m_iWidth * m_iHeight * m_ipixwidth );
-
 	close( fin );
 
 	return 0;
 }
-
 */
 
 //---------------------------------------------------------------------------

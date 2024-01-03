@@ -3,7 +3,7 @@
 \brief   Basic types and macros
 \author  David Joffe
 
-Copyright (C) 1998-2023 David Joffe
+Copyright (C) 1998-2024 David Joffe
 
 Try keep this file as 'small and light as possible' with few includes a reasonably pragmatically possible..
 Also some of these names are just itching to clash with other projects in global namespace .. starting to change some of them to reduce risk .. dj2022-11

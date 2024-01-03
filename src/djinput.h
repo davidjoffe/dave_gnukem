@@ -2,7 +2,7 @@
 /* David Joffe '95/07/20 test key hook */
 /* 1999/02 converting over from keys.h/cpp , trying to genericize */
 /* 2001/07 converting to SDL */
-/* Copyright (C) 1995-2023 David Joffe */
+/* Copyright (C) 1995-2024 David Joffe */
 
 // dj2022-11 removing anyway-now-unused "INPUT_.." flags that are now sometimes causing conflicts with existing libs in Win32 builds
 /*--------------------------------------------------------------------------*/

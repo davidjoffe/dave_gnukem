@@ -1,7 +1,7 @@
 /*
 djtypes.cpp
 
-Copyright (C) 2002-2023 David Joffe
+Copyright (C) 2002-2024 David Joffe
 
 */
 

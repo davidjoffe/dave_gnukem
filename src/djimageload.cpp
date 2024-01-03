@@ -3,7 +3,7 @@
 \brief   Image load/save helpers
 \author  David Joffe
 
-Copyright (C) 1998-2023 David Joffe
+Copyright (C) 1998-2024 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "config.h"

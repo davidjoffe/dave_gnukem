@@ -3,7 +3,7 @@
 \brief   Some timing functions
 \author  David Joffe
 
-Copyright (C) 1999-2018 David Joffe
+Copyright (C) 1999-2024 David Joffe
 */
 #ifndef _DJTIME_H_
 #define _DJTIME_H_
