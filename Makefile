@@ -1,6 +1,6 @@
 #
 # David Joffe
-# Copyright 1998-2022 David Joffe
+# Copyright 1998-2024 David Joffe
 # Created 1998/12
 # Makefile for Dave Gnukem
 #

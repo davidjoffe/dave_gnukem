@@ -1,7 +1,7 @@
 /*
 djimage.cpp
 
-Copyright (C) 1998-2023 David Joffe
+Copyright (C) 1998-2024 David Joffe
 
 dj2022-11 Note that since we're now on SDL2 we could potentially use e.g. SDLimage lib to more easily load 'better' file formats like png etc. (though would just require a new dependency)
 */

@@ -3,7 +3,7 @@
 \brief   Data directory
 \author  David Joffe
 
-Copyright (C) 1999-2023 David Joffe
+Copyright (C) 1999-2024 David Joffe
 */
 //dj2022-11 adding datadir.cpp to corresponding to old datadir.h to extend this functionality
 //dj2022-11 Adding new helper djDataDir() (and corresponding set) to make this more flexible (e.g. make it easier either for porters to override, or add functionality like checking fallback folders - e.g. check /usr/share but if not found e.g. check relative say to the executable path)

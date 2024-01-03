@@ -1,4 +1,4 @@
-// Copyright (C) 1998-2023 David Joffe
+// Copyright (C) 1998-2024 David Joffe
 //
 // dj2022 want to start trying to add options that give porters a bit more control e.g. some porters/platforms may want to 'force fullscreen always' or something etc.
 /*--------------------------------------------------------------------------*/

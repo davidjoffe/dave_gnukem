@@ -3,7 +3,7 @@
 \brief   Bullet class
 \author  David Joffe
 
-Copyright (C) 2002-2023 David Joffe
+Copyright (C) 2002-2024 David Joffe
 */
 #ifndef _BULLET_H_
 #define _BULLET_H_

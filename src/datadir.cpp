@@ -1,4 +1,4 @@
-//Copyright (C) 1995-2023 David Joffe
+//Copyright (C) 1995-2024 David Joffe
 //
 
 //dj2022-11 adding datadir.cpp to corresponding to old datadir.h to extend this functionality
