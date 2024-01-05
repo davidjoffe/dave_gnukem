@@ -1,7 +1,7 @@
 /*
 djtime.cpp
 
-Copyright (C) 1999-2018 David Joffe
+Copyright (C) 1999-2024 David Joffe
 */
 
 #include "../config.h"

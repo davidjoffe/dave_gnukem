@@ -3,7 +3,7 @@
 \brief   Some simple "mixin" helper classes.
 \author  David Joffe
 
-Copyright (C) 2000-2023 David Joffe
+Copyright (C) 2000-2024 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _MIXINS_H_

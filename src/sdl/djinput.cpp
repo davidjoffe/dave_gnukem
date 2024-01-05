@@ -1,7 +1,7 @@
 /*
 djinput.cpp
 
-Copyright (C) 1995-2023 David Joffe
+Copyright (C) 1995-2024 David Joffe
 
 Created: '95/07/20 (originally as a test keyboard interrupt hook)
 */

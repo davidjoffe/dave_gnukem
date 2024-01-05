@@ -1,7 +1,7 @@
 /*
 inventory.cpp
 
-Copyright (C) 2001-2023 David Joffe
+Copyright (C) 2001-2024 David Joffe
 */
 
 #include "config.h"

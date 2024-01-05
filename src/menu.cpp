@@ -3,7 +3,7 @@
 /*
 menu.cpp
 
-Copyright (C) 1995-2023 David Joffe
+Copyright (C) 1995-2024 David Joffe
 */
 
 #include "graph.h"

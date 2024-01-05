@@ -1,7 +1,7 @@
 /*
 settings.cpp
 
-Copyright (C) 2001-2023 David Joffe
+Copyright (C) 2001-2024 David Joffe
 
 09/2001
 */

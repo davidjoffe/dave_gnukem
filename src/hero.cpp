@@ -1,7 +1,7 @@
 /*
 hero.cpp
 
-Copyright (C) 2000-2022 David Joffe
+Copyright (C) 2000-2024 David Joffe
 */
 
 #include "hero.h"
