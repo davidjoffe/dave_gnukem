@@ -59,6 +59,8 @@
 Mix_Music* g_pInGameMusic=NULL;
 #endif
 
+//[todo: this file's a bit long, split a bit into smaller cpp files /]
+
 // See comments at viewport vertical auto-scrolling. DN1 vertical viewport auto-re-centering has this subtle feel of almost taking a frame or three to start 'catching up' to jumping upwards etc. ... this variable helps implement that effect. [dj2017-06-29]
 int g_nRecentlyFallingOrJumping = 0;
 int g_nNoShootCounter = 0;
@@ -161,9 +163,11 @@ SOUND_HANDLE g_iSounds[SOUND_MAX]={0};
 // (2) I always subjectively felt like DN1 was running 'around' 18Hz but never literally never confirmed this in any technical (I suspect they may have used the old IBM PC timer chip stuff which was 18Hz .. e.g. if you run DN1 in DosBox it doesn't run superfast it still runs 'correctly' at about the same speed it did in the old days)
 // In theory though we can uncap the frame rate here for much higher frame rates (and potential smooth scrolling) a lot of other parts of the code need to be refactored a bit to handle that more correctly/differently, as currently if you uncap it it just everything runs super-fast but with the same "klunky" 8-pixel or 16-pixel 'jumps' in scrolling etc. (because it's a retro nostalgic experience mimicking DN1)
 
+//[todo: make more configurable: g_fFrameRate]
 // Yeah its pretty low but thats what I was aiming for back in the EGA days
 // and I don't feel like changing it right now. I might still though.
 float g_fFrameRate=18.0f;
+//[/todo]
 //float g_fFrameRate=18.2f;
 //float g_fFrameRate = 36.f;
 // Hmm https://retrocomputing.stackexchange.com/questions/1428/why-is-the-8254s-default-rate-18-2-hz should it be 18.2 not 18?

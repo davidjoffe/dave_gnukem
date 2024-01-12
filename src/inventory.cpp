@@ -12,6 +12,8 @@ Copyright (C) 2001-2024 David Joffe
 #include "djlog.h"
 #include "thing.h"
 
+//[todo: inventory should belong to player not be global so that in multiplayer could be many inventories per player /]
+
 struct SInvItem
 {
 	CThing *pThing=nullptr;
@@ -52,13 +54,8 @@ void InvClear()
 	}
 }
 
-/*
-rtfb:
-FIXME: What the hell does this function do? If it releases
-the pThings it was fed, then the other routines, that may try to
-release thigns may crash.
-*/
 
+// Empty/clear inventory objects (deleting them from memory and calling their destructors)
 void InvEmpty()
 {
 	for ( int i=0; i<(int)g_apInventory.size(); i++ )
@@ -68,6 +65,7 @@ void InvEmpty()
 	g_apInventory.clear();
 }
 
+// Add new thing to inventory
 bool InvAdd(CThing *pThing)
 {
 	if (g_apInventory.size()>=INV_MAXSIZE)
