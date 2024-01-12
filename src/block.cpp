@@ -5,6 +5,7 @@ Copyright (C) 2000-2024 David Joffe
 *********/
 #include "block.h"
 
+//[todo: numbers shouldn't be baked in to strings]
 const char * block_type_names[TYPE_LASTONE+1] =
 {
    " 0 Nothing",
@@ -60,6 +61,7 @@ const char * block_type_names[TYPE_LASTONE+1] =
    "50 Dr Proton",
    "51 LastOne(UnusedNextID)"
 };
+//[/todo]
 
 const char * GetBlockTypeName(EBlockType eType)
 {
