@@ -52,11 +52,16 @@ int ED_IncCurrSpriteSet ( int amount );
 		Common Stuff
 =============================================================
 */
-// actaul drawers (relate on djg*):
+// Actual drawers (relate on djg*):
 void ED_DrawSprite( int x, int y, int a, int b );
 // void ED_DrawSprites();
 void ED_ClearScreen();
+
+// dj2024 not really clear to me why editor NEEDS its own special drawstring ultimately - should combine and consolidate with reusable helpers in djgraph?
+
+//! Editor draw-string helper
 void ED_DrawString( int x, int y, const std::string& sStr );
+//! Editor draw-string helper for pre background clear
 void ED_DrawStringClear( int x, int y, const std::string& sStr );
 
 // 2nd level drawers/visual-related:

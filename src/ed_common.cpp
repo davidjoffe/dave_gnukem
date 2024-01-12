@@ -159,7 +159,7 @@ void ED_DrawString( int x, int y, const std::string& sText )
 {
 	if (!g_pEdFont) return;
 	const size_t uLen=sText.length();
-	for ( int i=0; i<uLen; ++i )
+	for ( size_t i=0; i<uLen; ++i )
 	{
 		const int iChar = (int)sText[i];
 		int iX, iY;
