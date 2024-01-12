@@ -3,7 +3,7 @@
 \brief   Level stuff
 \author  David Joffe
 
-Copyright (C) 1995-2022 David Joffe
+Copyright (C) 1995-2024 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _LEVEL_H_

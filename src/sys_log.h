@@ -12,6 +12,7 @@
 #ifndef SYS_LOG_H_KRANKLYS__
 #define SYS_LOG_H_KRANKLYS__
 
+#include <string>
 
 // Init/Kill
 void InitLog ();
@@ -25,8 +26,6 @@ void KillLog ();
 // Filename parameter may be NULL. Then defaults to `game.log'
 unsigned long CreateLog ( const char *filename, const char *descr );
 void DisposeLog ( unsigned long lg_id );
-
-
 
 //unsigned int SysLog();
 
@@ -44,6 +43,8 @@ public:
 
 	// Log plain string (no printf formatting) - safer than printf so lean towards using this when you don't need printf style formatting [dj2022-11]
 	static void LogStr(const char* szStr);
+	// Log plain std::string (utf8) (no printf formatting) - safer than printf
+	static void LogStr(const std::string& sText);
 };
 //dj2022-11 convenience helper for new log of plain string (with no printf style formatting)
 #define djLOGSTR(sz) djLog::LogStr(sz)

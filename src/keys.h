@@ -3,7 +3,7 @@
 \brief   Game keys
 \author  David Joffe
 
-Copyright (C) 2001-2022 David Joffe
+Copyright (C) 2001-2024 David Joffe
 
 We want these headers as small and light as possible, not including lots of stuff, for fast compile speeds.
 

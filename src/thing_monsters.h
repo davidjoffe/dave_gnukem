@@ -2,7 +2,7 @@
 \file    thing_monsters.h
 \brief   Monster-type things (CThing-derived game entities), e.g. robots
 
-Copyright (C) 1999-2018 David Joffe
+Copyright (C) 1999-2024 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 /* Created dj 2017/07/29 - moving monster-type things into own file(s) */

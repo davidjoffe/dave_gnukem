@@ -3,7 +3,7 @@
 //
 // Created 2017-08-09
 /*
-Copyright (C) 1995-2018 David Joffe
+Copyright (C) 1995-2024 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "game.h"

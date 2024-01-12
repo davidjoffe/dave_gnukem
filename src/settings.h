@@ -3,7 +3,7 @@
 \brief   Game configuration file
 \author  David Joffe
 
-Copyright (C) 2001-2018 David Joffe
+Copyright (C) 2001-2024 David Joffe
 
 09/2001
 */
@@ -63,6 +63,7 @@ protected:
 //! Global game settings
 extern CSettings g_Settings;
 
+//[todo: make more configurable: USERFILE_CONFIG_FILE /]
 #define USERFILE_CONFIG_FILE "davegnukem.cfg"
 
 #endif

@@ -1,7 +1,7 @@
 /*
 djsound.cpp
 
-Copyright (C) 1999-2022 David Joffe and Kent Mein
+Copyright (C) 1999-2024 David Joffe and Kent Mein
 */
 
 #include "../config.h"

@@ -22,9 +22,11 @@ void _SYS_Error ( const char *file, int line, const char *fmt, ... )
 	if (NULL == fmt)
 		return;
 
-	static thread_local char		text[4096]={0};
-	static thread_local char		text2[4096+1024]={0};
+	// todo deprecate these kinds of printf buffers
+	static thread_local char		text[8192]={0};
+	static thread_local char		text2[8192+1024]={0};
 
+	//todo-deprecate:// See issue "Move away from printf-style formatting"
 	va_list		args;
 	va_start ( args, fmt );
 		vsnprintf ( text, sizeof(text), fmt, args );
@@ -43,9 +45,11 @@ void _SYS_Warning ( const char *file, int line, const char *fmt, ... )
 	if (NULL == fmt)
 		return;
 
-	static thread_local char		text[4096] = { 0 };
-	static thread_local char		text2[4096+1024] = { 0 };
+	// todo deprecate these kinds of printf buffers
+	static thread_local char		text[8192] = { 0 };
+	static thread_local char		text2[8192+1024] = { 0 };
 
+	//todo-deprecate:// See issue "Move away from printf-style formatting"
 	va_list		args;
 	va_start ( args, fmt );
 		vsnprintf ( text, sizeof(text), fmt, args );
@@ -62,15 +66,16 @@ void _SYS_Debug ( const char *file, int line, const char *fmt, ... )
 	if (NULL == fmt)
 		return;
 
-	static thread_local char		text[4096]={0};
-	static thread_local char		text2[4096+1024]={0};
+	// todo deprecate these kinds of printf buffers
+	static thread_local char		text[8192]={0};
 
+	//todo-deprecate:// See issue "Move away from printf-style formatting"
 	va_list		args;
 	va_start ( args, fmt );
 		vsnprintf ( text, sizeof(text), fmt, args );
 	va_end ( args );
 
-	snprintf( text2, sizeof(text2), "[Debug] %s line %d: %s", file, line, text);
+	const std::string text2 = std::string("[Debug] ") + file + " line " + std::to_string(line) + ": " + text;
 
 	djLog::LogStr(text2);
 }

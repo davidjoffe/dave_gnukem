@@ -3,7 +3,7 @@
 // David Joffe 1998/12
 // replacing the old djgega.cpp graphics interface
 /*
-Copyright (C) 1998-2023 David Joffe
+Copyright (C) 1998-2024 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 
@@ -152,7 +152,8 @@ void GraphFlip(bool bScaleView)
 			std::string sFrameRate;//Note this is 'instantaneous' frame rate i.e. last-frame-only so can look a bit jumpy, no smoothing
 			if (uTimeNow>=0 && uTimeNow>uTimeLast)
 			{
-				sFrameRate = djStrPrintf("%.2f", 1000.f / (float)(uTimeNow - uTimeLast));
+				// Was %.2f but we moving from printf-style stuff ..
+				sFrameRate = std::to_string(1000.f / static_cast<float>(uTimeNow - uTimeLast));
 				GraphDrawString( pVisBack, g_pFont8x8, 150, 0, (const unsigned char*)sFrameRate.c_str() );
 			}
 		}
@@ -396,6 +397,12 @@ void GraphFlipView(int iViewWidthPixels, int iViewHeightPixels, int nXS, int nYS
 	djgDrawVisual(pVisBack, pVisView, nXD, nYD, nXS, nYS, iViewWidthPixels, iViewHeightPixels);
 }
 
+void GraphDrawStringUTF8( djVisual *pVis, djImage *pImg, int x, int y, int nCharW, int nCharH, const std::string& sText)
+{
+	if (sText.empty()) return;
+	GraphDrawStringUTF8(pVis, pImg, x, y, nCharW, nCharH, sText.c_str(), sText.length());
+}
+
 void GraphDrawStringUTF8( djVisual *pVis, djImage *pImg, int x, int y, int nCharW, int nCharH, const char *szStr, int nStrLen )
 {
 	if (szStr == nullptr || szStr[0]==0) return;
@@ -439,6 +446,13 @@ void GraphDrawStringUTF8( djVisual *pVis, djImage *pImg, int x, int y, int nChar
 		}
 		ret = djutf8iterate(szStart + uOffset, uLen2, c);
 	}
+}
+
+void GraphDrawString( djVisual *pVis, djImage *pImg, int x, int y, const std::string& sText )
+{
+	//todo-future all these weird const unsigned char* should probably just be const char* [dj2024] I think there was some reason for it that may have been valid in the 90s but that's now lost to time
+	if (sText.empty()) return;
+	GraphDrawString( pVis, pImg, x, y, (const unsigned char *)(sText.c_str()) );
 }
 
 // FIXME: Currenetly assumes a 256-char 32x8 character 256x128 pixel alpha-mapped image

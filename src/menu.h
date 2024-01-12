@@ -3,7 +3,7 @@
 \brief   Main menu
 \author  David Joffe
 
-Copyright (C) 1995-2022 David Joffe
+Copyright (C) 1995-2024 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 /* menu.h
@@ -15,6 +15,7 @@ Copyright (C) 1995-2022 David Joffe
 /*--------------------------------------------------------------------------*/
 #include "djtypes.h"
 #include "djsound.h"
+#include "djrect.h"
 #include <string>
 
 /*--------------------------------------------------------------------------*/
@@ -43,27 +44,6 @@ public:
 /*--------------------------------------------------------------------------*/
 extern djMenuCursorSprite* g_pDefaultMenuCursor;
 /*--------------------------------------------------------------------------*/
-
-// For performance reasons we may want an initialized version of this for graphics stuff? Should we (for safety so programmers are aware) give it a name that indicates such? [low]
-class djRectBase
-{
-public:
-	int x;
-	int y;
-	int w;
-	int h;
-};
-class djRect : public djRectBase
-{
-public:
-	djRect(int nX, int nY, int nW, int nH)
-	{
-		x = nX;
-		y = nY;
-		w = nW;
-		h = nH;
-	}
-};
 
 /*--------------------------------------------------------------------------*/
 //! A single item in the menu
@@ -101,7 +81,7 @@ struct SMenuItem
 	const bool IsSelectable() const { return m_bitem; }
 
 	// Optional positional offset for drawing
-	djRect m_Pos;//(0,0,0,0);
+	djRectI m_Pos;
 };
 
 // Rather than a 'menu with text' we should conceptualize this as a general sort of 'widgets' UI system perhaps - then we could add custom things like, say, checkboxes straight in UI

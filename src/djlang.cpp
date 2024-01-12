@@ -3,7 +3,7 @@
 \brief   Localization / languages
 \author  David Joffe
 
-Copyright (C) 2023 David Joffe
+Copyright (C) 2024 David Joffe
 */
 
 #include "config.h"

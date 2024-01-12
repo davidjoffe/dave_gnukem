@@ -90,6 +90,12 @@
     <ClCompile Include="..\djlog.cpp">
       <Filter>Source Files\djGameLib</Filter>
     </ClCompile>
+    <ClCompile Include="..\djpoly.cpp">
+      <Filter>Source Files\djGameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\djrect.cpp">
+      <Filter>Source Files\djGameLib</Filter>
+    </ClCompile>
     <ClCompile Include="..\djsprite.cpp">
       <Filter>Source Files\djGameLib</Filter>
     </ClCompile>
@@ -100,6 +106,9 @@
       <Filter>Source Files\djGameLib</Filter>
     </ClCompile>
     <ClCompile Include="..\djutf8.cpp">
+      <Filter>Source Files\djGameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\djvec2d.cpp">
       <Filter>Source Files\djGameLib</Filter>
     </ClCompile>
     <ClCompile Include="..\ed.cpp">
@@ -236,6 +245,12 @@
     <ClInclude Include="..\djlog.h">
       <Filter>Header Files\djGameLibHeaders</Filter>
     </ClInclude>
+    <ClInclude Include="..\djpoly.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djrect.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
     <ClInclude Include="..\djsound.h">
       <Filter>Header Files\djGameLibHeaders</Filter>
     </ClInclude>
@@ -252,6 +267,9 @@
       <Filter>Header Files\djGameLibHeaders</Filter>
     </ClInclude>
     <ClInclude Include="..\djutf8.h">
+      <Filter>Header Files\djGameLibHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\djvec2d.h">
       <Filter>Header Files\djGameLibHeaders</Filter>
     </ClInclude>
     <ClInclude Include="..\localization\djgettext.h">

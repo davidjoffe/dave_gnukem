@@ -1,7 +1,7 @@
 /*
 bullet.cpp
 
-Copyright (C) 2002-2022 David Joffe
+Copyright (C) 2002-2024 David Joffe
 */
 
 #include "config.h"

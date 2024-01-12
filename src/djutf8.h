@@ -1,4 +1,4 @@
-//Copyright (C) 2022 David Joffe / Dave Gnukem project
+// Copyright (C) 2022-2024 David Joffe / Dave Gnukem project
 //
 //dj2022-11-30 new utf8 helper(s) (and possibly later other encoding or string conversion helpers or wrappers if/as needed in future)
 //NB Design-wise this is conceptually part of the generic reusable code so shouldn't have dependencies to any Dave Gnukem specific parts of the codebase

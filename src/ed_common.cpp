@@ -5,7 +5,6 @@
 #include "ed_common.h"
 #include "djinput.h"
 #include "djimage.h"
-#include "djstring.h"//djStrPrintf
 #include "graph.h"
 #include "block.h"		// TYPE_LASTONE is here
 #include "mission.h"
@@ -14,13 +13,10 @@
 #include "sys_error.h"
 
 
-
 // Convenience macro to call the sprite draw function for 16x16 sprite b in sprite set a
 #define DRAW_SPRITE16(vis,a,b,x,y) djgDrawImage( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%SPRITESHEET_NUM_COLS)*BLOCKW,((b)/SPRITESHEET_NUM_COLS)*BLOCKH, (x),(y), BLOCKW,BLOCKH )
 // Same as above but uses alpha map
 #define DRAW_SPRITE16A(vis,a,b,x,y) djgDrawImageAlpha( vis, g_pCurMission->GetSpriteData(a)->m_pImage, ((b)%SPRITESHEET_NUM_COLS)*BLOCKW,((b)/SPRITESHEET_NUM_COLS)*BLOCKH, (x),(y), BLOCKW,BLOCKH )
-
-
 
 
 #define POS_BLOCKTYPES_X ((16*16)+40)
@@ -34,14 +30,11 @@
 
 
 
-
 int	g_iSpriteset = 0;		// same as isprite, but points to current spriteset
 int	g_iSprite = 0;		// current sprite. looks like it's a good idea to embed it into 'common'
 
 
-
 static djImage		*g_pEdFont = NULL;
-
 
 
 void ED_CommonInit ()
@@ -94,13 +87,10 @@ void ED_CommonKill ()
 	pVisMain->pTexture = SDL_CreateTextureFromSurface(pVisMain->pRenderer, pVisMain->pSurface);
 }
 
-
-
 int ED_GetCurrSprite ()
 {
 	return g_iSprite;
 }
-
 
 
 /*
@@ -112,20 +102,15 @@ ED_IncCurrSprite
  of current sprite.
 ====================
 */
-int ED_IncCurrSprite ( int amount )
+int ED_IncCurrSprite( int amount )
 {
 	return (g_iSprite += amount);
 }
 
-
-
-
-int ED_GetCurrSpriteSet ()
+int ED_GetCurrSpriteSet()
 {
 	return g_iSpriteset;
 }
-
-
 
 /*
 ====================
@@ -151,8 +136,8 @@ void ED_SetSprite( int ispritenew, int ox, int oy )
 
 	g_iSprite = ispritenew;
 	// show sprite index
-	char buf[128]={0};
-	snprintf( buf, sizeof(buf), "%3d", (int)g_iSprite );
+	std::string buf = std::to_string((int)g_iSprite);
+	buf = std::string(3 - buf.length(), ' ') + buf;//right pad
 	ED_DrawStringClear( 0, 472, buf );
 	ED_DrawString( 0, 472, buf );
 
@@ -170,13 +155,13 @@ void ED_SetSprite( int ispritenew, int ox, int oy )
 }
 
 
-
-void ED_DrawString( int x, int y, const char *szStr )
+void ED_DrawString( int x, int y, const std::string& sText )
 {
 	if (!g_pEdFont) return;
-	for ( int i=0; i<(int)strlen(szStr); i++ )
+	const size_t uLen=sText.length();
+	for ( int i=0; i<uLen; ++i )
 	{
-		int iChar = (int)((unsigned char*)szStr)[i];
+		const int iChar = (int)sText[i];
 		int iX, iY;
 		iX = (iChar%32)*8;
 		iY = (iChar/32)*8;
@@ -184,19 +169,16 @@ void ED_DrawString( int x, int y, const char *szStr )
 	}
 }
 
-
-
-void ED_DrawStringClear( int x, int y, const char *szStr )
+void ED_DrawStringClear( int x, int y, const std::string& sText )
 {
 	if (!g_pEdFont) return;
 	djgSetColorFore( pVisMain, djColor(0,0,0) );
-	for ( int i=0; i<(int)strlen(szStr); i++ )
+	const size_t uLen=sText.length();
+	for ( int i=0; i<uLen; ++i )
 	{
 		djgDrawBox( pVisMain, x+i*8, y, 8, 8 );
 	}
 }
-
-
 
 
 void ED_SpriteShowType( bool bClear )
@@ -216,11 +198,9 @@ void ED_SpriteShowType( bool bClear )
 }
 
 
-
-
 void ED_SpriteShowExtra( int i )
 {
-	std::string s = djStrPrintf("%2d:[%4d]", i, ED_GetSpriteExtra( g_iSpriteset, g_iSprite, i ) );
+	std::string s = std::to_string(i) + ":[" + std::to_string(ED_GetSpriteExtra(g_iSpriteset, g_iSprite, i)) + "]";
 	switch (i)
 	{
 	case 4: s += "flags"; break;
@@ -252,7 +232,6 @@ int ED_GetSpriteExtra( int spriteset, int sprite, int i )
 }
 
 
-
 void ED_DrawSprite( int x, int y, int a, int b )
 {
 	DRAW_SPRITE16(pVisMain,a,b,x,y);
@@ -271,19 +250,16 @@ void ED_DrawSprite( int x, int y, int a, int b )
 }
 
 
-
 void ED_ClearScreen()
 {
 	djgSetColorFore( pVisMain, djColor(0,0,0) );
 	djgClear( pVisMain );
 }
 
-
 void ED_FlipBuffers ()
 {
 	djgFlip ( pVisMain, NULL, false );
 }
-
 
 
 void ED_SetSpriteSet ( int new_spriteset )
@@ -324,7 +300,6 @@ void ED_SetSpriteSet ( int new_spriteset )
 }
 
 
-
 void ED_SetSpriteExtra( int spriteset, int sprite, int i, int value )
 {
 	if ( value < 0 )
@@ -334,8 +309,6 @@ void ED_SetSpriteExtra( int spriteset, int sprite, int i, int value )
 
 	ED_SpriteShowExtra( i );
 }
-
-
 
 
 void ED_SetSpriteType( int spriteset, int sprite, int value )
@@ -356,7 +329,7 @@ int ED_SetCurrSpriteSet ( int new_spriteset )
 ====================
 ED_IncCurrSpriteSet
 
-	increments current spriteset by `amount', which may also
+ Increments current spriteset by `amount', which may also
  be negative, then it decrements, of course. Returns a new value
  of current spriteset.
 ====================
@@ -366,10 +339,7 @@ int ED_IncCurrSpriteSet ( int amount )
 	return (g_iSpriteset += amount);
 }
 
-
-
 djColor& ED_GetSpriteColor( int a, int b )
 {
 	return g_pCurMission->GetSpriteData( a )->m_Color[b];
 }
-

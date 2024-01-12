@@ -1,4 +1,4 @@
-//Copyright (C) 1995-2022 David Joffe / Dave Gnukem project
+//Copyright (C) 1995-2024 David Joffe / Dave Gnukem project
 //
 //dj2022-11 refactoring some file stuff into new djfile.h/cpp and maybe adding some more file- and path-related helpers and maybe some
 
@@ -23,30 +23,6 @@
 #include <string.h>//strdup
 #endif
 //-----------------------------------
-
-
-/*
-#include <stdarg.h>//va_list etc.
-
-int djScan::fscanf(FILE* const pStream, const char* szFormat, ...)
-{
-	va_list args;
-	va_start(args, szFormat);
-#ifdef djHAVE_SAFER_FUNCTIONS
-	int nRet = vfscanf_s(pStream, szFormat, args);
-#else
-	//#warning "Safer file functions not availables" hm unfortunately seems not available on my WSL ubuntu .. not sure where these are availables
-	int nRet = vfscanf(pStream, szFormat, args);
-#endif
-	va_end(args);
-	if (nRet < 0)
-	{
-		// breakpoint opportunity...
-		int n = 3;
-	}
-	return nRet;
-}
-*/
 
 // Returns 0 on success, else sets pFile to nullptr and returns an error code [dj2022-11] new safety helper for fopen
 int djFile::dj_fopen_s(FILE** ppFile, const char* szFilename, const char* szMode)
@@ -104,6 +80,7 @@ FILE* djFile::dj_fopen(const char* szFilename, const char* szMode)
 
 bool djFolderExists(const char* szPath)
 {
+	if (szPath==nullptr || szPath[0]==0)return false;
 	DWORD dwAttrib = GetFileAttributes(szPath);
 	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
 		(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
@@ -111,6 +88,7 @@ bool djFolderExists(const char* szPath)
 
 bool djFileExists(const char* szPath)
 {
+	if (szPath==nullptr || szPath[0]==0)return false;
 	DWORD fileAttr = ::GetFileAttributes(szPath);
 	if (0xFFFFFFFF == fileAttr)
 		return false;
@@ -119,6 +97,7 @@ bool djFileExists(const char* szPath)
 
 bool djEnsureFolderTreeExists(const char* szPath)
 {
+	if (szPath==nullptr || szPath[0]==0)return false;
 	if (djFolderExists(szPath))return true;
 	// "Returns ERROR_SUCCESS if successful"
 	if (::SHCreateDirectoryEx(NULL, szPath, NULL) == ERROR_SUCCESS)
@@ -130,6 +109,7 @@ bool djEnsureFolderTreeExists(const char* szPath)
 //#ifdef __APPLE__
 bool djFolderExists(const char* szPath)
 {
+	if (szPath==nullptr || szPath[0]==0)return false;
 	struct stat sb;
 	if (stat(szPath, &sb) == 0 && S_ISDIR(sb.st_mode))
 	{
@@ -139,6 +119,7 @@ bool djFolderExists(const char* szPath)
 }
 bool djFileExists(const char* szPath)
 {
+	if (szPath==nullptr || szPath[0]==0)return false;
 	struct stat sb;
 	if (stat(szPath, &sb) == 0 && S_ISREG(sb.st_mode))
 	{
@@ -149,15 +130,16 @@ bool djFileExists(const char* szPath)
 
 //[dj2018-03]https://stackoverflow.com/questions/675039/how-can-i-create-directory-tree-in-c-linux
 typedef struct stat Stat;
-static int do_mkdir(const char* path, mode_t mode)
+static int do_mkdir(const char* szPath, mode_t mode)
 {
+	if (szPath==nullptr || szPath[0]==0)return -1;
 	Stat            st;
 	int             status = 0;
 
-	if (stat(path, &st) != 0)
+	if (stat(szPath, &st) != 0)
 	{
 		/* Directory does not exist. EEXIST for race condition */
-		if (mkdir(path, mode) != 0 && errno != EEXIST)
+		if (mkdir(szPath, mode) != 0 && errno != EEXIST)
 			status = -1;
 	}
 	else if (!S_ISDIR(st.st_mode))
@@ -176,6 +158,7 @@ static int do_mkdir(const char* path, mode_t mode)
 */
 int mkpath(const char* path, mode_t mode)
 {
+	if (path==nullptr || path[0]==0)return -1;
 	char* pp=nullptr;
 	char* sp = nullptr;
 	int             status=0;
@@ -200,6 +183,7 @@ int mkpath(const char* path, mode_t mode)
 }
 bool djEnsureFolderTreeExists(const char* szPath)
 {
+	if (szPath==nullptr || szPath[0]==0)return false;
 	//debug//printf("djEnsureFolderTreeExists(%s)\n",szPath);fflush(NULL);
 	if (djFolderExists(szPath))return true;
 	//debug//printf("2");
@@ -207,8 +191,6 @@ bool djEnsureFolderTreeExists(const char* szPath)
 	//mkdir(szPath, 0777);
 	//debug//printf("(Exists?=%s)\n",djFolderExists(szPath)?"YES":"NO");fflush(NULL);
 	return djFolderExists(szPath);
-	//return mkpath(szPath);
 }
-//#else
 
 #endif

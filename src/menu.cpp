@@ -3,7 +3,7 @@
 /*
 menu.cpp
 
-Copyright (C) 1995-2023 David Joffe
+Copyright (C) 1995-2024 David Joffe
 */
 
 #include "graph.h"
@@ -14,6 +14,7 @@ Copyright (C) 1995-2023 David Joffe
 #include "menu.h"
 
 #include "djlang.h"//djLang::DoTranslations()
+#include "localization/djgettext.h"//dj2023 for localizations e.g. French Dave Gnukem
 #include "djsprite.h"
 #include "djimage.h"
 #include "djstring.h"
@@ -114,15 +115,19 @@ void do_menu_pump()
 		case SDL_KEYDOWN:
 
 			// 'Global' shortcut keys for adjusting volume [dj2016-10]
+
+			// Get localized string for "Volume"
+			const std::string sVolume = pgettext("sound", "Volume");
+
 			if (Event.key.keysym.sym==SDLK_7)//SDLK_PAGEUP)
 			{
 				djSoundAdjustVolume(4);
-				SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+				SetConsoleMessage(sVolume + ": " + std::to_string(static_cast<int>(100.f * (static_cast<float>(djSoundGetVolume()) / 128.f))));
 			}
 			else if (Event.key.keysym.sym==SDLK_6)//SDLK_PAGEDOWN)
 			{
 				djSoundAdjustVolume(-4);
-				SetConsoleMessage( djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+				SetConsoleMessage(sVolume + ": " + std::to_string(static_cast<int>(100.f * (static_cast<float>(djSoundGetVolume()) / 128.f))));
 			}
 			else if (Event.key.keysym.sym==SDLK_INSERT)
 			{
@@ -467,12 +472,12 @@ int do_menu( CMenu *pMenu )
 				if (Event.key.keysym.sym==SDLK_7)//SDLK_PAGEUP)
 				{
 					djSoundAdjustVolume(4);
-					djConsoleMessage::SetConsoleMessage(djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+					djConsoleMessage::SetConsoleMessage(std::string("Volume: ") + std::to_string(static_cast<int>(100.f * (static_cast<float>(djSoundGetVolume()) / 128.f))));
 				}
 				else if (Event.key.keysym.sym==SDLK_6)//SDLK_PAGEDOWN)
 				{
 					djSoundAdjustVolume(-4);
-					djConsoleMessage::SetConsoleMessage(djStrPrintf( "Volume: %d%%", (int) ( 100.f * ( (float)djSoundGetVolume()/128.f ) ) ) );
+					djConsoleMessage::SetConsoleMessage(std::string("Volume: ") + std::to_string(static_cast<int>(100.f * (static_cast<float>(djSoundGetVolume()) / 128.f))));
 				}
 				else if (Event.key.keysym.sym==SDLK_INSERT)
 				{

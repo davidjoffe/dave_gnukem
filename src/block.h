@@ -3,7 +3,7 @@
 \brief   Level block types
 \author  David Joffe
 
-Copyright (C) 2000-2022 David Joffe
+Copyright (C) 2000-2024 David Joffe
 */
 #ifndef _BLOCK_H_
 #define _BLOCK_H_

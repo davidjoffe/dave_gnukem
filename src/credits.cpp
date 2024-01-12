@@ -1,7 +1,7 @@
 /*********
   credits.cpp
 
-  Copyright (C) 1999-2023 David Joffe
+  Copyright (C) 1999-2024 David Joffe
 *********/
 
 #include <stdlib.h> // for NULL

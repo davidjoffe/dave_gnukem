@@ -1,7 +1,7 @@
 /*
 hiscores.cpp
 
-Copyright (C) 2001-2023 David Joffe
+Copyright (C) 2001-2024 David Joffe
 
 Conceptually should divide this file into more model/view/controller separation? low prio. dj2022-11
 */

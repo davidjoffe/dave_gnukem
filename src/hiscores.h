@@ -3,7 +3,7 @@
 \brief   High score list
 \author  David Joffe
 
-Copyright (C) 2000-2022 David Joffe
+Copyright (C) 2000-2024 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #ifndef _HISCORES_H_

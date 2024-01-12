@@ -2,7 +2,7 @@
 /*
 djgraph.cpp
 
-Copyright (C) 1997-2023 David Joffe
+Copyright (C) 1997-2024 David Joffe
 */
 
 
