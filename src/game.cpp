@@ -2393,22 +2393,26 @@ void GameDrawView(float fDeltaTime_ms)
 						}
 					}
 
-#ifdef djEFFECT_VIEWPORTSHADOW
-					// These shadowings look crap in simulated EGA/CGA retro so don't do if g_nSimulatedGraphics!=0
-					//const bool bBackgroundSolid = CHECK_SOLID( a, b );
-					extern int g_nSimulatedGraphics;
-					if (g_Effect.m_nEnabledIntensity!=0 && g_nSimulatedGraphics==0 && g_Effect.m_pShadows!=nullptr && CHECK_SOLID(a, b)==0)//<-only non-solid blocks
-					{
-//dj2022-11 hm this is maybe not the most efficient .. could probably improve efficiency here slightly
-						// [in pixels] hmm these values precise meaning etc. anmd how they're passed in could maybe use a re-think if/when we start abstracting away for more different games .. ideally we don't want *generic* effect code to "know about" crufty stuff like Dave Gnukem 1 specific "xo_small" viewport scrolling stuff (which itself is specifically meant to be there for the Duke Nukem 1 retro vibe)
-						const float fBlockWorldXStart = (float)(j + g_Viewport.xo) * (float)BLOCKW;
-		//					- (g_Viewport.xo_small ? ((float)BLOCKW / 2.f) : 0.f); //<- must compensate for extra 8-pixel viewport offset or the whole effect kinda looks like it 'wobbles' positionally slightly on the x axis as we walk left/right (this is purely an effect of DN1 scroling behaviour)
-						const float fBlockWorldYStart = (float)(i + g_Viewport.yo) * (float)BLOCKH;
-
-						g_Effect.DrawEffect(pVisView, j, i, nXOffset, nYOffset, nViewportOriginX, nViewportOriginY, fBlockWorldXStart, fBlockWorldYStart);
-					}
-#endif//#ifdef djEFFECT_VIEWPORTSHADOW
 				}
+                // dj2024-01 Above scope block moving from below "#ifdef djEFFECT_VIEWPORTSHADOW" to I think fix issue it doesn't draw shadows on background
+                // I'm not 100% sure this is always desirable so maybe this might either be changed back, or become a setting or something if it seems we may need
+                // to change this behaviour of drawing effet on background image(s) on a per-game or per-level basis.
+
+#ifdef djEFFECT_VIEWPORTSHADOW
+				// These shadowings don't look good in simulated EGA/CGA retro so don't do if g_nSimulatedGraphics!=0
+				//const bool bBackgroundSolid = CHECK_SOLID( a, b );
+				extern int g_nSimulatedGraphics;
+				if (g_Effect.m_nEnabledIntensity!=0 && g_nSimulatedGraphics==0 && g_Effect.m_pShadows!=nullptr && CHECK_SOLID(a, b)==0)//<-only non-solid blocks
+				{
+					//dj2022-11 hm this is maybe not the most efficient .. could probably improve efficiency here slightly
+					// [in pixels] hmm these values precise meaning etc. anmd how they're passed in could maybe use a re-think if/when we start abstracting away for more different games .. ideally we don't want *generic* effect code to "know about" crufty stuff like Dave Gnukem 1 specific "xo_small" viewport scrolling stuff (which itself is specifically meant to be there for the Duke Nukem 1 retro vibe)
+					const float fBlockWorldXStart = (float)(j + g_Viewport.xo) * (float)BLOCKW;
+					//					- (g_Viewport.xo_small ? ((float)BLOCKW / 2.f) : 0.f); //<- must compensate for extra 8-pixel viewport offset or the whole effect kinda looks like it 'wobbles' positionally slightly on the x axis as we walk left/right (this is purely an effect of DN1 scroling behaviour)
+					const float fBlockWorldYStart = (float)(i + g_Viewport.yo) * (float)BLOCKH;
+
+					g_Effect.DrawEffect(pVisView, j, i, nXOffset, nYOffset, nViewportOriginX, nViewportOriginY, fBlockWorldXStart, fBlockWorldYStart);
+				}
+#endif//#ifdef djEFFECT_VIEWPORTSHADOW
 
 				// BLOCK[0,1] -> foreground block
 				a = *(pLevelBlockPointer);
