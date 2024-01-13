@@ -346,16 +346,17 @@ void ShowInstructions()
 ShowBlocktypes
 ====================
 */
-void ShowBlockTypes ()
+void ShowBlockTypes()
 {
+    std::string sType;
 	for ( int i=0; i<=(int)TYPE_LASTONE; i++ )
 	{
-		ED_DrawString( POS_BLOCKTYPES_X, POS_BLOCKTYPES_Y + i*8, block_type_names[i] );
+        // E.g. "3 soft block"
+        sType = std::to_string(i) + " ";
+        sType += GetBlockTypeName((EBlockType)i);
+		ED_DrawString( POS_BLOCKTYPES_X, POS_BLOCKTYPES_Y + i*8, sType );
 	}
 }
-
-
-
 
 void SaveSprites ()
 {
@@ -364,7 +365,6 @@ void SaveSprites ()
 	g_pCurMission->SaveSprites();
 //	TRACE( "sprites_save(): finished\n" );
 }
-
 
 
 void SpriteSetType( int itype )

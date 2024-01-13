@@ -180,17 +180,23 @@ std::string GetFriendlyTypeName( int a, int b )
 	int iType = ED_GetSpriteType( a, b );
 	if (iType>0 && iType<TYPE_LASTONE)
 	{
-		sType = block_type_names[iType];
+        // Number + name e.g. "3 Softsolid"
+        sType = std::to_string(iType) + " ";
+		sType += GetBlockTypeName((EBlockType)iType);
 
 		// If it's a 'box', handle this as a special case to also show name of what's inside the box
 		if (iType==TYPE_BOX)
 		{
-			int c = ED_GetSpriteExtra(a, b, 10);
-			int d = ED_GetSpriteExtra(a, b, 11);
-			int iTypeContents = ED_GetSpriteType( c,d );
+			const int c = ED_GetSpriteExtra(a, b, 10);
+			const int d = ED_GetSpriteExtra(a, b, 11);
+			const int iTypeContents = ED_GetSpriteType( c,d );
 			sType += " [";
 			if (iTypeContents>=0 && iTypeContents<(int)TYPE_LASTONE)
-				sType += block_type_names[iTypeContents];
+            {
+                // Prefix index/number e.g. "3 soft block"
+                sType += std::to_string(iTypeContents) + " ";
+                sType += GetBlockTypeName((EBlockType)iTypeContents);
+            }
 			else
 				sType += "(error: invalid box contents - check in spreditor!)";
 			sType += "]";
@@ -284,6 +290,7 @@ void DisplayLevelStats( CLevelStats& Stats)
 			nPage = 0;
 		if (g_iKeys[DJKEY_END])
 			nPage = nPages-1;
+        // fixme todo also handle numpad pgup/down eg on laptops
 		if (g_iKeys[DJKEY_PGDN])
 		{
 			nPage++;
@@ -555,27 +562,31 @@ void DoAllLevelsOverview()
 				int n1=0;
 				int n2=0;
 				int nType = TYPE_ACCESSCARD;
+                std::string sType = GetBlockTypeName((EBlockType)nType);
 				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
 				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
-				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				snprintf(buf,sizeof(buf),"Num[%s]=%d NumBoxed=%d", sType.c_str(), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
 				nType = TYPE_FIREPOWER;
+                sType = GetBlockTypeName((EBlockType)nType);
 				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
 				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
-				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				snprintf(buf,sizeof(buf),"Num[%s]=%d NumBoxed=%d", sType.c_str(), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
 				nType = TYPE_MAINCOMPUTER;
+                sType = GetBlockTypeName((EBlockType)nType);
 				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
 				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
-				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				snprintf(buf,sizeof(buf),"Num[%s]=%d NumBoxed=%d", sType.c_str(), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
 				nType = TYPE_POWERBOOTS;
+                sType = GetBlockTypeName((EBlockType)nType);
 				n1 = 0; if (mapTypes.find(nType)!=mapTypes.end())		n1 = aLevelStats[iLev].SpriteCounts[ mapTypes[nType] ];
 				n2 = 0; if (mapBoxTypes.find(nType)!=mapBoxTypes.end())	n2 = aLevelStats[iLev].SpriteCounts[ mapBoxTypes[nType] ];
-				snprintf(buf,sizeof(buf),"[%s]=%d (Boxed=%d)", GetBlockTypeName((EBlockType)nType), n1, n2 );
+				snprintf(buf,sizeof(buf),"Num[%s]=%d NumBoxed=%d", sType.c_str(), n1, n2 );
 				ED_DrawString( PIXELSIZE*LEVEL_WIDTH + 8, nLevelDispY + (nTextY++)*nTEXTHEIGHT, buf );
 
 				snprintf(buf,sizeof(buf),"HIGHVOLTAGE: %-3d", aLevelStats[iLev].SpriteCounts[ std::make_pair(5, 31) ] );

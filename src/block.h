@@ -8,6 +8,8 @@ Copyright (C) 2000-2024 David Joffe
 #ifndef _BLOCK_H_
 #define _BLOCK_H_
 
+#include <string>
+
 //! Block type enumeration (NB: If add more here, remember to also extend \ref block_type_names)
 enum EBlockType
 {
@@ -112,6 +114,6 @@ enum EBlockType
 extern const char * block_type_names[TYPE_LASTONE+1];
 
 //! Friendly strings for block types \ref EBlockType, used by editor. Gets the block_type_names value, but safer, as returns empty string if out of bounds.
-extern const char * GetBlockTypeName(EBlockType eType);
+extern std::string GetBlockTypeName(EBlockType eType);
 
 #endif
