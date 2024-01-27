@@ -15,6 +15,8 @@
 /src/vcDave/Debug
 /src/vcDave/Release
 /src/vcDave/x64/*
+# Local settings Visual Studio project file should probably not be in repo:
+/src/vcDave/vcDave.vcxproj.user
 /DaveGnukem.exe
 /DaveGnukem.pdb
 
