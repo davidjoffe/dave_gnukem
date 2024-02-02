@@ -15,12 +15,12 @@ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspi
 
 **Repository for 'data' subfolder:** https://github.com/davidjoffe/gnukem_data
 
-**Project page**: http://djoffe.com/gnukem/
+**Project page**: https://djoffe.com/gnukem/
 
 **Mini Demo Video**: https://youtu.be/Hi7WYnOA_fo
 
 
-![Dave Gnukem Screenshot](http://scorpioncity.com/dave_gnukem/gallery/Dave%20Gnukem%200.90%20%2813%20Jan%202018%29.png "Dave Gnukem Screenshot")
+![Dave Gnukem Screenshot](https://scorpioncity.com/dave_gnukem/gallery/Dave%20Gnukem%200.90%20%2813%20Jan%202018%29.png "Dave Gnukem Screenshot")
 
 ### Who is to blame for this?
 
