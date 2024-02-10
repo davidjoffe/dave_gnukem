@@ -28,6 +28,7 @@ struct tsLoadedLevel
 	djSprite* Back1() const { return pBack1; }
 
 	// Vector of rectangles (specific case of polygons, but slightly faster collision detection if we do it this way) for collision detection [dj2024]
+	// NB this was not used in the main version 1 Dave Gnukem release, it's a possible new feature for the 2024 or later versions
 	std::vector<djRectD> collisionRects;
 	//std::vector<djRectD> collisionPolys;
 
