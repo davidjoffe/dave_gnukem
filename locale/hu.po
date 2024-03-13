@@ -19,17 +19,17 @@ msgstr ""
 #: game.cpp:2644
 msgctxt "ingame"
 msgid "Health"
-msgstr ""
+msgstr "Élet"
 
 #: game.cpp:2646
 msgctxt "ingame"
 msgid "Score"
-msgstr ""
+msgstr "Pontok"
 
 #: game.cpp:2648
 msgctxt "ingame"
 msgid "Firepower"
-msgstr ""
+msgstr "Tűzerő"
 
 #: game.cpp:2650
 msgctxt "ingame"
@@ -39,37 +39,37 @@ msgstr ""
 #: game.cpp:3208
 msgctxt "ingamemenu"
 msgid "Continue"
-msgstr ""
+msgstr "Folytatás"
 
 #: game.cpp:3209
 msgctxt "ingamemenu"
 msgid "Save Game"
-msgstr ""
+msgstr "Játék mentése"
 
 #: game.cpp:3210
 msgctxt "ingamemenu"
 msgid "Restore Game"
-msgstr ""
+msgstr "Játék betöltése"
 
 #: game.cpp:3211
 msgctxt "ingamemenu"
 msgid "Instructions"
-msgstr ""
+msgstr "Útmutató"
 
 #: game.cpp:3212
 msgctxt "ingamemenu"
 msgid "Retro Settings"
-msgstr ""
+msgstr "Retró beállítások"
 
 #: game.cpp:3223
 msgctxt "ingamemenu"
 msgid "Fullscreen"
-msgstr ""
+msgstr "Teljes képernyő"
 
 #: game.cpp:3226
 msgctxt "ingamemenu"
 msgid "Abort Game"
-msgstr ""
+msgstr "Játék elhagyása"
 
 #. TRANSLATORS: This is a pun on "Start new game". "Gnu" is an open-source reference.
 #. If a similar pun works in your language, feel free to use it. Otherwise,
@@ -77,78 +77,78 @@ msgstr ""
 #: mainmenu.cpp:79
 msgctxt "mainmenu/start_new_game"
 msgid "Start gnu game"
-msgstr ""
+msgstr "Új játék indítása"
 
 #: mainmenu.cpp:80
 msgctxt "mainmenu/restore_game"
 msgid "Restore game"
-msgstr ""
+msgstr "Játék betöltése"
 
 #: mainmenu.cpp:81
 msgctxt "mainmenu/select_mission"
 msgid "Select Mission"
-msgstr ""
+msgstr "Küldetés kiválasztása"
 
 #. Humor menu item (but might not be if this is re-use in future for orderable games)
 #: mainmenu.cpp:83
 msgctxt "mainmenu/order_info"
 msgid "Ordering info"
-msgstr ""
+msgstr "Vásárlási információ"
 
 #. Humor menu item. TRANSLATORS: This is a negation of 'ordering info' (a joke menu item since it's open source) but also since it's a retro game, it's another retro 90s reference to 90's 'not!', while the joke 'Ordering info' menu item is there in the first place as a parody reference to the Shareware games like the original Duke Nukem we're parodying here, which had 'ordering info'
 #: mainmenu.cpp:85
 msgctxt "mainmenu/not"
 msgid "(not!)"
-msgstr ""
+msgstr "(NE!)"
 
 #: mainmenu.cpp:86
 msgctxt "mainmenu/instructions"
 msgid "Instructions"
-msgstr ""
+msgstr "Útmutató"
 
 #: mainmenu.cpp:87
 msgctxt "mainmenu/redefine_keys"
 msgid "Redefine keys"
-msgstr ""
+msgstr "Billentyű beállítása"
 
 #: mainmenu.cpp:88
 msgctxt "mainmenu/high_scores"
 msgid "High scores"
-msgstr ""
+msgstr "Ranglista"
 
 #: mainmenu.cpp:89
 msgctxt "mainmenu/credits"
 msgid "Credits"
-msgstr ""
+msgstr "Készítők"
 
 #: mainmenu.cpp:90
 msgctxt "mainmenu/about"
 msgid "About"
-msgstr ""
+msgstr "Ismertető"
 
 #: mainmenu.cpp:91
 msgctxt "mainmenu/language"
 msgid "Choose language"
-msgstr ""
+msgstr "Nyelv kiválasztása"
 
 #: mainmenu.cpp:92
 msgctxt "mainmenu/settings"
 msgid "Settings"
-msgstr ""
+msgstr "Beállítások"
 
 #: mainmenu.cpp:93
 msgctxt "mainmendu/settings_retro"
 msgid "Retro Settings"
-msgstr ""
+msgstr "Retró beállítások"
 
 #. Humor menu item. TRANSLATORS: Note this is/was meant to mean "Don't quit the game" (or "Don't exit the game") (not "Don't give up") i.e. it's a humor joke menu item that does nothing
 #: mainmenu.cpp:95
 msgctxt "mainmenu/dont_quit"
 msgid "Don't quit"
-msgstr ""
+msgstr "NE lépj ki!"
 
 #. Quit/exit the game
 #: mainmenu.cpp:97
 msgctxt "mainmenu/quit"
 msgid "Quit"
-msgstr ""
+msgstr "Kilépés"
