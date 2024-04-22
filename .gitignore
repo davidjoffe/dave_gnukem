@@ -1,7 +1,7 @@
 #dj2019-05 Creating basic .gitignore, this file isn't critical but maybe just makes it a bit easier when working.
 
 /MacRelease*
-# Likely Finder droppings
+# Mac Finder droppings (DS_Store files that Mac Finder leaves all over the place) - this is not really critically important to be here for anything to function but helps development as these keep showing up in git status etc. and impede easy auto-commit-all-local-changes type of workflow actions
 *.DS_Store
 
 /.vscode/*
