@@ -10,7 +10,9 @@
 	<description>
 		<p>Dave Gnukem is an open source retro-style 2D scrolling platform shooter, inspired by and similar to Duke Nukem 1. It currently runs on Windows, macOS, Linux and various other platforms. It is written in C++ using SDL library and it features an integrated level editor as well. This game is not really a clone or remake, it is probably most akin to a parody.</p>
 	</description>
-	<developer_name>David Joffe</developer_name>
+	<developer id="com.djoffe">
+		<name>David Joffe</name>
+	</developer>
 	<id>com.djoffe.davegnukem</id>
 	<keywords>
 		<keyword>2D</keyword>
