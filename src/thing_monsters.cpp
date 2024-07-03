@@ -1136,7 +1136,7 @@ void CJumpingMonster::Initialize(int a, int b)
 	SetVisibleBounds(0,-16,31,15);
 	SetActionBounds (0,-16,31,15);
 	SetShootBounds  (0,-16,31,15);
-	m_nStrength = 3;//fixme chekc is this 3 or 4?
+	m_nStrength = 3;
 	m_nJumpingIndex = -1;
 	m_bFalling = false;
 	m_nNoShootCounter = 12;
