@@ -893,7 +893,8 @@ switch_e LVLED_MainLoop ()
 		if (g_iKeys[DJKEY_F3])
 		{
 			g_bFlashingIndicatorEnabled = !g_bFlashingIndicatorEnabled;
-			SDL_Delay(200);//HORRIBLE Ugly hack because i'm too lazy to detect keypress edges properly[dj2018-01] [to prevent toggling every frame rapidly effectively - give a bit of time to key-up]
+			SDL_Delay(200);//Ugly hack because I'm too lazy to detect keypress edges properly[dj2018-01] [to prevent toggling every frame rapidly effectively - give a bit of time to key-up]
+			// "lazy" is not the right word - this is an Open Source "spare time" project ... and I don't have spare time, so can't do everything perfectly [dj2024]
 		}
 		if (djiKeyPressed(DJKEY_X))
 		{
