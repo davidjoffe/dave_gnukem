@@ -365,7 +365,7 @@ int do_menu( CMenu *pMenu )
 			// If it's selectable item we right-indent it to make space for cursor (unless it already starts with three spaces)
 			if (Item.IsSelectable() && Item.GetTextStr().substr(0,3)!="   ")
 			{
-				// We must leave some space for menu cursor on left of selectable items shoudl do this differently though)
+				// We must leave some space for menu cursor on left of selectable items should do this differently though)
 				// TODO: DEPRECATE THIS LEADING SPACES STUFF?
 				// now we can start tweaking this e.g. to save space on screen we can shave some pixels, doesn't have to be exact align to 8 anymore once we localize all menu strings and strip leading spaces that are/were hard-baked into strongs
 				GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+3*8 + Item.m_Pos.x , pMenu->getYOffset()+i*8, (unsigned char*)Item.GetTextStr().c_str() );
@@ -382,7 +382,7 @@ int do_menu( CMenu *pMenu )
 			// If it's selectable item we right-indent it to make space for cursor (unless it already starts with three spaces)
 			if (Item.IsSelectable() && Item.GetTextStr().substr(0,3)!="   ")
 			{
-				// We must leave some space for menu cursor on left of selectable items shoudl do this differently though)
+				// We must leave some space for menu cursor on left of selectable items should do this differently though)
 				// TODO: DEPRECATE THIS LEADING SPACES STUFF?
 				// now we can start tweaking this e.g. to save space on screen we can shave some pixels, doesn't have to be exact align to 8 anymore once we localize all menu strings and strip leading spaces that are/were hard-baked into strongs
 				GraphDrawStringUTF8( pVisBack, g_pFont2->GetImage(), pMenu->getXOffset()+3*8 + Item.m_Pos.x , pMenu->getYOffset()+i*8, 8, 8, Item.GetTextStr().c_str() );

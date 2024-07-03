@@ -218,7 +218,7 @@ public:
 	std::map< std::pair< unsigned char, unsigned char >, int > SpriteCounts;	// Total count for (a,b)
 	std::map< std::pair< unsigned char, unsigned char >, int > SpriteCountsF;	// Foreground instance count for (a,b)
 	std::map< std::pair< unsigned char, unsigned char >, int > SpriteCountsB;	// Background instance count for (a,b)
-	// Hm, shoudltry detect Invalid sprites
+	// Hm, should try detect invalid sprites
 
 	//int m_nMaxCount;
 };

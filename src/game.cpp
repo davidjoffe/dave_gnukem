@@ -659,15 +659,15 @@ void UpdateBullets(float fDeltaTime_ms)
 					pThing = g_apThings[k];
 					if (pThing->IsShootable())
 					{
-						//fixmeHIGH this + 8 makes NO SENSE to me what the hell is
+						//fixmeHIGH this + 8 makes NO SENSE to me what is
 						// it doing here!?!? [dj2018-01]
 						int x1 = pBullet->x;//pBullet->dx<0 ? pBullet->x + 8 : pBullet->x;
 						if (pThing->OverlapsShootArea(
 							x1,
 							pBullet->y,
-							x1 + BULLET_WIDTH-1,//fixmeHIGH this makes no sense shoudl be + 15?? Shoudl be, BULLET_WIDTH?
-									// Why the F is it 7? It's possible the sprite used to be smaller, or perhaps
-									// it has something to do  with that + 8 above...
+							x1 + BULLET_WIDTH-1,//fixmeHIGH this makes no sense should be + 15?? Should be, BULLET_WIDTH?
+									// Why is it 7? It's possible the sprite used to be smaller, or perhaps
+									// it has something to do with that + 8 above...
 							pBullet->y+BULLET_HEIGHT-1))
 						{
 							int nRet = pThing->OnHeroShot();
@@ -2911,7 +2911,7 @@ bool check_solid( int ix, int iy, bool bCheckThings )
 			pThing = g_apThings[i];
 			if (pThing->m_bSolid)
 			{
-				//fixmeHIGH 'In theory' we shoudl add m_xoffset etc. but not sure
+				//fixmeHIGH 'In theory' we should add m_xoffset etc. but not sure
 				// that's the correct thing to do as e.g. cf. this is the code
 				// that checks a.o. whether things should fall ... could things
 				// end up falling when they're not supposed to or vice versa if
