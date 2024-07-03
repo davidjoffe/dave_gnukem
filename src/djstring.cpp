@@ -93,7 +93,7 @@ void djStrToLower( char * str )
 	}
 }
 
-// Should actually have a fileutils cpp/h or somethign [low dj2017-08] these don't belong here
+// Should actually have a fileutils cpp/h or something [low dj2017-08] these don't belong here
 
 // Append a folder to existing path, 'intelligently' handling
 // the trailing slash worries for us.
