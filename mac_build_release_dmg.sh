@@ -29,7 +29,7 @@ APPFOLDER="${APPNAME}.app"
 make clean
 make -j4
 
-# hm why not statically link into one binary? no dylibs .. woudl simplify the packaging slightly ..
+# hm why not statically link into one binary? no dylibs .. would simplify the packaging slightly ..
 
 # Code-sign davegnukem binary itself
 #echo codesign  --timestamp -v -f --sign "TSHWANEDJE HUMAN LANGUAGE TECHNOLOGY CC" davegnukem
