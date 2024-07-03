@@ -134,7 +134,7 @@ void djImage::CreateImage( int x, int y, int nBitsPerPixel, int pitch/*=-1*/, vo
 {
 	djDELV(m_pData);
 
-	//dj2023-02 new fields adding to help with possible PNG loading different formats so we can be mroe explicit
+	//dj2023-02 new fields adding to help with possible PNG loading different formats so we can be more explicit
 	m_Rmask = Rmask;
 	m_Gmask = Gmask;
 	m_Bmask = Bmask;
