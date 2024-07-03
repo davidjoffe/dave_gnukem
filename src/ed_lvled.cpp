@@ -670,7 +670,7 @@ void LVLED_Kill()
 
 void DoCreateNewLevel()
 {
-	//fixmeLOW if unsaved changes, doens't ask or anythign. Should warn and ask are you sure before just wiping changes and creating new level.
+	//fixmeLOW if unsaved changes, doesn't ask or anything. Should warn and ask are you sure before just wiping changes and creating new level.
 	g_bDocumentDirty=false;
 
 	//Generate a unique filename (using counter - if file exists, increment counter and try again)

@@ -2184,7 +2184,7 @@ void DrawHealth()
 	unsigned char szHealth[MAX_HEALTH+1]={0};
 	for ( unsigned int i=0; i<MAX_HEALTH; ++i )
 	{
-		// [dj2023-11] UNHARDCODING and doing more nicely generically. The below are ugly old hardcoded offsets into main old font.tga, we want to be able to not even load that and everythign else must work, so, separating small things like this into separate new png's [dj2023-11] so we can do French etc.
+		// [dj2023-11] UNHARDCODING and doing more nicely generically. The below are ugly old hardcoded offsets into main old font.tga, we want to be able to not even load that and everything else must work, so, separating small things like this into separate new png's [dj2023-11] so we can do French etc.
 		// 170 = health; 169 = not health
 		szHealth[MAX_HEALTH-1-i] = ((int)i<g_nHealth?170:169);
 	}
@@ -2195,7 +2195,7 @@ void DrawHealth()
 		GraphDrawString( pVisBack, g_pFont8x8, HEALTH_X, HEALTH_Y, (unsigned char*)szHealth );
 	//*/
 
-	// [dj2023-11] UNHARDCODING and doing more nicely generically. The below are ugly old hardcoded offsets into main old font.tga, we want to be able to not even load that and everythign else must work, so, separating small things like this into separate new png's [dj2023-11] so we can do French etc.
+	// [dj2023-11] UNHARDCODING and doing more nicely generically. The below are ugly old hardcoded offsets into main old font.tga, we want to be able to not even load that and everything else must work, so, separating small things like this into separate new png's [dj2023-11] so we can do French etc.
 	extern djSprite* g_pBars;
 	if (g_pBars!=nullptr && g_pBars->IsLoaded())
 	{
