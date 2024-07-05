@@ -24,7 +24,7 @@ djFontList::djFontList()
 }
 djFontList::~djFontList()
 {
-	// This should not actually be called from the destructor, you must properly call at correct time (global cleanup order bug issues coudl result)
+	// This should not actually be called from the destructor, you must properly call at correct time (global cleanup order bug issues could result)
 #ifdef _DEBUG
 	//assert(m_apFonts.size() == 0);
 #endif
