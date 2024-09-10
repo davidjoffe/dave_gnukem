@@ -174,7 +174,7 @@ void ED_DrawStringClear( int x, int y, const std::string& sText )
 	if (!g_pEdFont) return;
 	djgSetColorFore( pVisMain, djColor(0,0,0) );
 	const size_t uLen=sText.length();
-	for ( int i=0; i<uLen; ++i )
+	for ( int i=0; i<(int)uLen; ++i )
 	{
 		djgDrawBox( pVisMain, x+i*8, y, 8, 8 );
 	}
