@@ -19,6 +19,8 @@ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspi
 
 **Mini Demo Video**: https://youtu.be/Hi7WYnOA_fo
 
+**Donations or Sponsorhip Needed**: https://www.paypal.com/paypalme/davidjoffe
+
 
 ![Dave Gnukem Screenshot](https://scorpioncity.com/dave_gnukem/gallery/Dave%20Gnukem%200.90%20%2813%20Jan%202018%29.png "Dave Gnukem Screenshot")
 
