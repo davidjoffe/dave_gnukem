@@ -26,7 +26,7 @@ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspi
 
 ### Who is to blame for this?
 
-Created by: David Joffe https://djoffe.com/ / https://www.liveedu.tv/david_joffe/ / https://minds.com/David_Joffe
+Created by: David Joffe [@davidjoffe](https://github.com/davidjoffe) https://djoffe.com/ / liveedu.tv/david_joffe / https://www.linkedin.com/in/david-joffe-50771b4/ https://minds.com/David_Joffe
 
 The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: [T.O.G](http://www.nuke24.net/ "T.O.G."), [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
