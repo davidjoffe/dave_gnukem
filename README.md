@@ -1,6 +1,8 @@
 # Dave Gnukem
 Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'. It is kind of a parody of the original. Please note it is not a 'clone', and not a 're-make'.)
 
+**~2022-2024 Good news :)** Dave Gnukem is **in official Debian, Ubuntu, Kali, Raspbian, Devuan** & more. You can now finally really just "**sudo apt install davegnukem**" to install, then "**davegnukem**" to run, even on Windows WSL! Thanks to the hard work of contributors like Matteo Bini & others who helped.
+
 **29 Nov 2022: Version 1.0.3 released**: First official stable SDL2-based version, with new 'formally maintained' Debian package files (both SDL2 support and Debian packages done by Matteo Bini), as well as Ubuntu, Raspbian etc.
 
 **News Apr 2018: Version 1.0 released.** Apr 2019 OpenBSD port. (Apr 2020: Version 1.0.1 released.) (19 Nov 2022: 1.0.2 and 1.0.3 update to SDL2! Also adding OS/2 port)
@@ -26,7 +28,7 @@ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspi
 
 ### Who is to blame for this?
 
-Created by: David Joffe [@davidjoffe](https://github.com/davidjoffe) https://djoffe.com/ / liveedu.tv/david_joffe / https://www.linkedin.com/in/david-joffe-50771b4/ https://minds.com/David_Joffe
+Created by: David Joffe [@davidjoffe](https://github.com/davidjoffe) https://djoffe.com/ / liveedu.tv/david_joffe / https://www.linkedin.com/in/david-joffe-50771b4/ 
 
 The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: [T.O.G](http://www.nuke24.net/ "T.O.G."), [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
