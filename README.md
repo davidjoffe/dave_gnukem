@@ -1,7 +1,7 @@
 # Dave Gnukem
 Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'. It is kind of a parody of the original. Please note it is not a 'clone', and not a 're-make'.)
 
-**~2022-2024 Good news :)** Dave Gnukem is **in official Debian, Ubuntu, Kali, Raspbian, Devuan** & more. You can now finally really just "**sudo apt install davegnukem**" to install, then "**davegnukem**" to run, even on Windows WSL! Thanks to the hard work of contributors like Matteo Bini & others who helped.
+**2022-2024: Good news :)** Dave Gnukem is available in the latest **official Debian, Ubuntu, Kali, Raspbian, Devuan** & more! Also for WSL on Windows! You can now finally really just "**sudo apt install davegnukem**" to install, then "**davegnukem**" to run, even on Windows WSL! Thanks to the hard work of contributors like Matteo Bini & others who helped.
 
 **29 Nov 2022: Version 1.0.3 released**: First official stable SDL2-based version, with new 'formally maintained' Debian package files (both SDL2 support and Debian packages done by Matteo Bini), as well as Ubuntu, Raspbian etc.
 
@@ -38,9 +38,12 @@ As of 8 Oct 2016, this project is under 'properly' active development again, and
 
 Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by Apogee Software in 1991 that launched the Duke Nukem series: https://goo.gl/yP4PbS  The original Duke Nukem 1 was created by Todd Replogle (co-creator of the Duke Nukem series), John Carmack (of id Software), Scott Miller (founder of 3D Realms), Allen H. Blum III, George Broussard, and Jim Norwood.
 
-### Help Wanted: Packages for major Linux distros, e.g. Debian, Ubuntu etc.
+### [✅ done] ~~Help Wanted: Packages for major Linux distros, e.g. Debian, Ubuntu~~
 
-It would be really great if someone could create packages for all major Linux distros (perhaps dual packages, i.e. one for data, one for binary? as licenses differ a bit .. or just one?)
+### Help Wanted
+
+* **Translators wanted** to help with **localization** (see https://github.com/davidjoffe/dave_gnukem/issues/178) - Work has begun on translating the game into other languages, such as French! :)
+* Packages/ports for remaining not-yet-supported Linux distributions, and any other platforms, or consoles. See https://repology.org/project/dave-gnukem/versions as a guide to existing packages
 
 Dave Gnukem added to the Arch Linux AUR (Arch User Repository) 🙂 (Added May 2020 by https://github.com/caltlgin)
 
@@ -53,17 +56,6 @@ Spotted: openSUSE Leap packages :) (seemingly by Martin Hauke)
 * https://opensuse.pkgs.org/15.2/games-x86_64/dave_gnukem-1.0.1-lp152.1.1.x86_64.rpm.html (the description here is perfect to me - dj)
 * https://opensuse.pkgs.org/15.2/games-x86_64/dave_gnukem-data-1.0.1-lp152.1.1.noarch.rpm.html
 
-
-### Development LiveStreaming Channels
-
-Development live-stream channel(s):
-
-* https://www.liveedu.tv/david_joffe/
- * https://www.liveedu.tv/david_joffe/l98yv-dave-gnukem-side-scrolling-shooter/ (full development video archive here)
- * https://www.livecoding.tv/david_joffe/videos/wae18-dave-gnukem-c-game-side-scrolling-shooter and 
- * https://www.livecoding.tv/david_joffe/videos/K9XBz-dave-gnukem-c-game-side-scrolling-shooter-3 etc.
-* https://www.twitch.tv/david_joffe/
-* https://www.youtube.com/user/davidjoffe2 (partial archive)
 
 ### Notes
 
@@ -136,7 +128,7 @@ TL;DR Shoot anything that moves
 
 # Ports
 
-* Dave Gnukem on repology: https://repology.org/project/davegnukem/versions (and alternative spelling https://repology.org/project/dave-gnukem/versions)
+* Dave Gnukem on repology: https://repology.org/project/dave-gnukem/versions ("Versions for dave-gnukem")
 * Flathub Flatpak release of Dave Gnukem https://flathub.org/apps/details/com.djoffe.gnukem (~2023 by Matthias Mailänder)
 * OS/2 port by Andreas Peters (~2022/11 merge of ~2020 https://github.com/davidjoffe/dave_gnukem/pull/128)
 * Debian (work in progress ~2022 - Matteo Bini; https://github.com/enigma9o7, https://github.com/bgermann; Craig Langman)
@@ -166,7 +158,7 @@ Then follow the same instructions as for Linux, e.g. git clone the src, cd into 
 * A: The code can handle smoother scrolling and faster frame rates by tweaking settings and gameplay code, but is deliberately soft-limited to 18 frames per second (and the scrolling behaviour intended to mimic the original) because the original DN1 behaved close to this, and the point is to offer a nostalgic similar retro 'look and feel' (and thus also frame rate and scrolling behaviour) of the original Duke Nukem 1, which was designed to run on the much slower computers of that era (I used to play DN1 on an 80286 with 16-color EGA graphics in the '90s, and if you've ever had to code for EGA you'd also understand - dj) - so that anyone who also played the original should experience some nostalgic familiarity.
 
 * Q: Why is the game resolution 320x200?
-* A: The original Duke Nukem 1 had 320x200 16-color EGA-mode graphics ("Enhanced Graphics Adapter", an early video standard that supported 16 colors; many games of the time used 320x200). Since this game is intended as a sort of 'retro parody' it deliberately uses the same original resolution (and frame rate) in order to offer some retro nostalgic recognition and familiarity in look and feel and gameplay, especially for those who played the original. (David Joffe note: The first computer I did 'serious' programming on was an 80286 with EGA display adapter in the 1990s, and I spent quite a lot of time playing the original Duke Nukem 1 - I loved the game - and around ~1994 I started working on a very early x86 assembly language DOS/EGA version of what went on to become Dave Gnukem when in ~1995 I started this C++ version. So this wasn't a retro game when I started it - it just took so long to complete it that by the time version 1 was completed, I noticed everyone was calling it a "retro game", so it's now de facto "retro". I felt during development that if one deviates from 320x200 it feels much less like a 'retro parody of Duke Nukem 1'.) The game source code can support higher resolutions - these are controlled by config options - so the 'engine' could be used to make higher-resolution games, and with higher frame rates and smoother scrolling (with some tweaking).
+* A: The original Duke Nukem 1 had 320x200 16-color EGA-mode graphics ("Enhanced Graphics Adapter", an early video standard that supported 16 colors; many games of the time used 320x200). Since this game is intended as a sort of 'retro parody' it deliberately uses the same original resolution (and frame rate) in order to offer some retro nostalgic recognition and familiarity in look and feel and gameplay, especially for those who played the original. (David Joffe note: The first computer I did 'serious' programming on was an 80286 with EGA display adapter in the 1990s, and I spent quite a lot of time playing the original Duke Nukem 1 - I loved the game - and around ~1994 I started working on a very early (x86 assembly language DOS/EGA version)[https://github.com/davidjoffe/dj-90s-assembly-source] of what went on to become Dave Gnukem when in ~1995 I started this C++ version. So this wasn't a retro game when I started it - it just took so long to complete it that by the time version 1 was completed, I noticed everyone was calling it a "retro game", so it's now de facto "retro". I felt during development that if one deviates from 320x200 it feels much less like a 'retro parody of Duke Nukem 1'.) The game source code can support higher resolutions - these are controlled by config options - so the 'engine' could be used to make higher-resolution games, and with higher frame rates and smoother scrolling (with some tweaking).
 
 * Q: What does the "Don't quit" menu option do?
 * A: It does just what it says, it doesn't quit the game
@@ -177,6 +169,14 @@ Then follow the same instructions as for Linux, e.g. git clone the src, cd into 
 # Roadmap
 
 [Here's a roadmap](https://upload.wikimedia.org/wikipedia/commons/a/a8/Paris_printable_tourist_attractions_map.jpg)
+
+### Development LiveStreaming Channels
+
+Development live-stream channel(s):
+
+* (liveedu/livecoding now defunct: liveedu.tv/david_joffe/) 
+* https://www.twitch.tv/david_joffe/
+* https://www.youtube.com/user/davidjoffe2 (partial archive)
 
 # History / Changes
 
@@ -320,6 +320,7 @@ Matteo Bini implemented SDL2 support (including also contributions for Debian su
 
 1994/02/22 [david]
  - Crude origins as a 16-bit x86 assembler implementation
+(dj: found the old assembly source: https://github.com/davidjoffe/dj-90s-assembly-source)
 
 # Developer Info / Build Info
 
