@@ -1,7 +1,7 @@
 # Dave Gnukem
 Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'. It is kind of a parody of the original. Please note it is not a 'clone', and not a 're-make'.)
 
-**2022-2024: Good news :)** Dave Gnukem is available in the latest **official Debian, Ubuntu, Kali, Raspbian, Devuan** & more! Also for WSL on Windows! You can now finally really just "**sudo apt install davegnukem**" to install, then "**davegnukem**" to run, even on Windows WSL! Thanks to the hard work of contributors like Matteo Bini & others who helped.
+**Good news :)** Dave Gnukem is available in the latest official **Debian, Ubuntu, Kali, Raspbian, Devuan** & more! You can finally just "**sudo apt install davegnukem**" to install, then "**davegnukem**" to run. Even on Windows WSL! (Or use your preferred package manager to install.)
 
 **29 Nov 2022: Version 1.0.3 released**: First official stable SDL2-based version, with new 'formally maintained' Debian package files (both SDL2 support and Debian packages done by Matteo Bini), as well as Ubuntu, Raspbian etc.
 
@@ -10,14 +10,13 @@ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspi
 **Release Downloads:** https://sourceforge.net/projects/gnukem/
 
 **Direct Download Link:** https://sourceforge.net/projects/gnukem/files/latest/download?source=files
+* To install on Windows you can also use: **winget install "Dave Gnukem"**
 
 **Source code repository:** https://github.com/davidjoffe/dave_gnukem
+* **Repository for datasrc:** https://github.com/davidjoffe/gnukem_datasrc
+* **Repository for 'data' subfolder:** https://github.com/davidjoffe/gnukem_data
 
-**Repository for datasrc:** https://github.com/davidjoffe/gnukem_datasrc
-
-**Repository for 'data' subfolder:** https://github.com/davidjoffe/gnukem_data
-
-**Project page**: https://djoffe.com/gnukem/
+**Official project page**: https://djoffe.com/gnukem/
 
 **Mini Demo Video**: https://youtu.be/Hi7WYnOA_fo
 
@@ -38,11 +37,10 @@ As of 8 Oct 2016, this project is under 'properly' active development again, and
 
 Duke Nukem 1 was a famous original 16-color 320x200 'classic' game released by Apogee Software in 1991 that launched the Duke Nukem series: https://goo.gl/yP4PbS  The original Duke Nukem 1 was created by Todd Replogle (co-creator of the Duke Nukem series), John Carmack (of id Software), Scott Miller (founder of 3D Realms), Allen H. Blum III, George Broussard, and Jim Norwood.
 
-### [✅ done] ~~Help Wanted: Packages for major Linux distros, e.g. Debian, Ubuntu~~
-
 ### Help Wanted
 
 * **Translators wanted** to help with **localization** (see https://github.com/davidjoffe/dave_gnukem/issues/178) - Work has begun on translating the game into other languages, such as French! :)
+* [✅ done] ~~Help Wanted: Packages for major Linux distros, e.g. Debian, Ubuntu~~
 * Packages/ports for remaining not-yet-supported Linux distributions, and any other platforms, or consoles. See https://repology.org/project/dave-gnukem/versions as a guide to existing packages
 
 Dave Gnukem added to the Arch Linux AUR (Arch User Repository) 🙂 (Added May 2020 by https://github.com/caltlgin)
@@ -131,7 +129,7 @@ TL;DR Shoot anything that moves
 * Dave Gnukem on repology: https://repology.org/project/dave-gnukem/versions ("Versions for dave-gnukem")
 * Flathub Flatpak release of Dave Gnukem https://flathub.org/apps/details/com.djoffe.gnukem (~2023 by Matthias Mailänder)
 * OS/2 port by Andreas Peters (~2022/11 merge of ~2020 https://github.com/davidjoffe/dave_gnukem/pull/128)
-* Debian (work in progress ~2022 - Matteo Bini; https://github.com/enigma9o7, https://github.com/bgermann; Craig Langman)
+* Debian official (~2022 - Matteo Bini; https://github.com/enigma9o7, https://github.com/bgermann; Craig Langman)
 * Bodhi Linux Dec 2021 efforts: https://bodhilinux.boards.net/thread/892/packaged-dave-gnukem-silly-retro
 * Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi and https://github.com/ptitseb)
 * MorphOS [Mar 2018, by Bruno Peloille]: http://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_1.00.lha
@@ -523,9 +521,9 @@ Additional game data credits: Apart from the abovementioned, most the sprites we
 
 # Additional Development Credits
 
-* ~2022 Matteo Bini entirely developed and contributed updates of the code from SDL1 to SDL2 (~2022 merging in progress) https://github.com/davidjoffe/dave_gnukem/pull/135
+* ~2022 Matteo Bini entirely developed and contributed updates of the code from SDL1 to SDL2 - https://github.com/davidjoffe/dave_gnukem/pull/135
 
-* ~2021/2022/2023- Valuable contributions for Debian, Ubuntu etc. support (work in progress, see https://github.com/davidjoffe/dave_gnukem/pull/131 discussion) - amongst others:
+* ~2021/2022/2023- Valuable contributions for Debian, Ubuntu etc. support (see https://github.com/davidjoffe/dave_gnukem/pull/131 discussion) - amongst others:
 	Matteo Bini
 	https://github.com/enigma9o7
 	https://github.com/bgermann
