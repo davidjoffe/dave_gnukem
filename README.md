@@ -1,6 +1,8 @@
 # Dave Gnukem
 Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspired by, Duke Nukem 1 (~1991). The source code is cross-platform and open source. It runs on Windows, Linux, Mac OS X and more. (The original Duke Nukem 1 had 16-color EGA 320x200 graphics; the aim here is 'similar but different' gameplay and 'look and feel'. It is kind of a parody of the original. Please note it is not a 'clone', and not a 're-make'.)
 
+![Dave Gnukem Screenshot](https://scorpioncity.com/dave_gnukem/gallery/Dave%20Gnukem%200.90%20%2813%20Jan%202018%29.png "Dave Gnukem Screenshot")
+
 **Good news :)** Dave Gnukem is available in the latest official **Debian, Ubuntu, Kali, Raspbian, Devuan** & more! You can finally just "**sudo apt install davegnukem**" to install, then "**davegnukem**" to run. Even on Windows WSL! (Or use your preferred package manager to install.)
 
 **29 Nov 2022: Version 1.0.3 released**: First official stable SDL2-based version, with new 'formally maintained' Debian package files (both SDL2 support and Debian packages done by Matteo Bini), as well as Ubuntu, Raspbian etc.
@@ -23,11 +25,9 @@ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspi
 **Donations or Sponsorship Needed**: https://www.paypal.com/paypalme/davidjoffe
 
 
-![Dave Gnukem Screenshot](https://scorpioncity.com/dave_gnukem/gallery/Dave%20Gnukem%200.90%20%2813%20Jan%202018%29.png "Dave Gnukem Screenshot")
-
 ### Who is to blame for this?
 
-Created by: David Joffe [@davidjoffe](https://github.com/davidjoffe) https://djoffe.com/ / liveedu.tv/david_joffe / https://www.linkedin.com/in/david-joffe-50771b4/ 
+Created by: David Joffe [@davidjoffe](https://github.com/davidjoffe) https://djoffe.com/ / liveedu.tv/david_joffe / [LinkedIn](https://linkedin.com/in/david-joffe-50771b4/)
 
 The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: [T.O.G](http://www.nuke24.net/ "T.O.G."), [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
@@ -132,9 +132,9 @@ TL;DR Shoot anything that moves
 * Debian official (~2022 - Matteo Bini; https://github.com/enigma9o7, https://github.com/bgermann; Craig Langman)
 * Bodhi Linux Dec 2021 efforts: https://bodhilinux.boards.net/thread/892/packaged-dave-gnukem-silly-retro
 * Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi and https://github.com/ptitseb)
-* MorphOS [Mar 2018, by Bruno Peloille]: http://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_1.00.lha
+* MorphOS (Mar 2018, by Bruno Peloille): http://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_1.00.lha
 * Instructions for ClockworkPi GameShell: https://forum.clockworkpi.com/t/lets-play-dave-gnukem/1917 by: https://forum.clockworkpi.com/u/Oet
-* OpenBSD [Apr 2019 by Dr. Brian Robert Callahan] Callahan https://twitter.com/__briancallahan https://github.com/jasperla/openbsd-wip/commit/e51e3a3b9386365cd0eb8317018463ff4682e0d3 http://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/games/gnukem/
+* OpenBSD (Apr 2019, by Dr. [Brian Robert Callahan](https://briancallahan.net/)) https://openports.pl/path/games/gnukem
 * HaikuOS (see discussion thread and instructions here https://discuss.haiku-os.org/t/gaming-on-haiku/3928/74) [22 June 2020]
 * HaikuOS Instructions: (to check - confirm these instructions are right for SDL2?)
 
@@ -207,7 +207,7 @@ Matteo Bini implemented SDL2 support (including also contributions for Debian su
 2020/04/25 - Version 1.0.1
 
 * [11 Jun 2019] New 'Retro Settings' menu option with 'extra retro' settings/effects for simulated EGA 16-color and CGA 4-color graphics options. You'll feel like you're back in the 90s or your money back. [NB: currently little-endian platforms only]
-* [6 Jun 2019] Incorporate OpenBSD build fixes by Dr. Brian Robert Callahan https://twitter.com/__briancallahan https://github.com/jasperla/openbsd-wip/commit/e51e3a3b9386365cd0eb8317018463ff4682e0d3 http://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/games/gnukem/
+* [6 Jun 2019] Incorporate OpenBSD build fixes by Dr. Brian Robert Callahan https://github.com/jasperla/openbsd-wip/commit/e51e3a3b9386365cd0eb8317018463ff4682e0d3
 * [10 Apr 2018] Tentative fix for XP and ReactOS support (relating to SetProcessDPIAware stuff)
 * [4 Apr 2018] Got it running on TrueOS (use make -f Makefile.bsd)
 
