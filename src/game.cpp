@@ -3,7 +3,7 @@
 //
 // Created 1995/07/28
 //
-// Copyright (C) 1995-2024 David Joffe
+// Copyright (C) 1995-2025 David Joffe
 //
 /*--------------------------------------------------------------------------*/
 
@@ -2650,18 +2650,27 @@ void GameDrawSkin()
 	if (djLang::DoTranslations())
 	{
 		djSprite* spr = djDefaultFontSprite();
-		//
-		// Localized labels for "Health" etc.
-		int x = HEALTH_X - 4;
-		int y = 2+HEALTH_Y - 16;
+		// Draw translated in-game headings for "Health", "Score", "Firepower", "Inventory"
+		int x = HEALTH_X - 3;
+		int y = 4+HEALTH_Y - 16;
 		std::string sText = pgettext("ingame", "Health");
+
+		// Simple clear-background for now as a start ... should do this nicer still (but cuurrently 
+		djgSetColorBack(pVisBack, djColor(0, 0, 0));
+		djgDrawBox(pVisBack, x, -1 + y, 10 * spr->GetSpriteW(), spr->GetSpriteH()+2);
 		GraphDrawStringUTF8(pVisBack, djDefaultFont(), x, y, spr->GetSpriteW(), spr->GetSpriteH(), sText.c_str(), sText.length());
 		sText = pgettext("ingame", "Score");
+		djgSetColorBack(pVisBack, djColor(0, 0, 0));
+		djgDrawBox(pVisBack, x, -1 + y - 32, 10 * spr->GetSpriteW(), spr->GetSpriteH()+2);
 		GraphDrawStringUTF8(pVisBack, djDefaultFont(), x, y - 32, spr->GetSpriteW(), spr->GetSpriteH(), sText.c_str(), sText.length());
 		sText = pgettext("ingame", "Firepower");
-		GraphDrawStringUTF8(pVisBack, djDefaultFont(), x, y + 40, spr->GetSpriteW(), spr->GetSpriteH(), sText.c_str(), sText.length());
+		djgSetColorBack(pVisBack, djColor(0, 0, 0));
+		djgDrawBox(pVisBack, x, -1 + y + 38, 10 * spr->GetSpriteW(), spr->GetSpriteH() + 2);
+		GraphDrawStringUTF8(pVisBack, djDefaultFont(), x, y + 38, spr->GetSpriteW(), spr->GetSpriteH(), sText.c_str(), sText.length());
 		sText = pgettext("ingame", "Inventory");
-		GraphDrawStringUTF8(pVisBack, djDefaultFont(), x, y + 80, spr->GetSpriteW(), spr->GetSpriteH(), sText.c_str(), sText.length());
+		djgSetColorBack(pVisBack, djColor(0, 0, 0));
+		djgDrawBox(pVisBack, x, -1 + y + 81, 10 * spr->GetSpriteW(), spr->GetSpriteH() + 2);
+		GraphDrawStringUTF8(pVisBack, djDefaultFont(), x, y + 81, spr->GetSpriteW(), spr->GetSpriteH(), sText.c_str(), sText.length());
 	}
 }
 
