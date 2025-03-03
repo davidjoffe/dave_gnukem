@@ -3,7 +3,7 @@
 \brief   Localization / languages: gettext() and pgettext() etc.
 \author  David Joffe
 
-Copyright (C) 1995-2024 David Joffe
+Copyright (C) 1995-2025 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 
@@ -103,12 +103,20 @@ void loadPOFile(const std::string& filename, LanguageMap& StringsDB, const std::
     bool inMsgStr = false;
 
     while (getline(file, line)) {
+        // Note: Normally our .po files if 'git cloned' on Linux will end in LF while on Windows end with CR/LF
+        // If our data files have been (say) git cloned from Windows they may end with CR/LF and then on (say) WSL Linux (or plain Linux) we must deal with this by removing the extra CR
+        if (!line.empty() && line.back()=='\r') 
+        {
+            //std::cout << "Warning: Fix trailing CR (Carriage Return)" << std::endl;
+            line.pop_back();//remove CR if present
+        }
+
         if (line.substr(0, 7) == "msgctxt") {
             currentContext = line.substr(9, line.length() - 10); // Remove quotes and keyword
         } else if (line.substr(0, 5) == "msgid") {
             // Save previous message if exists
             if (!currentID.empty()) {
-                std::cout << "LOAD:" << lang << " " << currentContext << " " << currentID << " " << currentStr << std::endl;
+                std::cout << "LOAD1:" << lang << " c:" << currentContext << " id:" << currentID << " str:" << currentStr << std::endl;
                 StringsDB[lang][currentContext].messages[currentID] = {currentID, currentStr};
             }
             currentID = line.substr(7, line.length() - 8); // Remove quotes and keyword
@@ -122,7 +130,7 @@ void loadPOFile(const std::string& filename, LanguageMap& StringsDB, const std::
         } else if (line.empty()) {
             // Save previous message if exists
             if (!currentID.empty() && !currentStr.empty()) {
-                std::cout << "LOAD:" << lang << " " << currentContext << " " << currentID << " " << currentStr << std::endl;
+                std::cout << "LOAD:" << lang << " c:" << currentContext << " id:" << currentID << " str:" << currentStr << std::endl;
                 StringsDB[lang][currentContext].messages[currentID] = {currentID, currentStr};
             }
 
