@@ -1,7 +1,7 @@
 /*
 instructions.cpp
 
-Copyright (C) 1999-2024 David Joffe
+Copyright (C) 1999-2025 David Joffe
 */
 #include "config.h"//CFG_APPLICATION_RENDER_RES_W
 #include "djtypes.h"
@@ -139,10 +139,12 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 	{
 		for ( int j=0; j<W; ++j )
 		{
-			// "Character" 3rd-last from end of [0..255) font character range is for
-			// background clear.
-			const unsigned char szBACKGROUND[2]={255-2,0};
-			GraphDrawString( pVisBack, g_pFont8x8, X+j*8, Y+i*8, szBACKGROUND );
+			//[dj2025] deprecating the old font8x8.tga hardcoded stuff (here, offset 253 for noisy grey background effect for clearing background) to make localization easier. Just use plain colors for now instead of the grey 'noise' texture, for simplicity.)
+			// Quick n dirty dark grey background gradient
+			int n = 30 + 1 * (((2*i + j)/3));
+			n = djMIN(n, 100);
+			djgSetColor(pVisBack, djColor(n, n, n), djColor(120, 120, 120));
+			djgDrawBox(pVisBack, X + j * 8, Y + i * 8, 8, 8);
 		}
 	}
 

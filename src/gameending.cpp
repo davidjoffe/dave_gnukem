@@ -3,7 +3,7 @@
 //
 // Created 2017-08-09
 /*
-Copyright (C) 1995-2024 David Joffe
+Copyright (C) 1995-2025 David Joffe
 */
 /*--------------------------------------------------------------------------*/
 #include "game.h"
@@ -65,10 +65,12 @@ void ShowEndGameSequence()
 	{
 		for ( int j=0; j<W; ++j )
 		{
-			// "Character" 3rd-last from end of [0..255) font character range is for
-			// background clear.
-			const unsigned char szBACKGROUND[2]={255-2,0};
-			GraphDrawString( pVisBack, g_pFont8x8, X+j*8, Y+i*FH, szBACKGROUND );
+			//[dj2025] deprecating the old font8x8.tga hardcoded stuff (here, offset 253 for noisy grey background effect for clearing background) to make localization easier. Just use plain colors for now instead of the grey 'noise' texture, for simplicity.)
+			// Quick n dirty background gradient
+			int n = 40 + 1 * ((2 * i + j) % 255);
+			n = djMIN(n, 100);
+			djgSetColor(pVisBack, djColor(n,n+8,n+16), djColor(120, 120, 120));
+			djgDrawBox(pVisBack, X + j * 8, Y + i * FH, 8, 8);
 		}
 	}
 
