@@ -90,7 +90,7 @@ const struct SMenuItem* CreateMenuItems_MainMenu()
 		{ "mainmenu/about",				pgettext("mainmenu/about", "About") },
 		{ "mainmenu/language",			pgettext("mainmenu/language", "Choose language") },
 		{ "mainmenu/settings",			pgettext("mainmenu/settings", "Settings") },
-		{ "mainmenu/settings_retro",	pgettext("mainmendu/settings_retro", "Retro Settings") },
+		{ "mainmenu/settings_retro",	pgettext("mainmenu/settings_retro", "Retro Settings") },
 		// Humor menu item. TRANSLATORS: Note this is/was meant to mean "Don't quit the game" (or "Don't exit the game") (not "Don't give up") i.e. it's a humor joke menu item that does nothing
 		{ "mainmenu/dont_quit",			pgettext("mainmenu/dont_quit", "Don't quit") },
 		// Quit/exit the game

@@ -137,7 +137,7 @@ msgid "Settings"
 msgstr "Beállítások"
 
 #: mainmenu.cpp:93
-msgctxt "mainmendu/settings_retro"
+msgctxt "mainmenu/settings_retro"
 msgid "Retro Settings"
 msgstr "Retró beállítások"
 

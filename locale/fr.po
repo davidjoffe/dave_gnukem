@@ -83,7 +83,7 @@ msgid "Settings"
 msgstr "Options"
 
 #: mainmenu.cpp:93
-msgctxt "mainmendu/settings_retro"
+msgctxt "mainmenu/settings_retro"
 msgid "Retro Settings"
 msgstr "Options rétro"
 

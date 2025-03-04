@@ -3232,7 +3232,7 @@ void IngameMenu()
 		// todo-localization: merge/reconcile these with main menu strings, where applicable
 		{ true,  pgettext("mainmenu/restore_game", "Restore game") },
 		{ true,  pgettext("mainmenu/instructions", "Instructions") },
-		{ true,  pgettext("mainmendu/settings_retro", "Retro Settings"), "show_retrosettings_menu" },//dj2019-06 new
+		{ true,  pgettext("mainmenu/settings_retro", "Retro Settings"), "show_retrosettings_menu" },//dj2019-06 new
 		#ifdef djEFFECT_VIEWPORTSHADOW
 		{ true,  sViewportShadows.c_str(), "setting/betashadoweffect" },
 		#endif
