@@ -1,5 +1,5 @@
 # DAVE GNUKEM AFRIKAANS TRANSLATIONS
-# Copyright (C) 1995-2023
+# Copyright (C) 1995-2025
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
@@ -15,6 +15,27 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: game.cpp:2644
+msgctxt "ingame"
+msgid "Health"
+msgstr ""
+
+#: game.cpp:2646
+msgctxt "ingame"
+msgid "Score"
+msgstr "Telling"
+
+#: game.cpp:2648
+msgctxt "ingame"
+msgid "Firepower"
+msgstr "Vuurkrag(?)"
+
+#: game.cpp:2650
+msgctxt "ingame"
+msgid "Inventory"
+msgstr ""
+
 
 #. TRANSLATORS: This is a pun on "Start new game". "Gnu" is an open-source reference.
 #. If a similar pun works in your language, feel free to use it. Otherwise,

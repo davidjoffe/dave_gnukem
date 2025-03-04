@@ -1,4 +1,4 @@
-//Copyright (C) 1995-2024 David Joffe
+//Copyright (C) 1995-2025 David Joffe
 //
 // dj2022-12 Just refactoring old main menu code out of main.cpp (and in prep toward some localization stuff)
 
@@ -226,8 +226,6 @@ djSprite* LoadSpriteHelper(const char* szPath, int nW, int nH)
 }
 void InitMainMenu()
 {
-	std::string sLang = djGetLanguage();
-	
 	//djDEL(g_pDefaultMenuCursor);
 	if (g_pDefaultMenuCursor==nullptr)
 	{

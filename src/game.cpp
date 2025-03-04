@@ -1927,11 +1927,11 @@ int game_startup(bool bLoadGame)
 		// activate the end-game sequence and then move on to next
 		// level (which should end the game as Dr Proton should be
 		// placed on last level only).
+		//debug:ShowEndGameSequence();
 		if (CDrProton::GameEnding())
 		{
 			if (CDrProton::GetDrProton()->m_y<=5)
 			{
-				//ShowInstructions();
 				ShowEndGameSequence();
 
 				// Redraw everything that needs to be redrawn, otherwise still see parts of endgame window over right side etc. [dj2017-08-13]
@@ -2179,7 +2179,7 @@ bool HeroIsHurting()
 
 void DrawHealth()
 {
-	// Build a string representing health bars (which are in the 8x8 font)
+	// Build a string representing health bars (which used to be in the 8x8 font, but now are in a separate image, so we can do localization properly)
 	/*
 	unsigned char szHealth[MAX_HEALTH+1]={0};
 	for ( unsigned int i=0; i<MAX_HEALTH; ++i )
@@ -3229,9 +3229,10 @@ void IngameMenu()
 		{ false, "                       " },
 		{ true,  pgettext("ingamemenu", "Continue") },
 		{ true,  pgettext("ingamemenu", "Save Game") },
-		{ true,  pgettext("ingamemenu", "Restore Game") },
-		{ true,  pgettext("ingamemenu", "Instructions") },
-		{ true,  pgettext("ingamemenu", "Retro Settings"), "show_retrosettings_menu" },//dj2019-06 new
+		// todo-localization: merge/reconcile these with main menu strings, where applicable
+		{ true,  pgettext("mainmenu/restore_game", "Restore game") },
+		{ true,  pgettext("mainmenu/instructions", "Instructions") },
+		{ true,  pgettext("mainmendu/settings_retro", "Retro Settings"), "show_retrosettings_menu" },//dj2019-06 new
 		#ifdef djEFFECT_VIEWPORTSHADOW
 		{ true,  sViewportShadows.c_str(), "setting/betashadoweffect" },
 		#endif

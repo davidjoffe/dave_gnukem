@@ -9,9 +9,11 @@
 // 2016/10 : new github + livecoding 'era'
 // 2018/04 : 'DG version 1' released
 // ~2022 : Matteo Bini migration from SDL1 to SDL2
+// ~2022-2023 : Official Debian/Ubuntu package! sudo apt install davegnukem, here we come
+// ~2023 : begin localization support (e.g. French, Hebrew translated game versions etc.)
 
 /*
-Copyright (C) 1995-2024 David Joffe
+Copyright (C) 1995-2025 David Joffe
 */
 
 /*--------------------------------------------------------------------------*/

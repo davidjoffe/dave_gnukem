@@ -1,5 +1,8 @@
 NB: See README.md for most up-to-date history as of October 2016, this file is not always updated.
 
+* [26 Nov 2023] First French main menu https://github.com/davidjoffe/dave_gnukem/issues/178#issuecomment-1826774101
+* ~2023 - Start working on localization support (e.g. to have French, Hebrew etc. translated versions)
+
 2022/11/29 - Version 1.0.3 First official stable SDL2-based version, with new Debian package files
 
 * New improved Debian package files by Matteo Bini
