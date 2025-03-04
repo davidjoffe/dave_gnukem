@@ -3,7 +3,7 @@
 /*
 menu.cpp
 
-Copyright (C) 1995-2024 David Joffe
+Copyright (C) 1995-2025 David Joffe
 */
 
 #include "graph.h"
@@ -282,11 +282,6 @@ int do_menu( CMenu *pMenu )
 
 	// Draw dropshadows [dj2018-03-30]
 	//DrawDropShadowHelper(pMenu, size,pMenu->getXOffset(),pMenu->getYOffset(),	);
-	const unsigned char szTR[2]={(unsigned char)251,0};//top right
-	const unsigned char szR [2]={(unsigned char)252,0};//right
-	const unsigned char szBR[2]={(unsigned char)250,0};//bottom right
-	const unsigned char szB [2]={(unsigned char)249,0};//bottom
-	const unsigned char szBL[2]={(unsigned char)248,0};//bottom left
 	extern djSprite* g_pShadow;//<- new better more generic shadow in own sprite [dj2023]
 	//right and top right
 	for ( i=0; i<size; ++i )
@@ -294,27 +289,19 @@ int do_menu( CMenu *pMenu )
 		const int x = pMenu->getXOffset() + (int)lenLongestString*8;
 		if (g_pShadow)
 			djgDrawImageAlpha( pVisBack, g_pShadow->GetImage(), (i==0 ? 3 : 4)*8, 0, x, pMenu->getYOffset()+i*8, 8, 8);
-		else
-			GraphDrawString( pVisBack, g_pFont8x8, x, pMenu->getYOffset()+i*8, i==0?szTR:szR );
 	}
 	// bottom
 	for (size_t x = 0; x < lenLongestString; ++x)
 	{
 		if (g_pShadow)
 			djgDrawImageAlpha( pVisBack, g_pShadow->GetImage(), 1*8, 0, pMenu->getXOffset() + (int)x * 8, pMenu->getYOffset() + size * 8, 8, 8);
-		else
-			GraphDrawString(pVisBack, g_pFont8x8, pMenu->getXOffset() + (int)x * 8, pMenu->getYOffset() + size * 8, szB);
 	}
 	// bottom right
 	if (g_pShadow)
 		djgDrawImageAlpha( pVisBack, g_pShadow->GetImage(), 2*8, 0, pMenu->getXOffset()+ (int)lenLongestString*8, pMenu->getYOffset()+size*8, 8, 8);
-	else
-		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset()+ (int)lenLongestString*8, pMenu->getYOffset()+size*8, szBR );
 	// bottom left
 	if (g_pShadow)
 		djgDrawImageAlpha( pVisBack, g_pShadow->GetImage(), 0*8, 0, pMenu->getXOffset(), pMenu->getYOffset()+size*8, 8, 8);
-	else
-		GraphDrawString( pVisBack, g_pFont8x8, pMenu->getXOffset(), pMenu->getYOffset()+size*8, szBL );
 
 	// draw menu
 	for ( i=0; i<size; i++ )
