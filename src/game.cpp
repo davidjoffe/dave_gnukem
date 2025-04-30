@@ -1359,10 +1359,10 @@ int game_startup(bool bLoadGame)
 			{
 				switch (Event.type)
 				{
-				case SDL_KEYDOWN:
+				case SDL_EVENT_KEY_DOWN:
 					for ( i=0; i<KEY_NUM_MAIN_REDEFINABLE_KEYS; i++ )
 					{
-						if (Event.key.keysym.sym==g_anKeys[i])
+						if (Event.key.key==g_anKeys[i])
 						{
 							//debug//printf("KEY_DOWN[%d]",i);
 							anKeyState[i] = 1;
@@ -1379,22 +1379,22 @@ int game_startup(bool bLoadGame)
 					// Not sure if this really makes sense in 'production' game,
 					// but note the original DN1 had equivalent speec dec/inc ('<' and
 					// '>' keys) [dj2017-06-24]
-					if ( (Event.key.keysym.mod & KMOD_LSHIFT)!=0 ||
-					     (Event.key.keysym.mod & KMOD_RSHIFT)!=0)
+					if ( (Event.key.mod & SDL_KMOD_LSHIFT)!=0 ||
+					     (Event.key.mod & SDL_KMOD_RSHIFT)!=0)
 					{
 						// Ctrl+Shift?
-						if ( (Event.key.keysym.mod & KMOD_LCTRL)!=0 ||
-							 (Event.key.keysym.mod & KMOD_RCTRL)!=0)
+						if ( (Event.key.mod & SDL_KMOD_LCTRL)!=0 ||
+							 (Event.key.mod & SDL_KMOD_RCTRL)!=0)
 						{
 							// Ctrl+Shift+G: Enable debug commands (e.g. H for health self-damage etc.)
-							if (Event.key.keysym.sym==SDLK_g)
+							if (Event.key.key==SDLK_G)
 							{
 								g_bEnableDebugStuff = true;
 								ShowGameMessage("DebugStuff Enabled", 64);
 							}
 #ifdef djINGAME_FULLSCREEN_TOGGLE//dj2022-11
 //dj2022 do we really need to waste yet another key shortcut etc. just for live fullscreen toggle we can do from the ingame menu? what if porters using 'f' and its causing conflict?
-/*							else if (Event.key.keysym.sym == SDLK_f)
+/*							else if (Event.key.key == SDLK_f)
 							{
 								//dj2022-11 experimental toggle fullscreen probably going to crash a lot
 								djGraphicsSystem::ToggleFullscreen();
@@ -1404,7 +1404,7 @@ int game_startup(bool bLoadGame)
 							}*/
 #endif//djINGAME_FULLSCREEN_TOGGLE
 #ifdef DAVEGNUKEM_CHEATS_ENABLED
-							else if (Event.key.keysym.sym==SDLK_w)
+							else if (Event.key.key==SDLK_W)
 							{
 								// For now regard large-viewport-mode as a cheat but think about it [dj2017-08]
 								if (g_bEnableDebugStuff)
@@ -1421,10 +1421,10 @@ int game_startup(bool bLoadGame)
 						{
 						/*{
 						char buf[1024]={0};
-						snprintf(buf,sizeof(buf),"%08x,%08x,%08x",(int)Event.key.keysym.sym, (int)Event.key.keysym.mod, (int)Event.key.keysym.scancode);
+						snprintf(buf,sizeof(buf),"%08x,%08x,%08x",(int)Event.key.key, (int)Event.key.mod, (int)Event.key.keysym.scancode);
 						ShowGameMessage(buf, 32);
 						}*/
-						if (Event.key.keysym.sym==SDLK_F6)
+						if (Event.key.key==SDLK_F6)
 						{
 							//ShowEndGameSequence();
 							//RedrawEverythingHelper();
@@ -1437,7 +1437,7 @@ int game_startup(bool bLoadGame)
 							snprintf(buf,sizeof(buf),"Dec framerate %.2f",g_fFrameRate);
 							ShowGameMessage(buf, 32);
 						}
-						else if (Event.key.keysym.sym==SDLK_F7)
+						else if (Event.key.key==SDLK_F7)
 						{
 							g_fFrameRate += 1.0f;
 							fTIMEFRAME = (1.0f / g_fFrameRate);
@@ -1445,11 +1445,11 @@ int game_startup(bool bLoadGame)
 							snprintf(buf,sizeof(buf),"Inc framerate %.2f",g_fFrameRate);
 							ShowGameMessage(buf, 32);
 						}
-						else if (Event.key.keysym.sym==SDLK_F8)
+						else if (Event.key.key==SDLK_F8)
 						{
 							g_bAutoShadows = !g_bAutoShadows;
 						}
-						else if (Event.key.keysym.sym==SDLK_F9)
+						else if (Event.key.key==SDLK_F9)
 						{
 							g_bSpriteDropShadows = !g_bSpriteDropShadows;
 						}
@@ -1459,14 +1459,14 @@ int game_startup(bool bLoadGame)
 
 
 					// F10? Screenshot and auto-screenshot stuff
-					if (Event.key.keysym.sym==SDLK_F10)
+					if (Event.key.key==SDLK_F10)
 					{
 					// Ctrl+Shift+F10? Start/stop screenshot recording [dj2018-04-01]
-					if (((Event.key.keysym.mod & KMOD_LSHIFT)!=0 ||
-						(Event.key.keysym.mod & KMOD_RSHIFT)!=0)/*
+					if (((Event.key.mod & SDL_KMOD_LSHIFT)!=0 ||
+						(Event.key.mod & SDL_KMOD_RSHIFT)!=0)/*
 						&&
-						((Event.key.keysym.mod & KMOD_LCTRL)!=0 ||
-						(Event.key.keysym.mod & KMOD_RCTRL)!=0)*/)
+						((Event.key.mod & SDL_KMOD_LCTRL)!=0 ||
+						(Event.key.mod & SDL_KMOD_RCTRL)!=0)*/)
 					{
 						if (!g_sAutoScreenshotFolder.empty())
 						{
@@ -1521,7 +1521,7 @@ int game_startup(bool bLoadGame)
 					
 					// [dj2017-06] DEBUG/CHEAT/DEV KEYS
 					/*
-					if (Event.key.keysym.sym==SDLK_F8)
+					if (Event.key.key==SDLK_F8)
 					{
 						g_bSmoothVerticalMovementTest = !g_bSmoothVerticalMovementTest;
 						y_offset = 0;
@@ -1540,17 +1540,17 @@ int game_startup(bool bLoadGame)
 					{
 					// Get localized string for "Volume"
 					const std::string sVolume = pgettext("sound", "Volume");
-					if (Event.key.keysym.sym==SDLK_7)//SDLK_PAGEUP)
+					if (Event.key.key==SDLK_7)//SDLK_PAGEUP)
 					{
 						djSoundAdjustVolume(4);
 						djConsoleMessage::SetConsoleMessage(sVolume + ": " + std::to_string(static_cast<int>((100.f * (static_cast<float>(djSoundGetVolume()) / 128.f)))));
 					}
-					else if (Event.key.keysym.sym==SDLK_6)//SDLK_PAGEDOWN)
+					else if (Event.key.key==SDLK_6)//SDLK_PAGEDOWN)
 					{
 						djSoundAdjustVolume(-4);
 						djConsoleMessage::SetConsoleMessage(sVolume + ": " + std::to_string(static_cast<int>((100.f * (static_cast<float>(djSoundGetVolume()) / 128.f)))));
 					}
-					else if (Event.key.keysym.sym==SDLK_INSERT)
+					else if (Event.key.key==SDLK_INSERT)
 					{
 						if (djSoundEnabled())
 							djSoundDisable();
@@ -1560,10 +1560,10 @@ int game_startup(bool bLoadGame)
 					}
 					}
 					break;
-				case SDL_KEYUP:
+				case SDL_EVENT_KEY_UP:
 					for ( i=0; i<KEY_NUM_MAIN_REDEFINABLE_KEYS; i++ )
 					{
-						if (Event.key.keysym.sym==g_anKeys[i])
+						if (Event.key.key==g_anKeys[i])
 						{
 							//debug//printf("KEY_UP[%d]",i);
 							anKeyState[i] = 0;
@@ -1578,7 +1578,7 @@ int game_startup(bool bLoadGame)
 						}
 					}
 					break;
-				case SDL_QUIT:
+				case SDL_EVENT_QUIT:
 					//If user clicks Windows 'X' with mouse in-game, not quite sure
 					// what behavior makes the most sense, but for now just pop up
 					// in-game menu. I don't think it should immediately exit, in
@@ -2322,7 +2322,8 @@ void GameDrawView(float fDeltaTime_ms)
 		rect.y = g_nViewOffsetY;
 		rect.w = g_nViewportPixelW;
 		rect.h = g_nViewportPixelH;
-		SDL_FillRect(pVisView->pSurface, &rect, SDL_MapRGB(pVisView->pSurface->format, 0, 0, 0));
+		auto f = SDL_GetPixelFormatDetails(pVisView->pSurface->format);
+		SDL_FillSurfaceRect(pVisView->pSurface, &rect, SDL_MapRGB(f, nullptr, 0, 0, 0));
 		//djgClear(pVisView);
 	}
 

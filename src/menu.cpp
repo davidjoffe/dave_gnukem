@@ -112,24 +112,24 @@ void do_menu_pump()
 	{
 		switch (Event.type)
 		{
-		case SDL_KEYDOWN:
+		case SDL_EVENT_KEY_DOWN:
 
 			// 'Global' shortcut keys for adjusting volume [dj2016-10]
 
 			// Get localized string for "Volume"
 			const std::string sVolume = pgettext("sound", "Volume");
 
-			if (Event.key.keysym.sym==SDLK_7)//SDLK_PAGEUP)
+			if (Event.key.key==SDLK_7)//SDLK_PAGEUP)
 			{
 				djSoundAdjustVolume(4);
 				SetConsoleMessage(sVolume + ": " + std::to_string(static_cast<int>(100.f * (static_cast<float>(djSoundGetVolume()) / 128.f))));
 			}
-			else if (Event.key.keysym.sym==SDLK_6)//SDLK_PAGEDOWN)
+			else if (Event.key.key==SDLK_6)//SDLK_PAGEDOWN)
 			{
 				djSoundAdjustVolume(-4);
 				SetConsoleMessage(sVolume + ": " + std::to_string(static_cast<int>(100.f * (static_cast<float>(djSoundGetVolume()) / 128.f))));
 			}
-			else if (Event.key.keysym.sym==SDLK_INSERT)
+			else if (Event.key.key==SDLK_INSERT)
 			{
 				if (djSoundEnabled())
 					djSoundDisable();
@@ -139,34 +139,34 @@ void do_menu_pump()
 			}
 
 			// up arrow
-			else if (Event.key.keysym.sym==SDLK_UP)
+			else if (Event.key.key==SDLK_UP)
 				menu_move( menuPumpInfo.pMenu, menuPumpInfo.option, -1, *menuPumpInfo.szCursor );
 
 			// down arrow
-			else if (Event.key.keysym.sym==SDLK_DOWN)
+			else if (Event.key.key==SDLK_DOWN)
 				menu_move( menuPumpInfo.pMenu, menuPumpInfo.option, 1, *menuPumpInfo.szCursor );
 
 			// home key
-			else if (Event.key.keysym.sym==SDLK_HOME)//g_iKeys[DJKEY_HOME])
+			else if (Event.key.key==SDLK_HOME)//g_iKeys[DJKEY_HOME])
 				menu_move( menuPumpInfo.pMenu, menuPumpInfo.option, -menuPumpInfo.option + menuPumpInfo.pMenu->getSize() - 1, *menuPumpInfo.szCursor );
 
 			// end key
-			else if (Event.key.keysym.sym==SDLK_END)//if (g_iKeys[DJKEY_END])
+			else if (Event.key.key==SDLK_END)//if (g_iKeys[DJKEY_END])
 				menu_move( menuPumpInfo.pMenu, menuPumpInfo.option, -menuPumpInfo.option, *menuPumpInfo.szCursor );
 
 			// enter
-			else if (Event.key.keysym.sym==SDLK_RETURN)//if (g_iKeys[DJKEY_ENTER])
+			else if (Event.key.key==SDLK_RETURN)//if (g_iKeys[DJKEY_ENTER])
 				menuPumpInfo.bmenurunning = 0;
 
 			// escape
-			else if (Event.key.keysym.sym==SDLK_ESCAPE)//if (g_iKeys[DJKEY_ESC])
+			else if (Event.key.key==SDLK_ESCAPE)//if (g_iKeys[DJKEY_ESC])
 			{
 				menuPumpInfo.option = -1;
 				menuPumpInfo.bmenurunning = 0;
 			}
 
 			break;
-		case SDL_KEYUP:
+			case SDL_EVENT_KEY_UP:
 			break;
 		case SDL_QUIT:
 			menuPumpInfo.bmenurunning=0;
@@ -453,20 +453,20 @@ int do_menu( CMenu *pMenu )
 		{
 			switch (Event.type)
 			{
-			case SDL_KEYDOWN:
+			case SDL_EVENT_KEY_DOWN:
 
 				// 'Global' shortcut keys for adjusting volume [dj2016-10]
-				if (Event.key.keysym.sym==SDLK_7)//SDLK_PAGEUP)
+				if (Event.key.key==SDLK_7)//SDLK_PAGEUP)
 				{
 					djSoundAdjustVolume(4);
 					djConsoleMessage::SetConsoleMessage(std::string("Volume: ") + std::to_string(static_cast<int>(100.f * (static_cast<float>(djSoundGetVolume()) / 128.f))));
 				}
-				else if (Event.key.keysym.sym==SDLK_6)//SDLK_PAGEDOWN)
+				else if (Event.key.key==SDLK_6)//SDLK_PAGEDOWN)
 				{
 					djSoundAdjustVolume(-4);
 					djConsoleMessage::SetConsoleMessage(std::string("Volume: ") + std::to_string(static_cast<int>(100.f * (static_cast<float>(djSoundGetVolume()) / 128.f))));
 				}
-				else if (Event.key.keysym.sym==SDLK_INSERT)
+				else if (Event.key.key==SDLK_INSERT)
 				{
 					if (djSoundEnabled())
 						djSoundDisable();
@@ -476,42 +476,42 @@ int do_menu( CMenu *pMenu )
 				}
 
 				// up arrow
-				else if (Event.key.keysym.sym==SDLK_UP)
+				else if (Event.key.key==SDLK_UP)
 					menu_move( pMenu, option, -1, *szCursor, iFirstSelectable, iLastSelectable);
 
 				// down arrow
-				else if (Event.key.keysym.sym==SDLK_DOWN)
+				else if (Event.key.key==SDLK_DOWN)
 					menu_move( pMenu, option, 1, *szCursor, iFirstSelectable, iLastSelectable);
 
 				// home key
-				else if (Event.key.keysym.sym==SDLK_HOME ||
+				else if (Event.key.key==SDLK_HOME ||
 					// Numlock OFF + keypad7 = Home (at least on my laptop), make it also act as 'home' here [dj2023]
-					( ( (SDL_GetModState() & KMOD_NUM)==0) && Event.key.keysym.sym==SDLK_KP_7  )
+					( ( (SDL_GetModState() & SDL_KMOD_NUM)==0) && Event.key.key==SDLK_KP_7  )
 					)
 					menu_move( pMenu, option, -option + pMenu->getSize() - 1, *szCursor, iFirstSelectable, iLastSelectable);
 
 				// end key
-				else if (Event.key.keysym.sym==SDLK_END ||
+				else if (Event.key.key==SDLK_END ||
 					// Numlock OFF + keypad1 = End (at least on my laptop), make it also act as 'end' here [dj2023]
-					( ( (SDL_GetModState() & KMOD_NUM)==0) && Event.key.keysym.sym==SDLK_KP_1  )
+					( ( (SDL_GetModState() & SDL_KMOD_NUM)==0) && Event.key.key==SDLK_KP_1  )
 					)
 					menu_move( pMenu, option, -option, *szCursor, iFirstSelectable, iLastSelectable);
 
 				// enter
-				else if (Event.key.keysym.sym==SDLK_RETURN)//if (g_iKeys[DJKEY_ENTER])
+				else if (Event.key.key==SDLK_RETURN)//if (g_iKeys[DJKEY_ENTER])
 					bmenurunning = 0;
 
 				// escape
-				else if (Event.key.keysym.sym==SDLK_ESCAPE)//if (g_iKeys[DJKEY_ESC])
+				else if (Event.key.key==SDLK_ESCAPE)//if (g_iKeys[DJKEY_ESC])
 				{
 					option = -1;
 					bmenurunning = 0;
 				}
 
 				// dj2022-11 If an A-Z key pressed, see if we can find a selectable menu item that starts with that letter and select that (Duke Nukem did similar)
-				else if (bAllowMenuKeyLetterShortcuts && Event.key.keysym.sym>=SDLK_a && Event.key.keysym.sym<=SDLK_z && option>=0)
+				else if (bAllowMenuKeyLetterShortcuts && Event.key.key>=SDLK_A && Event.key.key<=SDLK_Z && option>=0)
 				{
-					const char cPressed = 'a' + (Event.key.keysym.sym - SDLK_a);
+					const char cPressed = 'a' + (Event.key.key - SDLK_A);
 					int nCurPos = option;
 					const SMenuItem* paItems = pMenu->getItems();
 					for (auto i = 0; i < pMenu->getSize(); ++i)
@@ -543,9 +543,9 @@ int do_menu( CMenu *pMenu )
 				}
 				break;
 
-			case SDL_KEYUP:
+			case SDL_EVENT_KEY_UP:
 				break;
-			case SDL_QUIT:
+			case SDL_EVENT_QUIT:
 				bmenurunning=0;
 				option = -1;//Exit
 				break;

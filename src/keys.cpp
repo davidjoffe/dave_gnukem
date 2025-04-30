@@ -8,13 +8,9 @@ Created: 09/2001
 
 #include "keys.h"
 #include "settings.h"
-#ifdef __OS2__
-#include <SDL/SDL.h>
-#else
-#include "SDL.h"
-#endif
-#include <vector>
+#include <SDL3/SDL.h>
 #include <stdio.h>
+#include <vector>
 
 // dj2022-11 [low prio] we might want to give porters more control over these default keys (some consolde platforms have needed to hardcode oddly specific things like 'j' etc. here, can't recall which right now but I saw it in a Dave Gnukem fork recently) ..
 // Also to think about is that a slightly rude user reported to me that these keys can interfere with default keys for some window managers like MATE etc. apparently for things like desktop switching? Or something like that
@@ -105,11 +101,11 @@ void InitialiseGameKeySystem()
 	//g_anValidGameKeys.push_back(SDLK_ESCAPE);
 	g_anValidGameKeys.push_back(SDLK_SPACE);
 	g_anValidGameKeys.push_back(SDLK_EXCLAIM);
-	g_anValidGameKeys.push_back(SDLK_QUOTEDBL);
+	g_anValidGameKeys.push_back(SDLK_DBLAPOSTROPHE);
 	g_anValidGameKeys.push_back(SDLK_HASH);
 	g_anValidGameKeys.push_back(SDLK_DOLLAR);
 	g_anValidGameKeys.push_back(SDLK_AMPERSAND);
-	g_anValidGameKeys.push_back(SDLK_QUOTE);
+	g_anValidGameKeys.push_back(SDLK_APOSTROPHE);
 	g_anValidGameKeys.push_back(SDLK_LEFTPAREN);
 	g_anValidGameKeys.push_back(SDLK_RIGHTPAREN);
 	g_anValidGameKeys.push_back(SDLK_ASTERISK);
@@ -140,33 +136,33 @@ void InitialiseGameKeySystem()
 	g_anValidGameKeys.push_back(SDLK_RIGHTBRACKET);
 	g_anValidGameKeys.push_back(SDLK_CARET);
 	g_anValidGameKeys.push_back(SDLK_UNDERSCORE);
-	g_anValidGameKeys.push_back(SDLK_BACKQUOTE);
-	g_anValidGameKeys.push_back(SDLK_a);
-	g_anValidGameKeys.push_back(SDLK_b);
-	g_anValidGameKeys.push_back(SDLK_c);
-	g_anValidGameKeys.push_back(SDLK_d);
-	g_anValidGameKeys.push_back(SDLK_e);
-	g_anValidGameKeys.push_back(SDLK_f);
-	g_anValidGameKeys.push_back(SDLK_g);
-	g_anValidGameKeys.push_back(SDLK_h);
-	g_anValidGameKeys.push_back(SDLK_i);
-	g_anValidGameKeys.push_back(SDLK_j);
-	g_anValidGameKeys.push_back(SDLK_k);
-	g_anValidGameKeys.push_back(SDLK_l);
-	g_anValidGameKeys.push_back(SDLK_m);
-	g_anValidGameKeys.push_back(SDLK_n);
-	g_anValidGameKeys.push_back(SDLK_o);
-	g_anValidGameKeys.push_back(SDLK_p);
-	g_anValidGameKeys.push_back(SDLK_q);
-	g_anValidGameKeys.push_back(SDLK_r);
-	g_anValidGameKeys.push_back(SDLK_s);
-	g_anValidGameKeys.push_back(SDLK_t);
-	g_anValidGameKeys.push_back(SDLK_u);
-	g_anValidGameKeys.push_back(SDLK_v);
-	g_anValidGameKeys.push_back(SDLK_w);
-	g_anValidGameKeys.push_back(SDLK_x);
-	g_anValidGameKeys.push_back(SDLK_y);
-	g_anValidGameKeys.push_back(SDLK_z);
+	g_anValidGameKeys.push_back(SDLK_GRAVE);
+	g_anValidGameKeys.push_back(SDLK_A);
+	g_anValidGameKeys.push_back(SDLK_B);
+	g_anValidGameKeys.push_back(SDLK_C);
+	g_anValidGameKeys.push_back(SDLK_D);
+	g_anValidGameKeys.push_back(SDLK_E);
+	g_anValidGameKeys.push_back(SDLK_F);
+	g_anValidGameKeys.push_back(SDLK_G);
+	g_anValidGameKeys.push_back(SDLK_H);
+	g_anValidGameKeys.push_back(SDLK_I);
+	g_anValidGameKeys.push_back(SDLK_J);
+	g_anValidGameKeys.push_back(SDLK_K);
+	g_anValidGameKeys.push_back(SDLK_L);
+	g_anValidGameKeys.push_back(SDLK_M);
+	g_anValidGameKeys.push_back(SDLK_N);
+	g_anValidGameKeys.push_back(SDLK_O);
+	g_anValidGameKeys.push_back(SDLK_P);
+	g_anValidGameKeys.push_back(SDLK_Q);
+	g_anValidGameKeys.push_back(SDLK_R);
+	g_anValidGameKeys.push_back(SDLK_S);
+	g_anValidGameKeys.push_back(SDLK_T);
+	g_anValidGameKeys.push_back(SDLK_U);
+	g_anValidGameKeys.push_back(SDLK_V);
+	g_anValidGameKeys.push_back(SDLK_W);
+	g_anValidGameKeys.push_back(SDLK_X);
+	g_anValidGameKeys.push_back(SDLK_Y);
+	g_anValidGameKeys.push_back(SDLK_Z);
 	g_anValidGameKeys.push_back(SDLK_DELETE);
 	g_anValidGameKeys.push_back(SDLK_KP_0);
 	g_anValidGameKeys.push_back(SDLK_KP_1);
