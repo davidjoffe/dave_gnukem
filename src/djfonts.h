@@ -14,11 +14,7 @@
 
 // forward? keep definition for .cpp backend?
 //struct TTF_Font;
-#ifdef __OS2__
-#include <SDL/SDL_ttf.h>
-#else
-#include <SDL_ttf.h>
-#endif
+#include <SDL3_ttf/SDL_ttf.h>
 
 
 

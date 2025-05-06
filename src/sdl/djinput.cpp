@@ -11,11 +11,7 @@ Created: '95/07/20 (originally as a test keyboard interrupt hook)
 #include <string.h>
 #include "../djinput.h"
 #include "../djlog.h"
-#ifdef __OS2__
-#include <SDL/SDL_timer.h>//dj2022-11 for SDL_Delay (which may change eg cf. emscripten issues) ..
-#else
-#include <SDL_timer.h>//dj2022-11 for SDL_Delay (which may change eg cf. emscripten issues) ..
-#endif
+#include <SDL3/SDL_timer.h>//dj2022-11 for SDL_Delay (which may change eg cf. emscripten issues) ..
 
 
 int g_iKeys[DJKEY_MAX] = { 0 };
@@ -70,58 +66,58 @@ SdjKeyMapping key_pairs[] =
 	{ DJKEY_ALT,       SDLK_LALT },
 	{ DJKEY_CTRL,      SDLK_RCTRL },
 	{ DJKEY_CTRL,      SDLK_LCTRL },
-	{ DJKEY_A,         SDLK_a },
-	{ DJKEY_A,         SDLK_a },
-	{ DJKEY_B,         SDLK_b },
-	{ DJKEY_B,         SDLK_b },
-	{ DJKEY_C,         SDLK_c },
-	{ DJKEY_C,         SDLK_c },
-	{ DJKEY_D,         SDLK_d },
-	{ DJKEY_D,         SDLK_d },
-	{ DJKEY_E,         SDLK_e },
-	{ DJKEY_E,         SDLK_e },
-	{ DJKEY_F,         SDLK_f },
-	{ DJKEY_F,         SDLK_f },
-	{ DJKEY_G,         SDLK_g },
-	{ DJKEY_G,         SDLK_g },
-	{ DJKEY_H,         SDLK_h },
-	{ DJKEY_H,         SDLK_h },
-	{ DJKEY_I,         SDLK_i },
-	{ DJKEY_I,         SDLK_i },
-	{ DJKEY_J,         SDLK_j },
-	{ DJKEY_J,         SDLK_j },
-	{ DJKEY_K,         SDLK_k },
-	{ DJKEY_K,         SDLK_k },
-	{ DJKEY_L,         SDLK_l },
-	{ DJKEY_L,         SDLK_l },
-	{ DJKEY_M,         SDLK_m },
-	{ DJKEY_M,         SDLK_m },
-	{ DJKEY_N,         SDLK_n },
-	{ DJKEY_N,         SDLK_n },
-	{ DJKEY_O,         SDLK_o },
-	{ DJKEY_O,         SDLK_o },
-	{ DJKEY_P,         SDLK_p },
-	{ DJKEY_P,         SDLK_p },
-	{ DJKEY_Q,         SDLK_q },
-	{ DJKEY_Q,         SDLK_q },
-	{ DJKEY_R,         SDLK_r },
-	{ DJKEY_R,         SDLK_r },
-	{ DJKEY_S,         SDLK_s },
-	{ DJKEY_S,         SDLK_s },
-	{ DJKEY_T,         SDLK_t },
-	{ DJKEY_T,         SDLK_t },
-	{ DJKEY_U,         SDLK_u },
-	{ DJKEY_U,         SDLK_u },
-	{ DJKEY_V,         SDLK_v },
-	{ DJKEY_V,         SDLK_v },
-	{ DJKEY_W,         SDLK_w },
-	{ DJKEY_W,         SDLK_w },
-	{ DJKEY_X,         SDLK_x },
-	{ DJKEY_X,         SDLK_x },
-	{ DJKEY_Y,         SDLK_y },
-	{ DJKEY_Y,         SDLK_y },
-	{ DJKEY_Z,         SDLK_z },
-	{ DJKEY_Z,         SDLK_z },
+	{ DJKEY_A,         SDLK_A },
+	{ DJKEY_A,         SDLK_A },
+	{ DJKEY_B,         SDLK_B },
+	{ DJKEY_B,         SDLK_B },
+	{ DJKEY_C,         SDLK_C },
+	{ DJKEY_C,         SDLK_C },
+	{ DJKEY_D,         SDLK_D },
+	{ DJKEY_D,         SDLK_D },
+	{ DJKEY_E,         SDLK_E },
+	{ DJKEY_E,         SDLK_E },
+	{ DJKEY_F,         SDLK_F },
+	{ DJKEY_F,         SDLK_F },
+	{ DJKEY_G,         SDLK_G },
+	{ DJKEY_G,         SDLK_G },
+	{ DJKEY_H,         SDLK_H },
+	{ DJKEY_H,         SDLK_H },
+	{ DJKEY_I,         SDLK_I },
+	{ DJKEY_I,         SDLK_I },
+	{ DJKEY_J,         SDLK_J },
+	{ DJKEY_J,         SDLK_J },
+	{ DJKEY_K,         SDLK_K },
+	{ DJKEY_K,         SDLK_K },
+	{ DJKEY_L,         SDLK_L },
+	{ DJKEY_L,         SDLK_L },
+	{ DJKEY_M,         SDLK_M },
+	{ DJKEY_M,         SDLK_M },
+	{ DJKEY_N,         SDLK_N },
+	{ DJKEY_N,         SDLK_N },
+	{ DJKEY_O,         SDLK_O },
+	{ DJKEY_O,         SDLK_O },
+	{ DJKEY_P,         SDLK_P },
+	{ DJKEY_P,         SDLK_P },
+	{ DJKEY_Q,         SDLK_Q },
+	{ DJKEY_Q,         SDLK_Q },
+	{ DJKEY_R,         SDLK_R },
+	{ DJKEY_R,         SDLK_R },
+	{ DJKEY_S,         SDLK_S },
+	{ DJKEY_S,         SDLK_S },
+	{ DJKEY_T,         SDLK_T },
+	{ DJKEY_T,         SDLK_T },
+	{ DJKEY_U,         SDLK_U },
+	{ DJKEY_U,         SDLK_U },
+	{ DJKEY_V,         SDLK_V },
+	{ DJKEY_V,         SDLK_V },
+	{ DJKEY_W,         SDLK_W },
+	{ DJKEY_W,         SDLK_W },
+	{ DJKEY_X,         SDLK_X },
+	{ DJKEY_X,         SDLK_X },
+	{ DJKEY_Y,         SDLK_Y },
+	{ DJKEY_Y,         SDLK_Y },
+	{ DJKEY_Z,         SDLK_Z },
+	{ DJKEY_Z,         SDLK_Z },
 	{ DJKEY_0,         SDLK_0 },
 	{ DJKEY_1,         SDLK_1 },
 	{ DJKEY_2,         SDLK_2 },
@@ -148,11 +144,11 @@ const char *GetKeyString(int nSDLKeyCode)
 	case SDLK_ESCAPE:		return "ESCAPE";
 	case SDLK_SPACE:		return "SPACE";
 	case SDLK_EXCLAIM:		return "EXCLAIM";
-	case SDLK_QUOTEDBL:		return "QUOTEDBL";
+	case SDLK_DBLAPOSTROPHE:		return "QUOTEDBL";
 	case SDLK_HASH:			return "#";
 	case SDLK_DOLLAR:		return "$";
 	case SDLK_AMPERSAND:	return "&";
-	case SDLK_QUOTE:		return "QUOTE";
+	case SDLK_APOSTROPHE:		return "QUOTE";
 	case SDLK_LEFTPAREN:	return "(";
 	case SDLK_RIGHTPAREN:	return ")";
 	case SDLK_ASTERISK:		return "*";
@@ -183,33 +179,33 @@ const char *GetKeyString(int nSDLKeyCode)
 	case SDLK_RIGHTBRACKET:	return ")";
 	case SDLK_CARET:		return "^";
 	case SDLK_UNDERSCORE:	return "_";
-	case SDLK_BACKQUOTE:	return "BACKQUOTE";
-	case SDLK_a:			return "A";
-	case SDLK_b:			return "B";
-	case SDLK_c:			return "C";
-	case SDLK_d:			return "D";
-	case SDLK_e:			return "E";
-	case SDLK_f:			return "F";
-	case SDLK_g:			return "G";
-	case SDLK_h:			return "H";
-	case SDLK_i:			return "I";
-	case SDLK_j:			return "J";
-	case SDLK_k:			return "K";
-	case SDLK_l:			return "L";
-	case SDLK_m:			return "M";
-	case SDLK_n:			return "N";
-	case SDLK_o:			return "O";
-	case SDLK_p:			return "P";
-	case SDLK_q:			return "Q";
-	case SDLK_r:			return "R";
-	case SDLK_s:			return "S";
-	case SDLK_t:			return "T";
-	case SDLK_u:			return "U";
-	case SDLK_v:			return "V";
-	case SDLK_w:			return "W";
-	case SDLK_x:			return "X";
-	case SDLK_y:			return "Y";
-	case SDLK_z:			return "Z";
+	case SDLK_GRAVE:	return "BACKQUOTE";
+	case SDLK_A:			return "A";
+	case SDLK_B:			return "B";
+	case SDLK_C:			return "C";
+	case SDLK_D:			return "D";
+	case SDLK_E:			return "E";
+	case SDLK_F:			return "F";
+	case SDLK_G:			return "G";
+	case SDLK_H:			return "H";
+	case SDLK_I:			return "I";
+	case SDLK_J:			return "J";
+	case SDLK_K:			return "K";
+	case SDLK_L:			return "L";
+	case SDLK_M:			return "M";
+	case SDLK_N:			return "N";
+	case SDLK_O:			return "O";
+	case SDLK_P:			return "P";
+	case SDLK_Q:			return "Q";
+	case SDLK_R:			return "R";
+	case SDLK_S:			return "S";
+	case SDLK_T:			return "T";
+	case SDLK_U:			return "U";
+	case SDLK_V:			return "V";
+	case SDLK_W:			return "W";
+	case SDLK_X:			return "X";
+	case SDLK_Y:			return "Y";
+	case SDLK_Z:			return "Z";
 	case SDLK_DELETE:		return "DEL";
 	case SDLK_KP_0:			return "KEYPAD0";
 	case SDLK_KP_1:			return "KEYPAD1";
@@ -284,42 +280,42 @@ bool djiPollEvents(SDL_Event &Event)
 	{
 		// [dj2016-10] Prevent distinguishing between left and right control/alt, i.e. treat both left-ctrl and right-ctrl as just 'ctrl'
 		// and likewise for alt .. I think this makes for slightly more user-friendlier experience with default keys etc.
-		if (Event.type==SDL_KEYDOWN||Event.type==SDL_KEYUP)
+		if (Event.type==SDL_EVENT_KEY_DOWN||Event.type==SDL_EVENT_KEY_UP)
 		{
-			if (Event.key.keysym.sym==SDLK_LCTRL)
-				Event.key.keysym.sym = SDLK_RCTRL;
-			else if (Event.key.keysym.sym==SDLK_LALT)
-				Event.key.keysym.sym = SDLK_RALT;
+			if (Event.key.key==SDLK_LCTRL)
+				Event.key.key = SDLK_RCTRL;
+			else if (Event.key.key==SDLK_LALT)
+				Event.key.key = SDLK_RALT;
 		}
 		int i;
 		// Handle some basic events
 		switch (Event.type)
 		{
-		case SDL_KEYDOWN:
+		case SDL_EVENT_KEY_DOWN:
 			for ( i=0; key_pairs[i].m_iScanCode!=-1; i++ )
 			{
-				if (Event.key.keysym.sym==(int)key_pairs[i].m_iPlatformCode)
+				if (Event.key.key==(int)key_pairs[i].m_iPlatformCode)
 					g_iKeys[key_pairs[i].m_iScanCode] = 1;
 			}
 			break;
-		case SDL_KEYUP:
+		case SDL_EVENT_KEY_UP:
 			for ( i=0; key_pairs[i].m_iScanCode!=-1; i++ )
 			{
-				if (Event.key.keysym.sym==(int)key_pairs[i].m_iPlatformCode)
+			if (Event.key.key==(int)key_pairs[i].m_iPlatformCode)
 					g_iKeys[key_pairs[i].m_iScanCode] = 0;
 			}
 			break;
-		case SDL_MOUSEMOTION:
+		case SDL_EVENT_MOUSE_MOTION:
 			djMouse::x = Event.motion.x;
 			djMouse::y = Event.motion.y;
 			break;
-		case SDL_MOUSEBUTTONDOWN:
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
 			if (Event.button.button==1) djMouse::b |= 1;
 			if (Event.button.button==3) djMouse::b |= 2;
 			djMouse::x = Event.button.x;
 			djMouse::y = Event.button.y;
 			break;
-		case SDL_MOUSEBUTTONUP:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
 			if (Event.button.button==1) djMouse::b &= ~1;
 			if (Event.button.button==3) djMouse::b &= ~2;
 			djMouse::x = Event.button.x;
@@ -354,33 +350,33 @@ void djiPoll()
 		int i;
 		switch (Event.type)
 		{
-		case SDL_KEYDOWN:
+		case SDL_EVENT_KEY_DOWN:
 			for ( i=0; key_pairs[i].m_iScanCode!=-1; i++ )
 			{
-				if (Event.key.keysym.sym==(int)key_pairs[i].m_iPlatformCode)
+				if (Event.key.key==(int)key_pairs[i].m_iPlatformCode)
 					g_iKeys[key_pairs[i].m_iScanCode] = 1;
 			}
 			break;
-		case SDL_KEYUP:
+		case SDL_EVENT_KEY_UP:
 			for ( i=0; key_pairs[i].m_iScanCode!=-1; i++ )
 			{
-				if (Event.key.keysym.sym==(int)key_pairs[i].m_iPlatformCode)
+				if (Event.key.key==(int)key_pairs[i].m_iPlatformCode)
 					g_iKeys[key_pairs[i].m_iScanCode] = 0;
 			}
 			break;
-		case SDL_QUIT:
+		case SDL_EVENT_QUIT:
 			break;
-		case SDL_MOUSEMOTION:
+		case SDL_EVENT_MOUSE_MOTION:
 			djMouse::x = Event.motion.x;
 			djMouse::y = Event.motion.y;
 			break;
-		case SDL_MOUSEBUTTONDOWN:
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
 			if (Event.button.button==1) djMouse::b |= 1;
 			if (Event.button.button==3) djMouse::b |= 2;
 			djMouse::x = Event.button.x;
 			djMouse::y = Event.button.y;
 			break;
-		case SDL_MOUSEBUTTONUP:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
 			if (Event.button.button==1) djMouse::b &= ~1;
 			if (Event.button.button==3) djMouse::b &= ~2;
 			djMouse::x = Event.button.x;

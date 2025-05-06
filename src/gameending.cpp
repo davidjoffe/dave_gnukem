@@ -144,23 +144,23 @@ void ShowEndGameSequence()
 		{
 			switch (Event.type)
 			{
-			case SDL_KEYDOWN:
+			case SDL_EVENT_KEY_DOWN:
 				if (
-					(Event.key.keysym.sym==SDLK_SPACE
-					|| Event.key.keysym.sym==SDLK_RETURN)
+					(Event.key.key==SDLK_SPACE
+					|| Event.key.key==SDLK_RETURN)
 					)
 				{
 					bRunning = false;
 				}
-				else if (Event.key.keysym.sym==SDLK_ESCAPE
-					|| Event.key.keysym.sym==SDLK_SPACE
-					|| Event.key.keysym.sym==SDLK_RETURN
+				else if (Event.key.key==SDLK_ESCAPE
+					|| Event.key.key==SDLK_SPACE
+					|| Event.key.key==SDLK_RETURN
 					)
 				{
 					bRunning = false;//Exit screen
 				}
 				break;
-			case SDL_QUIT:
+			case SDL_EVENT_QUIT:
 				bRunning=false;
 				break;
 			}

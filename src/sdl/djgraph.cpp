@@ -18,13 +18,8 @@ Copyright (C) 1997-2024 David Joffe
 #include "../djgraph.h"
 #include "../djtypes.h"
 #include "../sys_log.h"
-#ifdef __OS2__
-#include <SDL/SDL.h>
-#include <SDL/SDL_endian.h>
-#else
-#include "SDL.h"
-#include <SDL_endian.h>
-#endif
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_endian.h>
 
 #include <cstdint>//for uint32_t
 
@@ -93,13 +88,13 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 
 	//dj2016-10 fixmelow_tocheck i am wondering if the below is doing speed optimal way of doing everything as this hasn't been looked at in years
 
+	auto format = SDL_GetPixelFormatForMasks(bpp, 0, 0, 0, 0);
 	// Create a default visual: a resizable window or fullscreen
 	//static SDL_Surface *p = NULL;
 	if (NULL == vistype || pVis->m_bFullscreen)
 	{
 		// dj2022-11 slightly changing Matteo Bini's recent SDL2 code changes here to pass in the window title and bitmap as parameters (so this codebase could be more generically used for other games)
-		SDL_Window* win = SDL_CreateWindow(szWindowTitle == nullptr ? "Window" : szWindowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h,
-			pVis->m_bFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_RESIZABLE);
+		SDL_Window* win = SDL_CreateWindow(szWindowTitle == nullptr ? "Window" : szWindowTitle, w, h, pVis->m_bFullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
 		pVis->pWindow = win;//<- dj2022-11 added storing this pWindow pointer so we can cleanup with corresponding SDL_DestroyWindow (for in-game fullscreen toggle etc.)
 		if (szWindowIconFile != nullptr)
 		{
@@ -108,15 +103,15 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 			djImage* pImage = djImageLoad::LoadImage(szWindowIconFile);
 			if (pImage)
 			{
+				format = SDL_GetPixelFormatForMasks(pImage->BPP(), pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, pImage->m_Amask);
 				//printf("APPLE2   %s\n", szWindowIconFile);	
 				// Convert the djImage temporarily to a SDL_Surface
-				SDL_Surface* pSurface = ::SDL_CreateRGBSurfaceFrom(
-						pImage->Data(),
+				SDL_Surface* pSurface = ::SDL_CreateSurfaceFrom(
 						pImage->Width(),
 						pImage->Height(),
-						pImage->BPP(),
-						pImage->Pitch(),
-						pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, pImage->m_Amask
+						format,
+						pImage->Data(),
+						pImage->Pitch()
 					);				
 				SDL_SetWindowIcon(win, pSurface);
 			}
@@ -128,11 +123,10 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 			SDL_SetWindowIcon(win, SDL_LoadBMP(szWindowIconFile));
 			#endif
 		}
-		pVis->pRenderer = SDL_CreateRenderer(win, -1, 0);
-		SDL_RenderSetLogicalSize(pVis->pRenderer, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H);
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-		pVis->pSurface = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, bpp,
-			0, 0, 0, 0);
+		pVis->pRenderer = SDL_CreateRenderer(win, nullptr);
+		SDL_SetRenderLogicalPresentation(pVis->pRenderer, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, SDL_LOGICAL_PRESENTATION_STRETCH);
+		//SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+		pVis->pSurface = SDL_CreateSurface(CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, format);
 		pVis->pTexture = SDL_CreateTextureFromSurface(pVis->pRenderer, pVis->pSurface);
 		// to check/merge emsdk-build changes ->
 		//// 			pVis->pSurface = SDL_DisplayFormat(pSurface); =>
@@ -148,15 +142,15 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 		// previously if we were at say 'scale 2' then the game base resolution is e.g. 320x200 but w,h would be e.g. 640x400 at scale 2 (and so on for higher scale values) -
 		// .. the below by Matto Bini seems probably more 'correct' (and probably better performance in some aspects) but just adding a correcton here to also set
 		// "pVis->width = CFG_APPLICATION_RENDER_RES_W" etc. otherwise the actual pSurface resolution (320x200) doesn't match what pVis reports which cause menu rendering funnies and possible crasshes this should fix.
-		pVis->pSurface = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, bpp,
-			0, 0, 0, 0);
+		pVis->pSurface = SDL_CreateSurface(CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, format);
 		pVis->width = CFG_APPLICATION_RENDER_RES_W;
 		pVis->height = CFG_APPLICATION_RENDER_RES_H;
 		pVis->stride = CFG_APPLICATION_RENDER_RES_W * (bpp/8);
 	}
 
-	pVis->bpp = pVis->pSurface->format->BitsPerPixel;
-	switch (pVis->bpp)
+	auto f = SDL_GetPixelFormatDetails(pVis->pSurface->format);
+	pVis->format = pVis->pSurface->format;
+	switch (f->bits_per_pixel)
 	{
 	case  8: pVis->pixwidth = 1; break;
 	case 16: pVis->pixwidth = 2; break;
@@ -169,7 +163,7 @@ djVisual* djgOpenVisual( const char *vistype, int w, int h, int bpp, bool bBackb
 
 void djgCloseVisual( djVisual * pVis )
 {
-	SDL_FreeSurface(pVis->pSurface);
+	SDL_DestroySurface(pVis->pSurface);
 	pVis->pSurface = NULL;//?<- dj2017-01 not sure if this is all that's necessary for cleanup here ...
 
 	//dj2022-11 adding this SDL_DestroyWindow here as I think it may help fix the in-game fullscreen toggle issues
@@ -220,7 +214,8 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 		{
 			djgLock(pVisSrc);
 			djgLock(pVisDest);
-			unsigned int uBPP = pVisSrc->pSurface->format->BytesPerPixel;
+			auto f = SDL_GetPixelFormatDetails(pVisSrc->pSurface->format);
+			unsigned int uBPP = f->bits_per_pixel;
 			unsigned int *pSurfaceMem = (unsigned int*)pVisSrc->pSurface->pixels;
 			unsigned int uMemOffsetRow = 0;
 
@@ -280,8 +275,9 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 						}
 						*/
 
-						nPixel = SDL_MapRGB(pVisDest->pSurface->format,pPalette[nClosest].r,pPalette[nClosest].g,pPalette[nClosest].b);
-						SDL_FillRect(pVisDest->pSurface, &rc, nPixel);
+						auto f = SDL_GetPixelFormatDetails(pVisDest->pSurface->format);
+						nPixel = SDL_MapRGB(f, nullptr, pPalette[nClosest].r,pPalette[nClosest].g,pPalette[nClosest].b);
+						SDL_FillSurfaceRect(pVisDest->pSurface, &rc, nPixel);
 						++pSurfaceMem;
 						++rc.x;
 					}//x
@@ -300,7 +296,7 @@ void djgFlip( djVisual * pVisDest, djVisual * pVisSrc, bool bScaleView )
 	}
 	SDL_UpdateTexture(pVisDest->pTexture, NULL, pVisDest->pSurface->pixels, pVisDest->pSurface->pitch);
 	SDL_RenderClear(pVisDest->pRenderer);
-	SDL_RenderCopy(pVisDest->pRenderer, pVisDest->pTexture, NULL, NULL);
+	SDL_RenderTexture(pVisDest->pRenderer, pVisDest->pTexture, NULL, NULL);
 	SDL_RenderPresent(pVisDest->pRenderer);
 }
 
@@ -311,18 +307,18 @@ void djgClear( djVisual * pVis )
 	rc.y = 0;
 	rc.w = pVis->width;
 	rc.h = pVis->height;
-	SDL_FillRect(pVis->pSurface, &rc, SDL_MapRGB(pVis->pSurface->format, 0, 0, 0));//black
+	SDL_FillSurfaceRect(pVis->pSurface, &rc, SDL_MapRGB(SDL_GetPixelFormatDetails(pVis->pSurface->format), nullptr, 0, 0, 0));//black
 }
 
 void djgPutPixel( djVisual * pVis, int x, int y, int r, int g, int b )
 {
-	const uint32_t pixel = SDL_MapRGB(pVis->pSurface->format, r, g, b);
+	const uint32_t pixel = SDL_MapRGB(SDL_GetPixelFormatDetails(pVis->pSurface->format), nullptr, r, g, b);
 	SDL_Rect rc;
 	rc.x = x;
 	rc.y = y;
 	rc.w = 1;
 	rc.h = 1;
-	SDL_FillRect(pVis->pSurface, &rc, pixel);
+	SDL_FillSurfaceRect(pVis->pSurface, &rc, pixel);
 }
 
 //[low prio] these types of functions could/should ideally be sped up with inlining? [dj2022-11] [and/or avoid for sensitive performance bottleneck areas]
@@ -366,9 +362,10 @@ void djgDrawRectangle( djVisual * pVis, int x, int y, int w, int h )
 
 void djgDrawBox( djVisual * pVis, int x, int y, int w, int h )
 {
-	const uint32_t pixel = SDL_MapRGB(pVis->pSurface->format, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);
+	auto f = SDL_GetPixelFormatDetails(pVis->pSurface->format);
+	const uint32_t pixel = SDL_MapRGB(f, nullptr, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);
 	CdjRect rc(x, y, w, h);
-	SDL_FillRect(pVis->pSurface, &rc, pixel);
+	SDL_FillSurfaceRect(pVis->pSurface, &rc, pixel);
 }
 
 void djgDrawHLine( djVisual * pVis, int x, int y, int n )
@@ -378,7 +375,8 @@ void djgDrawHLine( djVisual * pVis, int x, int y, int n )
 	if (x+n>pVis->width) { n=pVis->width-x; }
 	if (n<=0) return;
 
-	const uint32_t pixel = SDL_MapRGB(pVis->pSurface->format, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);
+	auto f = SDL_GetPixelFormatDetails(pVis->pSurface->format);
+	const uint32_t pixel = SDL_MapRGB(f, nullptr, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);
 
 	djgLock( pVis );
 	for ( int i=0; i<n; i++ )
@@ -394,7 +392,7 @@ void djgDrawVLine( djVisual * pVis, int x, int y, int n )
 	if (y+n>pVis->height) { n=pVis->height-y; }
 	if (n<=0) return;
 
-	const uint32_t pixel = SDL_MapRGB(pVis->pSurface->format, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);
+	const uint32_t pixel = SDL_MapRGB(SDL_GetPixelFormatDetails(pVis->pSurface->format), nullptr, pVis->colorfore.r, pVis->colorfore.g, pVis->colorfore.b);
 
 	djgLock( pVis );
 	for ( int i=0; i<n; i++ )
@@ -438,7 +436,7 @@ void djgDrawImage( djVisual *pVis, djImage *pImage, int x, int y, int w, int h )
 		if (wS==wD && hS==hD)
 			SDL_BlitSurface(pHWSurface, &rectSrc, pVis->pSurface, &rectDest);
 		else
-			SDL_BlitScaled(pHWSurface, &rectSrc, pVis->pSurface, &rectDest);
+			SDL_BlitSurfaceScaled(pHWSurface, &rectSrc, pVis->pSurface, &rectDest, SDL_SCALEMODE_LINEAR);
 		return;
 	}
 
@@ -484,8 +482,9 @@ void djgDrawImage( djVisual *pVis, djImage *pImage, int xS, int yS, int xD, int 
 	if (xD<0) { w=w+xD; if (w<=0) return; xD=0; }
 	if (yD<0) { h=h+yD; if (h<=0) return; yD=0; }
 
+	auto f = SDL_GetPixelFormatDetails(pVis->format);
 	// If same pixel formats, just copy
-	if (pVis->bpp==pImage->BPP())
+	if (f->bits_per_pixel==pImage->BPP())
 	{
 		djgLock(pVis);
 
@@ -503,13 +502,13 @@ void djgDrawImage( djVisual *pVis, djImage *pImage, int xS, int yS, int xD, int 
 	}
 
 	// 32-bit, no transparency
-	if (pVis->bpp==32)
+	if (f->bytes_per_pixel==32)
 	{
 		if (pImage->BPP()==16)
 		{
 		}
 	}
-	if (pVis->bpp==16)
+	if (f->bytes_per_pixel==16)
 	{
 		// 32-bit, no transparency
 		if (pImage->BPP()==32)
@@ -630,8 +629,9 @@ void djgDrawImageAlpha( djVisual *pVis, djImage *pImage, int xS, int yS, int xD,
 	if (xD<0) { w=w+xD; if (w<=0) return; xD=0; }
 	if (yD<0) { h=h+yD; if (h<=0) return; yD=0; }
 
+	auto f = SDL_GetPixelFormatDetails(pVis->format);
 	// 32-bit, alpha map
-	if (pVis->bpp==32)
+	if (f->bits_per_pixel==32)
 	{
 		if (pImage->BPP()==32)
 		{
@@ -660,7 +660,7 @@ void djgDrawImageAlpha( djVisual *pVis, djImage *pImage, int xS, int yS, int xD,
 			return;
 		}
 	}
-	if (pVis->bpp==16)
+	if (f->bits_per_pixel==16)
 	{
 		if (pImage->BPP()==32)
 		{
@@ -701,7 +701,8 @@ void djgDrawVisual( djVisual *pDest, djVisual *pSrc, int xD, int yD, int xS, int
 
 void SetPixelConversion ( djVisual *vis )
 {
-	SDL_PixelFormat *f = vis->pSurface->format;
+	auto pf = vis->pSurface->format;
+	auto f = SDL_GetPixelFormatDetails(pf);
 
 	djLOGSTR( "Setting up pixel conversion attributes...:\n" );
 	rMask = f->Rmask;
@@ -736,7 +737,7 @@ void djImageHardwareSurfaceCache::ClearHardwareSurfaces()
 		SDL_Surface* pHardwareSurface = iter.second;
 		if (pHardwareSurface)
 		{
-			SDL_FreeSurface(pHardwareSurface);
+			SDL_DestroySurface(pHardwareSurface);
 			// fixme check if the above leaks?
 			g_SurfaceMap[pImage] = nullptr;
 		}
@@ -763,7 +764,7 @@ void djDestroyImageHWSurface( djImage* pImage )
 	SDL_Surface* pHardwareSurface = iter->second;
 	if (pHardwareSurface)
 	{
-		SDL_FreeSurface(pHardwareSurface);
+		SDL_DestroySurface(pHardwareSurface);
 		//? ?delete pHardwareSurface;
 		pHardwareSurface = NULL;
 	}
@@ -818,21 +819,15 @@ void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 	https://wiki.libsdl.org/CategoryEndian
 	https://wiki.libsdl.org/SDL_CreateRGBSurface
 	*/
+	auto format = SDL_GetPixelFormatForMasks(pImage->BPP(), pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, pImage->m_Amask);
 	if (pImage->BPP()==24)//3 bytes = RGB with NO alpha .. ?
 	{
-	pSurfaceHardware = ::SDL_CreateRGBSurfaceFrom(
-		pImage->Data(),
+	pSurfaceHardware = ::SDL_CreateSurfaceFrom(
 		pImage->Width(),
 		pImage->Height(),
-		pImage->BPP(),
-		pImage->Pitch(),
-		//// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
-		// Above fix/patch moved to inside TGA loading code (in order to accommodate also new .png loading more smoothly) - todo check it doesn't accidentally break big endian platforms again etc.
-		//#if SDL_BYTEORDER==SDL_BIG_ENDIAN
-		//pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, pImage->m_Amask
-		//#else
-		pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, pImage->m_Amask
-		//#endif
+		format,
+		pImage->Data(),
+		pImage->Pitch()
 	);
 	}
 	else
@@ -842,34 +837,20 @@ void* djCreateImageHWSurface( djImage* pImage/*, djVisual* pVisDisplayBuffer*/ )
 	// or generically handle more cases here .. or both I suppose, to help make sure this stuff works on all platforms etc.
 	#ifdef djUSE_SDLIMAGE
 	//pImage->
-	pSurfaceHardware = ::SDL_CreateRGBSurfaceFrom(
-		pImage->Data(),
+	pSurfaceHardware = ::SDL_CreateSurfaceFrom(
 		pImage->Width(),
 		pImage->Height(),
-		pImage->BPP(),
-		pImage->Pitch(),
-		// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
-		// Above fix/patch moved to inside TGA loading code (in order to accommodate also new .png loading more smoothly) - todo check it doesn't accidentally break big endian platforms again etc.
-		pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, pImage->m_Amask
+		format,
+		pImage->Data(),
+		pImage->Pitch()
 	);
 	#else
-	pSurfaceHardware = ::SDL_CreateRGBSurfaceFrom(
-		pImage->Data(),
+	pSurfaceHardware = ::SDL_CreateSurfaceFrom(
 		pImage->Width(),
 		pImage->Height(),
-		32,//pImage->BPP(),
-		pImage->Pitch(),
-		// R,G,B,A masks (dj2018-03 specify different masks here on PPC etc. - see https://github.com/davidjoffe/dave_gnukem/issues/100 - thanks to @BeWorld2018 for report and patch suggestion)
-		//#if SDL_BYTEORDER==SDL_BIG_ENDIAN
-		//0x0000FF00, 0X00FF0000, 0xFF000000, 0x000000FF
-		//#else
-		pImage->m_Rmask, pImage->m_Gmask, pImage->m_Bmask, pImage->m_Amask
-		/*was hardcoded as:
-		0xFF0000,
-		0xFF00,
-		0xFF,
-		0xFF000000*/// 
-		//#endif
+		format,
+		pImage->Data(),
+		pImage->Pitch()
 	);
 	#endif
 
@@ -952,7 +933,7 @@ SDL_SWSURFACE,
 SDL_SetSurfaceAlphaMod(pSurface, 0);
 		//SDL_UnlockSurface(pSurfaceImg);
 
-		//SDL_FreeSurface(pSurfaceImg);
+		//SDL_DestroySurface(pSurfaceImg);
 		//delete pSurface;//?
 	}
 	return (void*)pSurface;
