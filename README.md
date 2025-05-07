@@ -29,7 +29,7 @@ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspi
 
 Created by: David Joffe [@davidjoffe](https://github.com/davidjoffe) https://djoffe.com/ / liveedu.tv/david_joffe / [LinkedIn](https://linkedin.com/in/david-joffe-50771b4/)
 
-The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: [T.O.G](http://www.nuke24.net/ "T.O.G."), [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
+The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: [T.O.G](https://www.nuke24.net/ "T.O.G."), [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
 As of 8 Oct 2016, this project is under 'properly' active development again, and **on 3 Apr 2018, 'version 1.0' has been released**. (Note - this game wasn't 'retro genre' when I started it - it just took so long to complete that it's now 'de facto' "retro"! - David)
 
@@ -131,8 +131,8 @@ TL;DR Shoot anything that moves
 * OS/2 port by Andreas Peters (~2022/11 merge of ~2020 https://github.com/davidjoffe/dave_gnukem/pull/128)
 * Debian official (~2022 - Matteo Bini; https://github.com/enigma9o7, https://github.com/bgermann; Craig Langman)
 * Bodhi Linux Dec 2021 efforts: https://bodhilinux.boards.net/thread/892/packaged-dave-gnukem-silly-retro
-* Open Pandora: http://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi and https://github.com/ptitseb)
-* MorphOS (Mar 2018, by Bruno Peloille): http://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_1.00.lha
+* Open Pandora: https://repo.openpandora.org/?page=detail&app=davegnukem-magicsam - release thread: https://pyra-handheld.com/boards/threads/dave-gnukem.79533/ (by https://github.com/sviscapi and https://github.com/ptitseb)
+* MorphOS (Mar 2018, by Bruno Peloille): https://www.morphos-storage.net/?page=Games%2FShoot+2D&file=Davegnukem_1.00.lha
 * Instructions for ClockworkPi GameShell: https://forum.clockworkpi.com/t/lets-play-dave-gnukem/1917 by: https://forum.clockworkpi.com/u/Oet
 * OpenBSD (Apr 2019, by Dr. [Brian Robert Callahan](https://briancallahan.net/)) https://openports.pl/path/games/gnukem
 * HaikuOS (see discussion thread and instructions here https://discuss.haiku-os.org/t/gaming-on-haiku/3928/74) [22 June 2020]
@@ -287,13 +287,13 @@ Matteo Bini implemented SDL2 support (including also contributions for Debian su
 * Fix: On Windows, game window often starts slightly off bottom of screen
 * Fix: Restore Game from main menu doesn't work
 * Fix: Save/Restore game doesn't save "mission" (i.e. selected "game")
-* New proper exit sound (is "PowerUp13.mp3" by Eric Matyas http://soundimage.org/)
+* New proper exit sound (is "PowerUp13.mp3" by Eric Matyas https://soundimage.org/)
 * Fixed: A monster could kill you in the moments after you entered the exit
 * Better hero shooting sound
 
 2016/10/22 - Version 0.63 / 0.64 / 0.65
 
-* Add background music. So far, have only added music by Eric Matyas http://soundimage.org/
+* Add background music. So far, have only added music by Eric Matyas https://soundimage.org/
 * Add game volume controls (use 7 and 6 keys to increase/decrease volume from menus or in-game)
 * Level Editor: New feature: Hold in Ctrl+Alt and click with the mouse to automatically start level with hero 'dropped in' to the clicked position as starting position (to help with level editing / testing)
 
@@ -510,7 +510,7 @@ With respect to particular **data items**, the following license conditions appl
 * 2016-10-30 data/sounds/jump.wav and data/sounds/jump_landing.wav From same Juhani Junkala collection as per below
 * 2016-10-23 data/sounds/shoot\_cg1_modified.wav Slightly modified version of cg1.wav from http://opengameart.org/content/chaingun-pistol-rifle-shotgun-shots by Michel Baradari http://michel-baradari.de/
 	"Sounds (c) by Michel Baradari apollo-music.de
-	Licensed under CC BY 3.0 http://creativecommons.org/licenses/by/3.0/
+	Licensed under CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
 	Hosted on opengameart.org"
 * 2016-10-23 data/sounds/sfx\_weapon_singleshot7.wav by Juhani Junkala (CC0 creative commons license) ("The Essential Retro Video Game Sound Effects Collection [512 sounds]")
 * 2016-10 Thanks to daveywavey @ livecoding https://www.livecoding.tv/daveywavey/ for help with setting up github repo
