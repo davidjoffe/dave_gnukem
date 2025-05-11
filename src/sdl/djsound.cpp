@@ -8,21 +8,10 @@ Copyright (C) 1999-2024 David Joffe and Kent Mein
 #include "../djsound.h"
 #include "../djstring.h"
 #include "../djlog.h"
-#ifdef __OS2__
-#include <SDL/SDL_audio.h>
-#include <SDL/SDL_error.h>
-#else
 
-	#if defined(__has_include)
+#include <SDL3/SDL_audio.h>
+#include <SDL3/SDL_error.h>
 
-	#include <SDL_audio.h>
-	#include <SDL_error.h>
-	#else
-	#include <SDL_audio.h>
-	#include <SDL_error.h>
-	#endif
-
-#endif
 #ifndef NOSOUND
 #include "djinclude_sdlmixer.h"
 #endif//#ifndef NOSOUND
@@ -32,26 +21,6 @@ Copyright (C) 1999-2024 David Joffe and Kent Mein
 #else
 #include <malloc.h>
 #endif
-
-#if defined(WIN32) && defined(_MSC_VER)
-// Microsoft compiler stuff .. hmm not sure where best .. unless cmake etc.
-#ifdef _DEBUG
-
-	#ifdef djUSING_SDL_MIXER_EXT
-		#pragma comment(lib, "SDL2_mixer_ext.lib")
-	#else//djUSING_SDL_MIXER_EXT
-		// Should this be SDL2_mixerd.lib?
-		#pragma comment(lib, "SDL2_mixer.lib")
-	#endif//djUSING_SDL_MIXER_EXT
-
-#else//_DEBUG
-	#ifdef djUSING_SDL_MIXER_EXT
-		#pragma comment(lib, "SDL2_mixer_ext.lib")
-	#else//djUSING_SDL_MIXER_EXT
-		#pragma comment(lib, "SDL2_mixer.lib")
-	#endif//djUSING_SDL_MIXER_EXT
-#endif//_DEBUG
-#endif//#if defined(WIN32) && defined(_MSC_VER)
 
 //#define NOSOUND
 
@@ -139,7 +108,12 @@ int djSoundInit()
 	//{
 	numsounds = 0;
 	int audio_channels=2;
-	if (Mix_OpenAudio(22050, AUDIO_S16, audio_channels, 1024) < 0) {
+	SDL_AudioSpec spec = {
+		SDL_AUDIO_S16,
+		audio_channels,
+		22050
+	};
+	if (!Mix_OpenAudio(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec)) {
 		fprintf(stderr,
 			"Warning: Couldn't set 22050 Hz 16-bit audio\n- Reason : %s\n",
 			SDL_GetError());

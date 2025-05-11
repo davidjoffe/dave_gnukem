@@ -125,8 +125,6 @@ void ShowHighScores()
 				GraphDrawStringUTF8(pVisBack, pImg, nXPOS, nYSTART + i * nHEIGHTPERROW, 8, 8, sText.c_str(), sText.length());
 			}
 #else
-			if (bNEW)
-			{
 			// dj2022-11 though it's not so easy to do the same cheesey gradient we have on our 8x8 font, I grabbed the colors from that font to create a sort of a gradient anyway across the list of names that matches the visual color look .. not wonderful but not awful
 			std::vector< SDL_Color > aColorGrad;
 			aColorGrad.push_back(SDL_Color{ 221, 69, 69, 255 });
@@ -140,7 +138,6 @@ void ShowHighScores()
 			aColorGrad.push_back(SDL_Color{ 233, 185, 139, 255 });
 			aColorGrad.push_back(SDL_Color{ 237, 217, 158, 255 });
 			DrawStringUnicodeHelper(pVisBack, nXPOS, nYSTART + i * nHEIGHTPERROW - 6, aColorGrad[i % aColorGrad.size()], sText.c_str(), sText.length());
-		}
 #endif//#ifndef djUNICODE_TTF
 		}//i
 
