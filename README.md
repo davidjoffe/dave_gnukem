@@ -12,8 +12,11 @@ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspi
 **Release Downloads:** https://sourceforge.net/projects/gnukem/
 
 **Direct Download Link:** https://sourceforge.net/projects/gnukem/files/latest/download?source=files
-* To install on Windows you can also use: **winget install "Dave Gnukem"**
-
+* To install on Windows you can also use:
+```
+    winget install "Dave Gnukem" OR
+    winget install DavidJoffe.DaveGnukem
+```
 **Source code repository:** https://github.com/davidjoffe/dave_gnukem
 * **Repository for datasrc:** https://github.com/davidjoffe/gnukem_datasrc
 * **Repository for 'data' subfolder:** https://github.com/davidjoffe/gnukem_data
