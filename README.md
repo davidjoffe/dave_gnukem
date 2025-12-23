@@ -18,7 +18,7 @@ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspi
     winget install DavidJoffe.DaveGnukem
 ```
 **Source code repository:** https://github.com/davidjoffe/dave_gnukem
-* **Repository for datasrc:** https://github.com/davidjoffe/gnukem_datasrc
+* **Repository for datasrc:** https://github.com/davidjoffe/gnukem_datasrc (optional)
 * **Repository for 'data' subfolder:** https://github.com/davidjoffe/gnukem_data
 
 **Official project page**: https://djoffe.com/gnukem/
@@ -30,7 +30,7 @@ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspi
 
 ### Who is to blame for this?
 
-Created by: David Joffe [@davidjoffe](https://github.com/davidjoffe) https://djoffe.com/ / liveedu.tv/david_joffe / [LinkedIn](https://linkedin.com/in/david-joffe-50771b4/)
+Created by: [David Joffe](https://davidjoffe.github.io/) ◆ [@davidjoffe](https://github.com/davidjoffe) ◆ [djoffe.com](https://djoffe.com/) ◆ [LinkedIn](https://linkedin.com/in/david-joffe-50771b4/) ◆ [X](https://x.com/d_joffe/)
 
 The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: [T.O.G](https://www.nuke24.net/ "T.O.G."), [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
@@ -118,10 +118,15 @@ TL;DR Shoot anything that moves
 * A good time killer when baking
 * Detects and corrects wrongthink
 * Bugs older than your children
+* Procedurally generated bugs
 * Safe for use during pregnancy
 * Makefiles (from the 90s) to struggle with, like the 90s
+* Gluten-free
+* Supports resolutions nobody owns anymore
+* Ask your parents what CGA/EGA/VGA means
 * Floors
 * Walls
+* May cause "Is beauty subjective?" debates
 * Doors
 * Much much more!
 
