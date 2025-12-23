@@ -110,6 +110,13 @@ protected:
 	int m_nHeight;//Height (in game blocks) - this is comparable to the width of the crumbling floors (same principle, just vertical instead)
 };
 /*-----------------------------------------------------------*/
+/*!
+\class CCannon
+
+Something that sort of resembles a cannon on wheels.
+
+True dev story (dj2025): The original Duke Nukem 1 (which I loved playing in the 90s) had something that sort of resembles a cannon on wheels. I don't know what it is, so I just always described it like that. It shoots at you and goes back and forth. But I had to implement it in the code. But I still didn't know what it was! So I implemented something that just sort of resembles a cannon on wheels. And then I thought, how can I list this in the features, I don't know what it is? Aha, I'll list it as "Something that sort of resembles a cannon on wheels - even we don't know what it is!"
+*/
 class CCannon : public CMonster
 {
 public:
