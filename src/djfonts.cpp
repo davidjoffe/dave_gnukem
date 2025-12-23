@@ -10,12 +10,6 @@
 #ifdef djUNICODE_TTF
 	// /#include "datadir.h"//Don't actually want just for font rasterize?
 
-// hm to move obcviously not meant to be in hiscores
-#if defined(WIN32) && defined(_MSC_VER)
-// Microsoft compiler stuff .. hmm not sure where best .. unless cmake etc.
-#pragma comment(lib, "SDL2_ttf.lib")
-#endif
-
 /*--------------------------------------------------------------------------*/
 // djFontList
 /*--------------------------------------------------------------------------*/
@@ -170,11 +164,7 @@ TTF_Font* djUnicodeFontHelpers::FindBestMatchingFontMostCharsStr(const djFontLis
 			// [dj2022-11] Hmm SDL documentation says "This is the same as TTF_GlyphIsProvided(), but takes a 32-bit character instead of 16-bit, and thus can query a larger range. If you are sure you'll have an SDL_ttf that's version 2.0.18 or newer, there's no reason not to use this function exclusively."
 			// That means we may have a problem here supporting specifically (just) the Unicode SURROGATE PAIRS range IF (and only if) a platform has SDL older than this .. is that worth worrying about? [seems low prio to me dj2022-11 .. a few days ago we had no Unicode support at all so full Unicode support on 2.0.18+ and everything but surrogate pairs on older SDL's seems OK]
 			// We *definitely* want to use the 32-bit version when and where available as otherwise SURROGATE PAIRS won't work.
-#if SDL_VERSION_ATLEAST(2, 0, 18)
-			if (c > 0 && TTF_GlyphIsProvided32(pFont, c))
-#else
-			if (c > 0 && TTF_GlyphIsProvided(pFont, c))
-#endif
+			if (c > 0 && TTF_FontHasGlyph(pFont, c))
 			{
 				++nMatches;
 				if (nMatches > nMatchesMost)
@@ -258,13 +248,14 @@ void djRasterizeTTFFontHelper(const std::string& sFilename, int nCharW=8, int nC
 	TTF_Font *font = TTF_OpenFont(sFilename.c_str(), FONT_SIZE);
 	if (!font)
 	{
-		printf("TTF_OpenFont: %s\n", TTF_GetError());
+		printf("TTF_OpenFont: %s\n", SDL_GetError());
 		return;
 	}
 
 	// Create 32-bit with alpha channel
 	printf("Create 32-bit with alpha channel\n");
-	SDL_Surface *sprite_map = SDL_CreateRGBSurface(0, SPRITE_MAP_WIDTH, SPRITE_MAP_HEIGHT, 32, 0xFF, 0xFF00, 0xFF0000, 0xFF000000);
+	auto format = SDL_GetPixelFormatForMasks(32, 0xFF, 0xFF00, 0xFF0000, 0xFF000000);
+	SDL_Surface *sprite_map = SDL_CreateSurface(SPRITE_MAP_WIDTH, SPRITE_MAP_HEIGHT, format);
 	if (!sprite_map)
 	{	
 		printf("SDL_CreateRGBSurface: %s\n", SDL_GetError());
@@ -287,13 +278,8 @@ void djRasterizeTTFFontHelper(const std::string& sFilename, int nCharW=8, int nC
 		// all the texture memory filled up with thousands of characters we maybe don't need for a language?
 		// We could/should also have some sort of 'fallback rendering' system(s) in future, e.g. if we were writing some sort of massively multiplayer online game with this
 		// then we want a system that allows people of all languages to enter text and chat and see the text.
-#if SDL_VERSION_ATLEAST(2, 0, 18)
-		if (!TTF_GlyphIsProvided32(font, i))
+		if (!TTF_FontHasGlyph(font, i))
 			continue;
-#else
-		if (!TTF_GlyphIsProvided(font, i))
-			continue;
-#endif
 
 		utf8_len = 0;
 		utf8_buf[0] = 0;
@@ -303,10 +289,10 @@ void djRasterizeTTFFontHelper(const std::string& sFilename, int nCharW=8, int nC
 		if (utf8_len == 0)
 			continue;
 
-		SDL_Surface *character = TTF_RenderUTF8_Solid(font, utf8_buf, color);
+		SDL_Surface *character = TTF_RenderText_Solid(font, utf8_buf, utf8_len, color);
 		if (!character)
 		{
-			printf("TTF_RenderUTF8_Solid: %s\n", TTF_GetError());
+			printf("TTF_RenderUTF8_Solid: %s\n", SDL_GetError());
 			// return;
 		}
 		if (character)
@@ -333,7 +319,7 @@ void djRasterizeTTFFontHelper(const std::string& sFilename, int nCharW=8, int nC
 			}
 			//*/
 
-			SDL_FreeSurface(character);
+			SDL_DestroySurface(character);
 		}
 	}
 
@@ -343,7 +329,7 @@ void djRasterizeTTFFontHelper(const std::string& sFilename, int nCharW=8, int nC
 	SDL_SaveBMP(sprite_map, (sFilename + "-raster.bmp").c_str());
 	// Can use e.g. imagemagick + optipng on the generated .bmp to convert to .png and compress
 
-	SDL_FreeSurface(sprite_map);
+	SDL_DestroySurface(sprite_map);
 	TTF_CloseFont(font);
 }
 /*

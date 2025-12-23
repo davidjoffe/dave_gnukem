@@ -18,13 +18,8 @@ TODO:
 #include "block.h"
 #include "sys_error.h"
 
-#include <stdio.h>		// sprintf (NB don't use sprintf anymore, use sprintfs etc.!)
-#ifdef __OS2__
-#include <SDL/SDL_timer.h>//dj2022-11 for SDL_Delay (which may change eg cf. emscripten issues) ..
-#else
-#include <SDL_timer.h>//dj2022-11 for SDL_Delay (which may change eg cf. emscripten issues) ..
-#endif
-
+#include <SDL3/SDL_timer.h> //dj2022-11 for SDL_Delay (which may change eg cf. emscripten issues) ..
+#include <stdio.h> // sprintf (NB don't use sprintf anymore, use sprintfs etc.!)
 
 #define POS_FLAGS ((POS_SPRITES_Y + 8 * 16) + 8)
 #define POS_INSTRUCTIONS_X 420
