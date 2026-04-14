@@ -30,7 +30,7 @@ Dave Gnukem is a retro-style 2D scrolling platform shooter similar to, and inspi
 
 ### Who is to blame for this?
 
-Created by: [David Joffe](https://davidjoffe.github.io/) ◆ [@davidjoffe](https://github.com/davidjoffe) ◆ [djoffe.com](https://djoffe.com/) ◆ [LinkedIn](https://linkedin.com/in/david-joffe-50771b4/) ◆ [X](https://x.com/d_joffe/)
+Created by: [David Joffe](https://davidjoffe.github.io/) ◆ [@davidjoffe](https://github.com/davidjoffe) ◆ [djsoftware](https://djsoftware.tech/) ◆ [LinkedIn](https://linkedin.com/in/david-joffe-50771b4/) ◆ [X](https://x.com/d_joffe/)
 
 The project was originally created and maintained by David Joffe (~1994 to 2004, and Oct 2016 to present). It was maintained by EMH (Evil Mr Henry http://www.emhsoft.com/) from 2004 to 2008. Additional contributions by: [T.O.G](https://www.nuke24.net/ "T.O.G."), [Vytautas Shaltenis](https://rtfb.lt/), Kent Mein, Steve Merrifield, Felix Richter, Kevin Joffe. See also 'Additional Credits' below.
 
@@ -476,13 +476,11 @@ To add a new 'mission' (i.e. set of levels), edit the missions.txt file and add 
 	* Restoring hardware surfaces on toggle fullscreen with DirectX (is this no longer an issue now we're on SDL? or still something one must do with SDL?) (low)
 * Explosion sound doesn't always play (fixed 2016-10-22 but fix could use more testing, cf. channel -1 story)
 * DEV
-	* Update TargetName to DaveGnukem in VS2010
 	* Set up working folders to work 'out the box', so to speak
-	* Add a dev readme.txt to help devs get set up
 
 * [med] Level Editor is hogging CPU [check sprite editor, does it also?]
 * Check for all possible hardcoded keys that may be interfering with redefined keys (e.g. Ctrl, H, backspace+G etc.)
-* Some better graphics
+* More better graphics
 * Signed executables in binary release?
 * [check] Dying seems to reset score to 0 - is that right? Cf. DN1 behavior
 * Is the -640 flag now basically obsolete? Remove? Or change to do something else useful? E.g. to make window maximum size e.g. same as monitor could be useful for level editing.
