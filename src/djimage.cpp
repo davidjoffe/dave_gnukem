@@ -16,11 +16,8 @@ dj2022-11 Note that since we're now on SDL2 we could potentially use e.g. SDLima
 #include "djgraph.h"
 #include "sys_error.h"
 #include <string.h>
-	#ifdef __OS2__
-	#include <SDL/SDL_endian.h>
-	#else
-	#include <SDL_endian.h>
-	#endif
+#include <SDL3/SDL_endian.h>
+
 /*--------------------------------------------------------------------------*/
 // TGA types
 enum EfdTGAType
@@ -252,12 +249,12 @@ int djImage::Load( const char * szFilename )
 	if (szFilename == NULL) return -1; // NULL string
 	if (szFilename[0] == 0) return -1; // empty string
 
-    std::string filename = szFilename;
-    std::string extension = filename.substr(filename.find_last_of(".") + 1);
+	std::string filename = szFilename;
+	std::string extension = filename.substr(filename.find_last_of(".") + 1);
 	extern void djStrToLowerTmpHelper( std::string& s );
-    djStrToLowerTmpHelper(extension);
+	djStrToLowerTmpHelper(extension);
 
-    // For TGA files pass to our own old TGA loader
+	// For TGA files pass to our own old TGA loader
 	if (extension == "tga")
 	{
 		// fixme why are we bothering with all this? we only load TGA

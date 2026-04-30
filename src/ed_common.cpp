@@ -39,11 +39,10 @@ static djImage		*g_pEdFont = NULL;
 
 void ED_CommonInit ()
 {
-	SDL_FreeSurface(pVisMain->pSurface);
+	SDL_DestroySurface(pVisMain->pSurface);
 	SDL_DestroyTexture(pVisMain->pTexture);
-	SDL_RenderSetLogicalSize(pVisMain->pRenderer, pVisMain->width, pVisMain->height);
-	pVisMain->pSurface = SDL_CreateRGBSurface(0, pVisMain->width, pVisMain->height, pVisMain->bpp,
-		0, 0, 0, 0);
+	SDL_SetRenderLogicalPresentation(pVisMain->pRenderer, pVisMain->width, pVisMain->height, SDL_LOGICAL_PRESENTATION_STRETCH);
+	pVisMain->pSurface = SDL_CreateSurface(pVisMain->width, pVisMain->height, pVisMain->pSurface->format);
 	pVisMain->pTexture = SDL_CreateTextureFromSurface(pVisMain->pRenderer, pVisMain->pSurface);
 
 	// rtfb:
@@ -51,7 +50,8 @@ void ED_CommonInit ()
 	// but when i first tried to put my hands on Editor,
 	// this was my main headache. In short, sprites just
 	// *won't* display correctly if this is not set.
-	pVisMain->stride = pVisMain->width * (pVisMain->bpp/8);
+	auto f = SDL_GetPixelFormatDetails(pVisMain->format);
+	pVisMain->stride = pVisMain->width * (f->bytes_per_pixel);
 //	pVisMain->stride = 640*2;
 
 	if (!LoadMacros())
@@ -61,7 +61,7 @@ void ED_CommonInit ()
 	g_pEdFont->Load( djDATAPATHc( "simplefont.tga" ));
 	djCreateImageHWSurface(g_pEdFont);
 
-	SDL_ShowCursor ( 1 );
+	SDL_ShowCursor ();
 
 	djiInit();
 }
@@ -69,7 +69,7 @@ void ED_CommonInit ()
 void ED_CommonKill ()
 {
 	djiInit();
-	SDL_ShowCursor(0);
+	SDL_HideCursor();
 	djDestroyImageHWSurface(g_pEdFont);
 	if (g_pEdFont)
 	{
@@ -79,11 +79,10 @@ void ED_CommonKill ()
 	DeleteMacros ();
 	djiClearBuffer ();
 
-	SDL_FreeSurface(pVisMain->pSurface);
+	SDL_DestroySurface(pVisMain->pSurface);
 	SDL_DestroyTexture(pVisMain->pTexture);
-	SDL_RenderSetLogicalSize(pVisMain->pRenderer, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H);
-	pVisMain->pSurface = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, pVisMain->bpp,
-		0, 0, 0, 0);
+	SDL_SetRenderLogicalPresentation(pVisMain->pRenderer, CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, SDL_LOGICAL_PRESENTATION_STRETCH);
+	pVisMain->pSurface = SDL_CreateSurface(CFG_APPLICATION_RENDER_RES_W, CFG_APPLICATION_RENDER_RES_H, pVisMain->format);
 	pVisMain->pTexture = SDL_CreateTextureFromSurface(pVisMain->pRenderer, pVisMain->pSurface);
 }
 

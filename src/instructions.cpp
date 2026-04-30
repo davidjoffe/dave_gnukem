@@ -284,17 +284,17 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 		{
 			switch (Event.type)
 			{
-			case SDL_KEYDOWN:
+			case SDL_EVENT_KEY_DOWN:
 				if (!bTypingFinished &&
-					(Event.key.keysym.sym==SDLK_SPACE
-						|| Event.key.keysym.sym==SDLK_RETURN)
+					(Event.key.key==SDLK_SPACE
+						|| Event.key.key==SDLK_RETURN)
 					)
 				{
 					bFinishTyping = true;//Insta-finish typing
 				}
-				else if (Event.key.keysym.sym==SDLK_ESCAPE
-					|| Event.key.keysym.sym==SDLK_SPACE
-					|| Event.key.keysym.sym==SDLK_RETURN
+				else if (Event.key.key==SDLK_ESCAPE
+					|| Event.key.key==SDLK_SPACE
+					|| Event.key.key==SDLK_RETURN
 					)
 				{
 					if (!bTypingFinished)
@@ -303,7 +303,7 @@ void DoShow(const std::string& sLinesOrigText, const std::vector<std::string>& a
 						bRunning = false;//Exit instruction screen
 				}
 				break;
-			case SDL_QUIT:
+			case SDL_EVENT_QUIT:
 				bRunning=false;
 				break;
 			}

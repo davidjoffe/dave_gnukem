@@ -13,28 +13,21 @@ Copyright (C) 1998-2024 David Joffe
 #ifdef WIN32
 #include <Windows.h>//for workaround
 #endif
+#include <SDL3/SDL.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#ifdef __OS2__
-#include <SDL/SDL.h>
-#else
-#include "SDL.h"
-#endif
+#include <string.h>
 
 #ifdef djUNICODE_TTF
-#ifdef __OS2__
-	#include <SDL_ttf.h>//TTF_Init
-#else// !__OS2__
-	#include <SDL_ttf.h>//TTF_Init
-#endif// __OS2__
+#include <SDL3_ttf/SDL_ttf.h>//TTF_Init
+
 #include "djfonts.h"
 #include "datadir.h"//LoadFont
 #endif//#ifdef djUNICODE_TTF
 
 #ifdef djUSE_SDLIMAGE//d2023-02
-#include <SDL_image.h>
+#include <SDL3_image/SDL_image.h>
 #endif
 
 #include "console.h"//dj2022-11 refactoring
@@ -116,11 +109,7 @@ void GraphFlip(bool bScaleView)
 	// leaving text looking messed up [dj2016-10]
 	if (pVisBack!=NULL && g_pFont8x8!=NULL && (!djConsoleMessage::m_sMsg.empty() || bShowFrameRate))
 	{
-		pVisTemp = SDL_CreateRGBSurface(0, CFG_APPLICATION_RENDER_RES_W, 8, pVisBack->pSurface->format->BitsPerPixel,
-			pVisBack->pSurface->format->Rmask,
-			pVisBack->pSurface->format->Gmask,
-			pVisBack->pSurface->format->Bmask,
-			0);
+		pVisTemp = SDL_CreateSurface(CFG_APPLICATION_RENDER_RES_W, 8, pVisBack->pSurface->format);
 		if (pVisTemp)
 		{
 			SDL_Rect Rect;
@@ -174,7 +163,7 @@ void GraphFlip(bool bScaleView)
 		SDL_BlitSurface(pVisTemp, &Rect, pVisBack->pSurface, &Rect);
 
 		// inefficient .. do this once not every frame ..
-		SDL_FreeSurface(pVisTemp);
+		SDL_DestroySurface(pVisTemp);
 	}
 }
 
@@ -204,12 +193,6 @@ bool djSDLInit()
 	// Initialize graphics library
 	SDL_Init(SDL_INIT_VIDEO);
 
-#ifdef djUSE_SDLIMAGE//dj2023-02
-	// Initialize SDL_image for PNG loading
-	const int nImgFlags = IMG_INIT_PNG|IMG_INIT_JPG;
-	/*int nRet = */IMG_Init(nImgFlags/*|IMG_INIT_TIF*/);
-#endif
-
 #ifdef djUNICODE_TTF
 	TTF_Init();//dj2022-11
 #endif
@@ -219,10 +202,6 @@ bool djSDLDone()
 {
 #ifdef djUNICODE_TTF
 	TTF_Quit();//dj2022-11
-#endif
-
-#ifdef djUSE_SDLIMAGE
-	IMG_Quit();
 #endif
 
 	SDL_Quit();
@@ -259,15 +238,14 @@ bool djGraphicsSystem::GraphInit( bool bFullScreen, int iWidth, int iHeight, int
 	// tries to set a 'true' 320x200 fullscreen display mode, IIRC - dj2017-08.)
 	// No that doesn't seem to be what happens, press F5 when running with "-f" and see.
 	// [low/future] - if 2 monitors, will this behave 'correct'
-	SDL_DisplayMode dm;
-	int err = SDL_GetCurrentDisplayMode(0, &dm);
+	auto dm = SDL_GetCurrentDisplayMode(0);
 	int max_w = -1;
 	int max_h = -1;
-	if (!err)
+	if (dm)
 	{
 		// THIS MUST BE TESTED ON LINUX [dj2016-10]
-		max_w = dm.w;
-		max_h = dm.h;
+		max_w = dm->w;
+		max_h = dm->h;
 		if (max_w>iWidth && max_h>iHeight)
 		{
 			int nMultiple = djMAX(1, djMIN( max_w / iWidth, max_h / iHeight ) );
@@ -288,7 +266,7 @@ bool djGraphicsSystem::GraphInit( bool bFullScreen, int iWidth, int iHeight, int
 
 
 	// Hide mouse cursor
-	SDL_ShowCursor(0);
+	SDL_HideCursor();
 
 	std::string sIcon = djDATAPATHs("icon.bmp");
 	#ifdef __APPLE__
@@ -304,8 +282,10 @@ bool djGraphicsSystem::GraphInit( bool bFullScreen, int iWidth, int iHeight, int
 		printf( "GraphInit(): COULDN'T CREATE MAIN WINDOW\n" );
 		return false;
 	}
-	djLog::LogFormatStr( "GraphInit(): Display bytes per pixel %d\n", (int)pVisMain->bpp) ;
-	int imode = pVisMain->bpp;
+
+	auto f = SDL_GetPixelFormatDetails(pVisMain->format);
+	djLog::LogFormatStr( "GraphInit(): Display bytes per pixel %d\n", (int)f->bits_per_pixel) ;
+	int imode = f->bits_per_pixel;
 
 	// Set the 32<->16 pixel conversion atributes, so the
 	// images would be displayed correctly with any pixel format
@@ -542,7 +522,7 @@ void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, cons
 	//SDL_Surface* sur = TTF_RenderUNICODE_Blended_Wrapped(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
 	//SDL_Surface* sur = TTF_RenderUNICODE_Blended(pFont, (const Uint16*)text.c_str(), SDL_Color{ 255, 255, 255, 255 }, CFG_APPLICATION_RENDER_RES_W - nXPOS);
 	//SDL_Surface* sur = TTF_RenderUTF8_Blended(pFont, sText.c_str(), SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
-	SDL_Surface* sur = TTF_RenderUTF8_Solid(pFont, szTextUTF8, SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
+	SDL_Surface* sur = TTF_RenderText_Solid(pFont, szTextUTF8, uLen, SDL_Color{ 0, 0, 0, 255 });//black for +1 offset underline 'shadow' effect
 	//SDL_Texture* tex = SDL_CreateTextureFromSurface(pVis->pRenderer, sur);
 	if (sur)
 	{
@@ -550,11 +530,11 @@ void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, cons
 		CdjRect rcSrc(0, 0, sur->w, sur->h);
 		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
 		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
-		//SDL_FreeSurface(sur);// why does this SDL_FreeSurface crash?SDL_FreeSurface(sur); [dj2022-11 fixme]
+		//SDL_DestroySurface(sur);// why does this SDL_DestroySurface crash?SDL_DestroySurface(sur); [dj2022-11 fixme]
 		sur = nullptr;
 	}
 	//sur = TTF_RenderUTF8_Blended(pFont, sText.c_str(), SDL_Color{ 255, 255, 255, 255 });
-	sur = TTF_RenderUTF8_Blended(pFont, szTextUTF8, Color);
+	sur = TTF_RenderText_Blended(pFont, szTextUTF8, uLen, Color);
 	//SDL_Texture* tex = SDL_CreateTextureFromSurface(pVis->pRenderer, sur);
 	if (sur)
 	{
@@ -563,7 +543,7 @@ void DrawStringUnicodeHelper(djVisual* pVis, int x, int y, SDL_Color Color, cons
 		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
 		SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
 		//SDL_BlitSurface(sur, &rcSrc, pVis->pSurface, &rcDest);//blit [is this best way?]
-		//SDL_FreeSurface(sur);// why does this SDL_FreeSurface crash?SDL_FreeSurface(sur); [dj2022-11 fixme]
+		//SDL_DestroySurface(sur);// why does this SDL_DestroySurface crash?SDL_DestroySurface(sur); [dj2022-11 fixme]
 		sur = nullptr;
 	}
 	//SDL_RenderCopy(pVisBack->pRenderer, tex, NULL, &rect);

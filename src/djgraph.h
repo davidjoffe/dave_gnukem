@@ -27,7 +27,7 @@ Copyright (C) 1998-2024 David Joffe
 // [todo tidy this all up and simplify and maybe add a small simple light wrapper helper .h (or more than one) to help with this stuff]
 // Want to try be slightly smarter with __has_include (but it's C++17 only) so don't want to uncomment these things yet until I've tested it better so leaving it commented for now
 // All our includes are done like "SDL.h" and I've seen samples online that do it but it seems wrong because "" means check current directory first, which is davegnukem which obviously does not have SDL.h so shouldn't these all be <SDL.h> etc.? I think if we're on C++7 or higher it's a good idea to maybe try detect and do fallbacks etc.
-#include "SDL.h"
+#include <SDL3/SDL.h>
 //#endif
 
 #endif
@@ -72,7 +72,7 @@ public:
 		width    = 0;
 		height   = 0;
 		stride   = 0;
-		bpp      = 0;
+		format   = SDL_PIXELFORMAT_ABGR8888;
 		pixwidth = 0;
 		m_bFullscreen = false;
 	}
@@ -85,7 +85,7 @@ public:
 	int                      width;
 	int                      height;
 	int                      stride;
-	int                      bpp;         // 32 ... 24? (pixsize) pixdepth=24, pixsize=32 width=4
+	SDL_PixelFormat          format;         // 32 ... 24? (pixsize) pixdepth=24, pixsize=32 width=4
 	int                      pixwidth;    // 4
 	bool                     m_bFullscreen;
 };
