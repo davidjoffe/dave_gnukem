@@ -786,10 +786,10 @@ void RedefineKeys()
 		{
 			switch (Event.type)
 			{
-			//case SDL_KEYDOWN:
+			//case SDL_EVENT_KEY_DOWN:
 				//break;
-			case SDL_KEYDOWN://UP:
-				switch (Event.key.keysym.sym)
+			case SDL_EVENT_KEY_DOWN://UP:
+				switch (Event.key.key)
 				{
 				case SDLK_ESCAPE:
 					bLoop = false;
@@ -797,7 +797,7 @@ void RedefineKeys()
 				default:
 					if (bFinished)
 					{
-						if (Event.key.keysym.sym==SDLK_RETURN)
+						if (Event.key.key==SDLK_RETURN)
 						{
 							bLoop = false;
 							// Commit changes
@@ -810,9 +810,9 @@ void RedefineKeys()
 							StoreGameKeys();
 						}
 					}
-					else if (IsGameKey(Event.key.keysym.sym) && !IsKeyUsed(anKeys, Event.key.keysym.sym))
+					else if (IsGameKey(Event.key.key) && !IsKeyUsed(anKeys, Event.key.key))
 					{
-						anKeys[nCurrent] = Event.key.keysym.sym;
+						anKeys[nCurrent] = Event.key.key;
 						nCurrent++;
 						if (nCurrent==KEY_NUM_MAIN_REDEFINABLE_KEYS)
 						{
@@ -822,7 +822,7 @@ void RedefineKeys()
 					break;
 				}
 				break;
-			case SDL_QUIT:
+			case SDL_EVENT_QUIT:
 				bLoop = false;
 				break;
 			}
@@ -891,6 +891,9 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 
 	#ifdef djALLOW_UNICODE_TEXT_ENTRY
 	//SDL_EnableUNICODE(1);
+	auto window = SDL_GL_GetCurrentWindow();
+	if (window)
+		SDL_StartTextInput(window);
 	#endif
 	std::string sInput;
 
@@ -917,15 +920,15 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 			switch (Event.type)
 			{
 #ifdef djALLOW_UNICODE_TEXT_ENTRY
-			case SDL_TEXTINPUT://dj2022-11 NB for Unicode input (what platforms are supported here?)
+			case SDL_EVENT_TEXT_INPUT://dj2022-11 NB for Unicode input (what platforms are supported here?)
 				sInput += Event.text.text;
 				break;
-			case SDL_KEYDOWN:
+			case SDL_EVENT_KEY_DOWN:
 			{
-				if (((ModState & KMOD_SHIFT)==0) && ((ModState & KMOD_CTRL)!=0))
+				if (((ModState & SDL_KMOD_SHIFT)==0) && ((ModState & SDL_KMOD_CTRL)!=0))
 				{
 					// Ctrl+V paste text?
-					if (Event.key.keysym.sym == SDLK_v && SDL_HasClipboardText())
+					if (Event.key.key == SDLK_B && SDL_HasClipboardText())
 					{
 						char* sz = SDL_GetClipboardText();
 						if (sz)
@@ -946,7 +949,7 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 				}
 
 
-				switch (Event.key.keysym.sym)
+				switch (Event.key.key)
 				{
 				case SDLK_BACKSPACE: // Backspace is slightly non-trivial to handle if we're dealing with utf8 strings but technically we can probably use 
 					if (!sInput.empty())
@@ -982,23 +985,23 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 			}
 			break;
 #else
-			case SDL_KEYDOWN:
-				if (Event.key.keysym.sym>=SDLK_a && Event.key.keysym.sym<=SDLK_z)
+			case SDL_EVENT_KEY_DOWN:
+				if (Event.key.key>=SDLK_a && Event.key.key<=SDLK_z)
 				{
 					// I'm assuming these constants are linearly increasing, hopefully they are
-					AppendCharacter(sInput, ((char)Event.key.keysym.sym - SDLK_a) + ((ModState & KMOD_SHIFT) ? 'A' : 'a'), nMaxLen);
+					AppendCharacter(sInput, ((char)Event.key.key - SDLK_a) + ((ModState & SDL_KMOD_SHIFT) ? 'A' : 'a'), nMaxLen);
 				}
-				else if (Event.key.keysym.sym>=SDLK_0 && Event.key.keysym.sym<=SDLK_9)
+				else if (Event.key.key>=SDLK_0 && Event.key.key<=SDLK_9)
 				{
 					const char* acShifted = ")!@#$%^&*(";
-					if (ModState & KMOD_SHIFT)
-						AppendCharacter(sInput, acShifted[(char)Event.key.keysym.sym - SDLK_0], nMaxLen);
+					if (ModState & SDL_KMOD_SHIFT)
+						AppendCharacter(sInput, acShifted[(char)Event.key.key - SDLK_0], nMaxLen);
 					else
-						AppendCharacter(sInput, ((char)Event.key.keysym.sym - SDLK_0) + '0', nMaxLen);
+						AppendCharacter(sInput, ((char)Event.key.key - SDLK_0) + '0', nMaxLen);
 				}
 				else
 				{
-					switch (Event.key.keysym.sym)
+					switch (Event.key.key)
 					{
 					case SDLK_SPACE:	AppendCharacter(sInput, ' ', nMaxLen); break;
 					case SDLK_PLUS:		AppendCharacter(sInput, '+', nMaxLen); break;
@@ -1015,7 +1018,7 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 					}
 				}
 				break;
-			case SDL_KEYUP:
+			case SDL_EVENT_KEY_UP:
 				break;
 #endif
 			}
@@ -1055,12 +1058,14 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 #else
 		#ifdef djALLOW_UNICODE_TEXT_ENTRY
 			extern djSprite* g_pFont2;
-			djImage* pImg = g_pFont2->GetImage();
-			std::string sText = sInput;
-			if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
-				sText += "|";//<- simple 'fake cursor' (vertical bar/pipe character)
-			GraphDrawStringUTF8( pVisBack, pImg, nXLeft - 2, 104, 8, 8, sText.c_str(), sText.length() );
-			//DrawStringUnicodeHelper(pVisBack, nXLeft - 2, 104, SDL_Color{ 255, 255, 255, 255 }, sText.c_str(), sText.length());
+			if (g_pFont2 && g_pFont2->IsLoaded()) {
+				djImage* pImg = g_pFont2->GetImage();
+				std::string sText = sInput;
+				if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
+					sText += "|";//<- simple 'fake cursor' (vertical bar/pipe character)
+				GraphDrawStringUTF8( pVisBack, pImg, nXLeft - 2, 104, 8, 8, sText.c_str(), sText.length() );
+				//DrawStringUnicodeHelper(pVisBack, nXLeft - 2, 104, SDL_Color{ 255, 255, 255, 255 }, sText.c_str(), sText.length());
+			}
 #else//ASCII:
 		GraphDrawString( pVisBack, g_pFont8x8, nXLeft-2, 104, (unsigned char*)sInput.c_str() );
 		if ((SDL_GetTicks() % 700) < 400) // Draw flashing cursor
@@ -1086,6 +1091,8 @@ bool djGetTextInput(std::string& sReturnString, int nMaxLen, unsigned int uPixel
 	sReturnString = sInput;
 	#ifdef djALLOW_UNICODE_TEXT_ENTRY
 	//SDL_EnableUNICODE(0);
+	if (window)
+		SDL_StartTextInput(window);
 	#endif
 
 	return bRet;

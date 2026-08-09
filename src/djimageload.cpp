@@ -6,18 +6,15 @@
 Copyright (C) 1998-2024 David Joffe
 */
 /*--------------------------------------------------------------------------*/
+#include "djimageload.h"
 #include "config.h"
 #include "djimage.h"
-#include "djimageload.h"
+#include <SDL3/SDL_endian.h>
 #include <string>
-#ifdef __OS2__
-#include <SDL/SDL_endian.h>
-#else
-#include <SDL_endian.h>
-#endif
+
 #ifdef djUSE_SDLIMAGE
 // Hm not 100% sure if we should best put here 'SDL2/SDL_image.h' or just 'SDL_image.h' and let makefiles etc. pass the folder in ..
-#include <SDL_image.h>
+#include <SDL3_image/SDL_image.h>
 #endif
 
 //-----------------------------------------
@@ -213,21 +210,22 @@ int djImageLoad::LoadImage(djImage* pImg, const char *szFilename)
         return -1;
     }
     // if small endian am i supposed to reverse the masks here? not sure ..
-    printf("CreateImage:%d %d %d  pitch=%d  rgba  %08x %08x %08x %08x\n", (int)surface->w, (int)surface->h, (int)surface->format->BitsPerPixel, (int)surface->pitch,
-        (int)surface->format->Rmask,
-        (int)surface->format->Gmask,
-        (int)surface->format->Bmask,
-        (int)surface->format->Amask);
-    pImg->CreateImage(surface->w, surface->h, surface->format->BitsPerPixel, surface->pitch, surface->pixels,
-        surface->format->Rmask,
-        surface->format->Gmask,
-        surface->format->Bmask,
-        surface->format->Amask
+    auto f = SDL_GetPixelFormatDetails(surface->format);
+    printf("CreateImage:%d %d %d  pitch=%d  rgba  %08x %08x %08x %08x\n", (int)surface->w, (int)surface->h, (int)f->bits_per_pixel, (int)surface->pitch,
+        (int)f->Rmask,
+        (int)f->Gmask,
+        (int)f->Bmask,
+        (int)f->Amask);
+    pImg->CreateImage(surface->w, surface->h, f->bits_per_pixel, surface->pitch, surface->pixels,
+        f->Rmask,
+        f->Gmask,
+        f->Bmask,
+        f->Amask
     );
     printf("CreateImage:DONE\n");
     
     // Clean up
-    SDL_FreeSurface(surface);
+    SDL_DestroySurface(surface);
     return 0;
 #else
     return -1;//unhandled format

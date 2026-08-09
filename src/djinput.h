@@ -9,11 +9,7 @@
 #ifndef _DJINPUT_H_
 #define _DJINPUT_H_
 /*--------------------------------------------------------------------------*/
-#ifdef __OS2__
-#include <SDL/SDL_events.h>
-#else
-#include <SDL_events.h>
-#endif
+#include <SDL3/SDL_events.h>
 
 #define DJKEY_MAX 256
 extern int g_iKeys[DJKEY_MAX];
