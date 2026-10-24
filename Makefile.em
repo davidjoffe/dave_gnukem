@@ -78,7 +78,7 @@ OBJFILES = src/main.o     src/graph.o   src/game.o         src/menu.o\
            src/sdl/djtime.o \
            src/sys_error.o src/sys_log.o src/m_misc.cpp
 
-FLAGS=-s WASM=1 -s USE_SDL_MIXER=1 --preload-file ./data -s ALLOW_MEMORY_GROWTH=1 --use-preload-plugins -s STB_IMAGE=1
+FLAGS=-s WASM=1 -s USE_SDL=2 -s USE_SDL_MIXER=2 --preload-file ./data -s ALLOW_MEMORY_GROWTH=1 --use-preload-plugins -s STB_IMAGE=1
 
 default: gnukem
 
